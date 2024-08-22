@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>DALL·E-2024-08-07-20.33.14.ico</ApplicationIcon>
+    <ApplicationIcon>FPExport.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="DALL·E-2024-08-07-20.33.14.ico" />
+    <Content Include="FPExport.ico" />
   </ItemGroup>
 
   <ItemGroup>
