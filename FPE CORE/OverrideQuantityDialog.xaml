@@ -1,4 +1,4 @@
-﻿<Window x:Class="WpfApp1.OverrideQuantityDialog"
+﻿<Window x:Class="FPECORE.OverrideQuantityDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Переопределить количество" Width="290" Height="130" MinWidth="290" MinHeight="130">

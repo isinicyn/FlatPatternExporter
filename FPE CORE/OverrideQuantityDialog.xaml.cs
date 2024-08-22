@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows;
 
-namespace WpfApp1
+namespace FPECORE
 {
     public partial class OverrideQuantityDialog : Window
     {

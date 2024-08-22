@@ -16,7 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
-namespace WpfApp1
+namespace FPECORE
 {
     public partial class MainWindow : Window
     {
