@@ -197,7 +197,7 @@
                                     </ComboBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Label Content="Допуск хорды (мм):" VerticalAlignment="Center"/>
+                                    <Label Content="Допуск (мм):" VerticalAlignment="Center"/>
                                     <TextBox x:Name="splineToleranceTextBox" Width="50" Text="0.01" VerticalContentAlignment="Center" IsEnabled="False" Height="20"/>
                                 </StackPanel>
                             </StackPanel>
@@ -214,9 +214,9 @@
                                         <ComboBoxItem Content="R12"/>
                                     </ComboBox>
                                 </StackPanel>                                
-                                <CheckBox x:Name="mergeProfilesIntoPolylineCheckBox" Content="Преобразовать внешние профили в полилинии" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="rebaseGeometryCheckBox" Content="Переместить геометрию в первую четверть" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="trimCenterlinesCheckBox" Content="Обрезать осевые линии" Margin="0,0,0,5"/>
+                                <CheckBox x:Name="mergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5"/>
+                                <CheckBox x:Name="rebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5"/>
+                                <CheckBox x:Name="trimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" Margin="0,0,0,5"/>
                                 <!-- Новый чекбокс -->
                             </StackPanel>
                         </Grid>
