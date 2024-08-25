@@ -213,8 +213,7 @@
                                         <ComboBoxItem Content="2000"/>
                                         <ComboBoxItem Content="R12"/>
                                     </ComboBox>
-                                </StackPanel>
-                                <CheckBox x:Name="advancedLegacyExportCheckBox" Content="Расширенный устаревший экспорт" Margin="0,0,0,5"/>
+                                </StackPanel>                                
                                 <CheckBox x:Name="mergeProfilesIntoPolylineCheckBox" Content="Преобразовать внешние профили в полилинии" Margin="0,0,0,5"/>
                                 <CheckBox x:Name="rebaseGeometryCheckBox" Content="Переместить геометрию в первую четверть" Margin="0,0,0,5"/>
                                 <CheckBox x:Name="trimCenterlinesCheckBox" Content="Обрезать осевые линии" Margin="0,0,0,5"/>

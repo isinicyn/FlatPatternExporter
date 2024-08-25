@@ -120,11 +120,6 @@ namespace FPECORE
                 sb.Append("&SimplifySplines=False");
             }
 
-            if (advancedLegacyExportCheckBox.IsChecked == true)
-            {
-                sb.Append("&AdvancedLegacyExport=True");
-            }
-
             if (mergeProfilesIntoPolylineCheckBox.IsChecked == true)
             {
                 sb.Append("&MergeProfilesIntoPolyline=True");
