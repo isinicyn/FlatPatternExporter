@@ -5,6 +5,8 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPECore", "FPECORE\FPECore.csproj", "{E915F09E-0800-4187-85A9-F479902D33B0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LayerSettings", "..\LayerSettings\LayerSettings\LayerSettings.csproj", "{21F5E159-B495-4E50-9A22-B5E5BD28948C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E915F09E-0800-4187-85A9-F479902D33B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E915F09E-0800-4187-85A9-F479902D33B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E915F09E-0800-4187-85A9-F479902D33B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21F5E159-B495-4E50-9A22-B5E5BD28948C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21F5E159-B495-4E50-9A22-B5E5BD28948C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21F5E159-B495-4E50-9A22-B5E5BD28948C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21F5E159-B495-4E50-9A22-B5E5BD28948C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
