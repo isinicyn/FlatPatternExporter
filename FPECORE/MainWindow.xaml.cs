@@ -169,7 +169,7 @@ namespace FPECORE
         {
             if (ThisApplication == null)
             {
-                System.Windows.MessageBox.Show("Inventor не запущен. Пожалуйста, запустите Inventor и попробуйте снова.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxHelper.ShowInventorNotRunningError();
                 return;
             }
 
@@ -178,7 +178,7 @@ namespace FPECORE
             Document? doc = ThisApplication.ActiveDocument as Document;
             if (doc == null)
             {
-                System.Windows.MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBoxHelper.ShowNoDocumentOpenWarning();
                 return;
             }
 
@@ -634,7 +634,7 @@ namespace FPECORE
             else
             {
                 progressLabel.Text = $"Статус: Завершено ({elapsedTime})";
-                System.Windows.MessageBox.Show($"Экспорт DXF завершен.\nВсего файлов обработано: {processedCount + skippedCount}\nПропущено (без разверток): {skippedCount}\nВсего экспортировано: {processedCount}\nВремя выполнения: {elapsedTime}", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBoxHelper.ShowExportCompletedInfo(processedCount, skippedCount, elapsedTime);
             }
         }
 
@@ -645,14 +645,14 @@ namespace FPECORE
 
             if (ThisApplication == null)
             {
-                System.Windows.MessageBox.Show("Inventor не запущен. Пожалуйста, запустите Inventor и попробуйте снова.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxHelper.ShowInventorNotRunningError();
                 return;
             }
 
             Document doc = ThisApplication.ActiveDocument as Document;
             if (doc == null)
             {
-                System.Windows.MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBoxHelper.ShowNoDocumentOpenWarning();
                 return;
             }
 
@@ -715,7 +715,7 @@ namespace FPECORE
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBoxHelper.ShowNotSheetMetalWarning();
                 }
             }
 
@@ -737,14 +737,14 @@ namespace FPECORE
             }
             if (ThisApplication == null)
             {
-                System.Windows.MessageBox.Show("Inventor не запущен. Пожалуйста, запустите Inventor и попробуйте снова.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBoxHelper.ShowInventorNotRunningError();
                 return;
             }
 
             Document? doc = ThisApplication.ActiveDocument as Document;
             if (doc == null)
             {
-                System.Windows.MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBoxHelper.ShowNoDocumentOpenWarning();
                 return;
             }
 
@@ -790,7 +790,7 @@ namespace FPECORE
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBoxHelper.ShowNotSheetMetalWarning();
                 }
             }
 
@@ -1364,4 +1364,52 @@ namespace FPECORE
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
+    public static class MessageBoxHelper
+    {
+        public static void ShowInventorNotRunningError()
+        {
+            System.Windows.MessageBox.Show("Inventor не запущен. Пожалуйста, запустите Inventor и попробуйте снова.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        public static void ShowNoDocumentOpenWarning()
+        {
+            System.Windows.MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        public static void ShowScanningCancelledInfo()
+        {
+            System.Windows.MessageBox.Show("Процесс сканирования был прерван.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        public static void ShowExportCancelledInfo()
+        {
+            System.Windows.MessageBox.Show("Процесс экспорта был прерван.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        public static void ShowNoFlatPatternWarning()
+        {
+            System.Windows.MessageBox.Show("Выбранные файлы не содержат разверток.", "Информация", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        public static void ShowPartNotFoundError(string partNumber)
+        {
+            System.Windows.MessageBox.Show($"Файл {partNumber} не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        public static void ShowExportCompletedInfo(int processedCount, int skippedCount, string elapsedTime)
+        {
+            System.Windows.MessageBox.Show($"Экспорт DXF завершен.\nВсего файлов обработано: {processedCount + skippedCount}\nПропущено (без разверток): {skippedCount}\nВсего экспортировано: {processedCount}\nВремя выполнения: {elapsedTime}", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        public static void ShowErrorMessage(string message)
+        {
+            System.Windows.MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        public static void ShowNotSheetMetalWarning()
+        {
+            System.Windows.MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
 }
