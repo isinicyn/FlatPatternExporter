@@ -955,7 +955,7 @@ namespace FPECORE
                         {
                             string options = null;
                             Dispatcher.Invoke(() => PrepareExportOptions(out options));
-                            string dxfOptions = $"FLAT PATTERN DXF?{options}&InteriorProfilesLayer=IV_INTERIOR_PROFILES&InvisibleLayers=IV_TANGENT;IV_BEND;IV_BEND_DOWN;IV_TOOL_CENTER_DOWN;IV_ARC_CENTERS;IV_FEATURE_PROFILES;IV_FEATURE_PROFILES_DOWN;IV_UNCONSUMED_SKETCHES;IV_ROLL_TANGENT;IV_ROLL";
+                            string dxfOptions = $"FLAT PATTERN DXF?{options}";
 
                             // Debugging output
                             System.Diagnostics.Debug.WriteLine($"DXF Options: {dxfOptions}");
