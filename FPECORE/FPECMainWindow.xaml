@@ -191,14 +191,14 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                     <Label Content="Тип замены:" VerticalAlignment="Center"/>
-                                    <ComboBox x:Name="splineReplacementComboBox" Width="90" VerticalContentAlignment="Center" IsEnabled="False" Height="20" Padding="5,0,5,0">
+                                    <ComboBox x:Name="splineReplacementComboBox" Width="65" VerticalContentAlignment="Center" IsEnabled="False" Height="20" Padding="5,0,5,0">
                                         <ComboBoxItem Content="Линии"/>
                                         <ComboBoxItem Content="Дуги"/>
                                     </ComboBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                     <Label Content="Допуск (мм):" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="splineToleranceTextBox" Width="50" Text="0.01" VerticalContentAlignment="Center" IsEnabled="False" Height="20"/>
+                                    <TextBox x:Name="splineToleranceTextBox" Width="65" Text="0.01" VerticalContentAlignment="Center" IsEnabled="False" Height="20"/>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Vertical" Margin="0,5,0,5">
