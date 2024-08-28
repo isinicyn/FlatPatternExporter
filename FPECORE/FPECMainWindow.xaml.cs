@@ -54,6 +54,21 @@ namespace FPECORE
             this.KeyUp += new System.Windows.Input.KeyEventHandler(MainWindow_KeyUp);            
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            // Закрытие всех дочерних окон
+            foreach (Window window in System.Windows.Application.Current.Windows)
+            {
+                if (window != this)
+                {
+                    window.Close();
+                }
+            }
+
+            // Если были созданы дополнительные потоки, убедитесь, что они завершены
+        }
 
         private void InitializeLayerSettings()
         {
