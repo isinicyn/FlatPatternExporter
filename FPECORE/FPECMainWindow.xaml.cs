@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using LayerSettingsApp;
 
 namespace FPECORE
 {
@@ -26,6 +27,9 @@ namespace FPECORE
         private Document? lastScannedDocument = null;
         private ObservableCollection<PartData> partsData = new ObservableCollection<PartData>();
         private int itemCounter = 1; // Инициализация счетчика пунктов
+        private LayerSettingControl control;
+
+        public ObservableCollection<LayerSetting> LayerSettings { get; set; }
 
         public MainWindow()
         {
@@ -35,10 +39,26 @@ namespace FPECORE
             multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true; // Установите начальное состояние множителя
             UpdateFileCountLabel(0);
             clearButton.IsEnabled = false; // Изначально кнопка "Очистить" неактивна
+            LayerSettings = new ObservableCollection<LayerSetting>();
+            InitializeLayerSettings();  // Вызов метода из LayerSettingsApp
+            DataContext = this; // Установка DataContext для привязки данных в XAML
+            // Создаем экземпляр MainWindow из LayerSettingsApp
+            var layerSettingsWindow = new LayerSettingsApp.MainWindow();
+
+            // Используем его как DataContext для текущего окна
+            DataContext = layerSettingsWindow;
+
 
             // Добавляем обработчики для отслеживания нажатия и отпускания клавиши Ctrl
             this.KeyDown += new System.Windows.Input.KeyEventHandler(MainWindow_KeyDown);
             this.KeyUp += new System.Windows.Input.KeyEventHandler(MainWindow_KeyUp);            
+        }
+
+
+        private void InitializeLayerSettings()
+        {
+            var settingsWindow = new LayerSettingsApp.MainWindow();
+            LayerSettings = settingsWindow.LayerSettings;  // Используем настройку слоев из LayerSettings
         }
 
         private void InitializeInventor()
@@ -158,7 +178,6 @@ namespace FPECORE
             }
             partsDataGrid.Items.Refresh();
         }
-
 
         private async void ScanButton_Click(object sender, RoutedEventArgs e)
         {
@@ -955,6 +974,44 @@ namespace FPECORE
                         {
                             string options = null;
                             Dispatcher.Invoke(() => PrepareExportOptions(out options));
+
+                            // Интеграция настроек слоев
+                            StringBuilder layerOptionsBuilder = new StringBuilder();
+                            StringBuilder invisibleLayersBuilder = new StringBuilder();
+
+                            foreach (var layer in this.LayerSettings) // Используем настройки слоев
+                            {
+                                if (layer.HasVisibilityOption && !layer.IsVisible)
+                                {
+                                    invisibleLayersBuilder.Append($"{layer.LayerName};");
+                                    continue;
+                                }
+
+                                if (!string.IsNullOrWhiteSpace(layer.CustomName))
+                                {
+                                    layerOptionsBuilder.Append($"&{layer.DisplayName}={layer.CustomName}");
+                                }
+
+                                if (layer.SelectedLineType != "Default")
+                                {
+                                    layerOptionsBuilder.Append($"&{layer.DisplayName}LineType={LayerSettingsApp.MainWindow.GetLineTypeValue(layer.SelectedLineType)}");
+                                }
+
+                                if (layer.SelectedColor != "White")
+                                {
+                                    layerOptionsBuilder.Append($"&{layer.DisplayName}Color={LayerSettingsApp.MainWindow.GetColorValue(layer.SelectedColor)}");
+                                }
+                            }
+
+                            if (invisibleLayersBuilder.Length > 0)
+                            {
+                                invisibleLayersBuilder.Length -= 1; // Убираем последний символ ";"
+                                layerOptionsBuilder.Append($"&InvisibleLayers={invisibleLayersBuilder}");
+                            }
+
+                            // Объединяем общие параметры и параметры слоев
+                            options += layerOptionsBuilder.ToString();
+
                             string dxfOptions = $"FLAT PATTERN DXF?{options}";
 
                             // Debugging output
