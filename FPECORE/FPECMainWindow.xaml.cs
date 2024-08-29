@@ -27,31 +27,34 @@ namespace FPECORE
         private Document? lastScannedDocument = null;
         private ObservableCollection<PartData> partsData = new ObservableCollection<PartData>();
         private int itemCounter = 1; // Инициализация счетчика пунктов
-        private LayerSettingControl control;
 
         public ObservableCollection<LayerSetting> LayerSettings { get; set; }
+        public ObservableCollection<string> AvailableColors { get; set; }
+        public ObservableCollection<string> LineTypes { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
             InitializeInventor();
             partsDataGrid.ItemsSource = partsData;
-            multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true; // Установите начальное состояние множителя
+            multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true;
             UpdateFileCountLabel(0);
-            clearButton.IsEnabled = false; // Изначально кнопка "Очистить" неактивна
-            LayerSettings = new ObservableCollection<LayerSetting>();
-            InitializeLayerSettings();  // Вызов метода из LayerSettingsApp
-            DataContext = this; // Установка DataContext для привязки данных в XAML
+            clearButton.IsEnabled = false;
+
             // Создаем экземпляр MainWindow из LayerSettingsApp
             var layerSettingsWindow = new LayerSettingsApp.MainWindow();
 
-            // Используем его как DataContext для текущего окна
-            DataContext = layerSettingsWindow;
+            // Используем его данные для настройки LayerSettings
+            LayerSettings = layerSettingsWindow.LayerSettings;
+            AvailableColors = layerSettingsWindow.AvailableColors;
+            LineTypes = layerSettingsWindow.LineTypes;
 
+            // Устанавливаем DataContext для текущего окна, объединяя данные из LayerSettingsWindow и других источников
+            DataContext = this;
 
             // Добавляем обработчики для отслеживания нажатия и отпускания клавиши Ctrl
             this.KeyDown += new System.Windows.Input.KeyEventHandler(MainWindow_KeyDown);
-            this.KeyUp += new System.Windows.Input.KeyEventHandler(MainWindow_KeyUp);            
+            this.KeyUp += new System.Windows.Input.KeyEventHandler(MainWindow_KeyUp);
         }
 
         protected override void OnClosed(EventArgs e)

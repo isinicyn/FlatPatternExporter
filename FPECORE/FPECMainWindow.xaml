@@ -261,6 +261,26 @@
                         <local:LayerSettingControl x:Name="AltRepFrontLayerControl" DataContext="{Binding LayerSettings[9]}" Pseudonym="AltRepFront"/>
                         <local:LayerSettingControl x:Name="AltRepBackLayerControl" DataContext="{Binding LayerSettings[10]}" Pseudonym="AltRepBack"/>
                     </StackPanel>
+                    <Separator Background="#FF969595" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Width="185" Grid.ColumnSpan="2" Margin="0,5,0,20">
+                        <Separator.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="90"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Separator.RenderTransform>
+                    </Separator>
+                    <Separator Background="#FF969595" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Width="185" Grid.ColumnSpan="2" Margin="0,5,0,20" Grid.Column="1">
+                        <Separator.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="90"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Separator.RenderTransform>
+                    </Separator>
                 </Grid>
             </TabItem>
             <TabItem Header="Имя файла"/>
