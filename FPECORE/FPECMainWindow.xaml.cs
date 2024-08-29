@@ -72,13 +72,7 @@ namespace FPECORE
 
             // Если были созданы дополнительные потоки, убедитесь, что они завершены
         }
-
-        private void InitializeLayerSettings()
-        {
-            var settingsWindow = new LayerSettingsApp.MainWindow();
-            LayerSettings = settingsWindow.LayerSettings;  // Используем настройку слоев из LayerSettings
-        }
-
+        
         private void InitializeInventor()
         {
             try
