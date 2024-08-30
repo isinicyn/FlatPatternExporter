@@ -285,5 +285,6 @@
             </TabItem>
             <TabItem Header="Имя файла"/>
         </TabControl>
+        <Button x:Name="addCustomIPropertyButton" Content="Добавить Custom IProperty" Click="AddCustomIPropertyButton_Click" Width="200" Height="30" Margin="10"/>
     </Grid>
 </Window>

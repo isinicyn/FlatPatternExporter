@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using LayerSettingsApp;
+using System.Windows.Data;
 
 namespace FPECORE
 {
@@ -31,6 +32,8 @@ namespace FPECORE
         public ObservableCollection<LayerSetting> LayerSettings { get; set; }
         public ObservableCollection<string> AvailableColors { get; set; }
         public ObservableCollection<string> LineTypes { get; set; }
+
+        private List<string> customPropertiesList = new List<string>();
 
         public MainWindow()
         {
@@ -345,7 +348,7 @@ namespace FPECORE
                 if (partDoc == null) return null;
             }
 
-            string modelState = partDoc.ModelStateName;  // Получаем состояние модели
+            string modelState = partDoc.ModelStateName;
             var previewImage = await GetThumbnailAsync(partDoc);
 
             var smCompDef = partDoc.ComponentDefinition as SheetMetalComponentDefinition;
@@ -359,12 +362,18 @@ namespace FPECORE
                 Description = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description"),
                 Material = GetMaterialForPart(partDoc),
                 Thickness = GetThicknessForPart(partDoc).ToString("F1") + " мм",
-                OriginalQuantity = quantity, // Устанавливаем исходное количество
+                OriginalQuantity = quantity,
                 Quantity = quantity,
-                QuantityColor = System.Windows.Media.Brushes.Black, // Устанавливаем исходный цвет
+                QuantityColor = System.Windows.Media.Brushes.Black,
                 Preview = previewImage,
                 FlatPatternColor = hasFlatPattern ? System.Windows.Media.Brushes.Green : System.Windows.Media.Brushes.Red
             };
+
+            // Заполнение Custom iProperty для текущей детали
+            foreach (var customPropertyName in customPropertiesList)
+            {
+                partData.AddCustomProperty(customPropertyName, GetCustomIPropertyValue(partNumber, customPropertyName));
+            }
 
             return partData;
         }
@@ -1443,6 +1452,77 @@ namespace FPECORE
         {
 
         }
+        private void AddCustomIPropertyButton_Click(object sender, RoutedEventArgs e)
+        {
+            var inputDialog = new CustomIPropertyDialog();
+            if (inputDialog.ShowDialog() == true)
+            {
+                string customPropertyName = inputDialog.CustomPropertyName;
+
+                if (!customPropertiesList.Contains(customPropertyName))
+                {
+                    customPropertiesList.Add(customPropertyName);
+
+                    // Добавляем новую колонку в DataGrid
+                    AddCustomIPropertyColumn(customPropertyName);
+
+                    // Заполняем значения Custom iProperty для уже существующих деталей
+                    foreach (var partData in partsData)
+                    {
+                        partData.AddCustomProperty(customPropertyName, GetCustomIPropertyValue(partData.PartNumber, customPropertyName));
+                    }
+
+                    partsDataGrid.Items.Refresh();
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show($"Свойство {customPropertyName} уже добавлено.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+        private void AddCustomIPropertyColumn(string propertyName)
+        {
+            var column = new DataGridTextColumn
+            {
+                Header = propertyName,
+                Binding = new System.Windows.Data.Binding($"CustomProperties[{propertyName}]")
+                {
+                    Mode = BindingMode.OneWay // Устанавливаем режим привязки
+                },
+                Width = DataGridLength.Auto
+            };
+
+            partsDataGrid.Columns.Add(column);
+        }
+        private string GetCustomIPropertyValue(string partNumber, string propertyName)
+        {
+            try
+            {
+                var partDoc = OpenPartDocument(partNumber);
+                if (partDoc != null)
+                {
+                    var propertySet = partDoc.PropertySets["Inventor User Defined Properties"];
+
+                    // Проверяем, существует ли свойство в данном PropertySet
+                    if (propertySet[propertyName] is Property property)
+                    {
+                        return property.Value?.ToString() ?? string.Empty;
+                    }
+                }
+            }
+            catch (System.Runtime.InteropServices.COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
+            {
+                // Ловим ошибку и возвращаем пустую строку
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                MessageBoxHelper.ShowErrorMessage($"Ошибка при получении свойства {propertyName}: {ex.Message}");
+            }
+
+            return string.Empty;
+        }
+
     }
 
     public class PartData : INotifyPropertyChanged
@@ -1460,6 +1540,16 @@ namespace FPECORE
                 OnPropertyChanged();
             }
         }
+        private Dictionary<string, string> customProperties = new Dictionary<string, string>();
+        public Dictionary<string, string> CustomProperties
+        {
+            get => customProperties;
+            set
+            {
+                customProperties = value;
+                OnPropertyChanged();
+            }
+        }
         public string PartNumber { get; set; }
         public string ModelState { get; set; }
         public string Description { get; set; }
@@ -1474,6 +1564,18 @@ namespace FPECORE
                 quantity = value;
                 OnPropertyChanged();
             }
+        }
+        public void AddCustomProperty(string propertyName, string propertyValue)
+        {
+            if (customProperties.ContainsKey(propertyName))
+            {
+                customProperties[propertyName] = propertyValue;
+            }
+            else
+            {
+                customProperties.Add(propertyName, propertyValue);
+            }
+            OnPropertyChanged(nameof(CustomProperties));
         }
         public BitmapImage Preview { get; set; }
         public System.Windows.Media.Brush FlatPatternColor { get; set; }
