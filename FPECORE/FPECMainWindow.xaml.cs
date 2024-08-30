@@ -17,6 +17,8 @@ using System.Windows.Media.Imaging;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using LayerSettingsApp;
 using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Controls.Primitives;
 
 namespace FPECORE
 {
@@ -28,6 +30,10 @@ namespace FPECORE
         private Document? lastScannedDocument = null;
         private ObservableCollection<PartData> partsData = new ObservableCollection<PartData>();
         private int itemCounter = 1; // Инициализация счетчика пунктов
+        private AdornerLayer _adornerLayer;
+        private HeaderAdorner _headerAdorner;
+        private DataGridColumn _reorderingColumn;
+        private bool _isColumnDraggedOutside = false;
 
         public ObservableCollection<LayerSetting> LayerSettings { get; set; }
         public ObservableCollection<string> AvailableColors { get; set; }
@@ -43,6 +49,8 @@ namespace FPECORE
             multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true;
             UpdateFileCountLabel(0);
             clearButton.IsEnabled = false;
+            partsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
+            partsDataGrid.PreviewMouseDown += PartsDataGrid_PreviewMouseDown;
             partsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
             partsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
             partsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
@@ -64,64 +72,179 @@ namespace FPECORE
             this.KeyUp += new System.Windows.Input.KeyEventHandler(MainWindow_KeyUp);
         }
 
-        private DataGridColumn _reorderingColumn;
-        private bool _isColumnDraggedOutside = false;
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            // Закрытие всех дочерних окон
+            foreach (Window window in System.Windows.Application.Current.Windows)
+            {
+                if (window != this)
+                {
+                    window.Close();
+                }
+            }
+
+            // Если были созданы дополнительные потоки, убедитесь, что они завершены
+        }
 
         private void PartsDataGrid_ColumnReordering(object sender, DataGridColumnReorderingEventArgs e)
         {
-            // Сохраняем колонку, которую перетаскивают
             _reorderingColumn = e.Column;
-            _isColumnDraggedOutside = false; // Сбрасываем флаг при начале перетаскивания
-        }
+            _isColumnDraggedOutside = false;
 
+            // Создаем фантомный заголовок с фиксированным размером
+            var header = new TextBlock
+            {
+                Text = _reorderingColumn.Header.ToString(),
+                Background = System.Windows.Media.Brushes.LightGray,
+                FontSize = 12, // Установите желаемый размер шрифта
+                Padding = new Thickness(5),
+                Opacity = 0.7, // Полупрозрачность
+                TextAlignment = TextAlignment.Center,
+                Width = _reorderingColumn.ActualWidth,
+                Height = 30,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                IsHitTestVisible = false
+            };
+
+            // Создаем и добавляем Adorner
+            _adornerLayer = AdornerLayer.GetAdornerLayer(partsDataGrid);
+            _headerAdorner = new HeaderAdorner(partsDataGrid, header);
+            _adornerLayer.Add(_headerAdorner);
+
+            // Изначально размещаем Adorner там, где находится заголовок
+            UpdateAdornerPosition(e);
+        }
+        private void PartsDataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                // Определяем, кликнул ли пользователь на заголовке колонки
+                var header = e.OriginalSource as FrameworkElement;
+                if (header?.Parent is DataGridColumnHeader columnHeader)
+                {
+                    // Начинаем перетаскивание
+                    StartColumnReordering(columnHeader.Column);
+                }
+            }
+        }
+        private void StartColumnReordering(DataGridColumn column)
+        {
+            _reorderingColumn = column;
+            _isColumnDraggedOutside = false;
+
+            // Создаем фантомный заголовок с фиксированным размером
+            var header = new TextBlock
+            {
+                Text = _reorderingColumn.Header.ToString(),
+                Background = System.Windows.Media.Brushes.LightGray,
+                FontSize = 12, // Установите желаемый размер шрифта
+                Padding = new Thickness(5),
+                Opacity = 0.7, // Полупрозрачность
+                TextAlignment = TextAlignment.Center,
+                Width = _reorderingColumn.ActualWidth,
+                Height = 30,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                IsHitTestVisible = false
+            };
+
+            // Создаем и добавляем Adorner
+            _adornerLayer = AdornerLayer.GetAdornerLayer(partsDataGrid);
+            _headerAdorner = new HeaderAdorner(partsDataGrid, header);
+            _adornerLayer.Add(_headerAdorner);
+
+            // Изначально размещаем Adorner там, где находится заголовок
+            var position = Mouse.GetPosition(partsDataGrid);
+            _headerAdorner.RenderTransform = new TranslateTransform(
+                position.X - _headerAdorner.DesiredSize.Width / 2,
+                position.Y - _headerAdorner.DesiredSize.Height / 2
+            );
+        }
         private void PartsDataGrid_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            if (_reorderingColumn == null)
+            if (_headerAdorner == null || _reorderingColumn == null)
                 return;
 
-            System.Windows.Point currentMousePosition = e.GetPosition(partsDataGrid);
+            // Обновляем позицию Adorner
+            UpdateAdornerPosition(null);
 
-            // Проверяем, если мышь вышла за правую границу DataGrid
-            if (currentMousePosition.X > partsDataGrid.ActualWidth || currentMousePosition.Y < 0 || currentMousePosition.Y > partsDataGrid.ActualHeight)
+            // Получаем текущую позицию мыши относительно DataGrid
+            var position = e.GetPosition(partsDataGrid);
+
+            // Проверяем, если мышь вышла за границы DataGrid
+            if (position.X > partsDataGrid.ActualWidth || position.Y < 0 || position.Y > partsDataGrid.ActualHeight)
             {
-                _isColumnDraggedOutside = true; // Устанавливаем флаг, если колонка перемещена за пределы
+                _isColumnDraggedOutside = true;
+                SetAdornerColor(System.Windows.Media.Brushes.Red); // Меняем цвет на красный
             }
             else
             {
-                _isColumnDraggedOutside = false; // Сбрасываем флаг, если вернулись внутрь границ DataGrid
+                _isColumnDraggedOutside = false;
+                SetAdornerColor(System.Windows.Media.Brushes.LightGray); // Возвращаем исходный цвет
+            }
+        }
+        private void SetAdornerColor(System.Windows.Media.Brush color)
+        {
+            if (_headerAdorner != null && _headerAdorner.Child is TextBlock textBlock)
+            {
+                textBlock.Background = color;
             }
         }
         private void PartsDataGrid_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            // Убираем Adorner
+            if (_adornerLayer != null && _headerAdorner != null)
+            {
+                _adornerLayer.Remove(_headerAdorner);
+                _headerAdorner = null;
+            }
+
             if (_reorderingColumn != null && _isColumnDraggedOutside)
             {
-                // Получаем имя колонки
                 string columnName = _reorderingColumn.Header.ToString();
 
-                // Удаляем колонку из DataGrid
                 partsDataGrid.Columns.Remove(_reorderingColumn);
 
-                // Удаляем соответствующее свойство из PartData
                 foreach (var partData in partsData)
                 {
                     partData.RemoveCustomProperty(columnName);
                 }
 
-                // Обновляем DataGrid
                 partsDataGrid.Items.Refresh();
             }
 
-            // Очищаем переменные, так как перетаскивание завершено
             _reorderingColumn = null;
             _isColumnDraggedOutside = false;
         }
         private void PartsDataGrid_ColumnReordered(object sender, DataGridColumnEventArgs e)
         {
-            // Очищаем переменные после завершения перетаскивания
             _reorderingColumn = null;
             _isColumnDraggedOutside = false;
-        }
 
+            // Убираем Adorner
+            if (_adornerLayer != null && _headerAdorner != null)
+            {
+                _adornerLayer.Remove(_headerAdorner);
+                _headerAdorner = null;
+            }
+        }
+        private void UpdateAdornerPosition(DataGridColumnReorderingEventArgs e)
+        {
+            if (_headerAdorner == null)
+                return;
+
+            // Получаем текущую позицию мыши относительно родителя DataGrid
+            var position = Mouse.GetPosition(_adornerLayer);
+
+            // Применяем трансформацию для перемещения Adorner
+            _headerAdorner.RenderTransform = new TranslateTransform(
+                position.X - (_headerAdorner.RenderSize.Width / 2),
+                position.Y - (_headerAdorner.RenderSize.Height / 2)
+            );
+        }
         private void InitializeInventor()
         {
             try
@@ -479,7 +602,6 @@ namespace FPECORE
                 return null;
             }
         }
-
         private string GetModelStateName(PartDocument partDoc)
         {
             try
@@ -1662,6 +1784,37 @@ namespace FPECORE
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+    }
+    public class HeaderAdorner : Adorner
+    {
+        private readonly VisualCollection _visuals;
+        private readonly UIElement _child;
+
+        public HeaderAdorner(UIElement adornedElement, UIElement header)
+            : base(adornedElement)
+        {
+            _visuals = new VisualCollection(this);
+            _child = header;
+            _visuals.Add(_child);
+
+            IsHitTestVisible = false;
+            Opacity = 0.5;  // Полупрозрачность
+        }
+
+        public UIElement Child => _child;
+
+        protected override System.Windows.Size ArrangeOverride(System.Windows.Size finalSize)
+        {
+            _child.Arrange(new Rect(finalSize));
+            return finalSize;
+        }
+
+        protected override Visual GetVisualChild(int index)
+        {
+            return _visuals[index];
+        }
+
+        protected override int VisualChildrenCount => _visuals.Count;
     }
     public static class MessageBoxHelper
     {
