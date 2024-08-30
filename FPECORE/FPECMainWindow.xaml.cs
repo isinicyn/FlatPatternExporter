@@ -43,6 +43,10 @@ namespace FPECORE
             multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true;
             UpdateFileCountLabel(0);
             clearButton.IsEnabled = false;
+            partsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
+            partsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
+            partsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
+            partsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
 
             // Создаем экземпляр MainWindow из LayerSettingsApp
             var layerSettingsWindow = new LayerSettingsApp.MainWindow();
@@ -60,22 +64,64 @@ namespace FPECORE
             this.KeyUp += new System.Windows.Input.KeyEventHandler(MainWindow_KeyUp);
         }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
+        private DataGridColumn _reorderingColumn;
+        private bool _isColumnDraggedOutside = false;
 
-            // Закрытие всех дочерних окон
-            foreach (Window window in System.Windows.Application.Current.Windows)
+        private void PartsDataGrid_ColumnReordering(object sender, DataGridColumnReorderingEventArgs e)
+        {
+            // Сохраняем колонку, которую перетаскивают
+            _reorderingColumn = e.Column;
+            _isColumnDraggedOutside = false; // Сбрасываем флаг при начале перетаскивания
+        }
+
+        private void PartsDataGrid_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (_reorderingColumn == null)
+                return;
+
+            System.Windows.Point currentMousePosition = e.GetPosition(partsDataGrid);
+
+            // Проверяем, если мышь вышла за правую границу DataGrid
+            if (currentMousePosition.X > partsDataGrid.ActualWidth || currentMousePosition.Y < 0 || currentMousePosition.Y > partsDataGrid.ActualHeight)
             {
-                if (window != this)
+                _isColumnDraggedOutside = true; // Устанавливаем флаг, если колонка перемещена за пределы
+            }
+            else
+            {
+                _isColumnDraggedOutside = false; // Сбрасываем флаг, если вернулись внутрь границ DataGrid
+            }
+        }
+        private void PartsDataGrid_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_reorderingColumn != null && _isColumnDraggedOutside)
+            {
+                // Получаем имя колонки
+                string columnName = _reorderingColumn.Header.ToString();
+
+                // Удаляем колонку из DataGrid
+                partsDataGrid.Columns.Remove(_reorderingColumn);
+
+                // Удаляем соответствующее свойство из PartData
+                foreach (var partData in partsData)
                 {
-                    window.Close();
+                    partData.RemoveCustomProperty(columnName);
                 }
+
+                // Обновляем DataGrid
+                partsDataGrid.Items.Refresh();
             }
 
-            // Если были созданы дополнительные потоки, убедитесь, что они завершены
+            // Очищаем переменные, так как перетаскивание завершено
+            _reorderingColumn = null;
+            _isColumnDraggedOutside = false;
         }
-        
+        private void PartsDataGrid_ColumnReordered(object sender, DataGridColumnEventArgs e)
+        {
+            // Очищаем переменные после завершения перетаскивания
+            _reorderingColumn = null;
+            _isColumnDraggedOutside = false;
+        }
+
         private void InitializeInventor()
         {
             try
@@ -112,6 +158,16 @@ namespace FPECORE
                 isCtrlPressed = false;
                 exportButton.IsEnabled = partsData.Count > 0; // Восстанавливаем исходное состояние кнопки
             }
+        }
+
+        private double GetColumnStartX(DataGrid dataGrid, int columnIndex)
+        {
+            double startX = 0;
+            for (int i = 0; i < columnIndex; i++)
+            {
+                startX += dataGrid.Columns[i].ActualWidth;
+            }
+            return startX;
         }
 
         private void EnableSplineReplacementCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
@@ -1589,6 +1645,15 @@ namespace FPECORE
                 OnPropertyChanged();
             }
         }
+        public void RemoveCustomProperty(string propertyName)
+        {
+            if (customProperties.ContainsKey(propertyName))
+            {
+                customProperties.Remove(propertyName);
+                OnPropertyChanged(nameof(CustomProperties));
+            }
+        }
+
         public bool IsOverridden { get; set; } = false;
         public BitmapImage DxfPreview { get; set; }
 

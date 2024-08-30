@@ -36,6 +36,15 @@
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                 </Style>
             </DataGrid.Resources>
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Style.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#FFC3C3C3"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="!" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
