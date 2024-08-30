@@ -1029,6 +1029,56 @@ namespace FPECORE
                             // Debugging output
                             System.Diagnostics.Debug.WriteLine($"DXF Options: {dxfOptions}");
 
+                            // Создаем файл, если он не существует
+                            if (!System.IO.File.Exists(filePath))
+                            {
+                                System.IO.File.Create(filePath).Close();
+                            }
+
+                            // Проверка на занятость файла
+                            if (IsFileLocked(filePath))
+                            {
+                                var result = System.Windows.MessageBox.Show(
+                                    $"Файл {filePath} занят другим приложением. Прервать операцию?",
+                                    "Предупреждение",
+                                    MessageBoxButton.YesNo,
+                                    MessageBoxImage.Warning,
+                                    MessageBoxResult.No // Устанавливаем "No" как значение по умолчанию
+                                );
+
+                                if (result == MessageBoxResult.Yes)
+                                {
+                                    isCancelled = true; // Прерываем операцию
+                                    break;
+                                }
+                                else
+                                {
+                                    while (IsFileLocked(filePath))
+                                    {
+                                        var waitResult = System.Windows.MessageBox.Show(
+                                            "Ожидание разблокировки файла. Возможно файл открыт в программе просмотра. Закройте файл и нажмите OK.",
+                                            "Информация",
+                                            MessageBoxButton.OKCancel,
+                                            MessageBoxImage.Information,
+                                            MessageBoxResult.Cancel // Устанавливаем "Cancel" как значение по умолчанию
+                                        );
+
+                                        if (waitResult == MessageBoxResult.Cancel)
+                                        {
+                                            isCancelled = true; // Прерываем операцию
+                                            break;
+                                        }
+
+                                        Thread.Sleep(1000); // Ожидание 1 секунды перед повторной проверкой
+                                    }
+
+                                    if (isCancelled)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+
                             oDataIO.WriteDataToFile(dxfOptions, filePath);
                             exportSuccess = true;
                         }
@@ -1085,6 +1135,24 @@ namespace FPECORE
                 progressBar.Value = progressBar.Maximum; // Установка значения 100% по завершению
             });
         }
+
+        private bool IsFileLocked(string filePath)
+        {
+            try
+            {
+                using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                {
+                    stream.Close();
+                }
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private async Task ExportDXFFiles(Dictionary<string, int> sheetMetalParts, string targetDir, int multiplier, Stopwatch stopwatch)
         {
             int processedCount = 0;
