@@ -178,12 +178,12 @@ namespace FPECORE
             if (position.X > partsDataGrid.ActualWidth || position.Y < 0 || position.Y > partsDataGrid.ActualHeight)
             {
                 _isColumnDraggedOutside = true;
-                SetAdornerColor(System.Windows.Media.Brushes.Red); // Меняем цвет на красный
+                SetAdornerColor(System.Windows.Media.Brushes.Red); // Меняем цвет на красный и добавляем надпись "УДАЛИТЬ"
             }
             else
             {
                 _isColumnDraggedOutside = false;
-                SetAdornerColor(System.Windows.Media.Brushes.LightGray); // Возвращаем исходный цвет
+                SetAdornerColor(System.Windows.Media.Brushes.LightGray); // Возвращаем исходный цвет и удаляем надпись "УДАЛИТЬ"
             }
         }
         private void SetAdornerColor(System.Windows.Media.Brush color)
@@ -191,6 +191,30 @@ namespace FPECORE
             if (_headerAdorner != null && _headerAdorner.Child is TextBlock textBlock)
             {
                 textBlock.Background = color;
+
+                if (color == System.Windows.Media.Brushes.Red)
+                {
+                    textBlock.Text = $"{_reorderingColumn.Header}\n✖";
+                    textBlock.Foreground = System.Windows.Media.Brushes.White; // Белый текст на красном фоне
+                    textBlock.FontWeight = FontWeights.Bold; // Жирный шрифт для улучшенной видимости
+                    textBlock.Padding = new Thickness(5); // Дополнительное внутреннее пространство
+                    textBlock.TextAlignment = TextAlignment.Center; // Центрирование текста
+                    textBlock.VerticalAlignment = VerticalAlignment.Center;
+                    textBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+                }
+                else
+                {
+                    textBlock.Text = _reorderingColumn.Header.ToString();
+                    textBlock.Foreground = System.Windows.Media.Brushes.Black; // Черный текст на сером фоне
+                    textBlock.FontWeight = FontWeights.Normal;
+                    textBlock.Padding = new Thickness(5);
+                }
+
+                // Убираем фиксированные размеры и устанавливаем авторазмеры
+                textBlock.Width = Double.NaN;
+                textBlock.Height = Double.NaN;
+                textBlock.Measure(new System.Windows.Size(Double.PositiveInfinity, Double.PositiveInfinity));
+                textBlock.Arrange(new Rect(textBlock.DesiredSize));
             }
         }
         private void PartsDataGrid_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -242,7 +266,7 @@ namespace FPECORE
             // Применяем трансформацию для перемещения Adorner
             _headerAdorner.RenderTransform = new TranslateTransform(
                 position.X - (_headerAdorner.RenderSize.Width / 2),
-                position.Y - (_headerAdorner.RenderSize.Height / 2)
+                position.Y - (_headerAdorner.RenderSize.Height / 1.8)
             );
         }
         private void InitializeInventor()
@@ -1798,7 +1822,7 @@ namespace FPECORE
             _visuals.Add(_child);
 
             IsHitTestVisible = false;
-            Opacity = 0.5;  // Полупрозрачность
+            Opacity = 0.8;  // Полупрозрачность
         }
 
         public UIElement Child => _child;
