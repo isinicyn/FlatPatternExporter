@@ -36,8 +36,27 @@
                 </Button>
             </Grid>
         </StackPanel>
-        <DataGrid x:Name="partsDataGrid" AutoGenerateColumns="False" Margin="10,0,10,10" IsReadOnly="True" CanUserAddRows="False" Grid.Row="2" RowHeight="50" GridLinesVisibility="All" HorizontalGridLinesBrush="Gray" VerticalGridLinesBrush="Gray"
-          ContextMenuOpening="partsDataGrid_ContextMenuOpening" SelectionChanged="partsDataGrid_SelectionChanged" Background="White" Height="400" VerticalAlignment="Top">
+        <DataGrid x:Name="partsDataGrid"
+          AutoGenerateColumns="False"
+          Margin="10,0,10,10"
+          IsReadOnly="True"
+          CanUserAddRows="False"
+          Grid.Row="2"
+          RowHeight="50"
+          GridLinesVisibility="None"
+          Background="White"
+          VerticalAlignment="Top"
+          BorderBrush="#D6D6D6"
+          BorderThickness="1"
+          HorizontalGridLinesBrush="#EAEAEA"
+          VerticalGridLinesBrush="#EAEAEA"
+          SelectionMode="Extended"
+          SelectionUnit="FullRow"
+          AlternatingRowBackground="#F5F5F5"
+          RowHeaderWidth="0"
+          RowBackground="White">
+
+            <!-- Контекстное меню -->
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Экспортировать выбранные DXF" Click="ExportSelectedDXF_Click"/>
@@ -51,102 +70,162 @@
                     <MenuItem Header="Очистить список" Click="ClearList_Click"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
+
             <DataGrid.Resources>
                 <!-- Стиль для заголовков столбцов -->
                 <Style TargetType="DataGridColumnHeader">
-                    <Setter Property="Padding" Value="10,5,10,5"/>
+                    <Setter Property="Background" Value="#F2F2F2"/>
+                    <Setter Property="Foreground" Value="#333333"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Padding" Value="10,5"/>
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="BorderBrush" Value="#FFE0DDDD"/>
+                    <Setter Property="BorderThickness" Value="0,0,1,0"/>
                 </Style>
+
+                <!-- Стиль для заголовка строки (кнопка выделения всей строки) -->
+                <Style TargetType="DataGridRowHeader">
+                    <Setter Property="Background" Value="#F2F2F2"/>
+                    <Setter Property="BorderBrush" Value="#FFE0DDDD"/>
+                    <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                    <Setter Property="Width" Value="15"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="DataGridRowHeader">
+                                <Grid>
+                                    <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+
                 <!-- Стиль для ячеек строк -->
                 <Style TargetType="DataGridCell">
-                    <Setter Property="Padding" Value="5,2,5,2"/>
-                    <!-- Отступы для содержимого ячеек -->
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="BorderBrush" Value="#EAEAEA"/>
+                    <Setter Property="BorderThickness" Value="0,0,1,1"/>
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Foreground" Value="#333333"/>
+                    <!-- Удалено свойство Background -->
                 </Style>
-                <!-- Стиль для текстовых блоков внутри ячеек -->
+
+                <!-- Стиль для текста внутри ячеек -->
                 <Style TargetType="TextBlock">
-                    <Setter Property="Padding" Value="5,2,5,2"/>
-                    <!-- Отступы для текста внутри ячеек -->
+                    <Setter Property="Padding" Value="5,2"/>
                     <Setter Property="HorizontalAlignment" Value="Center"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Foreground" Value="#333333"/>
                 </Style>
             </DataGrid.Resources>
+
             <DataGrid.Columns>
+                <!-- Колонка с флажком наличия развертки -->
                 <DataGridTemplateColumn Header="✅" Width="Auto" IsReadOnly="False" CanUserReorder="False" CanUserResize="False">
-                    <!-- Индивидуальный стиль для заголовка без отступов -->
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="ToolTip" Value="Проверка наличия развертки у детали"/>
-                            <Setter Property="Padding" Value="0"/>
-                            <!-- Устанавливаем отступы в 0 -->
+                            <Setter Property="Padding" Value="10,5"/>
                             <Setter Property="HorizontalContentAlignment" Value="Center"/>
                             <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Background" Value="#F2F2F2"/>
+                            <Setter Property="Foreground" Value="#333333"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="BorderBrush" Value="#FFE0DDDD"/>
+                            <Setter Property="BorderThickness" Value="0,0,1,0"/>
                         </Style>
                     </DataGridTemplateColumn.HeaderStyle>
-
-                    <!-- Шаблон ячейки -->
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Background="{Binding FlatPatternColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            <Border Background="{Binding FlatPatternColor}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="20"
+                    Height="20"
+                    Padding="10,5"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                
+                <!-- Колонка с номером пункта -->
                 <DataGridTextColumn Header="#" Binding="{Binding Item, Mode=OneWay}" Width="Auto" SortMemberPath="Item" SortDirection="Ascending">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}"/>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+
+                <!-- Колонка с обозначением детали -->
                 <DataGridTextColumn Header="Обозначение" Binding="{Binding PartNumber}" Width="Auto">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}"/>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+
+                <!-- Колонка с наименованием детали -->
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Description}" Width="Auto">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}"/>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+
+                <!-- Колонка с состоянием модели -->
                 <DataGridTextColumn Header="Состояние модели" Binding="{Binding ModelState}" Width="Auto">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}"/>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+
+                <!-- Колонка с материалом детали -->
                 <DataGridTextColumn Header="Материал" Binding="{Binding Material}" Width="Auto">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}"/>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+
+                <!-- Колонка с толщиной материала -->
                 <DataGridTextColumn Header="Толщина" Binding="{Binding Thickness}" Width="Auto">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}"/>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+
+                <!-- Колонка с количеством деталей -->
                 <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="Auto">
-                    <DataGridTextColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTextColumn.HeaderStyle>
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
                             <Setter Property="Foreground" Value="{Binding QuantityColor}"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsOverridden}" Value="True">
@@ -156,20 +235,18 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+
+                <!-- Колонка с изображением детали -->
                 <DataGridTemplateColumn Header="Изображение детали" Width="Auto">
-                    <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTemplateColumn.HeaderStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image Source="{Binding Preview}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+
+                <!-- Колонка с изображением развертки -->
                 <DataGridTemplateColumn Header="Изображение развертки" Width="Auto">
-                    <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTemplateColumn.HeaderStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image Source="{Binding DxfPreview}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -177,10 +254,8 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <!-- Колонка с индикатором обработки -->
                 <DataGridTemplateColumn Header="Обработано" Width="Auto">
-                    <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
-                    </DataGridTemplateColumn.HeaderStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border x:Name="ProcessingStatus" Width="10" Height="10" BorderBrush="DarkGray" BorderThickness="1" Background="{Binding ProcessingColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
