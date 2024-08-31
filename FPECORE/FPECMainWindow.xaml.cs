@@ -110,21 +110,33 @@ namespace FPECORE
 
             // Если были созданы дополнительные потоки, убедитесь, что они завершены
         }
+        private void ClearSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Очищаем текстовое поле и восстанавливаем PlaceholderText
+            searchTextBox.Text = string.Empty;
+            searchTextBox.Text = PlaceholderText;
+            searchTextBox.Foreground = System.Windows.Media.Brushes.Gray;
+            clearSearchButton.Visibility = Visibility.Collapsed;
+            searchTextBox.CaretIndex = 0; // Перемещаем курсор в начало
+        }
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (searchTextBox.Text == PlaceholderText)
             {
                 actualSearchText = string.Empty;
+                clearSearchButton.Visibility = Visibility.Collapsed;
                 return;
             }
 
             actualSearchText = searchTextBox.Text.Trim().ToLower();
 
+            // Показываем или скрываем кнопку очистки в зависимости от наличия текста
+            clearSearchButton.Visibility = string.IsNullOrEmpty(actualSearchText) ? Visibility.Collapsed : Visibility.Visible;
+
             // Перезапуск таймера при изменении текста
             searchDelayTimer.Stop();
             searchDelayTimer.Start();
         }
-
         private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if (searchTextBox.Text == PlaceholderText)
@@ -133,7 +145,6 @@ namespace FPECORE
                 searchTextBox.Foreground = System.Windows.Media.Brushes.Black;
             }
         }
-
         private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(searchTextBox.Text))
@@ -141,9 +152,9 @@ namespace FPECORE
                 searchTextBox.Text = PlaceholderText;
                 searchTextBox.Foreground = System.Windows.Media.Brushes.Gray;
                 actualSearchText = string.Empty; // Очищаем фактический текст поиска
+                clearSearchButton.Visibility = Visibility.Collapsed; // Скрываем кнопку очистки
             }
         }
-
         private void SearchDelayTimer_Tick(object sender, EventArgs e)
         {
             searchDelayTimer.Stop();

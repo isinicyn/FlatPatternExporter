@@ -13,13 +13,26 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
-        <!-- Добавляем TextBox для поиска -->
+        <!-- Поле поиска с иконкой крестика для очистки -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10">
-            <TextBox x:Name="searchTextBox" Width="300" Margin="10,0,0,10" VerticalAlignment="Top" 
-                     TextChanged="SearchTextBox_TextChanged"
-                     VerticalContentAlignment="Center"
-                     GotFocus="SearchTextBox_GotFocus"
-                     LostFocus="SearchTextBox_LostFocus"/>
+            <Grid Width="300" Margin="10,0,0,10" VerticalAlignment="Top">
+                <TextBox x:Name="searchTextBox" 
+                         Width="300" 
+                         VerticalContentAlignment="Center"
+                         Padding="5,0,30,0"
+                         TextChanged="SearchTextBox_TextChanged"
+                         GotFocus="SearchTextBox_GotFocus"
+                         LostFocus="SearchTextBox_LostFocus"/>
+                <Button x:Name="clearSearchButton" 
+                        Content="✖"
+                        Width="20"
+                        Height="20"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Margin="0,0,5,0"
+                        Visibility="Collapsed" 
+                        Click="ClearSearchButton_Click"/>
+            </Grid>
         </StackPanel>
         <DataGrid x:Name="partsDataGrid" AutoGenerateColumns="False" Margin="10,0,10,10" IsReadOnly="True" CanUserAddRows="False" Grid.Row="2" RowHeight="50"
           ContextMenuOpening="partsDataGrid_ContextMenuOpening" SelectionChanged="partsDataGrid_SelectionChanged" Background="White" Height="400" VerticalAlignment="Top">            
