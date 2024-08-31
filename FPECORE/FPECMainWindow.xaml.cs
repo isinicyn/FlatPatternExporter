@@ -194,7 +194,7 @@ namespace FPECORE
 
                 if (color == System.Windows.Media.Brushes.Red)
                 {
-                    textBlock.Text = $"{_reorderingColumn.Header}\n✖";
+                    textBlock.Text = $"❎ {_reorderingColumn.Header}";
                     textBlock.Foreground = System.Windows.Media.Brushes.White; // Белый текст на красном фоне
                     textBlock.FontWeight = FontWeights.Bold; // Жирный шрифт для улучшенной видимости
                     textBlock.Padding = new Thickness(5); // Дополнительное внутреннее пространство
