@@ -39,6 +39,7 @@ namespace FPECORE
         private DispatcherTimer searchDelayTimer;
         private const string PlaceholderText = "Поиск...";
         private string actualSearchText = string.Empty; // Поле для хранения фактического текста поиска
+        private string fixedFolderPath = string.Empty;
 
         public ObservableCollection<LayerSetting> LayerSettings { get; set; }
         public ObservableCollection<string> AvailableColors { get; set; }
@@ -951,18 +952,63 @@ namespace FPECORE
                 }
             }
         }
+        private void SelectFixedFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                fixedFolderPath = dialog.SelectedPath;
 
+                if (fixedFolderPath.Length > 40)
+                {
+                    // Гарантируем, что показываем именно последние 40 символов
+                    fixedFolderPathTextBlock.Text = "..." + fixedFolderPath.Substring(fixedFolderPath.Length - 40);
+                }
+                else
+                {
+                    fixedFolderPathTextBlock.Text = fixedFolderPath;
+                }
+            }
+        }
         private bool PrepareForExport(out string targetDir, out int multiplier, out Stopwatch stopwatch)
         {
-            targetDir = @"C:\DXF";
-            stopwatch = new Stopwatch();  // Инициализируем Stopwatch перед возможным возвратом
+            stopwatch = new Stopwatch();
+            targetDir = string.Empty;
+            multiplier = 1; // Присваиваем значение по умолчанию
 
-            if (!Directory.Exists(targetDir))
+            if (chooseFolderRadioButton.IsChecked == true)
             {
-                Directory.CreateDirectory(targetDir);
+                // Открываем диалог выбора папки
+                var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    targetDir = dialog.SelectedPath;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (componentFolderRadioButton.IsChecked == true)
+            {
+                // Папка компонента
+                targetDir = System.IO.Path.GetDirectoryName(ThisApplication.ActiveDocument.FullFileName);
+            }
+            else if (partFolderRadioButton.IsChecked == true)
+            {
+                // Папка детали (выбирается отдельно для каждой детали)
+                // Этот случай будет обработан в процессе экспорта
+            }
+            else if (fixedFolderRadioButton.IsChecked == true)
+            {
+                if (string.IsNullOrEmpty(fixedFolderPath))
+                {
+                    System.Windows.MessageBox.Show("Выберите фиксированную папку.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+                targetDir = fixedFolderPath;
             }
 
-            multiplier = 1;
             if (includeQuantityInFileNameCheckBox.IsChecked == true && !int.TryParse(multiplierTextBox.Text, out multiplier))
             {
                 System.Windows.MessageBox.Show("Введите допустимое целое число для множителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -1269,6 +1315,7 @@ namespace FPECORE
             bool organizeByThickness = false;
             bool includeQuantityInFileName = false;
 
+            // Выполняем доступ к элементам управления через Dispatcher
             Dispatcher.Invoke(() =>
             {
                 organizeByMaterial = organizeByMaterialCheckBox.IsChecked == true;
@@ -1293,6 +1340,16 @@ namespace FPECORE
 
                 string partNumber = partData.PartNumber;
                 int qty = partData.IsOverridden ? partData.Quantity : partData.OriginalQuantity * multiplier;
+
+                // Доступ к RadioButton через Dispatcher для потока безопасности
+                Dispatcher.Invoke(() =>
+                {
+                    if (partFolderRadioButton.IsChecked == true)
+                    {
+                        targetDir = GetPartDocumentFullPath(partNumber);
+                        targetDir = System.IO.Path.GetDirectoryName(targetDir);
+                    }
+                });
 
                 PartDocument partDoc = null;
                 bool isPartDocOpenedHere = false;

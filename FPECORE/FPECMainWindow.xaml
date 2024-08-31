@@ -5,7 +5,7 @@
         Title="Экспорт DXF" Width="1740"
         MinHeight="850" MinWidth="1150"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Height="850">
-    <Grid>        
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
             <RowDefinition Height="210"/>
@@ -37,7 +37,7 @@
             </Grid>
         </StackPanel>
         <DataGrid x:Name="partsDataGrid" AutoGenerateColumns="False" Margin="10,0,10,10" IsReadOnly="True" CanUserAddRows="False" Grid.Row="2" RowHeight="50"
-          ContextMenuOpening="partsDataGrid_ContextMenuOpening" SelectionChanged="partsDataGrid_SelectionChanged" Background="White" Height="400" VerticalAlignment="Top">            
+          ContextMenuOpening="partsDataGrid_ContextMenuOpening" SelectionChanged="partsDataGrid_SelectionChanged" Background="White" Height="400" VerticalAlignment="Top">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Экспортировать выбранные DXF" Click="ExportSelectedDXF_Click"/>
@@ -224,18 +224,31 @@
         <TabControl Margin="10,10,10,10" Grid.Row="1">
             <TabItem Header="Основные">
                 <Grid Background="White">
-                    <GroupBox Header="Настройки" Margin="10,10,0,0" Height="160" VerticalAlignment="Top" HorizontalAlignment="Left" Width="225">
+                    <GroupBox Header="Папка экспорта" Margin="765,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="760" Height="140">
+                        <StackPanel Orientation="Vertical" Margin="10,5,0,0">
+                            <RadioButton x:Name="chooseFolderRadioButton" Content="Указать папку в процессе экспорта" Margin="0,5,0,0" GroupName="ExportFolderOptions"/>
+                            <RadioButton x:Name="componentFolderRadioButton" Content="Папка компонента" Margin="0,5,0,0" GroupName="ExportFolderOptions"/>
+                            <RadioButton x:Name="partFolderRadioButton" Content="В папку с деталью" Margin="0,5,0,0" GroupName="ExportFolderOptions"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                <RadioButton x:Name="fixedFolderRadioButton" Content="Фиксированная папка" VerticalAlignment="Center" GroupName="ExportFolderOptions"/>
+                                <Button x:Name="selectFixedFolderButton" Content="..." Width="30" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Click="SelectFixedFolderButton_Click"/>
+                                <TextBlock x:Name="fixedFolderPathTextBlock" Text="Путь не выбран" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0" Width="250" TextTrimming="CharacterEllipsis" Opacity="0.75"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Header="Настройки" Margin="10,10,0,0" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Width="225">
                         <StackPanel Margin="0,5,0,5">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                 <RadioButton x:Name="traverseRadioButton" Content="Перебор" IsChecked="False" Margin="0,0,10,0"/>
                                 <RadioButton x:Name="bomRadioButton" Content="Спецификация" IsChecked="True"/>
                             </StackPanel>
-                            <CheckBox x:Name="organizeByMaterialCheckBox" Content="Сортировать по материалу" Margin="0,0,0,10"/>
-                            <CheckBox x:Name="organizeByThicknessCheckBox" Content="Сортировать по толщине" Margin="0,0,0,10"/>
-                            <CheckBox x:Name="includeQuantityInFileNameCheckBox" Content="Записать количество в имя файла" Margin="0,0,0,10"
+                            <CheckBox x:Name="organizeByMaterialCheckBox" Content="Сортировать по материалу" Margin="0,0,0,5"/>
+                            <CheckBox x:Name="organizeByThicknessCheckBox" Content="Сортировать по толщине" Margin="0,0,0,5"/>
+                            <CheckBox x:Name="includeQuantityInFileNameCheckBox" Content="Записать количество в имя файла" Margin="0,0,0,5"
           Checked="IncludeQuantityInFileNameCheckBox_CheckedChanged"
           Unchecked="IncludeQuantityInFileNameCheckBox_CheckedChanged"/>
-                            <CheckBox x:Name="backgroundModeCheckBox" Content="Фоновый режим" Margin="0,0,0,10" IsChecked="True"
+                            <CheckBox x:Name="backgroundModeCheckBox" Content="Фоновый режим" Margin="0,0,0,5" IsChecked="True"
                                       ToolTip="Если включено, Inventor будет работать в фоновом режиме, снижая нагрузку на интерфейс пользователя."/>
                             <!-- Новый чекбокс -->
                         </StackPanel>
