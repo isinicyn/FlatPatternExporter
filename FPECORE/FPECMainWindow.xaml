@@ -22,7 +22,18 @@
                      LostFocus="SearchTextBox_LostFocus"/>
         </StackPanel>
         <DataGrid x:Name="partsDataGrid" AutoGenerateColumns="False" Margin="10,0,10,10" IsReadOnly="True" CanUserAddRows="False" Grid.Row="2" RowHeight="50"
-          ContextMenuOpening="partsDataGrid_ContextMenuOpening" SelectionChanged="partsDataGrid_SelectionChanged" Background="White" Height="400" VerticalAlignment="Top">
+          ContextMenuOpening="partsDataGrid_ContextMenuOpening" SelectionChanged="partsDataGrid_SelectionChanged" Background="White" Height="400" VerticalAlignment="Top">            
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Экспортировать выбранные DXF" Click="ExportSelectedDXF_Click"/>
+                    <MenuItem Header="Переопределить количество" Click="OverrideQuantity_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Открыть расположение файла" Click="OpenFileLocation_Click"/>
+                    <MenuItem Header="Открыть выбранные модели" Click="OpenSelectedModels_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Очистить список" Click="ClearList_Click"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Resources>
                 <!-- Стиль для заголовков столбцов -->
                 <Style TargetType="DataGridColumnHeader">
