@@ -658,6 +658,54 @@ namespace FPECORE
                 System.Windows.MessageBox.Show("Процесс сканирования был прерван.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+        private void UpdateSubfolderOptions()
+        {
+            // Опция "В папку с деталью" - чекбокс и текстовое поле должны быть отключены
+            if (partFolderRadioButton.IsChecked == true)
+            {
+                enableSubfolderCheckBox.IsEnabled = false;
+                enableSubfolderCheckBox.IsChecked = false;
+                subfolderNameTextBox.IsEnabled = false;
+            }
+            else
+            {
+                // Для всех остальных опций чекбокс активен
+                enableSubfolderCheckBox.IsEnabled = true;
+                subfolderNameTextBox.IsEnabled = enableSubfolderCheckBox.IsChecked == true;
+            }
+        }
+
+        private void PartFolderRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateSubfolderOptions();
+        }
+
+        private void ComponentFolderRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateSubfolderOptions();
+        }
+
+        private void ChooseFolderRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateSubfolderOptions();
+        }
+
+        private void FixedFolderRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateSubfolderOptions();
+        }
+
+        private void EnableSubfolderCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            subfolderNameTextBox.IsEnabled = true;
+        }
+
+        private void EnableSubfolderCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            subfolderNameTextBox.IsEnabled = false;
+            subfolderNameTextBox.Text = string.Empty;
+        }
+
         private string GetProperty(PropertySet propertySet, string propertyName)
         {
             try
@@ -994,11 +1042,6 @@ namespace FPECORE
                 // Папка компонента
                 targetDir = System.IO.Path.GetDirectoryName(ThisApplication.ActiveDocument.FullFileName);
             }
-            else if (partFolderRadioButton.IsChecked == true)
-            {
-                // Папка детали (выбирается отдельно для каждой детали)
-                // Этот случай будет обработан в процессе экспорта
-            }
             else if (fixedFolderRadioButton.IsChecked == true)
             {
                 if (string.IsNullOrEmpty(fixedFolderPath))
@@ -1007,6 +1050,15 @@ namespace FPECORE
                     return false;
                 }
                 targetDir = fixedFolderPath;
+            }
+
+            if (enableSubfolderCheckBox.IsChecked == true && !string.IsNullOrEmpty(subfolderNameTextBox.Text))
+            {
+                targetDir = System.IO.Path.Combine(targetDir, subfolderNameTextBox.Text);
+                if (!Directory.Exists(targetDir))
+                {
+                    Directory.CreateDirectory(targetDir);
+                }
             }
 
             if (includeQuantityInFileNameCheckBox.IsChecked == true && !int.TryParse(multiplierTextBox.Text, out multiplier))
