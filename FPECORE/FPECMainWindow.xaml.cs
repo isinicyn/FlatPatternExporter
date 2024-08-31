@@ -348,12 +348,17 @@ namespace FPECORE
             {
                 string columnName = _reorderingColumn.Header.ToString();
 
+                // Удаляем колонку
                 partsDataGrid.Columns.Remove(_reorderingColumn);
 
+                // Удаляем соответствующие данные из CustomProperties
                 foreach (var partData in partsData)
                 {
                     partData.RemoveCustomProperty(columnName);
                 }
+
+                // Обновляем список свойств
+                customPropertiesList.Remove(columnName);
 
                 partsDataGrid.Items.Refresh();
             }
@@ -1911,36 +1916,43 @@ namespace FPECORE
             {
                 string customPropertyName = inputDialog.CustomPropertyName;
 
-                if (!customPropertiesList.Contains(customPropertyName))
+                // Проверка на существование в списке пользовательских свойств
+                if (customPropertiesList.Contains(customPropertyName))
                 {
-                    customPropertiesList.Add(customPropertyName);
+                    System.Windows.MessageBox.Show($"Свойство '{customPropertyName}' уже добавлено.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
-                    // Добавляем новую колонку в DataGrid
-                    AddCustomIPropertyColumn(customPropertyName);
+                // Проверка на существование колонки
+                if (partsDataGrid.Columns.Any(c => (c.Header as string) == customPropertyName))
+                {
+                    System.Windows.MessageBox.Show($"Столбец с именем '{customPropertyName}' уже существует.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
-                    // Если включен фоновый режим, отключаем взаимодействие с UI
+                customPropertiesList.Add(customPropertyName);
+
+                // Добавляем новую колонку в DataGrid
+                AddCustomIPropertyColumn(customPropertyName);
+
+                // Если включен фоновый режим, отключаем взаимодействие с UI
+                if (backgroundModeCheckBox.IsChecked == true)
+                {
+                    ThisApplication.UserInterfaceManager.UserInteractionDisabled = true;
+                }
+
+                try
+                {
+                    // Заполняем значения Custom iProperty для уже существующих деталей асинхронно
+                    await FillCustomPropertyAsync(customPropertyName);
+                }
+                finally
+                {
+                    // Восстанавливаем взаимодействие с UI после завершения асинхронной операции
                     if (backgroundModeCheckBox.IsChecked == true)
                     {
-                        ThisApplication.UserInterfaceManager.UserInteractionDisabled = true;
+                        ThisApplication.UserInterfaceManager.UserInteractionDisabled = false;
                     }
-
-                    try
-                    {
-                        // Заполняем значения Custom iProperty для уже существующих деталей асинхронно
-                        await FillCustomPropertyAsync(customPropertyName);
-                    }
-                    finally
-                    {
-                        // Восстанавливаем взаимодействие с UI после завершения асинхронной операции
-                        if (backgroundModeCheckBox.IsChecked == true)
-                        {
-                            ThisApplication.UserInterfaceManager.UserInteractionDisabled = false;
-                        }
-                    }
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show($"Свойство {customPropertyName} уже добавлено.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }
@@ -1965,8 +1977,34 @@ namespace FPECORE
                 }
             }
         }
+        private void RemoveCustomIPropertyColumn(string propertyName)
+        {
+            // Удаление столбца из DataGrid, если он существует
+            var columnToRemove = partsDataGrid.Columns.FirstOrDefault(c => (c.Header as string) == propertyName);
+            if (columnToRemove != null)
+            {
+                partsDataGrid.Columns.Remove(columnToRemove);
+            }
+
+            // Удаление всех данных, связанных с этим Custom IProperty
+            foreach (var partData in partsData)
+            {
+                partData.RemoveCustomProperty(propertyName);
+            }
+
+            partsDataGrid.Items.Refresh();
+        }
+
         private void AddCustomIPropertyColumn(string propertyName)
         {
+            // Проверяем, существует ли уже колонка с таким именем или заголовком
+            if (partsDataGrid.Columns.Any(c => (c.Header as string) == propertyName))
+            {
+                System.Windows.MessageBox.Show($"Столбец с именем '{propertyName}' уже существует.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Добавляем новую колонку
             var column = new DataGridTextColumn
             {
                 Header = propertyName,
@@ -2035,6 +2073,7 @@ namespace FPECORE
                 OnPropertyChanged();
             }
         }
+
         public string PartNumber { get; set; }
         public string ModelState { get; set; }
         public string Description { get; set; }
