@@ -39,9 +39,17 @@
             </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="✅" Width="Auto" IsReadOnly="False" CanUserReorder="False" CanUserResize="False">
+                    <!-- Индивидуальный стиль для заголовка без отступов -->
                     <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"/>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Padding" Value="0"/>
+                            <!-- Устанавливаем отступы в 0 -->
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        </Style>
                     </DataGridTemplateColumn.HeaderStyle>
+
+                    <!-- Шаблон ячейки -->
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border Background="{Binding FlatPatternColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
