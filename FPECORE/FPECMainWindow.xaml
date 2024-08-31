@@ -200,7 +200,7 @@
                 <Button x:Name="cancelButton" Content="Прервать" Click="CancelButton_Click" IsEnabled="False" Width="75" Height="32.5" VerticalAlignment="Top" Margin="0,0,0,10"/>
                 <Button x:Name="clearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Width="75" Height="32.5" VerticalAlignment="Bottom"/>
             </StackPanel>
-            <Button x:Name="exportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75"/>
+            <Button x:Name="exportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования"/>
         </StackPanel>
         <Border Grid.Row="4" Background="LightGray" Height="25" VerticalAlignment="Center">
             <StackPanel x:Name="bottomPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Opacity="0.75">
@@ -235,7 +235,8 @@
                             <CheckBox x:Name="includeQuantityInFileNameCheckBox" Content="Записать количество в имя файла" Margin="0,0,0,10"
           Checked="IncludeQuantityInFileNameCheckBox_CheckedChanged"
           Unchecked="IncludeQuantityInFileNameCheckBox_CheckedChanged"/>
-                            <CheckBox x:Name="backgroundModeCheckBox" Content="Фоновый режим" Margin="0,0,0,10" IsChecked="True"/>
+                            <CheckBox x:Name="backgroundModeCheckBox" Content="Фоновый режим" Margin="0,0,0,10" IsChecked="True"
+                                      ToolTip="Если включено, Inventor будет работать в фоновом режиме, снижая нагрузку на интерфейс пользователя."/>
                             <!-- Новый чекбокс -->
                         </StackPanel>
                     </GroupBox>
@@ -274,8 +275,8 @@
                                         <ComboBoxItem Content="R12"/>
                                     </ComboBox>
                                 </StackPanel>
-                                <CheckBox x:Name="mergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="rebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5"/>
+                                <CheckBox x:Name="mergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5" IsChecked="True"/>
+                                <CheckBox x:Name="rebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5" IsChecked="True"/>
                                 <CheckBox x:Name="trimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" Margin="0,0,0,5"/>
                                 <!-- Новый чекбокс -->
                             </StackPanel>
@@ -287,7 +288,7 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Слои">
+            <TabItem Header="Настройка слоев">
                 <Grid Background="White">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="210"/>
@@ -342,7 +343,7 @@
                     </Separator>
                 </Grid>
             </TabItem>
-            <TabItem Header="Имя файла"/>
+            <TabItem Header="Имя выгружаемого файла"/>
         </TabControl>
         <Button x:Name="addCustomIPropertyButton" Content=" + Custom IProperty " Click="AddCustomIPropertyButton_Click" Height="30" Margin="260,0,0,5" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" HorizontalAlignment="Left"/>
     </Grid>
