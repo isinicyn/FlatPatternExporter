@@ -235,8 +235,8 @@
                                 <TextBlock x:Name="fixedFolderPathTextBlock" Text="Путь не выбран" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0" Width="250" TextTrimming="CharacterEllipsis" Opacity="0.75"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                <CheckBox x:Name="enableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsEnabled="False" Checked="EnableSubfolderCheckBox_Checked" Unchecked="EnableSubfolderCheckBox_Unchecked"/>
-                                <TextBox x:Name="subfolderNameTextBox" Width="200" Height="20" Margin="10,0,0,0" VerticalAlignment="Center" IsEnabled="False"/>
+                                <CheckBox x:Name="enableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsEnabled="False" Checked="EnableSubfolderCheckBox_Checked" Unchecked="EnableSubfolderCheckBox_Unchecked" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |"/>
+                                <TextBox x:Name="subfolderNameTextBox" Width="200" Height="20" Margin="10,0,0,0" VerticalAlignment="Center" IsEnabled="False" TextChanged="SubfolderNameTextBox_TextChanged"/>
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>

@@ -679,6 +679,24 @@ namespace FPECORE
                 subfolderNameTextBox.IsEnabled = enableSubfolderCheckBox.IsChecked == true;
             }
         }
+        private void SubfolderNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string forbiddenChars = "\\/:*?\"<>|";
+            var textBox = sender as System.Windows.Controls.TextBox;
+            int caretIndex = textBox.CaretIndex;
+
+            foreach (var ch in forbiddenChars)
+            {
+                if (textBox.Text.Contains(ch))
+                {
+                    textBox.Text = textBox.Text.Replace(ch.ToString(), string.Empty);
+                    caretIndex--; // Уменьшаем позицию курсора на 1
+                }
+            }
+
+            // Возвращаем курсор на правильное место после удаления символов
+            textBox.CaretIndex = Math.Max(caretIndex, 0);
+        }
 
         private void PartFolderRadioButton_Checked(object sender, RoutedEventArgs e)
         {
