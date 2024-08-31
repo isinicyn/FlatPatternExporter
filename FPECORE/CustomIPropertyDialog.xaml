@@ -1,7 +1,7 @@
 ﻿<Window x:Class="FPECORE.CustomIPropertyDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Введите имя Custom IProperty" Height="150" Width="400">
+        Title="Введите имя Custom IProperty" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" UseLayoutRounding="False" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" MinWidth="350">
     <Grid>
         <StackPanel Margin="10">
             <TextBlock Text="Введите имя Custom IProperty:" Margin="0,0,0,10"/>

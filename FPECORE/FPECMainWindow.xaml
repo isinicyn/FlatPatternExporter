@@ -223,7 +223,7 @@
                                         <ComboBoxItem Content="2000"/>
                                         <ComboBoxItem Content="R12"/>
                                     </ComboBox>
-                                </StackPanel>                                
+                                </StackPanel>
                                 <CheckBox x:Name="mergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5"/>
                                 <CheckBox x:Name="rebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5"/>
                                 <CheckBox x:Name="trimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" Margin="0,0,0,5"/>
@@ -294,6 +294,6 @@
             </TabItem>
             <TabItem Header="Имя файла"/>
         </TabControl>
-        <Button x:Name="addCustomIPropertyButton" Content="Добавить Custom IProperty" Click="AddCustomIPropertyButton_Click" Width="200" Height="30" Margin="10"/>
+        <Button x:Name="addCustomIPropertyButton" Content=" + Custom IProperty " Click="AddCustomIPropertyButton_Click" Height="30" Margin="260,0,0,5" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" HorizontalAlignment="Left"/>
     </Grid>
 </Window>
