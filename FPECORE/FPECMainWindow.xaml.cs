@@ -1904,7 +1904,7 @@ namespace FPECORE
         {
 
         }
-        private void AddCustomIPropertyButton_Click(object sender, RoutedEventArgs e)
+        private async void AddCustomIPropertyButton_Click(object sender, RoutedEventArgs e)
         {
             var inputDialog = new CustomIPropertyDialog();
             if (inputDialog.ShowDialog() == true)
@@ -1918,17 +1918,50 @@ namespace FPECORE
                     // Добавляем новую колонку в DataGrid
                     AddCustomIPropertyColumn(customPropertyName);
 
-                    // Заполняем значения Custom iProperty для уже существующих деталей
-                    foreach (var partData in partsData)
+                    // Если включен фоновый режим, отключаем взаимодействие с UI
+                    if (backgroundModeCheckBox.IsChecked == true)
                     {
-                        partData.AddCustomProperty(customPropertyName, GetCustomIPropertyValue(partData.PartNumber, customPropertyName));
+                        ThisApplication.UserInterfaceManager.UserInteractionDisabled = true;
                     }
 
-                    partsDataGrid.Items.Refresh();
+                    try
+                    {
+                        // Заполняем значения Custom iProperty для уже существующих деталей асинхронно
+                        await FillCustomPropertyAsync(customPropertyName);
+                    }
+                    finally
+                    {
+                        // Восстанавливаем взаимодействие с UI после завершения асинхронной операции
+                        if (backgroundModeCheckBox.IsChecked == true)
+                        {
+                            ThisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+                        }
+                    }
                 }
                 else
                 {
                     System.Windows.MessageBox.Show($"Свойство {customPropertyName} уже добавлено.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+        private async Task FillCustomPropertyAsync(string customPropertyName)
+        {
+            foreach (var partData in partsData)
+            {
+                // Получаем значение custom iProperty асинхронно
+                string propertyValue = await Task.Run(() => GetCustomIPropertyValue(partData.PartNumber, customPropertyName));
+
+                // Добавляем значение в коллекцию свойств для конкретного элемента
+                partData.AddCustomProperty(customPropertyName, propertyValue);
+
+                // Обновляем UI
+                partsDataGrid.Items.Refresh();
+
+                // Проверяем, включен ли фоновый режим
+                if (backgroundModeCheckBox.IsChecked == true)
+                {
+                    // Дополнительная задержка для плавности и снижения нагрузки на UI
+                    await Task.Delay(50);
                 }
             }
         }
