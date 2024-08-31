@@ -36,7 +36,7 @@
                 </Button>
             </Grid>
         </StackPanel>
-        <DataGrid x:Name="partsDataGrid" AutoGenerateColumns="False" Margin="10,0,10,10" IsReadOnly="True" CanUserAddRows="False" Grid.Row="2" RowHeight="50"
+        <DataGrid x:Name="partsDataGrid" AutoGenerateColumns="False" Margin="10,0,10,10" IsReadOnly="True" CanUserAddRows="False" Grid.Row="2" RowHeight="50" GridLinesVisibility="All" HorizontalGridLinesBrush="Gray" VerticalGridLinesBrush="Gray"
           ContextMenuOpening="partsDataGrid_ContextMenuOpening" SelectionChanged="partsDataGrid_SelectionChanged" Background="White" Height="400" VerticalAlignment="Top">
             <DataGrid.ContextMenu>
                 <ContextMenu>
@@ -241,7 +241,7 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <GroupBox Header="Настройки" Margin="10,10,0,0" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Width="225">
+                    <GroupBox Header="Базовые настройки" Margin="10,10,0,0" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Width="225">
                         <StackPanel Margin="0,5,0,5">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                 <RadioButton x:Name="traverseRadioButton" Content="Перебор" IsChecked="False" Margin="0,0,10,0"/>
@@ -253,7 +253,7 @@
           Checked="IncludeQuantityInFileNameCheckBox_CheckedChanged"
           Unchecked="IncludeQuantityInFileNameCheckBox_CheckedChanged"/>
                             <CheckBox x:Name="backgroundModeCheckBox" Content="Фоновый режим" Margin="0,0,0,5" IsChecked="True"
-                                      ToolTip="Если включено, Inventor будет работать в фоновом режиме, снижая нагрузку на интерфейс пользователя."/>
+                                      ToolTip="Если включено, Inventor будет работать в фоновом режиме, ускоряя загрузку и выгрузку данных."/>
                             <!-- Новый чекбокс -->
                         </StackPanel>
                     </GroupBox>
