@@ -1667,13 +1667,12 @@ namespace FPECORE
             FinalizeExport(isCancelled, stopwatch, processedCount, skippedCount);
         }
 
-        private PartDocument? OpenPartDocument(string partNumber)
+        private PartDocument OpenPartDocument(string partNumber)
         {
             var docs = ThisApplication.Documents;
-            var projectManager = ThisApplication.DesignProjectManager;
-            var activeProject = projectManager.ActiveDesignProject;
-            PartDocument? partDoc = null;
+            PartDocument partDoc = null;
 
+            // Попытка найти открытый документ
             foreach (Document doc in docs)
             {
                 if (doc is PartDocument pd && GetProperty(pd.PropertySets["Design Tracking Properties"], "Part Number") == partNumber)
@@ -1682,18 +1681,25 @@ namespace FPECORE
                 }
             }
 
+            // Попытка открыть документ по имени файла
+            var projectManager = ThisApplication.DesignProjectManager;
+            var activeProject = projectManager.ActiveDesignProject;
             string fullFileName = System.IO.Path.Combine(activeProject.WorkspacePath, partNumber + ".ipt");
+
             if (System.IO.File.Exists(fullFileName))
             {
                 try
                 {
                     partDoc = (PartDocument)docs.Open(fullFileName);
-                    // Устанавливаем флаг, что документ был открыт здесь
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // Обработка ошибок открытия документа детали
+                    System.Windows.MessageBox.Show($"Ошибка при открытии файла {partNumber}: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+            }
+            else
+            {
+                System.Windows.MessageBox.Show($"Файл {partNumber} не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             return partDoc;
@@ -1925,7 +1931,8 @@ namespace FPECORE
 
         private void partsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            // Активация пункта "Редактировать iProperty" только при выборе одной строки
+            editIPropertyMenuItem.IsEnabled = partsDataGrid.SelectedItems.Count == 1;
         }
         private async void AddCustomIPropertyButton_Click(object sender, RoutedEventArgs e)
         {
@@ -2035,6 +2042,56 @@ namespace FPECORE
 
             partsDataGrid.Columns.Add(column);
         }
+        private void EditIProperty_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = partsDataGrid.SelectedItem as PartData;
+            if (selectedItem == null || partsDataGrid.SelectedItems.Count != 1)
+            {
+                System.Windows.MessageBox.Show("Выберите одну строку для редактирования iProperty.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var editDialog = new EditIPropertyDialog(selectedItem.PartNumber, selectedItem.Description);
+            if (editDialog.ShowDialog() == true)
+            {
+                // Открываем документ детали
+                var partDoc = OpenPartDocument(selectedItem.PartNumber);
+                if (partDoc != null)
+                {
+                    // Обновляем iProperty в файле детали
+                    SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number", editDialog.PartNumber);
+                    SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description", editDialog.Description);
+
+                    // Сохраняем изменения и закрываем документ
+                    partDoc.Save();
+                    // partDoc.Close(); // Можно закрыть документ, если он не нужен больше открыт
+
+                    // Обновляем свойства детали в таблице
+                    selectedItem.PartNumber = editDialog.PartNumber;
+                    selectedItem.Description = editDialog.Description;
+
+                    // Обновляем данные в таблице
+                    partsDataGrid.Items.Refresh();
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("Не удалось открыть документ детали для редактирования.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+        private void SetProperty(PropertySet propertySet, string propertyName, string value)
+        {
+            try
+            {
+                Property property = propertySet[propertyName];
+                property.Value = value;
+            }
+            catch (Exception)
+            {
+                System.Windows.MessageBox.Show($"Не удалось обновить свойство {propertyName}.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private string GetCustomIPropertyValue(string partNumber, string propertyName)
         {
             try

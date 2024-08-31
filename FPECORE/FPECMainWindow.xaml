@@ -46,6 +46,8 @@
                     <MenuItem Header="Открыть расположение файла" Click="OpenFileLocation_Click"/>
                     <MenuItem Header="Открыть выбранные модели" Click="OpenSelectedModels_Click"/>
                     <Separator/>
+                    <MenuItem Header="Редактировать iProperty" Click="EditIProperty_Click" x:Name="editIPropertyMenuItem"/>
+                    <Separator/>
                     <MenuItem Header="Очистить список" Click="ClearList_Click"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
