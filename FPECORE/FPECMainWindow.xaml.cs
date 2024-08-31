@@ -405,6 +405,12 @@ namespace FPECORE
                 return;
             }
 
+            bool isBackgroundMode = backgroundModeCheckBox.IsChecked == true;
+            if (isBackgroundMode)
+            {
+                ThisApplication.UserInterfaceManager.UserInteractionDisabled = true;
+            }
+
             modelStateInfoRunBottom.Text = string.Empty;
 
             Document? doc = ThisApplication.ActiveDocument as Document;
@@ -426,7 +432,7 @@ namespace FPECORE
             scanButton.IsEnabled = false;
             cancelButton.IsEnabled = true;
             exportButton.IsEnabled = false;
-            clearButton.IsEnabled = false; // Кнопка "Очистить" неактивна в процессе сканирования
+            clearButton.IsEnabled = false;
             isScanning = true;
             isCancelled = false;
 
@@ -441,14 +447,14 @@ namespace FPECORE
             string modelStateInfo = string.Empty;
 
             partsData.Clear();
-            itemCounter = 1; // Сброс счетчика
+            itemCounter = 1;
 
             var progress = new Progress<PartData>(partData =>
             {
-                partData.Item = itemCounter; // Присвоение значения Item как int
+                partData.Item = itemCounter;
                 partsData.Add(partData);
                 partsDataGrid.Items.Refresh();
-                itemCounter++; // Увеличение счетчика после добавления новой строки
+                itemCounter++;
             });
 
             if (doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
@@ -479,7 +485,7 @@ namespace FPECORE
                         if (partData != null)
                         {
                             ((IProgress<PartData>)progress).Report(partData);
-                            await Task.Delay(10); // Увеличиваем время задержки для более плавной анимации
+                            await Task.Delay(10);
                         }
                     }
                 });
@@ -497,7 +503,7 @@ namespace FPECORE
                     if (partData != null)
                     {
                         ((IProgress<PartData>)progress).Report(partData);
-                        await Task.Delay(10); // Увеличиваем время задержки для более плавной анимации
+                        await Task.Delay(10);
                     }
                 }
             }
@@ -505,7 +511,6 @@ namespace FPECORE
             stopwatch.Stop();
             string elapsedTime = GetElapsedTime(stopwatch.Elapsed);
 
-            // Применение множителя после сканирования
             if (int.TryParse(multiplierTextBox.Text, out int multiplier) && multiplier > 0)
             {
                 UpdateQuantitiesWithMultiplier(multiplier);
@@ -517,13 +522,18 @@ namespace FPECORE
             progressLabel.Text = isCancelled ? $"Статус: Прервано ({elapsedTime})" : $"Статус: Готово ({elapsedTime})";
             bottomPanel.Opacity = 1.0;
             UpdateDocumentInfo(documentType, partNumber, description, doc);
-            UpdateFileCountLabel(isCancelled ? 0 : partCount); // Обновленное использование метода для обновления счетчика
+            UpdateFileCountLabel(isCancelled ? 0 : partCount);
 
             scanButton.IsEnabled = true;
             cancelButton.IsEnabled = false;
             exportButton.IsEnabled = partCount > 0 && !isCancelled;
-            clearButton.IsEnabled = partsData.Count > 0; // Активируем кнопку "Очистить" при наличии данных
+            clearButton.IsEnabled = partsData.Count > 0;
             lastScannedDocument = isCancelled ? null : doc;
+
+            if (isBackgroundMode)
+            {
+                ThisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+            }
 
             if (isCancelled)
             {
@@ -978,6 +988,12 @@ namespace FPECORE
                 return;
             }
 
+            bool isBackgroundMode = backgroundModeCheckBox.IsChecked == true;
+            if (isBackgroundMode)
+            {
+                ThisApplication.UserInterfaceManager.UserInteractionDisabled = true;
+            }
+
             Document? doc = ThisApplication.ActiveDocument as Document;
             if (doc == null)
             {
@@ -994,11 +1010,15 @@ namespace FPECORE
 
             if (!PrepareForExport(out string targetDir, out int multiplier, out Stopwatch stopwatch))
             {
+                if (isBackgroundMode)
+                {
+                    ThisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+                }
                 return;
             }
 
-            clearButton.IsEnabled = false; // Деактивируем кнопку "Очистить" в процессе экспорта
-            scanButton.IsEnabled = false; // Деактивируем кнопку "Сканировать" в процессе экспорта
+            clearButton.IsEnabled = false;
+            scanButton.IsEnabled = false;
 
             int processedCount = 0;
             int skippedCount = 0;
@@ -1031,10 +1051,14 @@ namespace FPECORE
                 }
             }
 
-            clearButton.IsEnabled = true; // Активируем кнопку "Очистить" после завершения экспорта
-            scanButton.IsEnabled = true; // Активируем кнопку "Сканировать" после завершения экспорта
+            clearButton.IsEnabled = true;
+            scanButton.IsEnabled = true;
 
-            // Кнопка "Экспорт" остается активной после обычного экспорта
+            if (isBackgroundMode)
+            {
+                ThisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+            }
+
             exportButton.IsEnabled = true;
         }
         private string GetElapsedTime(TimeSpan timeSpan)
