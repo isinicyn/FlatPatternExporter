@@ -61,6 +61,7 @@
                     <!-- Индивидуальный стиль для заголовка без отступов -->
                     <DataGridTemplateColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ToolTip" Value="Проверка наличия развертки у детали"/>
                             <Setter Property="Padding" Value="0"/>
                             <!-- Устанавливаем отступы в 0 -->
                             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -219,7 +220,7 @@
                             <CheckBox x:Name="includeQuantityInFileNameCheckBox" Content="Записать количество в имя файла" Margin="0,0,0,10"
           Checked="IncludeQuantityInFileNameCheckBox_CheckedChanged"
           Unchecked="IncludeQuantityInFileNameCheckBox_CheckedChanged"/>
-                            <CheckBox x:Name="backgroundModeCheckBox" Content="Фоновый режим" Margin="0,0,0,10"/>
+                            <CheckBox x:Name="backgroundModeCheckBox" Content="Фоновый режим" Margin="0,0,0,10" IsChecked="True"/>
                             <!-- Новый чекбокс -->
                         </StackPanel>
                     </GroupBox>
