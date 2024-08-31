@@ -5,7 +5,7 @@
         Title="Экспорт DXF" Width="1740"
         MinHeight="850" MinWidth="1150"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Height="850">
-    <Grid>
+    <Grid>        
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
             <RowDefinition Height="210"/>
@@ -13,6 +13,14 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
+        <!-- Добавляем TextBox для поиска -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10">
+            <TextBox x:Name="searchTextBox" Width="300" Margin="10,0,0,10" VerticalAlignment="Top" 
+                     TextChanged="SearchTextBox_TextChanged"
+                     VerticalContentAlignment="Center"
+                     GotFocus="SearchTextBox_GotFocus"
+                     LostFocus="SearchTextBox_LostFocus"/>
+        </StackPanel>
         <DataGrid x:Name="partsDataGrid" AutoGenerateColumns="False" Margin="10,0,10,10" IsReadOnly="True" CanUserAddRows="False" Grid.Row="2" RowHeight="50"
           ContextMenuOpening="partsDataGrid_ContextMenuOpening" SelectionChanged="partsDataGrid_SelectionChanged" Background="White" Height="400" VerticalAlignment="Top">
             <DataGrid.Resources>

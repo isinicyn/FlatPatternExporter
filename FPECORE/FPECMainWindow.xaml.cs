@@ -19,6 +19,7 @@ using LayerSettingsApp;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Controls.Primitives;
+using System.Windows.Threading;
 
 namespace FPECORE
 {
@@ -34,6 +35,10 @@ namespace FPECORE
         private HeaderAdorner _headerAdorner;
         private DataGridColumn _reorderingColumn;
         private bool _isColumnDraggedOutside = false;
+        private CollectionViewSource partsDataView;
+        private DispatcherTimer searchDelayTimer;
+        private const string PlaceholderText = "Поиск...";
+        private string actualSearchText = string.Empty; // Поле для хранения фактического текста поиска
 
         public ObservableCollection<LayerSetting> LayerSettings { get; set; }
         public ObservableCollection<string> AvailableColors { get; set; }
@@ -55,6 +60,24 @@ namespace FPECORE
             partsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
             partsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
             partsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
+
+            // Инициализация CollectionViewSource для фильтрации
+            partsDataView = new CollectionViewSource { Source = partsData };
+            partsDataView.Filter += PartsData_Filter;
+
+            // Устанавливаем ItemsSource для DataGrid
+            partsDataGrid.ItemsSource = partsDataView.View;
+
+            // Настраиваем таймер для задержки поиска
+            searchDelayTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1) // 1 секунда задержки
+            };
+            searchDelayTimer.Tick += SearchDelayTimer_Tick;
+
+            // Установка начального текста для searchTextBox
+            searchTextBox.Text = PlaceholderText;
+            searchTextBox.Foreground = System.Windows.Media.Brushes.Gray;
 
             // Создаем экземпляр MainWindow из LayerSettingsApp
             var layerSettingsWindow = new LayerSettingsApp.MainWindow();
@@ -87,7 +110,90 @@ namespace FPECORE
 
             // Если были созданы дополнительные потоки, убедитесь, что они завершены
         }
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (searchTextBox.Text == PlaceholderText)
+            {
+                actualSearchText = string.Empty;
+                return;
+            }
 
+            actualSearchText = searchTextBox.Text.Trim().ToLower();
+
+            // Перезапуск таймера при изменении текста
+            searchDelayTimer.Stop();
+            searchDelayTimer.Start();
+        }
+
+        private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (searchTextBox.Text == PlaceholderText)
+            {
+                searchTextBox.Text = string.Empty;
+                searchTextBox.Foreground = System.Windows.Media.Brushes.Black;
+            }
+        }
+
+        private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(searchTextBox.Text))
+            {
+                searchTextBox.Text = PlaceholderText;
+                searchTextBox.Foreground = System.Windows.Media.Brushes.Gray;
+                actualSearchText = string.Empty; // Очищаем фактический текст поиска
+            }
+        }
+
+        private void SearchDelayTimer_Tick(object sender, EventArgs e)
+        {
+            searchDelayTimer.Stop();
+            partsDataView.View.Refresh(); // Обновление фильтрации
+        }
+
+        private void PartsData_Filter(object sender, FilterEventArgs e)
+        {
+            if (e.Item is PartData partData)
+            {
+                if (string.IsNullOrEmpty(actualSearchText))
+                {
+                    e.Accepted = true;
+                    return;
+                }
+
+                bool matches = partData.PartNumber?.ToLower().Contains(actualSearchText) == true ||
+                               partData.Description?.ToLower().Contains(actualSearchText) == true ||
+                               partData.ModelState?.ToLower().Contains(actualSearchText) == true ||
+                               partData.Material?.ToLower().Contains(actualSearchText) == true ||
+                               partData.Thickness?.ToLower().Contains(actualSearchText) == true ||
+                               partData.Quantity.ToString().Contains(actualSearchText) == true;
+
+                // Проверка на пользовательские свойства
+                if (!matches)
+                {
+                    foreach (var property in partData.CustomProperties)
+                    {
+                        if (property.Value.ToLower().Contains(actualSearchText))
+                        {
+                            matches = true;
+                            break;
+                        }
+                    }
+                }
+
+                e.Accepted = matches;
+            }
+            else
+            {
+                e.Accepted = false;
+            }
+        }
+
+        // Метод для обновления таблицы после добавления новых элементов
+        private void AddPartData(PartData partData)
+        {
+            partsData.Add(partData);
+            partsDataView.View.Refresh(); // Обновляем фильтрацию и отображение
+        }
         private void PartsDataGrid_ColumnReordering(object sender, DataGridColumnReorderingEventArgs e)
         {
             _reorderingColumn = e.Column;
