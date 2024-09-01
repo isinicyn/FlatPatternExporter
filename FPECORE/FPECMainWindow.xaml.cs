@@ -2059,7 +2059,7 @@ namespace FPECORE
                 return;
             }
 
-            // Добавляем новую колонку
+            // Создаем новую колонку
             var column = new DataGridTextColumn
             {
                 Header = propertyName,
@@ -2069,6 +2069,9 @@ namespace FPECORE
                 },
                 Width = DataGridLength.Auto
             };
+
+            // Применяем стиль CenteredCellStyle
+            column.ElementStyle = partsDataGrid.FindResource("CenteredCellStyle") as System.Windows.Style;
 
             partsDataGrid.Columns.Add(column);
         }
