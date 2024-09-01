@@ -265,7 +265,7 @@
                 </DataGridTemplateColumn>
 
                 <!-- Колонка с индикатором обработки -->
-                <DataGridTemplateColumn Header="Обработано" Width="Auto">
+                <DataGridTemplateColumn Header="Обработано" Width="Auto" IsReadOnly="False" CanUserSort="False" CanUserReorder="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border x:Name="ProcessingStatus" Width="10" Height="10" BorderBrush="DarkGray" BorderThickness="1" Background="{Binding ProcessingColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
