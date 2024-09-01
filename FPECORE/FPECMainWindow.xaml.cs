@@ -303,14 +303,29 @@ namespace FPECORE
                 var droppedData = e.Data.GetData(typeof(PresetIProperty)) as PresetIProperty;
                 if (droppedData != null && !droppedData.IsAdded)
                 {
-                    droppedData.IsAdded = true;
-                    // Добавляем колонку в DataGrid
-                    AddIPropertyColumn(droppedData);
+                    // Определяем позицию мыши
+                    System.Windows.Point position = e.GetPosition(partsDataGrid);
+
+                    // Найти колонку, перед которой должна быть вставлена новая колонка
+                    int insertIndex = -1;
+                    double totalWidth = 0;
+
+                    for (int i = 0; i < partsDataGrid.Columns.Count; i++)
+                    {
+                        totalWidth += partsDataGrid.Columns[i].ActualWidth;
+                        if (position.X < totalWidth)
+                        {
+                            insertIndex = i;
+                            break;
+                        }
+                    }
+
+                    // Добавляем колонку на нужную позицию
+                    AddIPropertyColumn(droppedData, insertIndex);
                 }
             }
         }
-
-        public void AddIPropertyColumn(PresetIProperty iProperty)
+        public void AddIPropertyColumn(PresetIProperty iProperty, int? insertIndex = null)
         {
             // Проверяем, существует ли уже колонка с таким заголовком
             if (partsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.InternalName))
@@ -355,11 +370,19 @@ namespace FPECORE
                 column = textColumn;
             }
 
-            // Добавляем колонку в DataGrid
-            partsDataGrid.Columns.Add(column);
+            // Если указан индекс вставки, вставляем колонку в нужное место
+            if (insertIndex.HasValue && insertIndex.Value >= 0 && insertIndex.Value < partsDataGrid.Columns.Count)
+            {
+                partsDataGrid.Columns.Insert(insertIndex.Value, column);
+            }
+            else
+            {
+                // В противном случае добавляем колонку в конец
+                partsDataGrid.Columns.Add(column);
+            }
+
             iProperty.IsAdded = true;
-        }
-        // Метод для обновления таблицы после добавления новых элементов
+        }        // Метод для обновления таблицы после добавления новых элементов
         private void AddPartData(PartData partData)
         {
             partsData.Add(partData);
