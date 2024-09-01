@@ -334,11 +334,25 @@ namespace FPECORE
             }
             else
             {
-                column = new DataGridTextColumn
+                // Создаем текстовую колонку
+                var textColumn = new DataGridTextColumn
                 {
                     Header = iProperty.InternalName,
                     Binding = new System.Windows.Data.Binding(iProperty.InventorPropertyName)
                 };
+
+                // Применяем специальный стиль для колонки "Количество"
+                if (iProperty.InternalName == "Количество")
+                {
+                    textColumn.ElementStyle = partsDataGrid.FindResource("QuantityCellStyle") as System.Windows.Style;
+                }
+                else
+                {
+                    // Применяем стиль CenteredCellStyle для всех остальных текстовых колонок
+                    textColumn.ElementStyle = partsDataGrid.FindResource("CenteredCellStyle") as System.Windows.Style;
+                }
+
+                column = textColumn;
             }
 
             // Добавляем колонку в DataGrid
