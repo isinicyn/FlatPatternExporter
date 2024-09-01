@@ -382,7 +382,10 @@ namespace FPECORE
             }
 
             iProperty.IsAdded = true;
-        }        // Метод для обновления таблицы после добавления новых элементов
+            // Обновляем список доступных свойств
+            var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
+            selectIPropertyWindow?.UpdateAvailableProperties();
+        }        
         private void AddPartData(PartData partData)
         {
             partsData.Add(partData);
