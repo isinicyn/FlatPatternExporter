@@ -111,6 +111,24 @@ namespace FPECORE
 
             // Если были созданы дополнительные потоки, убедитесь, что они завершены
         }
+        private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // Получаем источник события
+            var source = e.OriginalSource as DependencyObject;
+
+            // Ищем DataGrid по иерархии визуальных элементов
+            while (source != null && !(source is DataGrid))
+            {
+                source = VisualTreeHelper.GetParent(source);
+            }
+
+            // Если DataGrid не найден (клик был вне DataGrid), сбрасываем выделение
+            if (source == null)
+            {
+                partsDataGrid.UnselectAll();
+            }
+        }
+
         private void ClearSearchButton_Click(object sender, RoutedEventArgs e)
         {
             // Очищаем текстовое поле и восстанавливаем PlaceholderText
