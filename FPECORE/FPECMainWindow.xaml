@@ -91,6 +91,12 @@
                 </Style>
 
                 <Style TargetType="DataGridRow">
+                    <Style.Resources>
+                        <!-- Стиль для выделенной строки -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF67A6E0"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="LightBlue"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                    </Style.Resources>
                     <Style.Triggers>
                         <Trigger Property="AlternationIndex" Value="0">
                             <Setter Property="Background" Value="White"/>
@@ -136,13 +142,18 @@
 
                 <!-- Стиль для ячеек строк -->
                 <Style TargetType="DataGridCell">
+                    <Style.Resources>
+                        <!-- Стиль для выделенной ячейки -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="LightBlue"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                    </Style.Resources>
                     <Setter Property="Padding" Value="10,5"/>
                     <Setter Property="BorderBrush" Value="#EAEAEA"/>
                     <Setter Property="BorderThickness" Value="0,0,1,1"/>
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                     <Setter Property="Foreground" Value="#333333"/>
-                    <!-- Удалено свойство Background -->
                 </Style>
 
                 <!-- Стиль для текста внутри ячеек -->
