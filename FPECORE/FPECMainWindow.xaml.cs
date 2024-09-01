@@ -311,21 +311,24 @@ namespace FPECORE
 
         public void AddIPropertyColumn(PresetIProperty iProperty)
         {
+            // Проверяем, существует ли уже колонка с таким заголовком
             if (partsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.InternalName))
                 return;
 
             DataGridColumn column;
 
-            if (iProperty.InternalName == "Preview" || iProperty.InternalName == "DxfPreview")
+            // Проверка, если это колонка с изображением детали или развертки
+            if (iProperty.InternalName == "Изображение детали" || iProperty.InternalName == "Изображение развертки")
             {
                 column = new DataGridTemplateColumn
                 {
                     Header = iProperty.InternalName,
                     CellTemplate = new DataTemplate
                     {
-                        VisualTree = new FrameworkElementFactory(typeof(System.Windows.Controls.Image), "img")
+                        VisualTree = new FrameworkElementFactory(typeof(System.Windows.Controls.Image))
                     }
                 };
+                // Устанавливаем привязку данных для колонки изображения
                 (column as DataGridTemplateColumn).CellTemplate.VisualTree.SetBinding(System.Windows.Controls.Image.SourceProperty, new System.Windows.Data.Binding(iProperty.InventorPropertyName));
             }
             else
@@ -337,12 +340,9 @@ namespace FPECORE
                 };
             }
 
+            // Добавляем колонку в DataGrid
             partsDataGrid.Columns.Add(column);
-            iProperty.IsAdded = true; // Обновляем флаг IsAdded
-
-            // Обновляем список доступных свойств
-            var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
-            selectIPropertyWindow?.UpdateAvailableProperties();
+            iProperty.IsAdded = true;
         }
         // Метод для обновления таблицы после добавления новых элементов
         private void AddPartData(PartData partData)
