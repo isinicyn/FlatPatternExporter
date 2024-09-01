@@ -62,6 +62,7 @@ namespace FPECORE
             partsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
             partsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
             partsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
+            chooseFolderRadioButton.IsChecked = true;
 
             partsDataGrid.DragOver += PartsDataGrid_DragOver;
             partsDataGrid.DragLeave += PartsDataGrid_DragLeave;
