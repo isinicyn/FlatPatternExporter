@@ -75,6 +75,23 @@ namespace FPECORE
                 }
             }
         }
+        private void iPropertyListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (iPropertyListBox.SelectedItem is PresetIProperty selectedProperty)
+            {
+                if (!SelectedProperties.Contains(selectedProperty))
+                {
+                    // Добавляем выбранное свойство в список выбранных
+                    SelectedProperties.Add(selectedProperty);
+                    // Убираем его из доступных свойств
+                    AvailableProperties.Remove(selectedProperty);
+
+                    // Обновляем отображение в DataGrid
+                    var mainWindow = System.Windows.Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+                    mainWindow?.AddIPropertyColumn(selectedProperty);
+                }
+            }
+        }
 
         public void partsDataGrid_DragOver(object sender, System.Windows.DragEventArgs e)
         {
