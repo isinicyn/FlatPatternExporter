@@ -6,7 +6,7 @@
         Title="Экспорт DXF" Width="1740"
         MinHeight="850" MinWidth="1150"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Height="850">
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
@@ -15,7 +15,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
-        <Button x:Name="addPresetIPropertyButton" Content="+ iProperty" Click="AddPresetIPropertyButton_Click" Height="30" Margin="260,0,0,50" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115"/>
+        <Button x:Name="addPresetIPropertyButton" Content="+ iProperty" Click="AddPresetIPropertyButton_Click" Height="32" Margin="265,0,0,48" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1"/>
 
         <!-- Поле поиска с иконкой крестика для очистки -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10,10,10,10">
@@ -196,7 +196,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
                 <!-- Колонка с номером пункта -->
                 <DataGridTextColumn Header="#" Binding="{Binding Item, Mode=OneWay}" Width="Auto" SortMemberPath="Item" SortDirection="Ascending">
                     <DataGridTextColumn.ElementStyle>
@@ -449,6 +449,6 @@
             </TabItem>
             <TabItem Header="Имя выгружаемого файла"/>
         </TabControl>
-        <Button x:Name="addCustomIPropertyButton" Content=" + Custom IProperty " Click="AddCustomIPropertyButton_Click" Height="30" Margin="260,0,0,5" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" HorizontalAlignment="Left"/>
+        <Button x:Name="addCustomIPropertyButton" Content="+ Custom iProperty" Click="AddCustomIPropertyButton_Click" Height="32" Margin="265,0,0,5" VerticalAlignment="Bottom" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Padding="5,1,1,1" Width="115"/>
     </Grid>
 </Window>

@@ -55,8 +55,7 @@ namespace FPECORE
             partsDataGrid.ItemsSource = partsData;
             multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true;
             UpdateFileCountLabel(0);
-            clearButton.IsEnabled = false;
-            partsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
+            clearButton.IsEnabled = false;            
             partsDataGrid.PreviewMouseDown += PartsDataGrid_PreviewMouseDown;
             partsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
             partsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
@@ -104,7 +103,13 @@ namespace FPECORE
                 new PresetIProperty { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness", IsAdded = true },
                 new PresetIProperty { InternalName = "Количество", DisplayName = "Количество", InventorPropertyName = "Quantity", IsAdded = true },
                 new PresetIProperty { InternalName = "Изображение детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview", IsAdded = true },
-                new PresetIProperty { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", IsAdded = true }
+                new PresetIProperty { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", IsAdded = true },
+
+                // Добавление новых предустановленных свойств
+                new PresetIProperty { InternalName = "Author", DisplayName = "Автор", InventorPropertyName = "Author", IsAdded = false },
+                new PresetIProperty { InternalName = "Revision", DisplayName = "Ревизия", InventorPropertyName = "Revision Number", IsAdded = false },
+                new PresetIProperty { InternalName = "Project", DisplayName = "Проект", InventorPropertyName = "Project", IsAdded = false },
+                new PresetIProperty { InternalName = "Stock number", DisplayName = "Номер партии", InventorPropertyName = "Stock Number", IsAdded = false }
             };
 
             // Устанавливаем DataContext для текущего окна, объединяя данные из LayerSettingsWindow и других источников
@@ -932,6 +937,38 @@ namespace FPECORE
                 return string.Empty;
             }
         }
+        private void ReadIPropertyValuesFromPart(PartDocument partDoc, PartData partData)
+        {
+            var propertySets = partDoc.PropertySets;
+
+            // Проверка и чтение свойства "Author"
+            var authorProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == "Author");
+            if (authorProperty != null && authorProperty.IsAdded)
+            {
+                partData.Author = GetProperty(propertySets["Summary Information"], "Author");
+            }
+
+            // Проверка и чтение свойства "Revision"
+            var revisionProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == "Revision");
+            if (revisionProperty != null && revisionProperty.IsAdded)
+            {
+                partData.Revision = GetProperty(propertySets["Design Tracking Properties"], "Revision Number");
+            }
+
+            // Проверка и чтение свойства "Project"
+            var projectProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == "Project");
+            if (projectProperty != null && projectProperty.IsAdded)
+            {
+                partData.Project = GetProperty(propertySets["Summary Information"], "Project");
+            }
+
+            // Проверка и чтение свойства "Stock number"
+            var stockNumberProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == "Stock number");
+            if (stockNumberProperty != null && stockNumberProperty.IsAdded)
+            {
+                partData.StockNumber = GetProperty(propertySets["Design Tracking Properties"], "Stock Number");
+            }
+        }
 
         private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, BOM bom, int itemNumber, PartDocument? partDoc = null)
         {
@@ -967,6 +1004,9 @@ namespace FPECORE
             {
                 partData.AddCustomProperty(customPropertyName, GetCustomIPropertyValue(partNumber, customPropertyName));
             }
+
+            // Чтение значений iProperty при условии, что они добавлены в таблицу
+            ReadIPropertyValuesFromPart(partDoc, partData);
 
             return partData;
         }
@@ -2382,6 +2422,12 @@ namespace FPECORE
                 OnPropertyChanged();
             }
         }
+            // Новые свойства для хранения значений iProperty
+        public string Author { get; set; }
+        public string Revision { get; set; }
+        public string Project { get; set; }
+        public string StockNumber { get; set; }
+    
         public void RemoveCustomProperty(string propertyName)
         {
             if (customProperties.ContainsKey(propertyName))
