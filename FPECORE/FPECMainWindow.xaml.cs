@@ -44,6 +44,7 @@ namespace FPECORE
         public ObservableCollection<LayerSetting> LayerSettings { get; set; }
         public ObservableCollection<string> AvailableColors { get; set; }
         public ObservableCollection<string> LineTypes { get; set; }
+        public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
 
         private List<string> customPropertiesList = new List<string>();
 
@@ -61,6 +62,9 @@ namespace FPECORE
             partsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
             partsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
             partsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
+
+            partsDataGrid.DragOver += PartsDataGrid_DragOver;
+            partsDataGrid.DragLeave += PartsDataGrid_DragLeave;
 
             // Инициализация CollectionViewSource для фильтрации
             partsDataView = new CollectionViewSource { Source = partsData };
@@ -88,14 +92,64 @@ namespace FPECORE
             AvailableColors = layerSettingsWindow.AvailableColors;
             LineTypes = layerSettingsWindow.LineTypes;
 
+            // Инициализация предустановленных колонок
+            PresetIProperties = new ObservableCollection<PresetIProperty>
+            {
+                new PresetIProperty { InternalName = "#", DisplayName = "#Нумерация", InventorPropertyName = "Item", IsAdded = true },
+                new PresetIProperty { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber", IsAdded = true },
+                new PresetIProperty { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description", IsAdded = true },
+                new PresetIProperty { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState", IsAdded = true },
+                new PresetIProperty { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material", IsAdded = true },
+                new PresetIProperty { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness", IsAdded = true },
+                new PresetIProperty { InternalName = "Количество", DisplayName = "Количество", InventorPropertyName = "Quantity", IsAdded = true },
+                new PresetIProperty { InternalName = "Изображение детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview", IsAdded = true },
+                new PresetIProperty { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", IsAdded = true }
+            };
+
             // Устанавливаем DataContext для текущего окна, объединяя данные из LayerSettingsWindow и других источников
             DataContext = this;
+
+            // Инициализация DataGrid с предустановленными колонками
+            InitializePresetColumns();
 
             // Добавляем обработчики для отслеживания нажатия и отпускания клавиши Ctrl
             this.KeyDown += new System.Windows.Input.KeyEventHandler(MainWindow_KeyDown);
             this.KeyUp += new System.Windows.Input.KeyEventHandler(MainWindow_KeyUp);
         }
+        private void InitializePresetColumns()
+        {
+            if (PresetIProperties == null)
+            {
+                throw new InvalidOperationException("PresetIProperties is not initialized.");
+            }
 
+            foreach (var property in PresetIProperties)
+            {
+                if (property.IsAdded)
+                {
+                    AddIPropertyColumn(property);
+                }
+            }
+        }
+        private void PartsDataGrid_DragOver(object sender, System.Windows.DragEventArgs e)
+        {
+            // Уведомляем SelectIPropertyWindow, что курсор находится над DataGrid
+            var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
+            if (selectIPropertyWindow != null)
+            {
+                selectIPropertyWindow.partsDataGrid_DragOver(sender, e);
+            }
+        }
+
+        private void PartsDataGrid_DragLeave(object sender, System.Windows.DragEventArgs e)
+        {
+            // Уведомляем SelectIPropertyWindow, что курсор ушел из DataGrid
+            var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
+            if (selectIPropertyWindow != null)
+            {
+                selectIPropertyWindow.partsDataGrid_DragLeave(sender, e);
+            }
+        }
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
@@ -111,6 +165,18 @@ namespace FPECORE
 
             // Если были созданы дополнительные потоки, убедитесь, что они завершены
         }
+        private void AddPresetIPropertyButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectIPropertyWindow = new SelectIPropertyWindow(PresetIProperties);
+            selectIPropertyWindow.ShowDialog();
+
+            // После закрытия окна добавляем выбранные свойства
+            foreach (var property in selectIPropertyWindow.SelectedProperties)
+            {
+                AddIPropertyColumn(property);
+            }
+        }
+
         private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             // Получаем источник события
@@ -229,7 +295,55 @@ namespace FPECORE
                 e.Row.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(245, 245, 245)); // #F5F5F5
             }
         }
+        private void partsDataGrid_Drop(object sender, System.Windows.DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(typeof(PresetIProperty)))
+            {
+                var droppedData = e.Data.GetData(typeof(PresetIProperty)) as PresetIProperty;
+                if (droppedData != null && !droppedData.IsAdded)
+                {
+                    droppedData.IsAdded = true;
+                    // Добавляем колонку в DataGrid
+                    AddIPropertyColumn(droppedData);
+                }
+            }
+        }
 
+        public void AddIPropertyColumn(PresetIProperty iProperty)
+        {
+            if (partsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.InternalName))
+                return;
+
+            DataGridColumn column;
+
+            if (iProperty.InternalName == "Preview" || iProperty.InternalName == "DxfPreview")
+            {
+                column = new DataGridTemplateColumn
+                {
+                    Header = iProperty.InternalName,
+                    CellTemplate = new DataTemplate
+                    {
+                        VisualTree = new FrameworkElementFactory(typeof(System.Windows.Controls.Image), "img")
+                    }
+                };
+                (column as DataGridTemplateColumn).CellTemplate.VisualTree.SetBinding(System.Windows.Controls.Image.SourceProperty, new System.Windows.Data.Binding(iProperty.InventorPropertyName));
+            }
+            else
+            {
+                column = new DataGridTextColumn
+                {
+                    Header = iProperty.InternalName,
+                    Binding = new System.Windows.Data.Binding(iProperty.InventorPropertyName)
+                };
+            }
+
+            partsDataGrid.Columns.Add(column);
+            iProperty.IsAdded = true; // Обновляем флаг IsAdded
+
+            // Обновляем список доступных свойств
+            var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
+            selectIPropertyWindow?.UpdateAvailableProperties();
+        }
         // Метод для обновления таблицы после добавления новых элементов
         private void AddPartData(PartData partData)
         {
@@ -367,7 +481,6 @@ namespace FPECORE
         }
         private void PartsDataGrid_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            // Убираем Adorner
             if (_adornerLayer != null && _headerAdorner != null)
             {
                 _adornerLayer.Remove(_headerAdorner);
@@ -378,19 +491,26 @@ namespace FPECORE
             {
                 string columnName = _reorderingColumn.Header.ToString();
 
-                // Удаляем колонку
-                partsDataGrid.Columns.Remove(_reorderingColumn);
-
-                // Удаляем соответствующие данные из CustomProperties
-                foreach (var partData in partsData)
+                // Проверка для предустановленных колонок
+                var removedIProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == columnName);
+                if (removedIProperty != null)
                 {
-                    partData.RemoveCustomProperty(columnName);
+                    removedIProperty.IsAdded = false;
+                    // Убираем колонку из DataGrid
+                    partsDataGrid.Columns.Remove(_reorderingColumn);
                 }
+                else
+                {
+                    // Логика для кастомных колонок
+                    var customPropertyColumn = partsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == columnName);
+                    if (customPropertyColumn != null)
+                    {
+                        partsDataGrid.Columns.Remove(customPropertyColumn);
 
-                // Обновляем список свойств
-                customPropertiesList.Remove(columnName);
-
-                partsDataGrid.Items.Refresh();
+                        // Если это кастомная колонка, она должна быть возвращена в список
+                        customPropertiesList.Remove(columnName);
+                    }
+                }
             }
 
             _reorderingColumn = null;
@@ -2317,5 +2437,11 @@ namespace FPECORE
             System.Windows.MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
-
+    public class PresetIProperty
+    {
+        public string InternalName { get; set; }  // Внутреннее имя колонки (например, "#")
+        public string DisplayName { get; set; }   // Псевдоним для отображения в списке выбора (например, "#Нумерация")
+        public string InventorPropertyName { get; set; }  // Соответствующее имя свойства iProperty в Inventor
+        public bool IsAdded { get; set; }  // Флаг, указывающий, добавлена ли колонка в DataGrid
+    }
 }

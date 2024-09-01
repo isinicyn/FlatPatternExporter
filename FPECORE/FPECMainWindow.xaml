@@ -15,6 +15,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
+        <Button x:Name="addPresetIPropertyButton" Content="+ iProperty" Click="AddPresetIPropertyButton_Click" Height="30" Margin="260,0,0,50" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115"/>
+
         <!-- Поле поиска с иконкой крестика для очистки -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10,10,10,10">
             <Grid Width="300" Margin="10,0,0,10" VerticalAlignment="Top">
@@ -53,6 +55,8 @@
           HorizontalGridLinesBrush="#EAEAEA"
           VerticalGridLinesBrush="#EAEAEA"
           SelectionMode="Extended"
+          Drop="partsDataGrid_Drop" 
+          AllowDrop="True"
           RowHeaderWidth="0"
           LoadingRow="partsDataGrid_LoadingRow">
 
