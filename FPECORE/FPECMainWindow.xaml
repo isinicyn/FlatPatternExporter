@@ -51,10 +51,8 @@
           HorizontalGridLinesBrush="#EAEAEA"
           VerticalGridLinesBrush="#EAEAEA"
           SelectionMode="Extended"
-          SelectionUnit="FullRow"
-          AlternatingRowBackground="#F5F5F5"
           RowHeaderWidth="0"
-          RowBackground="White">
+          LoadingRow="partsDataGrid_LoadingRow">
 
             <!-- Контекстное меню -->
             <DataGrid.ContextMenu>
@@ -72,6 +70,18 @@
             </DataGrid.ContextMenu>
 
             <DataGrid.Resources>
+
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <Trigger Property="AlternationIndex" Value="0">
+                            <Setter Property="Background" Value="White"/>
+                        </Trigger>
+                        <Trigger Property="AlternationIndex" Value="1">
+                            <Setter Property="Background" Value="#F5F5F5"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+
                 <!-- Стиль для заголовков столбцов -->
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="Background" Value="#F2F2F2"/>

@@ -199,6 +199,18 @@ namespace FPECORE
                 e.Accepted = false;
             }
         }
+        private void partsDataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            // Устанавливаем чередование цветов
+            if (e.Row.GetIndex() % 2 == 0)
+            {
+                e.Row.Background = new SolidColorBrush(Colors.White);
+            }
+            else
+            {
+                e.Row.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(245, 245, 245)); // #F5F5F5
+            }
+        }
 
         // Метод для обновления таблицы после добавления новых элементов
         private void AddPartData(PartData partData)
