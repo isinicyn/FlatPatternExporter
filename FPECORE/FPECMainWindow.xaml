@@ -5,6 +5,7 @@
         Title="Экспорт DXF" Width="1740"
         MinHeight="850" MinWidth="1150"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Height="850">
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
@@ -70,6 +71,23 @@
             </DataGrid.ContextMenu>
 
             <DataGrid.Resources>
+
+                <!-- Общий стиль для TextBlock внутри ячеек -->
+                <Style x:Key="CenteredCellStyle" TargetType="TextBlock">
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                </Style>
+
+                <!-- Специальный стиль для колонки "Количество" с дополнительными настройками -->
+                <Style x:Key="QuantityCellStyle" TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}">
+                    <Setter Property="Foreground" Value="{Binding QuantityColor}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOverridden}" Value="True">
+                            <Setter Property="Foreground" Value="Red"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
 
                 <Style TargetType="DataGridRow">
                     <Style.Triggers>
@@ -166,83 +184,49 @@
                 <!-- Колонка с номером пункта -->
                 <DataGridTextColumn Header="#" Binding="{Binding Item, Mode=OneWay}" Width="Auto" SortMemberPath="Item" SortDirection="Ascending">
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
+                        <StaticResource ResourceKey="CenteredCellStyle"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <!-- Колонка с обозначением детали -->
                 <DataGridTextColumn Header="Обозначение" Binding="{Binding PartNumber}" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
+                        <StaticResource ResourceKey="CenteredCellStyle"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <!-- Колонка с наименованием детали -->
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Description}" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
+                        <StaticResource ResourceKey="CenteredCellStyle"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <!-- Колонка с состоянием модели -->
                 <DataGridTextColumn Header="Состояние модели" Binding="{Binding ModelState}" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
+                        <StaticResource ResourceKey="CenteredCellStyle"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <!-- Колонка с материалом детали -->
                 <DataGridTextColumn Header="Материал" Binding="{Binding Material}" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
+                        <StaticResource ResourceKey="CenteredCellStyle"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <!-- Колонка с толщиной материала -->
                 <DataGridTextColumn Header="Толщина" Binding="{Binding Thickness}" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                        </Style>
+                        <StaticResource ResourceKey="CenteredCellStyle"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <!-- Колонка с количеством деталей -->
                 <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Padding" Value="10,5"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="Foreground" Value="{Binding QuantityColor}"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsOverridden}" Value="True">
-                                    <Setter Property="Foreground" Value="Red"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
+                        <StaticResource ResourceKey="QuantityCellStyle"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
