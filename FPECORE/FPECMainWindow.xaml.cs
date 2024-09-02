@@ -106,10 +106,10 @@ namespace FPECORE
                 new PresetIProperty { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", IsAdded = true },
 
                 // Добавление новых предустановленных свойств
-                new PresetIProperty { InternalName = "Author", DisplayName = "Автор", InventorPropertyName = "Author", IsAdded = false },
-                new PresetIProperty { InternalName = "Revision", DisplayName = "Ревизия", InventorPropertyName = "Revision Number", IsAdded = false },
-                new PresetIProperty { InternalName = "Project", DisplayName = "Проект", InventorPropertyName = "Project", IsAdded = false },
-                new PresetIProperty { InternalName = "Stock number", DisplayName = "Номер партии", InventorPropertyName = "Stock Number", IsAdded = false }
+                new PresetIProperty { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author", IsAdded = false },
+                new PresetIProperty { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision Number", IsAdded = false },
+                new PresetIProperty { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project", IsAdded = false },
+                new PresetIProperty { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "Stock Number", IsAdded = false }
             };
 
             // Устанавливаем DataContext для текущего окна, объединяя данные из LayerSettingsWindow и других источников
@@ -942,28 +942,28 @@ namespace FPECORE
             var propertySets = partDoc.PropertySets;
 
             // Проверка и чтение свойства "Author"
-            var authorProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == "Author");
+            var authorProperty = PresetIProperties.FirstOrDefault(p => p.InventorPropertyName == "Author");
             if (authorProperty != null && authorProperty.IsAdded)
             {
                 partData.Author = GetProperty(propertySets["Summary Information"], "Author");
             }
 
             // Проверка и чтение свойства "Revision"
-            var revisionProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == "Revision");
+            var revisionProperty = PresetIProperties.FirstOrDefault(p => p.InventorPropertyName == "Revision Number");
             if (revisionProperty != null && revisionProperty.IsAdded)
             {
                 partData.Revision = GetProperty(propertySets["Design Tracking Properties"], "Revision Number");
             }
 
             // Проверка и чтение свойства "Project"
-            var projectProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == "Project");
+            var projectProperty = PresetIProperties.FirstOrDefault(p => p.InventorPropertyName == "Project");
             if (projectProperty != null && projectProperty.IsAdded)
             {
                 partData.Project = GetProperty(propertySets["Summary Information"], "Project");
             }
 
             // Проверка и чтение свойства "Stock number"
-            var stockNumberProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == "Stock number");
+            var stockNumberProperty = PresetIProperties.FirstOrDefault(p => p.InventorPropertyName == "Stock Number");
             if (stockNumberProperty != null && stockNumberProperty.IsAdded)
             {
                 partData.StockNumber = GetProperty(propertySets["Design Tracking Properties"], "Stock Number");
