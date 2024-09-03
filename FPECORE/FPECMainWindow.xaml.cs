@@ -2000,19 +2000,37 @@ namespace FPECORE
 
         private void MultiplierTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // Проверяем, является ли введенное значение допустимым числом
             if (int.TryParse(multiplierTextBox.Text, out int multiplier) && multiplier > 0)
             {
                 UpdateQuantitiesWithMultiplier(multiplier);
+
+                // Проверка на null перед изменением видимости кнопки
+                if (clearMultiplierButton != null)
+                {
+                    clearMultiplierButton.Visibility = multiplier > 1 ? Visibility.Visible : Visibility.Collapsed;
+                }
             }
             else
             {
-                // Если введенное значение некорректное, сбрасываем текст на последнее допустимое значение
+                // Если введенное значение некорректное, сбрасываем текст на "1" и скрываем кнопку сброса
                 multiplierTextBox.Text = "1";
                 UpdateQuantitiesWithMultiplier(1);
+
+                if (clearMultiplierButton != null)
+                {
+                    clearMultiplierButton.Visibility = Visibility.Collapsed;
+                }
             }
         }
+        private void ClearMultiplierButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Сбрасываем множитель на 1
+            multiplierTextBox.Text = "1";
+            UpdateQuantitiesWithMultiplier(1);
 
+            // Скрываем кнопку сброса
+            clearMultiplierButton.Visibility = Visibility.Collapsed;
+        }
         private void UpdateFileCountLabel(int count)
         {
             fileCountLabelBottom.Text = $"Найдено листовых деталей: {count}";
