@@ -724,6 +724,14 @@ namespace FPECORE
                 return;
             }
 
+            // Проверка на наличие активного документа
+            Document? doc = ThisApplication.ActiveDocument as Document;
+            if (doc == null)
+            {
+                MessageBoxHelper.ShowNoDocumentOpenWarning();
+                return;
+            }
+
             bool isBackgroundMode = backgroundModeCheckBox.IsChecked == true;
             if (isBackgroundMode)
             {
@@ -731,13 +739,6 @@ namespace FPECORE
             }
 
             modelStateInfoRunBottom.Text = string.Empty;
-
-            Document? doc = ThisApplication.ActiveDocument as Document;
-            if (doc == null)
-            {
-                MessageBoxHelper.ShowNoDocumentOpenWarning();
-                return;
-            }
 
             if (doc.DocumentType != DocumentTypeEnum.kAssemblyDocumentObject && doc.DocumentType != DocumentTypeEnum.kPartDocumentObject)
             {
