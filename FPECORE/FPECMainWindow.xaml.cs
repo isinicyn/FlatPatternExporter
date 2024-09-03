@@ -95,21 +95,21 @@ namespace FPECORE
             // Инициализация предустановленных колонок
             PresetIProperties = new ObservableCollection<PresetIProperty>
             {
-                new PresetIProperty { InternalName = "#", DisplayName = "#Нумерация", InventorPropertyName = "Item", IsAdded = true },
-                new PresetIProperty { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber", IsAdded = true },
-                new PresetIProperty { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description", IsAdded = true },
-                new PresetIProperty { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState", IsAdded = true },
-                new PresetIProperty { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material", IsAdded = true },
-                new PresetIProperty { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness", IsAdded = true },
-                new PresetIProperty { InternalName = "Количество", DisplayName = "Количество", InventorPropertyName = "Quantity", IsAdded = true },
-                new PresetIProperty { InternalName = "Изображение детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview", IsAdded = true },
-                new PresetIProperty { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", IsAdded = true },
+                new PresetIProperty { InternalName = "#", DisplayName = "#Нумерация", InventorPropertyName = "Item"},
+                new PresetIProperty { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber"},
+                new PresetIProperty { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description"},
+                new PresetIProperty { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState"},
+                new PresetIProperty { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material"},
+                new PresetIProperty { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness"},
+                new PresetIProperty { InternalName = "Количество", DisplayName = "Количество", InventorPropertyName = "Quantity"},
+                new PresetIProperty { InternalName = "Изображение детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview"},
+                new PresetIProperty { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview"},
 
                 // Добавление новых предустановленных свойств
-                new PresetIProperty { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author", IsAdded = false },
-                new PresetIProperty { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision Number", IsAdded = false },
-                new PresetIProperty { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project", IsAdded = false },
-                new PresetIProperty { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "Stock Number", IsAdded = false }
+                new PresetIProperty { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author"}, //, ShouldBeAddedOnInit = true or false
+                new PresetIProperty { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision Number" },
+                new PresetIProperty { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project"},
+                new PresetIProperty { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "Stock Number"}
             };
 
             // Устанавливаем DataContext для текущего окна, объединяя данные из LayerSettingsWindow и других источников
@@ -122,6 +122,19 @@ namespace FPECORE
             this.KeyDown += new System.Windows.Input.KeyEventHandler(MainWindow_KeyDown);
             this.KeyUp += new System.Windows.Input.KeyEventHandler(MainWindow_KeyUp);
         }
+        public bool IsColumnPresent(string columnName)
+        {
+            bool result = false;
+
+            // Используем Dispatcher для доступа к UI-элементам
+            Dispatcher.Invoke(() =>
+            {
+                result = partsDataGrid.Columns.Any(c => c.Header.ToString() == columnName);
+            });
+
+            return result;
+        }
+
         private void InitializePresetColumns()
         {
             if (PresetIProperties == null)
@@ -131,7 +144,14 @@ namespace FPECORE
 
             foreach (var property in PresetIProperties)
             {
-                if (property.IsAdded)
+                // Если колонка уже есть в таблице, ничего не делаем
+                if (IsColumnPresent(property.InternalName))
+                {
+                    continue;
+                }
+
+                // Если колонка не добавлена в XAML, пропускаем её добавление
+                if (property.ShouldBeAddedOnInit)
                 {
                     AddIPropertyColumn(property);
                 }
@@ -173,7 +193,7 @@ namespace FPECORE
         }
         private void AddPresetIPropertyButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectIPropertyWindow = new SelectIPropertyWindow(PresetIProperties);
+            var selectIPropertyWindow = new SelectIPropertyWindow(PresetIProperties, this); // Передаем `this` как ссылку на MainWindow
             selectIPropertyWindow.ShowDialog();
 
             // После закрытия окна добавляем выбранные свойства
@@ -306,7 +326,7 @@ namespace FPECORE
             if (e.Data.GetDataPresent(typeof(PresetIProperty)))
             {
                 var droppedData = e.Data.GetData(typeof(PresetIProperty)) as PresetIProperty;
-                if (droppedData != null && !droppedData.IsAdded)
+                if (droppedData != null && !IsColumnPresent(droppedData.InternalName))
                 {
                     // Определяем позицию мыши
                     System.Windows.Point position = e.GetPosition(partsDataGrid);
@@ -333,7 +353,7 @@ namespace FPECORE
         public void AddIPropertyColumn(PresetIProperty iProperty, int? insertIndex = null)
         {
             // Проверяем, существует ли уже колонка с таким заголовком
-            if (partsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.InternalName))
+            if (IsColumnPresent(iProperty.InternalName))
                 return;
 
             DataGridColumn column;
@@ -386,11 +406,10 @@ namespace FPECORE
                 partsDataGrid.Columns.Add(column);
             }
 
-            iProperty.IsAdded = true;
             // Обновляем список доступных свойств
             var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
             selectIPropertyWindow?.UpdateAvailableProperties();
-        }        
+        }
         private void AddPartData(PartData partData)
         {
             partsData.Add(partData);
@@ -537,25 +556,15 @@ namespace FPECORE
             {
                 string columnName = _reorderingColumn.Header.ToString();
 
-                // Проверка для предустановленных колонок
-                var removedIProperty = PresetIProperties.FirstOrDefault(p => p.InternalName == columnName);
-                if (removedIProperty != null)
+                // Убираем колонку из DataGrid
+                var columnToRemove = partsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == columnName);
+                if (columnToRemove != null)
                 {
-                    removedIProperty.IsAdded = false;
-                    // Убираем колонку из DataGrid
-                    partsDataGrid.Columns.Remove(_reorderingColumn);
-                }
-                else
-                {
-                    // Логика для кастомных колонок
-                    var customPropertyColumn = partsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == columnName);
-                    if (customPropertyColumn != null)
-                    {
-                        partsDataGrid.Columns.Remove(customPropertyColumn);
+                    partsDataGrid.Columns.Remove(columnToRemove);
 
-                        // Если это кастомная колонка, она должна быть возвращена в список
-                        customPropertiesList.Remove(columnName);
-                    }
+                    // Обновляем список доступных свойств
+                    var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
+                    selectIPropertyWindow?.UpdateAvailableProperties();
                 }
             }
 
@@ -943,29 +952,25 @@ namespace FPECORE
             var propertySets = partDoc.PropertySets;
 
             // Проверка и чтение свойства "Author"
-            var authorProperty = PresetIProperties.FirstOrDefault(p => p.InventorPropertyName == "Author");
-            if (authorProperty != null && authorProperty.IsAdded)
+            if (IsColumnPresent("Автор"))
             {
                 partData.Author = GetProperty(propertySets["Summary Information"], "Author");
             }
 
             // Проверка и чтение свойства "Revision"
-            var revisionProperty = PresetIProperties.FirstOrDefault(p => p.InventorPropertyName == "Revision Number");
-            if (revisionProperty != null && revisionProperty.IsAdded)
+            if (IsColumnPresent("Ревизия"))
             {
                 partData.Revision = GetProperty(propertySets["Design Tracking Properties"], "Revision Number");
             }
 
             // Проверка и чтение свойства "Project"
-            var projectProperty = PresetIProperties.FirstOrDefault(p => p.InventorPropertyName == "Project");
-            if (projectProperty != null && projectProperty.IsAdded)
+            if (IsColumnPresent("Проект"))
             {
                 partData.Project = GetProperty(propertySets["Summary Information"], "Project");
             }
 
             // Проверка и чтение свойства "Stock number"
-            var stockNumberProperty = PresetIProperties.FirstOrDefault(p => p.InventorPropertyName == "Stock Number");
-            if (stockNumberProperty != null && stockNumberProperty.IsAdded)
+            if (IsColumnPresent("Инвентарный номер"))
             {
                 partData.StockNumber = GetProperty(propertySets["Design Tracking Properties"], "Stock Number");
             }
@@ -2530,6 +2535,6 @@ namespace FPECORE
         public string InternalName { get; set; }  // Внутреннее имя колонки (например, "#")
         public string DisplayName { get; set; }   // Псевдоним для отображения в списке выбора (например, "#Нумерация")
         public string InventorPropertyName { get; set; }  // Соответствующее имя свойства iProperty в Inventor
-        public bool IsAdded { get; set; }  // Флаг, указывающий, добавлена ли колонка в DataGrid
+        public bool ShouldBeAddedOnInit { get; set; } = false;  // Новый флаг для определения необходимости добавления при старте
     }
 }
