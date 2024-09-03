@@ -705,12 +705,17 @@ namespace FPECORE
         }
         private void MultiplierTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
-            e.Handled = !IsTextAllowed(e.Text);
+            // Проверяем текущий текст вместе с новым вводом
+            string newText = (sender as System.Windows.Controls.TextBox).Text.Insert((sender as System.Windows.Controls.TextBox).CaretIndex, e.Text);
+
+            // Проверяем, является ли текст положительным числом больше нуля
+            e.Handled = !IsTextAllowed(newText);
         }
 
         private static bool IsTextAllowed(string text)
         {
-            Regex regex = new Regex("^[1-9][0-9]*$"); // Разрешены только положительные числа, исключая ноль
+            // Регулярное выражение для проверки положительных чисел
+            Regex regex = new Regex("^[1-9][0-9]*$"); // Разрешены только положительные числа больше нуля
             return regex.IsMatch(text);
         }
 
@@ -1995,9 +2000,16 @@ namespace FPECORE
 
         private void MultiplierTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            // Проверяем, является ли введенное значение допустимым числом
             if (int.TryParse(multiplierTextBox.Text, out int multiplier) && multiplier > 0)
             {
                 UpdateQuantitiesWithMultiplier(multiplier);
+            }
+            else
+            {
+                // Если введенное значение некорректное, сбрасываем текст на последнее допустимое значение
+                multiplierTextBox.Text = "1";
+                UpdateQuantitiesWithMultiplier(1);
             }
         }
 
