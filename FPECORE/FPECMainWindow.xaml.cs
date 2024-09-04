@@ -40,6 +40,7 @@ namespace FPECORE
         private const string PlaceholderText = "Поиск...";
         private string actualSearchText = string.Empty; // Поле для хранения фактического текста поиска
         private string fixedFolderPath = string.Empty;
+        private bool isEditing = false;
 
         public ObservableCollection<LayerSetting> LayerSettings { get; set; }
         public ObservableCollection<string> AvailableColors { get; set; }
@@ -155,6 +156,50 @@ namespace FPECORE
                 {
                     AddIPropertyColumn(property);
                 }
+            }
+        }
+        private void EditButton_Click(object sender, RoutedEventArgs e)
+        {
+            isEditing = true;
+            partsDataGrid.IsReadOnly = false;
+            editButton.IsEnabled = false;
+            saveButton.IsEnabled = true;
+
+            // Разрешаем редактирование только для выбранных строк
+            foreach (var item in partsData)
+            {
+                item.IsReadOnly = false;
+            }
+        }
+
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            isEditing = false;
+            partsDataGrid.IsReadOnly = true;
+            editButton.IsEnabled = true;
+            saveButton.IsEnabled = false;
+
+            // Записываем изменения обратно в файлы Inventor
+            foreach (var item in partsData)
+            {
+                await SaveIPropertyChangesAsync(item);
+                item.IsReadOnly = true;
+            }
+        }
+
+        private async Task SaveIPropertyChangesAsync(PartData item)
+        {
+            var partDoc = OpenPartDocument(item.PartNumber);
+            if (partDoc != null)
+            {
+                SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number", item.PartNumber);
+                SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description", item.Description);
+
+                await Task.Run(() =>
+                {
+                    partDoc.Save();
+                    partDoc.Close();
+                });
             }
         }
         private void PartsDataGrid_DragOver(object sender, System.Windows.DragEventArgs e)
@@ -2397,9 +2442,12 @@ namespace FPECORE
     {
         private int quantity;
         private System.Windows.Media.Brush quantityColor;
-        private int item; // Новое поле для пункта
+        private int item;
+        private Dictionary<string, string> customProperties = new Dictionary<string, string>();
+        private bool isReadOnly = true;
 
-        public int Item // Измените тип на int
+        // Порядковый номер элемента
+        public int Item
         {
             get => item;
             set
@@ -2408,7 +2456,8 @@ namespace FPECORE
                 OnPropertyChanged();
             }
         }
-        private Dictionary<string, string> customProperties = new Dictionary<string, string>();
+
+        // Пользовательские свойства
         public Dictionary<string, string> CustomProperties
         {
             get => customProperties;
@@ -2419,12 +2468,14 @@ namespace FPECORE
             }
         }
 
+        // Основные свойства детали
         public string PartNumber { get; set; }
         public string ModelState { get; set; }
         public string Description { get; set; }
         public string Material { get; set; }
         public string Thickness { get; set; }
         public int OriginalQuantity { get; set; }
+
         public int Quantity
         {
             get => quantity;
@@ -2434,6 +2485,44 @@ namespace FPECORE
                 OnPropertyChanged();
             }
         }
+
+        // Свойства для отображения изображений и цветов
+        public BitmapImage Preview { get; set; }
+        public BitmapImage DxfPreview { get; set; }
+        public System.Windows.Media.Brush FlatPatternColor { get; set; }
+        public System.Windows.Media.Brush ProcessingColor { get; set; } = System.Windows.Media.Brushes.Transparent;
+
+        public System.Windows.Media.Brush QuantityColor
+        {
+            get => quantityColor;
+            set
+            {
+                quantityColor = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Новые свойства для хранения значений iProperty
+        public string Author { get; set; }
+        public string Revision { get; set; }
+        public string Project { get; set; }
+        public string StockNumber { get; set; }
+
+        // Свойство для контроля редактируемости
+        public bool IsReadOnly
+        {
+            get => isReadOnly;
+            set
+            {
+                isReadOnly = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Флаг переопределения
+        public bool IsOverridden { get; set; } = false;
+
+        // Методы для работы с пользовательскими свойствами
         public void AddCustomProperty(string propertyName, string propertyValue)
         {
             if (customProperties.ContainsKey(propertyName))
@@ -2446,24 +2535,7 @@ namespace FPECORE
             }
             OnPropertyChanged(nameof(CustomProperties));
         }
-        public BitmapImage Preview { get; set; }
-        public System.Windows.Media.Brush FlatPatternColor { get; set; }
-        public System.Windows.Media.Brush ProcessingColor { get; set; } = System.Windows.Media.Brushes.Transparent;
-        public System.Windows.Media.Brush QuantityColor
-        {
-            get => quantityColor;
-            set
-            {
-                quantityColor = value;
-                OnPropertyChanged();
-            }
-        }
-            // Новые свойства для хранения значений iProperty
-        public string Author { get; set; }
-        public string Revision { get; set; }
-        public string Project { get; set; }
-        public string StockNumber { get; set; }
-    
+
         public void RemoveCustomProperty(string propertyName)
         {
             if (customProperties.ContainsKey(propertyName))
@@ -2473,9 +2545,7 @@ namespace FPECORE
             }
         }
 
-        public bool IsOverridden { get; set; } = false;
-        public BitmapImage DxfPreview { get; set; }
-
+        // Реализация интерфейса INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
