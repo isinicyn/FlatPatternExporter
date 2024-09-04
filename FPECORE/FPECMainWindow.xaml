@@ -40,25 +40,29 @@
                 </Button>
             </Grid>
         </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="385,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="75" Width="245">
+            <Button x:Name="editButton" Content="Редактировать" Click="EditButton_Click" Margin="0,0,10,0" Height="75" Width="75" />
+            <Button x:Name="saveButton" Content="Сохранить" Click="SaveButton_Click" Margin="0,0,10,0" Height="75" Width="75" IsEnabled="False" />
+        </StackPanel>
         <DataGrid x:Name="partsDataGrid"
-          AutoGenerateColumns="False"
-          Margin="10,0,10,10"
-          IsReadOnly="True"
-          CanUserAddRows="False"
-          Grid.Row="2"
-          RowHeight="50"
-          GridLinesVisibility="None"
-          Background="White"
-          VerticalAlignment="Top"
-          BorderBrush="#D6D6D6"
-          BorderThickness="1"
-          HorizontalGridLinesBrush="#EAEAEA"
-          VerticalGridLinesBrush="#EAEAEA"
-          SelectionMode="Extended"
-          Drop="partsDataGrid_Drop" 
-          AllowDrop="True"
-          RowHeaderWidth="0"
-          LoadingRow="partsDataGrid_LoadingRow">
+              AutoGenerateColumns="False"
+              Margin="10,0,10,10"
+              IsReadOnly="True"
+              CanUserAddRows="False"
+              Grid.Row="2"
+              RowHeight="50"
+              GridLinesVisibility="None"
+              Background="White"
+              VerticalAlignment="Top"
+              BorderBrush="#D6D6D6"
+              BorderThickness="1"
+              HorizontalGridLinesBrush="#EAEAEA"
+              VerticalGridLinesBrush="#EAEAEA"
+              SelectionMode="Extended"
+              Drop="partsDataGrid_Drop" 
+              AllowDrop="True"
+              RowHeaderWidth="0"
+              LoadingRow="partsDataGrid_LoadingRow">
 
             <!-- Контекстное меню -->
             <DataGrid.ContextMenu>
@@ -205,18 +209,39 @@
                 </DataGridTextColumn>
 
                 <!-- Колонка с обозначением детали -->
-                <DataGridTextColumn Header="Обозначение" Binding="{Binding PartNumber}" Width="Auto">
-                    <DataGridTextColumn.ElementStyle>
-                        <StaticResource ResourceKey="CenteredCellStyle"/>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                <DataGridTemplateColumn Header="Обозначение" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding PartNumber}" Style="{StaticResource CenteredCellStyle}" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding PartNumber, UpdateSourceTrigger=PropertyChanged}" 
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     Padding="5,2"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
 
                 <!-- Колонка с наименованием детали -->
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Description}" Width="Auto">
-                    <DataGridTextColumn.ElementStyle>
-                        <StaticResource ResourceKey="CenteredCellStyle"/>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                <DataGridTemplateColumn Header="Наименование" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Description}" Style="{StaticResource CenteredCellStyle}" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     Padding="5,2"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
 
                 <!-- Колонка с состоянием модели -->
                 <DataGridTextColumn Header="Состояние модели" Binding="{Binding ModelState}" Width="Auto">
