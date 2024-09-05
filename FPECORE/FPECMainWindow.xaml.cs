@@ -1957,39 +1957,19 @@ namespace FPECORE
         private PartDocument OpenPartDocument(string partNumber)
         {
             var docs = ThisApplication.Documents;
-            PartDocument partDoc = null;
 
             // Попытка найти открытый документ
             foreach (Document doc in docs)
             {
                 if (doc is PartDocument pd && GetProperty(pd.PropertySets["Design Tracking Properties"], "Part Number") == partNumber)
                 {
-                    return pd;
+                    return pd; // Возвращаем найденный открытый документ
                 }
             }
 
-            // Попытка открыть документ по имени файла
-            var projectManager = ThisApplication.DesignProjectManager;
-            var activeProject = projectManager.ActiveDesignProject;
-            string fullFileName = System.IO.Path.Combine(activeProject.WorkspacePath, partNumber + ".ipt");
-
-            if (System.IO.File.Exists(fullFileName))
-            {
-                try
-                {
-                    partDoc = (PartDocument)docs.Open(fullFileName);
-                }
-                catch (Exception ex)
-                {
-                    System.Windows.MessageBox.Show($"Ошибка при открытии файла {partNumber}: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            else
-            {
-                System.Windows.MessageBox.Show($"Файл {partNumber} не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-            return partDoc;
+            // Если документ не найден
+            System.Windows.MessageBox.Show($"Документ с номером детали {partNumber} не найден среди открытых.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            return null; // Возвращаем null, если документ не найден
         }
 
         private string GetMaterialForPart(PartDocument partDoc)
@@ -2177,14 +2157,30 @@ namespace FPECORE
             {
                 string partNumber = item.PartNumber;
                 string fullPath = GetPartDocumentFullPath(partNumber);
+
+                // Проверка на null перед использованием fullPath
+                if (string.IsNullOrEmpty(fullPath))
+                {
+                    System.Windows.MessageBox.Show($"Файл, связанный с номером детали {partNumber}, не найден среди открытых.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    continue;
+                }
+
+                // Проверка существования файла
                 if (System.IO.File.Exists(fullPath))
                 {
-                    string argument = "/select, \"" + fullPath + "\"";
-                    Process.Start("explorer.exe", argument);
+                    try
+                    {
+                        string argument = "/select, \"" + fullPath + "\"";
+                        Process.Start("explorer.exe", argument);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.MessageBox.Show($"Ошибка при открытии проводника для файла по пути {fullPath}: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show($"Файл {partNumber} не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show($"Файл по пути {fullPath}, связанный с номером детали {partNumber}, не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -2202,20 +2198,30 @@ namespace FPECORE
             {
                 string partNumber = item.PartNumber;
                 string fullPath = GetPartDocumentFullPath(partNumber);
+
+                // Проверка на null перед использованием fullPath
+                if (string.IsNullOrEmpty(fullPath))
+                {
+                    System.Windows.MessageBox.Show($"Файл, связанный с номером детали {partNumber}, не найден среди открытых.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    continue;
+                }
+
+                // Проверка существования файла
                 if (System.IO.File.Exists(fullPath))
                 {
                     try
                     {
+                        // Открытие документа в Inventor
                         ThisApplication.Documents.Open(fullPath);
                     }
                     catch (Exception ex)
                     {
-                        System.Windows.MessageBox.Show($"Ошибка при открытии файла {partNumber}: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        System.Windows.MessageBox.Show($"Ошибка при открытии файла по пути {fullPath}: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show($"Файл {partNumber} не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Windows.MessageBox.Show($"Файл по пути {fullPath}, связанный с номером детали {partNumber}, не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -2223,22 +2229,19 @@ namespace FPECORE
         private string GetPartDocumentFullPath(string partNumber)
         {
             var docs = ThisApplication.Documents;
+
+            // Попытка найти открытый документ
             foreach (Document doc in docs)
             {
-                if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
+                if (doc is PartDocument pd && GetProperty(pd.PropertySets["Design Tracking Properties"], "Part Number") == partNumber)
                 {
-                    var partDoc = doc as PartDocument;
-                    if (partDoc != null && GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number") == partNumber)
-                    {
-                        return partDoc.FullFileName;
-                    }
+                    return pd.FullFileName; // Возвращаем полный путь найденного документа
                 }
             }
 
-            // Если документ не найден в открытых, ищем в проекте
-            var projectManager = ThisApplication.DesignProjectManager;
-            var activeProject = projectManager.ActiveDesignProject;
-            return System.IO.Path.Combine(activeProject.WorkspacePath, partNumber + ".ipt");
+            // Если документ не найден среди открытых
+            System.Windows.MessageBox.Show($"Документ с номером детали {partNumber} не найден среди открытых.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            return null; // Возвращаем null, если документ не найден
         }
 
         private void partsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -2610,9 +2613,20 @@ namespace FPECORE
             System.Windows.MessageBox.Show("Выбранные файлы не содержат разверток.", "Информация", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
-        public static void ShowPartNotFoundError(string partNumber)
+        public static void ShowPartNotFoundError(string partNumber, string filePath = null)
         {
-            System.Windows.MessageBox.Show($"Файл {partNumber} не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            string message;
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                message = $"Файл, связанный с номером детали {partNumber}, не найден среди открытых документов.";
+            }
+            else
+            {
+                message = $"Файл по пути {filePath}, связанный с номером детали {partNumber}, не найден.";
+            }
+
+            System.Windows.MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         public static void ShowExportCompletedInfo(int processedCount, int skippedCount, string elapsedTime)
