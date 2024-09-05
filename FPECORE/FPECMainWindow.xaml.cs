@@ -169,8 +169,11 @@ namespace FPECORE
             {
                 // Сохраняем оригинальный PartNumber перед редактированием
                 item.OriginalPartNumber = item.PartNumber;
-                item.IsReadOnly = false;
+                item.IsReadOnly = false;  // Разрешаем редактирование
             }
+
+            // Выделяем редактируемые колонки, если нужно визуально выделить редактируемые поля
+            partsDataGrid.Items.Refresh();
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -185,10 +188,15 @@ namespace FPECORE
                 if (item.IsModified)  // Сохраняем только изменённые элементы
                 {
                     await SaveIPropertyChangesAsync(item);
+
+                    // Устанавливаем элемент обратно в режим "только для чтения"
                     item.IsReadOnly = true;
                     item.IsModified = false;  // Сбрасываем флаг изменений после сохранения
                 }
             }
+
+            // Сбрасываем визуальное выделение редактируемых колонок после сохранения
+            partsDataGrid.Items.Refresh();
         }
 
         private async Task SaveIPropertyChangesAsync(PartData item)

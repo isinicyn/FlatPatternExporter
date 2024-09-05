@@ -83,6 +83,22 @@
 
             <DataGrid.Resources>
 
+                <!-- Стиль для редактируемых ячеек -->
+                <Style x:Key="EditableCellStyle" TargetType="DataGridCell">
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="BorderBrush" Value="#EAEAEA"/>
+                    <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Foreground" Value="#333333"/>
+                    <!-- Добавляем визуальное выделение для редактируемых ячеек при активном режиме редактирования -->
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsReadOnly}" Value="False">
+                            <Setter Property="Background" Value="LightYellow"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+
                 <!-- Общий стиль для TextBlock внутри ячеек -->
                 <Style x:Key="CenteredCellStyle" TargetType="TextBlock">
                     <Setter Property="Padding" Value="10,5"/>
@@ -224,6 +240,9 @@
                      Padding="5,2"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
+                    <DataGridTemplateColumn.CellStyle>
+                        <StaticResource ResourceKey="EditableCellStyle"/>
+                    </DataGridTemplateColumn.CellStyle>
                 </DataGridTemplateColumn>
 
                 <!-- Колонка с наименованием детали -->
@@ -241,6 +260,9 @@
                      Padding="5,2"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
+                    <DataGridTemplateColumn.CellStyle>
+                        <StaticResource ResourceKey="EditableCellStyle"/>
+                    </DataGridTemplateColumn.CellStyle>
                 </DataGridTemplateColumn>
 
                 <!-- Колонка с состоянием модели -->
