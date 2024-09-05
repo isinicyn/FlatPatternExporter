@@ -180,11 +180,14 @@ namespace FPECORE
             editButton.IsEnabled = true;
             saveButton.IsEnabled = false;
 
-            // Записываем изменения обратно в файлы Inventor
             foreach (var item in partsData)
             {
-                await SaveIPropertyChangesAsync(item);
-                item.IsReadOnly = true;
+                if (item.IsModified)  // Сохраняем только изменённые элементы
+                {
+                    await SaveIPropertyChangesAsync(item);
+                    item.IsReadOnly = true;
+                    item.IsModified = false;  // Сбрасываем флаг изменений после сохранения
+                }
             }
         }
 
@@ -192,11 +195,9 @@ namespace FPECORE
         {
             try
             {
-                // Используем OriginalPartNumber для открытия документа
                 var partDoc = OpenPartDocument(item.OriginalPartNumber);
                 if (partDoc != null)
                 {
-                    // Сохраняем обновленные данные
                     SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number", item.PartNumber);
                     SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description", item.Description);
 
@@ -205,6 +206,9 @@ namespace FPECORE
                         partDoc.Save2(true);
                         partDoc.Close();
                     });
+
+                    // После успешного сохранения сбрасываем флаг
+                    item.IsModified = false;
                 }
             }
             catch (Exception ex)
@@ -2459,17 +2463,12 @@ namespace FPECORE
         private int item;
         private Dictionary<string, string> customProperties = new Dictionary<string, string>();
         private bool isReadOnly = true;
-
+        private string partNumber;
+        private string description;
+        private string material;
+        private string thickness;
         private string originalPartNumber; // Хранит оригинальный PartNumber
-        public string OriginalPartNumber
-        {
-            get => originalPartNumber;
-            set
-            {
-                originalPartNumber = value;
-                OnPropertyChanged();
-            }
-        }
+        private bool isModified; // Флаг для отслеживания изменений
 
         // Порядковый номер элемента
         public int Item
@@ -2494,11 +2493,62 @@ namespace FPECORE
         }
 
         // Основные свойства детали
-        public string PartNumber { get; set; }
+        public string PartNumber
+        {
+            get => partNumber;
+            set
+            {
+                partNumber = value;
+                IsModified = true;  // Устанавливаем флаг изменений при изменении
+                OnPropertyChanged();
+            }
+        }
+
+        public string OriginalPartNumber
+        {
+            get => originalPartNumber;
+            set
+            {
+                originalPartNumber = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string ModelState { get; set; }
-        public string Description { get; set; }
-        public string Material { get; set; }
-        public string Thickness { get; set; }
+
+        public string Description
+        {
+            get => description;
+            set
+            {
+                description = value;
+                IsModified = true;  // Устанавливаем флаг изменений при изменении
+                OnPropertyChanged();
+            }
+        }
+
+        public string Material
+        {
+            get => material;
+            set
+            {
+                material = value;
+                IsModified = true;  // Устанавливаем флаг изменений при изменении
+                OnPropertyChanged();
+            }
+        }
+
+        public string Thickness
+        {
+            get => thickness;
+            set
+            {
+                thickness = value;
+                IsModified = true;  // Устанавливаем флаг изменений при изменении
+                OnPropertyChanged();
+            }
+        }
+
         public int OriginalQuantity { get; set; }
 
         public int Quantity
@@ -2507,6 +2557,7 @@ namespace FPECORE
             set
             {
                 quantity = value;
+                IsModified = true;  // Устанавливаем флаг изменений при изменении
                 OnPropertyChanged();
             }
         }
@@ -2544,6 +2595,17 @@ namespace FPECORE
             }
         }
 
+        // Флаг для отслеживания изменений
+        public bool IsModified
+        {
+            get => isModified;
+            set
+            {
+                isModified = value;
+                OnPropertyChanged();
+            }
+        }
+
         // Флаг переопределения
         public bool IsOverridden { get; set; } = false;
 
@@ -2558,6 +2620,7 @@ namespace FPECORE
             {
                 customProperties.Add(propertyName, propertyValue);
             }
+            IsModified = true;  // Устанавливаем флаг изменений
             OnPropertyChanged(nameof(CustomProperties));
         }
 
@@ -2566,6 +2629,7 @@ namespace FPECORE
             if (customProperties.ContainsKey(propertyName))
             {
                 customProperties.Remove(propertyName);
+                IsModified = true;  // Устанавливаем флаг изменений
                 OnPropertyChanged(nameof(CustomProperties));
             }
         }
