@@ -165,9 +165,10 @@ namespace FPECORE
             editButton.IsEnabled = false;
             saveButton.IsEnabled = true;
 
-            // Разрешаем редактирование только для выбранных строк
             foreach (var item in partsData)
             {
+                // Сохраняем оригинальный PartNumber перед редактированием
+                item.OriginalPartNumber = item.PartNumber;
                 item.IsReadOnly = false;
             }
         }
@@ -189,18 +190,26 @@ namespace FPECORE
 
         private async Task SaveIPropertyChangesAsync(PartData item)
         {
-            var partDoc = OpenPartDocument(item.PartNumber);
-            if (partDoc != null)
+            try
             {
-                SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number", item.PartNumber);
-                SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description", item.Description);
-
-                await Task.Run(() =>
+                // Используем OriginalPartNumber для открытия документа
+                var partDoc = OpenPartDocument(item.OriginalPartNumber);
+                if (partDoc != null)
                 {
-                    // Сохраняем изменения без запроса на подтверждение
-                    partDoc.Save2(true); // true означает сохранение без запроса подтверждения
-                    partDoc.Close();
-                });
+                    // Сохраняем обновленные данные
+                    SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number", item.PartNumber);
+                    SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description", item.Description);
+
+                    await Task.Run(() =>
+                    {
+                        partDoc.Save2(true);
+                        partDoc.Close();
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -2450,6 +2459,17 @@ namespace FPECORE
         private int item;
         private Dictionary<string, string> customProperties = new Dictionary<string, string>();
         private bool isReadOnly = true;
+
+        private string originalPartNumber; // Хранит оригинальный PartNumber
+        public string OriginalPartNumber
+        {
+            get => originalPartNumber;
+            set
+            {
+                originalPartNumber = value;
+                OnPropertyChanged();
+            }
+        }
 
         // Порядковый номер элемента
         public int Item
