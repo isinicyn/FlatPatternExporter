@@ -197,11 +197,13 @@ namespace FPECORE
 
                 await Task.Run(() =>
                 {
-                    partDoc.Save();
+                    // Сохраняем изменения без запроса на подтверждение
+                    partDoc.Save2(true); // true означает сохранение без запроса подтверждения
                     partDoc.Close();
                 });
             }
         }
+
         private void PartsDataGrid_DragOver(object sender, System.Windows.DragEventArgs e)
         {
             // Уведомляем SelectIPropertyWindow, что курсор находится над DataGrid
