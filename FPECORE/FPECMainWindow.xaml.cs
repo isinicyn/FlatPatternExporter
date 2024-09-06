@@ -75,6 +75,11 @@ namespace FPECORE
             // Устанавливаем ItemsSource для DataGrid
             partsDataGrid.ItemsSource = partsDataView.View;
 
+            // Подписываемся на событие изменения коллекции
+            partsData.CollectionChanged += PartsData_CollectionChanged;
+
+            UpdateEditButtonState(); // Обновляем состояние кнопки после загрузки данных
+
             // Настраиваем таймер для задержки поиска
             searchDelayTimer = new DispatcherTimer
             {
@@ -166,20 +171,19 @@ namespace FPECORE
                 // Режим отмены изменений
                 isEditing = false;
                 partsDataGrid.IsReadOnly = true;
-                editButton.Content = "Редактировать";
-                saveButton.IsEnabled = false;
+                editButton.Content = "Редактировать"; // Меняем текст кнопки на "Редактировать"
+                saveButton.IsEnabled = false; // Деактивируем кнопку "Сохранить"
 
-                // Восстанавливаем исходное состояние только редактируемых колонок
+                // Восстанавливаем исходное состояние данных
                 for (int i = 0; i < partsData.Count; i++)
                 {
                     var currentItem = partsData[i];
                     var originalItem = originalPartsData[i];
 
-                    // Восстанавливаем только редактируемые поля
                     currentItem.PartNumber = originalItem.PartNumber;
                     currentItem.Description = originalItem.Description;
 
-                    // Если есть кастомные свойства, восстанавливаем их
+                    // Восстанавливаем кастомные свойства
                     foreach (var key in currentItem.CustomProperties.Keys.ToList())
                     {
                         currentItem.CustomProperties[key] = originalItem.CustomProperties.ContainsKey(key)
@@ -187,44 +191,42 @@ namespace FPECORE
                             : currentItem.CustomProperties[key];
                     }
 
-                    // Сбрасываем флаг изменений
+                    // Сбрасываем флаг изменений и блокируем редактирование
                     currentItem.IsModified = false;
-                    currentItem.IsReadOnly = true; // Блокируем редактирование
+                    currentItem.IsReadOnly = true;
                 }
 
-                // Очищаем оригинальные данные
-                originalPartsData.Clear();
+                originalPartsData.Clear(); // Очищаем сохранённые оригинальные данные
 
-                // Обновляем таблицу, чтобы изменения отразились в интерфейсе
-                partsDataGrid.ItemsSource = null;
-                partsDataGrid.ItemsSource = partsData;
+                partsDataGrid.Items.Refresh(); // Обновляем отображение таблицы
             }
             else
             {
-                // Режим редактирования
+                // Включаем режим редактирования
                 isEditing = true;
                 partsDataGrid.IsReadOnly = false;
-                editButton.Content = "Отмена";
-                saveButton.IsEnabled = true;
+                editButton.Content = "Отмена"; // Меняем текст на "Отмена"
+                saveButton.IsEnabled = true; // Активируем кнопку "Сохранить"
 
-                // Сохраняем исходное состояние данных в память
+                // Сохраняем исходное состояние данных
                 originalPartsData = partsData.Select(item => new PartData
                 {
                     PartNumber = item.PartNumber,
                     Description = item.Description,
-                    CustomProperties = new Dictionary<string, string>(item.CustomProperties),
-                    // Сохраняем другие поля, если нужно
+                    CustomProperties = new Dictionary<string, string>(item.CustomProperties)
                 }).ToList();
 
-                // Разрешаем редактирование
+                // Восстанавливаем логику с сохранением `OriginalPartNumber`
                 foreach (var item in partsData)
                 {
-                    item.IsReadOnly = false;
+                    item.OriginalPartNumber = item.PartNumber; // Сохраняем оригинальный PartNumber перед редактированием
+                    item.IsReadOnly = false;  // Разрешаем редактирование
                 }
 
-                // Обновляем интерфейс
-                partsDataGrid.Items.Refresh();
+                partsDataGrid.Items.Refresh(); // Обновляем таблицу для отображения изменений
             }
+
+            UpdateEditButtonState(); // Обновляем состояние кнопок
         }
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -246,6 +248,9 @@ namespace FPECORE
             // Очищаем оригинальные данные, так как изменения сохранены
             originalPartsData.Clear();
             partsDataGrid.Items.Refresh();
+
+            // Восстанавливаем состояние кнопки
+            UpdateEditButtonState();
         }
         private async Task SaveIPropertyChangesAsync(PartData item)
         {
@@ -307,6 +312,26 @@ namespace FPECORE
 
             // Если были созданы дополнительные потоки, убедитесь, что они завершены
         }
+        private void PartsData_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            UpdateEditButtonState(); // Обновляем состояние кнопки при изменении данных
+        }
+
+        private void UpdateEditButtonState()
+        {
+            // Если данные в таблице присутствуют, и не активирован режим редактирования
+            if (partsData != null && partsData.Count > 0)
+            {
+                editButton.IsEnabled = true;  // Кнопка "Редактировать/Отмена" всегда активна, если есть данные
+                saveButton.IsEnabled = isEditing; // Кнопка "Сохранить" активна только в режиме редактирования
+            }
+            else
+            {
+                editButton.IsEnabled = false; // Деактивируем кнопку, если данных нет
+                saveButton.IsEnabled = false; // Деактивируем кнопку сохранения, если данных нет
+            }
+        }
+
         private void AddPresetIPropertyButton_Click(object sender, RoutedEventArgs e)
         {
             var selectIPropertyWindow = new SelectIPropertyWindow(PresetIProperties, this); // Передаем `this` как ссылку на MainWindow
@@ -530,6 +555,9 @@ namespace FPECORE
         {
             partsData.Add(partData);
             partsDataView.View.Refresh(); // Обновляем фильтрацию и отображение
+
+            // Обновляем состояние кнопки после добавления данных
+            UpdateEditButtonState();
         }
         private void PartsDataGrid_ColumnReordering(object sender, DataGridColumnReorderingEventArgs e)
         {
@@ -2206,6 +2234,9 @@ namespace FPECORE
             // Обнуляем информацию о документе
             UpdateDocumentInfo(string.Empty, string.Empty, string.Empty, null);
             UpdateFileCountLabel(0); // Сброс счетчика файлов
+
+            // Обновляем состояние кнопки после очистки данных
+            UpdateEditButtonState();
         }
         private void partsDataGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
