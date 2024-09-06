@@ -219,7 +219,7 @@
                 </DataGridTemplateColumn>
 
                 <!-- Колонка с номером пункта -->
-                <DataGridTextColumn Header="#" Binding="{Binding Item, Mode=OneWay}" Width="Auto" SortMemberPath="Item" SortDirection="Ascending">
+                <DataGridTextColumn Header="ID" Binding="{Binding Item, Mode=OneWay}" Width="Auto" SortMemberPath="Item" SortDirection="Ascending">
                     <DataGridTextColumn.ElementStyle>
                         <StaticResource ResourceKey="CenteredCellStyle"/>
                     </DataGridTextColumn.ElementStyle>
