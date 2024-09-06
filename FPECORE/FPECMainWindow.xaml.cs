@@ -41,6 +41,7 @@ namespace FPECORE
         private string actualSearchText = string.Empty; // Поле для хранения фактического текста поиска
         private string fixedFolderPath = string.Empty;
         private bool isEditing = false;
+        private List<PartData> originalPartsData = new List<PartData>(); // Для хранения исходного состояния
 
         public ObservableCollection<LayerSetting> LayerSettings { get; set; }
         public ObservableCollection<string> AvailableColors { get; set; }
@@ -160,27 +161,76 @@ namespace FPECORE
         }
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
-            isEditing = true;
-            partsDataGrid.IsReadOnly = false;
-            editButton.IsEnabled = false;
-            saveButton.IsEnabled = true;
-
-            foreach (var item in partsData)
+            if (isEditing)
             {
-                // Сохраняем оригинальный PartNumber перед редактированием
-                item.OriginalPartNumber = item.PartNumber;
-                item.IsReadOnly = false;  // Разрешаем редактирование
+                // Режим отмены изменений
+                isEditing = false;
+                partsDataGrid.IsReadOnly = true;
+                editButton.Content = "Редактировать";
+                saveButton.IsEnabled = false;
+
+                // Восстанавливаем исходное состояние только редактируемых колонок
+                for (int i = 0; i < partsData.Count; i++)
+                {
+                    var currentItem = partsData[i];
+                    var originalItem = originalPartsData[i];
+
+                    // Восстанавливаем только редактируемые поля
+                    currentItem.PartNumber = originalItem.PartNumber;
+                    currentItem.Description = originalItem.Description;
+
+                    // Если есть кастомные свойства, восстанавливаем их
+                    foreach (var key in currentItem.CustomProperties.Keys.ToList())
+                    {
+                        currentItem.CustomProperties[key] = originalItem.CustomProperties.ContainsKey(key)
+                            ? originalItem.CustomProperties[key]
+                            : currentItem.CustomProperties[key];
+                    }
+
+                    // Сбрасываем флаг изменений
+                    currentItem.IsModified = false;
+                    currentItem.IsReadOnly = true; // Блокируем редактирование
+                }
+
+                // Очищаем оригинальные данные
+                originalPartsData.Clear();
+
+                // Обновляем таблицу, чтобы изменения отразились в интерфейсе
+                partsDataGrid.ItemsSource = null;
+                partsDataGrid.ItemsSource = partsData;
             }
+            else
+            {
+                // Режим редактирования
+                isEditing = true;
+                partsDataGrid.IsReadOnly = false;
+                editButton.Content = "Отмена";
+                saveButton.IsEnabled = true;
 
-            // Выделяем редактируемые колонки, если нужно визуально выделить редактируемые поля
-            partsDataGrid.Items.Refresh();
+                // Сохраняем исходное состояние данных в память
+                originalPartsData = partsData.Select(item => new PartData
+                {
+                    PartNumber = item.PartNumber,
+                    Description = item.Description,
+                    CustomProperties = new Dictionary<string, string>(item.CustomProperties),
+                    // Сохраняем другие поля, если нужно
+                }).ToList();
+
+                // Разрешаем редактирование
+                foreach (var item in partsData)
+                {
+                    item.IsReadOnly = false;
+                }
+
+                // Обновляем интерфейс
+                partsDataGrid.Items.Refresh();
+            }
         }
-
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             isEditing = false;
             partsDataGrid.IsReadOnly = true;
-            editButton.IsEnabled = true;
+            editButton.Content = "Редактировать";
             saveButton.IsEnabled = false;
 
             foreach (var item in partsData)
@@ -188,17 +238,15 @@ namespace FPECORE
                 if (item.IsModified)  // Сохраняем только изменённые элементы
                 {
                     await SaveIPropertyChangesAsync(item);
-
-                    // Устанавливаем элемент обратно в режим "только для чтения"
                     item.IsReadOnly = true;
                     item.IsModified = false;  // Сбрасываем флаг изменений после сохранения
                 }
             }
 
-            // Сбрасываем визуальное выделение редактируемых колонок после сохранения
+            // Очищаем оригинальные данные, так как изменения сохранены
+            originalPartsData.Clear();
             partsDataGrid.Items.Refresh();
         }
-
         private async Task SaveIPropertyChangesAsync(PartData item)
         {
             try
