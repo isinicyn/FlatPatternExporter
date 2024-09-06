@@ -219,6 +219,7 @@ namespace FPECORE
                 // Восстанавливаем логику с сохранением `OriginalPartNumber`
                 foreach (var item in partsData)
                 {
+                    item.IsModified = false;  // Обнуляем флаг изменений
                     item.OriginalPartNumber = item.PartNumber; // Сохраняем оригинальный PartNumber перед редактированием
                     item.IsReadOnly = false;  // Разрешаем редактирование
                 }
@@ -240,9 +241,11 @@ namespace FPECORE
                 if (item.IsModified)  // Сохраняем только изменённые элементы
                 {
                     await SaveIPropertyChangesAsync(item);
-                    item.IsReadOnly = true;
-                    item.IsModified = false;  // Сбрасываем флаг изменений после сохранения
                 }
+
+                // После успешного сохранения сбрасываем флаг IsModified и делаем строки только для чтения
+                item.IsModified = false;
+                item.IsReadOnly = true;
             }
 
             // Очищаем оригинальные данные, так как изменения сохранены

@@ -90,12 +90,12 @@
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                     <Setter Property="Foreground" Value="#333333"/>
-                    
+
                     <!-- Добавляем визуальное выделение для редактируемых ячеек при активном режиме редактирования -->
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsReadOnly}" Value="False">
                             <Setter Property="Background" Value="LightYellow"/>
-                        </DataTrigger>
+                        </DataTrigger>                        
                     </Style.Triggers>
                 </Style>
 
