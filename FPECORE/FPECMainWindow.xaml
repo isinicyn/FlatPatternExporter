@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:LayerSettingsApp;assembly=LayerSettings"
         PreviewMouseLeftButtonDown="MainWindow_PreviewMouseLeftButtonDown"
         Title="Экспорт DXF" Width="1740"
-        MinHeight="850" MinWidth="1150"
+        MinHeight="850" MinWidth="1410"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Height="850">
 
     <Grid>
@@ -16,7 +16,7 @@
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
         <Button x:Name="addPresetIPropertyButton" Content="+ iProperty" Click="AddPresetIPropertyButton_Click" Height="32.5" Margin="265,0,10,48" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1"/>
-
+        <Button x:Name="addCustomIPropertyButton" Content="+ Custom iProperty" Click="AddCustomIPropertyButton_Click" Height="32.5" Margin="265,0,0,5" VerticalAlignment="Bottom" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Padding="5,1,1,1" Width="115"/>
         <!-- Поле поиска с иконкой крестика для очистки -->
         <StackPanel x:Name="stackPanel" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,10,0" HorizontalAlignment="Right" Width="240">
             <Grid Margin="0,0,0,10" VerticalAlignment="Center" Width="{Binding Width, ElementName=stackPanel}">
@@ -90,6 +90,7 @@
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                     <Setter Property="Foreground" Value="#333333"/>
+                    
                     <!-- Добавляем визуальное выделение для редактируемых ячеек при активном режиме редактирования -->
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsReadOnly}" Value="False">
@@ -118,7 +119,7 @@
                 <Style TargetType="DataGridRow">
                     <Style.Resources>
                         <!-- Стиль для выделенной строки -->
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF67A6E0"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
                         <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="LightBlue"/>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
                     </Style.Resources>
@@ -357,11 +358,11 @@
         <TabControl Margin="10,10,10,10" Grid.Row="1">
             <TabItem Header="Основные">
                 <Grid Background="White">
-                    <GroupBox Header="Папка экспорта" Margin="765,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="475" Height="140">
-                        <StackPanel Orientation="Vertical" Margin="10,5,0,0">
+                    <GroupBox Header="Папка экспорта" Margin="742,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="140">
+                        <StackPanel Orientation="Vertical" Margin="10,5,10,0">
                             <RadioButton x:Name="chooseFolderRadioButton" Content="Указать папку в процессе экспорта" Margin="0,5,0,0" GroupName="ExportFolderOptions"  Checked="ChooseFolderRadioButton_Checked"/>
                             <RadioButton x:Name="componentFolderRadioButton" Content="Папка компонента" Margin="0,5,0,0" GroupName="ExportFolderOptions" Checked="ComponentFolderRadioButton_Checked"/>
-                            <RadioButton x:Name="partFolderRadioButton" Content="В папку с деталью" Margin="0,5,0,0" GroupName="ExportFolderOptions" Checked="PartFolderRadioButton_Checked"/>
+                            <RadioButton x:Name="partFolderRadioButton" Content="Рядом с деталью" Margin="0,5,0,0" GroupName="ExportFolderOptions" Checked="PartFolderRadioButton_Checked"/>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <RadioButton x:Name="fixedFolderRadioButton" Content="Фиксированная папка" VerticalAlignment="Center" GroupName="ExportFolderOptions" Checked="FixedFolderRadioButton_Checked"/>
                                 <Button x:Name="selectFixedFolderButton" Content="..." Width="30" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Click="SelectFixedFolderButton_Click"/>
@@ -369,13 +370,13 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <CheckBox x:Name="enableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsEnabled="False" Checked="EnableSubfolderCheckBox_Checked" Unchecked="EnableSubfolderCheckBox_Unchecked" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |"/>
-                                <TextBox x:Name="subfolderNameTextBox" Width="200" Height="20" Margin="10,0,0,0" VerticalAlignment="Center" IsEnabled="False" TextChanged="SubfolderNameTextBox_TextChanged"/>
+                                <TextBox x:Name="subfolderNameTextBox" Width="127" Height="20" Margin="32,0,0,0" VerticalAlignment="Center" IsEnabled="False" TextChanged="SubfolderNameTextBox_TextChanged"/>
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
 
-                    <GroupBox Header="Базовые настройки" Margin="10,10,0,0" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left" Width="225">
-                        <StackPanel Margin="0,5,0,5">
+                    <GroupBox Header="Базовые настройки" Margin="10,10,0,0" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left">
+                        <StackPanel Margin="10,5,10,5" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                 <RadioButton x:Name="traverseRadioButton" Content="Перебор" IsChecked="False" Margin="0,0,10,0"/>
                                 <RadioButton x:Name="bomRadioButton" Content="Спецификация" IsChecked="True"/>
@@ -383,54 +384,30 @@
                             <CheckBox x:Name="organizeByMaterialCheckBox" Content="Сортировать по материалу" Margin="0,0,0,5"/>
                             <CheckBox x:Name="organizeByThicknessCheckBox" Content="Сортировать по толщине" Margin="0,0,0,5"/>
                             <CheckBox x:Name="includeQuantityInFileNameCheckBox" Content="Записать количество в имя файла" Margin="0,0,0,5"
-          Checked="IncludeQuantityInFileNameCheckBox_CheckedChanged"
-          Unchecked="IncludeQuantityInFileNameCheckBox_CheckedChanged"/>
+                                Checked="IncludeQuantityInFileNameCheckBox_CheckedChanged"
+                                Unchecked="IncludeQuantityInFileNameCheckBox_CheckedChanged"/>
                             <CheckBox x:Name="backgroundModeCheckBox" Content="Фоновый режим" Margin="0,0,0,5" IsChecked="True"
-                                      ToolTip="Если включено, Inventor будет работать в фоновом режиме, ускоряя загрузку и выгрузку данных."/>
-                            <!-- Новый чекбокс -->
+                            ToolTip="Если включено, Inventor будет работать в фоновом режиме, ускоряя загрузку и выгрузку данных."/>
                         </StackPanel>
                     </GroupBox>
-                    <GroupBox Header="Настройки экспорта DXF" Margin="240,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="520" Height="140">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="311*"/>
-                                <ColumnDefinition Width="197*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Orientation="Vertical" Grid.Column="1" Margin="0,5,0,5">
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <CheckBox x:Name="enableSplineReplacementCheckBox" Content="Замена сплайнов" Checked="EnableSplineReplacementCheckBox_CheckedChanged" Unchecked="EnableSplineReplacementCheckBox_CheckedChanged" VerticalAlignment="Center"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Label Content="Тип замены:" VerticalAlignment="Center"/>
-                                    <ComboBox x:Name="splineReplacementComboBox" Width="65" VerticalContentAlignment="Center" IsEnabled="False" Height="20" Padding="5,0,5,0">
-                                        <ComboBoxItem Content="Линии"/>
-                                        <ComboBoxItem Content="Дуги"/>
-                                    </ComboBox>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Label Content="Допуск (мм):" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="splineToleranceTextBox" Width="65" Text="0.01" VerticalContentAlignment="Center" IsEnabled="False" Height="20"/>
-                                </StackPanel>
+                    <GroupBox Header="Настройки экспорта DXF" Margin="254,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="140">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="10,5,10,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <Label Content="Версия AutoCAD:" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="acadVersionComboBox" Width="70" SelectedIndex="5" Height="20" VerticalContentAlignment="Center" Padding="5,0,5,0">
+                                    <ComboBoxItem Content="2018"/>
+                                    <ComboBoxItem Content="2013"/>
+                                    <ComboBoxItem Content="2010"/>
+                                    <ComboBoxItem Content="2007"/>
+                                    <ComboBoxItem Content="2004"/>
+                                    <ComboBoxItem Content="2000"/>
+                                    <ComboBoxItem Content="R12"/>
+                                </ComboBox>
                             </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="0,5,0,5">
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Label Content="Версия AutoCAD:" VerticalAlignment="Center"/>
-                                    <ComboBox x:Name="acadVersionComboBox" Width="70" SelectedIndex="5" Height="20" VerticalContentAlignment="Center" Padding="5,0,5,0">
-                                        <ComboBoxItem Content="2018"/>
-                                        <ComboBoxItem Content="2013"/>
-                                        <ComboBoxItem Content="2010"/>
-                                        <ComboBoxItem Content="2007"/>
-                                        <ComboBoxItem Content="2004"/>
-                                        <ComboBoxItem Content="2000"/>
-                                        <ComboBoxItem Content="R12"/>
-                                    </ComboBox>
-                                </StackPanel>
-                                <CheckBox x:Name="mergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5" IsChecked="True"/>
-                                <CheckBox x:Name="rebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5" IsChecked="True"/>
-                                <CheckBox x:Name="trimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" Margin="0,0,0,5"/>
-                                <!-- Новый чекбокс -->
-                            </StackPanel>
-                        </Grid>
+                            <CheckBox x:Name="mergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5" IsChecked="True"/>
+                            <CheckBox x:Name="rebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5" IsChecked="True"/>
+                            <CheckBox x:Name="trimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" Margin="0,0,0,5"/>
+                        </StackPanel>
                     </GroupBox>
                     <StackPanel Orientation="Horizontal" Margin="0,0,10,10" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="134">
                         <Label Content="Множитель" Margin="0,0,10,0" VerticalAlignment="Center"/>
@@ -457,6 +434,24 @@
                             </Button>
                         </Grid>
                     </StackPanel>
+                    <GroupBox Header="Замена сплайнов " Margin="555,10,0,0" Height="140" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <StackPanel Orientation="Vertical" Margin="10,5,10,0" VerticalAlignment="Top" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <CheckBox x:Name="enableSplineReplacementCheckBox" Content="Активация" Checked="EnableSplineReplacementCheckBox_CheckedChanged" Unchecked="EnableSplineReplacementCheckBox_CheckedChanged" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <Label Content="Тип замены:" VerticalAlignment="Center" Padding="0,5,5,5"/>
+                                <ComboBox x:Name="splineReplacementComboBox" Width="65" VerticalContentAlignment="Center" IsEnabled="False" Height="20" Padding="5,0,5,0" Margin="2,0,0,0">
+                                    <ComboBoxItem Content="Линии"/>
+                                    <ComboBoxItem Content="Дуги"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="0,5,5,5"/>
+                                <TextBox x:Name="splineToleranceTextBox" Width="65" Text="0.01" VerticalContentAlignment="Center" IsEnabled="False" Height="20"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
 
                 </Grid>
             </TabItem>
@@ -517,6 +512,5 @@
             </TabItem>
             <TabItem Header="Имя выгружаемого файла"/>
         </TabControl>
-        <Button x:Name="addCustomIPropertyButton" Content="+ Custom iProperty" Click="AddCustomIPropertyButton_Click" Height="32.5" Margin="265,0,0,5" VerticalAlignment="Bottom" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Padding="5,1,1,1" Width="115"/>
     </Grid>
 </Window>
