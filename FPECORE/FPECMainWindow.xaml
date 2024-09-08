@@ -95,7 +95,7 @@
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsReadOnly}" Value="False">
                             <Setter Property="Background" Value="LightYellow"/>
-                        </DataTrigger>                        
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
 
@@ -512,5 +512,6 @@
             </TabItem>
             <TabItem Header="Имя выгружаемого файла"/>
         </TabControl>
+        <TextBlock Name="VersionTextBlock" VerticalAlignment="Center" Margin="0,0,25,0" HorizontalAlignment="Right" Text="Версия программы: x.x.x.x + xxxxxxx" Grid.Row="4"/>
     </Grid>
 </Window>

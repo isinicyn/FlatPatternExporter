@@ -3,12 +3,29 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-	<UseWindowsForms>true</UseWindowsForms>
+    <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>FPExport.ico</ApplicationIcon>
+    <ApplicationIcon>FPExport.ico</ApplicationIcon>	
+  <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
+
+  <Target Name="SetVersionInfo" BeforeTargets="GetAssemblyVersion">
+    <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="RevisionNumber" />
+    </Exec>
+    <Exec Command="git rev-parse --short HEAD" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="CommitHash" />
+    </Exec>
+    <PropertyGroup>
+      <AssemblyFileVersion>1.0.0.$(RevisionNumber)</AssemblyFileVersion>
+      <FileVersion>$(AssemblyFileVersion)</FileVersion>
+      <InformationalVersion>$(AssemblyFileVersion)+$(CommitHash)</InformationalVersion>
+    </PropertyGroup>
+    <Message Text="Assembly File Version: $(AssemblyFileVersion)" Importance="high" />
+    <Message Text="Informational Version: $(InformationalVersion)" Importance="high" />
+  </Target>
 
   <ItemGroup>
     <COMReference Include="InventorApprentice">

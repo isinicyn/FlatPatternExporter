@@ -20,6 +20,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
+using System.Reflection;
 
 namespace FPECORE
 {
@@ -57,7 +58,7 @@ namespace FPECORE
             partsDataGrid.ItemsSource = partsData;
             multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true;
             UpdateFileCountLabel(0);
-            clearButton.IsEnabled = false;            
+            clearButton.IsEnabled = false;
             partsDataGrid.PreviewMouseDown += PartsDataGrid_PreviewMouseDown;
             partsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
             partsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
@@ -99,6 +100,7 @@ namespace FPECORE
             AvailableColors = layerSettingsWindow.AvailableColors;
             LineTypes = layerSettingsWindow.LineTypes;
 
+
             // Инициализация предустановленных колонок
             PresetIProperties = new ObservableCollection<PresetIProperty>
             {
@@ -128,6 +130,29 @@ namespace FPECORE
             // Добавляем обработчики для отслеживания нажатия и отпускания клавиши Ctrl
             this.KeyDown += new System.Windows.Input.KeyEventHandler(MainWindow_KeyDown);
             this.KeyUp += new System.Windows.Input.KeyEventHandler(MainWindow_KeyUp);
+
+            VersionTextBlock.Text = "Версия программы: " + GetVersion();
+        }
+        public string GetVersion()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            // Попытка получить информацию о версии из различных атрибутов
+            var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            var fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
+            var assemblyVersion = assembly.GetName().Version?.ToString();
+
+            // Если версия содержит commit hash, обрезаем его до 7 символов
+            if (informationalVersion != null && informationalVersion.Contains("+"))
+            {
+                // Разбиваем строку на части и обрезаем commit hash до 7 символов
+                var parts = informationalVersion.Split('+');
+                var shortCommitHash = parts[1].Length > 7 ? parts[1].Substring(0, 7) : parts[1];
+                informationalVersion = $"{parts[0]}+{shortCommitHash}";
+            }
+
+            // Возвращаем обрезанную версию или другие версии
+            return informationalVersion ?? fileVersion ?? assemblyVersion ?? "Версия неизвестна";
         }
         public bool IsColumnPresent(string columnName)
         {
