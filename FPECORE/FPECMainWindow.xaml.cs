@@ -21,6 +21,7 @@ using System.Windows.Documents;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using System.Reflection;
+using System.Windows.Media.Media3D;
 
 namespace FPECORE
 {
@@ -374,6 +375,20 @@ namespace FPECORE
 
         private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // Получаем исходный элемент
+            var clickedElement = e.OriginalSource as DependencyObject;
+
+            // Поднимаемся по дереву визуальных элементов
+            while (clickedElement != null && !(clickedElement is Visual || clickedElement is Visual3D))
+            {
+                // Проверяем, что это не элемент типа Run
+                if (clickedElement is Run)
+                {
+                    // Просто выходим, если наткнулись на Run
+                    return;
+                }
+                clickedElement = VisualTreeHelper.GetParent(clickedElement);
+            }
             // Получаем источник события
             var source = e.OriginalSource as DependencyObject;
 
