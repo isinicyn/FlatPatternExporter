@@ -105,7 +105,7 @@ namespace FPECORE
             // Инициализация предустановленных колонок
             PresetIProperties = new ObservableCollection<PresetIProperty>
             {
-                new PresetIProperty { InternalName = "#", DisplayName = "#Нумерация", InventorPropertyName = "Item"},
+                new PresetIProperty { InternalName = "ID", DisplayName = "#Нумерация", InventorPropertyName = "Item"},
                 new PresetIProperty { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber"},
                 new PresetIProperty { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description"},
                 new PresetIProperty { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState"},
