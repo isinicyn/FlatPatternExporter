@@ -749,7 +749,10 @@ namespace FPECORE
                 {
                     partsDataGrid.Columns.Remove(columnToRemove);
 
-                    // Обновляем список доступных свойств
+                    // Удаляем кастомное свойство из списка и данных деталей
+                    RemoveCustomIPropertyColumn(columnName);
+
+                    // Обновляем список доступных свойств, если это кастомное свойство
                     var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
                     selectIPropertyWindow?.UpdateAvailableProperties();
                 }
@@ -2464,7 +2467,7 @@ namespace FPECORE
         }
         private void RemoveCustomIPropertyColumn(string propertyName)
         {
-            // Удаление столбца из DataGrid, если он существует
+            // Удаление столбца из DataGrid
             var columnToRemove = partsDataGrid.Columns.FirstOrDefault(c => (c.Header as string) == propertyName);
             if (columnToRemove != null)
             {
@@ -2474,9 +2477,14 @@ namespace FPECORE
             // Удаление всех данных, связанных с этим Custom IProperty
             foreach (var partData in partsData)
             {
-                partData.RemoveCustomProperty(propertyName);
+                if (partData.CustomProperties.ContainsKey(propertyName))
+                {
+                    partData.RemoveCustomProperty(propertyName);
+                }
             }
 
+            // Обновляем список доступных свойств
+            customPropertiesList.Remove(propertyName); // Не забудьте удалить свойство из списка доступных свойств
             partsDataGrid.Items.Refresh();
         }
 
