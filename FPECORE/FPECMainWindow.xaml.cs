@@ -190,6 +190,53 @@ namespace FPECORE
                 }
             }
         }
+        private string GetPropertyExpressionOrValue(PartDocument partDoc, string propertyName)
+        {
+            try
+            {
+                var propertySets = partDoc.PropertySets;
+
+                foreach (PropertySet propSet in propertySets)
+                {
+                    foreach (Inventor.Property prop in propSet)
+                    {
+                        if (prop.Name == propertyName)
+                        {
+                            try
+                            {
+                                // Проверяем, есть ли выражение
+                                string expression = prop.Expression;
+                                if (!string.IsNullOrEmpty(expression))
+                                {
+                                    return expression; // Возвращаем выражение, если оно есть
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                // Игнорируем ошибку получения выражения и возвращаем значение
+                            }
+
+                            return prop.Value?.ToString() ?? string.Empty; // Возвращаем значение, если выражение отсутствует
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка при получении выражения или значения для {propertyName}: {ex.Message}");
+            }
+
+            return string.Empty; // Если ничего не найдено
+        }
+        private void UpdateCustomProperties(PartDocument partDoc, PartData partData)
+        {
+            foreach (var customPropertyName in partData.CustomProperties.Keys.ToList())
+            {
+                var expressionOrValue = GetPropertyExpressionOrValue(partDoc, customPropertyName);
+                partData.CustomProperties[customPropertyName] = expressionOrValue;
+            }
+        }
+
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             if (isEditing)
@@ -197,10 +244,10 @@ namespace FPECORE
                 // Режим отмены изменений
                 isEditing = false;
                 partsDataGrid.IsReadOnly = true;
-                editButton.Content = "Редактировать"; // Меняем текст кнопки на "Редактировать"
-                saveButton.IsEnabled = false; // Деактивируем кнопку "Сохранить"
+                editButton.Content = "Редактировать";
+                saveButton.IsEnabled = false;
 
-                // Восстанавливаем исходное состояние данных
+                // Восстанавливаем исходные данные, если они были изменены
                 for (int i = 0; i < partsData.Count; i++)
                 {
                     var currentItem = partsData[i];
@@ -217,24 +264,22 @@ namespace FPECORE
                             : currentItem.CustomProperties[key];
                     }
 
-                    // Сбрасываем флаг изменений и блокируем редактирование
                     currentItem.IsModified = false;
                     currentItem.IsReadOnly = true;
                 }
 
-                originalPartsData.Clear(); // Очищаем сохранённые оригинальные данные
-
-                partsDataGrid.Items.Refresh(); // Обновляем отображение таблицы
+                originalPartsData.Clear();
+                partsDataGrid.Items.Refresh();
             }
             else
             {
                 // Включаем режим редактирования
                 isEditing = true;
                 partsDataGrid.IsReadOnly = false;
-                editButton.Content = "Отмена"; // Меняем текст на "Отмена"
-                saveButton.IsEnabled = true; // Активируем кнопку "Сохранить"
+                editButton.Content = "Отмена";
+                saveButton.IsEnabled = true;
 
-                // Сохраняем исходное состояние данных
+                // Сохраняем оригинальные данные
                 originalPartsData = partsData.Select(item => new PartData
                 {
                     PartNumber = item.PartNumber,
@@ -250,10 +295,28 @@ namespace FPECORE
                     item.IsReadOnly = false;  // Разрешаем редактирование
                 }
 
-                partsDataGrid.Items.Refresh(); // Обновляем таблицу для отображения изменений
+                // Обновляем данные с выражениями, если они имеются
+                foreach (var item in partsData)
+                {
+                    var partDoc = OpenPartDocument(item.PartNumber);
+                    if (partDoc != null)
+                    {
+                        item.PartNumber = GetPropertyExpressionOrValue(partDoc, "Part Number");
+                        item.Description = GetPropertyExpressionOrValue(partDoc, "Description");
+
+                        // Проходимся по всем пользовательским свойствам и заменяем значения на выражения
+                        foreach (var customProperty in item.CustomProperties.Keys.ToList())
+                        {
+                            item.CustomProperties[customProperty] = GetPropertyExpressionOrValue(partDoc, customProperty);
+                        }
+                    }
+                    item.IsReadOnly = false;
+                }
+
+                partsDataGrid.Items.Refresh();
             }
 
-            UpdateEditButtonState(); // Обновляем состояние кнопок
+            UpdateEditButtonState();
         }
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
