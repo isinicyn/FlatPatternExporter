@@ -259,8 +259,9 @@ namespace FPECORE
                     var currentItem = partsData[i];
                     var originalItem = originalPartsData[i];
 
-                    currentItem.PartNumber = originalItem.PartNumber; // Возвращаем значение
-                    currentItem.Description = originalItem.Description; // Возвращаем значение
+                    currentItem.PartNumber = originalItem.PartNumber; // Восстанавливаем значение
+                    currentItem.OriginalPartNumber = originalItem.OriginalPartNumber; // Восстанавливаем оригинальный PartNumber
+                    currentItem.Description = originalItem.Description; // Восстанавливаем значение
 
                     // Восстанавливаем кастомные свойства
                     foreach (var key in currentItem.CustomProperties.Keys.ToList())
@@ -269,10 +270,15 @@ namespace FPECORE
                             ? originalItem.CustomProperties[key]
                             : currentItem.CustomProperties[key];
                     }
+
+                    // Восстанавливаем флаги
+                    currentItem.IsModified = originalItem.IsModified;
+                    currentItem.IsReadOnly = originalItem.IsReadOnly;
                 }
 
                 partsDataGrid.Items.Refresh(); // Обновляем таблицу
             }
+
             else
             {
                 // Включаем режим редактирования
@@ -285,14 +291,25 @@ namespace FPECORE
                 originalPartsData = partsData.Select(item => new PartData
                 {
                     PartNumber = item.PartNumber,
+                    OriginalPartNumber = item.OriginalPartNumber, // Сохраняем оригинальный PartNumber
                     PartNumberExpression = item.PartNumberExpression,
                     Description = item.Description,
                     DescriptionExpression = item.DescriptionExpression,
                     CustomProperties = new Dictionary<string, string>(item.CustomProperties),
-                    CustomPropertyExpressions = new Dictionary<string, string>(item.CustomPropertyExpressions)
+                    CustomPropertyExpressions = new Dictionary<string, string>(item.CustomPropertyExpressions),
+                    IsModified = item.IsModified, // Сохраняем состояние флага
+                    IsReadOnly = item.IsReadOnly // Сохраняем состояние флага
                 }).ToList();
 
-                // Проверяем, если чекбокс активен, то отображаем выражения
+                // Разрешаем редактирование и сбрасываем флаг изменений
+                foreach (var item in partsData)
+                {
+                    item.IsModified = false;  // Обнуляем флаг изменений
+                    item.OriginalPartNumber = item.PartNumber; // Сохраняем оригинальный PartNumber перед редактированием
+                    item.IsReadOnly = false;  // Разрешаем редактирование
+                }
+
+                // Если чекбокс активен, отображаем выражения
                 if (expressionsCheckBox.IsChecked == true)
                 {
                     foreach (var item in partsData)
@@ -307,9 +324,8 @@ namespace FPECORE
                     }
                 }
 
-                partsDataGrid.Items.Refresh();
+                partsDataGrid.Items.Refresh(); // Обновляем таблицу
             }
-
 
             UpdateEditButtonState();
         }
