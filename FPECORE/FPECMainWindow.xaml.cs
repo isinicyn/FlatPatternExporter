@@ -190,35 +190,37 @@ namespace FPECORE
                 }
             }
         }
-        private async Task<string> GetPropertyExpressionOrValueAsync(PartDocument partDoc, string propertyName)
+        private async Task<string> GetPropertyExpressionOrValueAsync(PartDocument partDoc, string propertyName, bool getExpression = false)
         {
             return await Task.Run(() =>
             {
                 try
                 {
                     var propertySets = partDoc.PropertySets;
-
                     foreach (PropertySet propSet in propertySets)
                     {
                         foreach (Inventor.Property prop in propSet)
                         {
                             if (prop.Name == propertyName)
                             {
-                                try
+                                if (getExpression)
                                 {
-                                    // Проверяем, есть ли выражение
-                                    string expression = prop.Expression;
-                                    if (!string.IsNullOrEmpty(expression))
+                                    // Попытка получить выражение
+                                    try
                                     {
-                                        return expression; // Возвращаем выражение, если оно есть
+                                        string expression = prop.Expression;
+                                        if (!string.IsNullOrEmpty(expression))
+                                        {
+                                            return expression; // Возвращаем выражение
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                        // Если нет выражения, вернем значение
+                                        return prop.Value?.ToString() ?? string.Empty;
                                     }
                                 }
-                                catch (Exception)
-                                {
-                                    // Игнорируем ошибку получения выражения и возвращаем значение
-                                }
-
-                                return prop.Value?.ToString() ?? string.Empty; // Возвращаем значение, если выражение отсутствует
+                                return prop.Value?.ToString() ?? string.Empty;
                             }
                         }
                     }
@@ -228,9 +230,10 @@ namespace FPECORE
                     Debug.WriteLine($"Ошибка при получении выражения или значения для {propertyName}: {ex.Message}");
                 }
 
-                return string.Empty; // Если ничего не найдено
+                return string.Empty;
             });
         }
+
         //private void UpdateCustomProperties(PartDocument partDoc, PartData partData)
         //{
         //    foreach (var customPropertyName in partData.CustomProperties.Keys.ToList())
@@ -244,20 +247,20 @@ namespace FPECORE
         {
             if (isEditing)
             {
-                // Режим отмены изменений
+                // Отключаем режим редактирования
                 isEditing = false;
                 partsDataGrid.IsReadOnly = true;
                 editButton.Content = "Редактировать";
                 saveButton.IsEnabled = false;
 
-                // Восстанавливаем исходные данные
+                // Восстанавливаем исходное состояние данных
                 for (int i = 0; i < partsData.Count; i++)
                 {
                     var currentItem = partsData[i];
                     var originalItem = originalPartsData[i];
 
-                    currentItem.PartNumber = originalItem.PartNumber;
-                    currentItem.Description = originalItem.Description;
+                    currentItem.PartNumber = originalItem.PartNumber; // Возвращаем значение
+                    currentItem.Description = originalItem.Description; // Возвращаем значение
 
                     // Восстанавливаем кастомные свойства
                     foreach (var key in currentItem.CustomProperties.Keys.ToList())
@@ -266,13 +269,9 @@ namespace FPECORE
                             ? originalItem.CustomProperties[key]
                             : currentItem.CustomProperties[key];
                     }
-
-                    currentItem.IsModified = false;
-                    currentItem.IsReadOnly = true;
                 }
 
-                originalPartsData.Clear();
-                partsDataGrid.Items.Refresh();
+                partsDataGrid.Items.Refresh(); // Обновляем таблицу
             }
             else
             {
@@ -282,67 +281,75 @@ namespace FPECORE
                 editButton.Content = "Отмена";
                 saveButton.IsEnabled = true;
 
-                // Проверяем состояние фонового режима
-                bool isBackgroundModeEnabled = backgroundModeCheckBox.IsChecked == true;
-                if (isBackgroundModeEnabled)
-                {
-                    // Отключаем взаимодействие с интерфейсом Inventor
-                    ThisApplication.UserInterfaceManager.UserInteractionDisabled = true;
-                }
-
-                // Сохраняем оригинальные данные
+                // Сохраняем исходное состояние данных
                 originalPartsData = partsData.Select(item => new PartData
                 {
                     PartNumber = item.PartNumber,
+                    PartNumberExpression = item.PartNumberExpression,
                     Description = item.Description,
-                    CustomProperties = new Dictionary<string, string>(item.CustomProperties)
+                    DescriptionExpression = item.DescriptionExpression,
+                    CustomProperties = new Dictionary<string, string>(item.CustomProperties),
+                    CustomPropertyExpressions = new Dictionary<string, string>(item.CustomPropertyExpressions)
                 }).ToList();
 
-                // Восстанавливаем логику с сохранением `OriginalPartNumber`
-                foreach (var item in partsData)
+                // Проверяем, если чекбокс активен, то отображаем выражения
+                if (expressionsCheckBox.IsChecked == true)
                 {
-                    item.IsModified = false;  // Обнуляем флаг изменений
-                    item.OriginalPartNumber = item.PartNumber; // Сохраняем оригинальный PartNumber перед редактированием
-                    item.IsReadOnly = false;  // Разрешаем редактирование
-                }
-
-                // Асинхронное обновление данных с выражениями
-                foreach (var item in partsData)
-                {
-                    var partDoc = OpenPartDocument(item.PartNumber);
-                    if (partDoc != null)
+                    foreach (var item in partsData)
                     {
-                        item.PartNumber = await GetPropertyExpressionOrValueAsync(partDoc, "Part Number");
-                        item.Description = await GetPropertyExpressionOrValueAsync(partDoc, "Description");
+                        item.PartNumber = item.PartNumberExpression; // Показываем выражение
+                        item.Description = item.DescriptionExpression; // Показываем выражение
 
-                        // Асинхронно обновляем кастомные свойства
                         foreach (var customProperty in item.CustomProperties.Keys.ToList())
                         {
-                            item.CustomProperties[customProperty] = await GetPropertyExpressionOrValueAsync(partDoc, customProperty);
-                        }
-
-                        // Если фоновый режим включен, приостанавливаем обновление UI
-                        if (isBackgroundModeEnabled)
-                        {
-                            await Task.Delay(50); // Это замедлит обновление, чтобы снизить нагрузку на интерфейс
+                            item.CustomProperties[customProperty] = item.CustomPropertyExpressions[customProperty]; // Показываем выражение
                         }
                     }
-
-                    item.IsReadOnly = false;
                 }
 
-                // Включаем обновление UI только в конце, если фоновый режим активен
                 partsDataGrid.Items.Refresh();
-
-                // Восстанавливаем взаимодействие с интерфейсом Inventor после завершения
-                if (isBackgroundModeEnabled)
-                {
-                    ThisApplication.UserInterfaceManager.UserInteractionDisabled = false;
-                }
             }
+
 
             UpdateEditButtonState();
         }
+        private void ExpressionsCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (isEditing) // Применяем изменения только в режиме редактирования
+            {
+                if (expressionsCheckBox.IsChecked == true)
+                {
+                    // Показываем выражения
+                    foreach (var item in partsData)
+                    {
+                        item.PartNumber = item.PartNumberExpression; // Показываем выражение
+                        item.Description = item.DescriptionExpression; // Показываем выражение
+
+                        foreach (var customProperty in item.CustomProperties.Keys.ToList())
+                        {
+                            item.CustomProperties[customProperty] = item.CustomPropertyExpressions[customProperty]; // Показываем выражение
+                        }
+                    }
+                }
+                else
+                {
+                    // Показываем обычные значения
+                    foreach (var item in partsData)
+                    {
+                        item.PartNumber = item.PartNumber; // Показываем значение
+                        item.Description = item.Description; // Показываем значение
+
+                        foreach (var customProperty in item.CustomProperties.Keys.ToList())
+                        {
+                            item.CustomProperties[customProperty] = item.CustomProperties[customProperty]; // Показываем значение
+                        }
+                    }
+                }
+
+                partsDataGrid.Items.Refresh(); // Обновляем таблицу после изменения
+            }
+        }
+
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             isEditing = false;
@@ -1261,41 +1268,43 @@ namespace FPECORE
 
         private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, BOM bom, int itemNumber, PartDocument? partDoc = null)
         {
+            // Открываем документ, если он не передан
             if (partDoc == null)
             {
                 partDoc = OpenPartDocument(partNumber);
                 if (partDoc == null) return null;
             }
 
-            string modelState = partDoc.ModelStateName;
-            var previewImage = await GetThumbnailAsync(partDoc);
-
-            var smCompDef = partDoc.ComponentDefinition as SheetMetalComponentDefinition;
-            bool hasFlatPattern = smCompDef != null && smCompDef.HasFlatPattern;
-
+            // Создаем новый объект PartData и заполняем его основными свойствами
             var partData = new PartData
             {
-                Item = itemNumber,
-                PartNumber = partNumber,
-                ModelState = modelState,
-                Description = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description"),
-                Material = GetMaterialForPart(partDoc),
-                Thickness = GetThicknessForPart(partDoc).ToString("F1") + " мм",
+                PartNumber = await GetPropertyExpressionOrValueAsync(partDoc, "Part Number"),
+                PartNumberExpression = await GetPropertyExpressionOrValueAsync(partDoc, "Part Number", true),
+                Description = await GetPropertyExpressionOrValueAsync(partDoc, "Description"),
+                DescriptionExpression = await GetPropertyExpressionOrValueAsync(partDoc, "Description", true),
+                Material = await GetPropertyExpressionOrValueAsync(partDoc, "Material"),
+                Thickness = await GetPropertyExpressionOrValueAsync(partDoc, "Thickness"),
+                ModelState = partDoc.ModelStateName,
                 OriginalQuantity = quantity,
                 Quantity = quantity,
-                QuantityColor = System.Windows.Media.Brushes.Black,
-                Preview = previewImage,
-                FlatPatternColor = hasFlatPattern ? System.Windows.Media.Brushes.Green : System.Windows.Media.Brushes.Red
+                Item = itemNumber
             };
 
-            // Заполнение Custom iProperty для текущей детали
-            foreach (var customPropertyName in customPropertiesList)
+            // Получаем выражения и значения для пользовательских свойств
+            foreach (var customProperty in customPropertiesList)
             {
-                partData.AddCustomProperty(customPropertyName, GetCustomIPropertyValue(partNumber, customPropertyName));
+                // Асинхронно получаем значения пользовательских свойств
+                partData.CustomProperties[customProperty] = await GetPropertyExpressionOrValueAsync(partDoc, customProperty);
+                partData.CustomPropertyExpressions[customProperty] = await GetPropertyExpressionOrValueAsync(partDoc, customProperty, true);
             }
 
-            // Чтение значений iProperty при условии, что они добавлены в таблицу
-            ReadIPropertyValuesFromPart(partDoc, partData);
+            // Асинхронно получаем превью-изображение (если доступно)
+            partData.Preview = await GetThumbnailAsync(partDoc);
+
+            // Проверяем наличие развертки для листовых деталей и задаем цвет
+            var smCompDef = partDoc.ComponentDefinition as SheetMetalComponentDefinition;
+            bool hasFlatPattern = smCompDef != null && smCompDef.HasFlatPattern;
+            partData.FlatPatternColor = hasFlatPattern ? System.Windows.Media.Brushes.Green : System.Windows.Media.Brushes.Red;
 
             return partData;
         }
@@ -2687,7 +2696,6 @@ namespace FPECORE
         private int quantity;
         private System.Windows.Media.Brush quantityColor;
         private int item;
-        private Dictionary<string, string> customProperties = new Dictionary<string, string>();
         private bool isReadOnly = true;
         private string partNumber;
         private string description;
@@ -2696,6 +2704,25 @@ namespace FPECORE
         private string originalPartNumber; // Хранит оригинальный PartNumber
         private bool isModified; // Флаг для отслеживания изменений
 
+        // Выражения (если они есть)
+        public string PartNumberExpression { get; set; }
+        public string DescriptionExpression { get; set; }
+
+        // Пользовательские iProperty
+        private Dictionary<string, string> customProperties = new Dictionary<string, string>();
+        public Dictionary<string, string> CustomProperties
+        {
+            get => customProperties;
+            set
+            {
+                customProperties = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // Выражения для пользовательских iProperty
+        public Dictionary<string, string> CustomPropertyExpressions { get; set; } = new Dictionary<string, string>();
+
         // Порядковый номер элемента
         public int Item
         {
@@ -2703,17 +2730,6 @@ namespace FPECORE
             set
             {
                 item = value;
-                OnPropertyChanged();
-            }
-        }
-
-        // Пользовательские свойства
-        public Dictionary<string, string> CustomProperties
-        {
-            get => customProperties;
-            set
-            {
-                customProperties = value;
                 OnPropertyChanged();
             }
         }

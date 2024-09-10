@@ -17,6 +17,7 @@
         </Grid.RowDefinitions>
         <Button x:Name="addPresetIPropertyButton" Content="+ iProperty" Click="AddPresetIPropertyButton_Click" Height="32.5" Margin="265,0,10,48" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1"/>
         <Button x:Name="addCustomIPropertyButton" Content="+ Custom iProperty" Click="AddCustomIPropertyButton_Click" Height="32.5" Margin="265,0,0,5" VerticalAlignment="Bottom" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Padding="5,1,1,1" Width="115"/>
+        <CheckBox x:Name="expressionsCheckBox" Content="Показывать выражения" Margin="489,30,788,30" />
         <!-- Поле поиска с иконкой крестика для очистки -->
         <StackPanel x:Name="stackPanel" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,10,0" HorizontalAlignment="Right" Width="240">
             <Grid Margin="0,0,0,10" VerticalAlignment="Center" Width="{Binding Width, ElementName=stackPanel}">
