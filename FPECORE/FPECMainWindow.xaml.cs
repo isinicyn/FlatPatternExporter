@@ -190,54 +190,57 @@ namespace FPECORE
                 }
             }
         }
-        private string GetPropertyExpressionOrValue(PartDocument partDoc, string propertyName)
+        private async Task<string> GetPropertyExpressionOrValueAsync(PartDocument partDoc, string propertyName)
         {
-            try
+            return await Task.Run(() =>
             {
-                var propertySets = partDoc.PropertySets;
-
-                foreach (PropertySet propSet in propertySets)
+                try
                 {
-                    foreach (Inventor.Property prop in propSet)
-                    {
-                        if (prop.Name == propertyName)
-                        {
-                            try
-                            {
-                                // Проверяем, есть ли выражение
-                                string expression = prop.Expression;
-                                if (!string.IsNullOrEmpty(expression))
-                                {
-                                    return expression; // Возвращаем выражение, если оно есть
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                // Игнорируем ошибку получения выражения и возвращаем значение
-                            }
+                    var propertySets = partDoc.PropertySets;
 
-                            return prop.Value?.ToString() ?? string.Empty; // Возвращаем значение, если выражение отсутствует
+                    foreach (PropertySet propSet in propertySets)
+                    {
+                        foreach (Inventor.Property prop in propSet)
+                        {
+                            if (prop.Name == propertyName)
+                            {
+                                try
+                                {
+                                    // Проверяем, есть ли выражение
+                                    string expression = prop.Expression;
+                                    if (!string.IsNullOrEmpty(expression))
+                                    {
+                                        return expression; // Возвращаем выражение, если оно есть
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    // Игнорируем ошибку получения выражения и возвращаем значение
+                                }
+
+                                return prop.Value?.ToString() ?? string.Empty; // Возвращаем значение, если выражение отсутствует
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка при получении выражения или значения для {propertyName}: {ex.Message}");
-            }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Ошибка при получении выражения или значения для {propertyName}: {ex.Message}");
+                }
 
-            return string.Empty; // Если ничего не найдено
+                return string.Empty; // Если ничего не найдено
+            });
         }
-        private void UpdateCustomProperties(PartDocument partDoc, PartData partData)
-        {
-            foreach (var customPropertyName in partData.CustomProperties.Keys.ToList())
-            {
-                var expressionOrValue = GetPropertyExpressionOrValue(partDoc, customPropertyName);
-                partData.CustomProperties[customPropertyName] = expressionOrValue;
-            }
-        }
+        //private void UpdateCustomProperties(PartDocument partDoc, PartData partData)
+        //{
+        //    foreach (var customPropertyName in partData.CustomProperties.Keys.ToList())
+        //    {
+        //        var expressionOrValue = GetPropertyExpressionOrValue(partDoc, customPropertyName);
+        //        partData.CustomProperties[customPropertyName] = expressionOrValue;
+        //    }
+        //}
 
-        private void EditButton_Click(object sender, RoutedEventArgs e)
+        private async void EditButton_Click(object sender, RoutedEventArgs e)
         {
             if (isEditing)
             {
@@ -247,7 +250,7 @@ namespace FPECORE
                 editButton.Content = "Редактировать";
                 saveButton.IsEnabled = false;
 
-                // Восстанавливаем исходные данные, если они были изменены
+                // Восстанавливаем исходные данные
                 for (int i = 0; i < partsData.Count; i++)
                 {
                     var currentItem = partsData[i];
@@ -279,6 +282,14 @@ namespace FPECORE
                 editButton.Content = "Отмена";
                 saveButton.IsEnabled = true;
 
+                // Проверяем состояние фонового режима
+                bool isBackgroundModeEnabled = backgroundModeCheckBox.IsChecked == true;
+                if (isBackgroundModeEnabled)
+                {
+                    // Отключаем взаимодействие с интерфейсом Inventor
+                    ThisApplication.UserInterfaceManager.UserInteractionDisabled = true;
+                }
+
                 // Сохраняем оригинальные данные
                 originalPartsData = partsData.Select(item => new PartData
                 {
@@ -295,25 +306,39 @@ namespace FPECORE
                     item.IsReadOnly = false;  // Разрешаем редактирование
                 }
 
-                // Обновляем данные с выражениями, если они имеются
+                // Асинхронное обновление данных с выражениями
                 foreach (var item in partsData)
                 {
                     var partDoc = OpenPartDocument(item.PartNumber);
                     if (partDoc != null)
                     {
-                        item.PartNumber = GetPropertyExpressionOrValue(partDoc, "Part Number");
-                        item.Description = GetPropertyExpressionOrValue(partDoc, "Description");
+                        item.PartNumber = await GetPropertyExpressionOrValueAsync(partDoc, "Part Number");
+                        item.Description = await GetPropertyExpressionOrValueAsync(partDoc, "Description");
 
-                        // Проходимся по всем пользовательским свойствам и заменяем значения на выражения
+                        // Асинхронно обновляем кастомные свойства
                         foreach (var customProperty in item.CustomProperties.Keys.ToList())
                         {
-                            item.CustomProperties[customProperty] = GetPropertyExpressionOrValue(partDoc, customProperty);
+                            item.CustomProperties[customProperty] = await GetPropertyExpressionOrValueAsync(partDoc, customProperty);
+                        }
+
+                        // Если фоновый режим включен, приостанавливаем обновление UI
+                        if (isBackgroundModeEnabled)
+                        {
+                            await Task.Delay(50); // Это замедлит обновление, чтобы снизить нагрузку на интерфейс
                         }
                     }
+
                     item.IsReadOnly = false;
                 }
 
+                // Включаем обновление UI только в конце, если фоновый режим активен
                 partsDataGrid.Items.Refresh();
+
+                // Восстанавливаем взаимодействие с интерфейсом Inventor после завершения
+                if (isBackgroundModeEnabled)
+                {
+                    ThisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+                }
             }
 
             UpdateEditButtonState();
