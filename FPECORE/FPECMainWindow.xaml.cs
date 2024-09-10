@@ -278,7 +278,6 @@ namespace FPECORE
 
                 partsDataGrid.Items.Refresh(); // Обновляем таблицу
             }
-
             else
             {
                 // Включаем режим редактирования
@@ -319,8 +318,17 @@ namespace FPECORE
 
                         foreach (var customProperty in item.CustomProperties.Keys.ToList())
                         {
-                            item.CustomProperties[customProperty] = item.CustomPropertyExpressions[customProperty]; // Показываем выражение
+                            // Проверяем наличие ключа перед доступом к выражению
+                            if (item.CustomPropertyExpressions.ContainsKey(customProperty))
+                            {
+                                item.CustomProperties[customProperty] = item.CustomPropertyExpressions[customProperty]; // Показываем выражение
+                            }
+                            else
+                            {
+                                item.CustomProperties[customProperty] = item.CustomProperties[customProperty]; // Оставляем значение
+                            }
                         }
+
                     }
                 }
 
@@ -385,8 +393,7 @@ namespace FPECORE
                 item.IsReadOnly = true;
             }
 
-            // Очищаем оригинальные данные, так как изменения сохранены
-            originalPartsData.Clear();
+            originalPartsData.Clear(); // Очищаем сохранённые оригинальные данные
             partsDataGrid.Items.Refresh();
 
             // Восстанавливаем состояние кнопки
@@ -1298,12 +1305,13 @@ namespace FPECORE
                 PartNumberExpression = await GetPropertyExpressionOrValueAsync(partDoc, "Part Number", true),
                 Description = await GetPropertyExpressionOrValueAsync(partDoc, "Description"),
                 DescriptionExpression = await GetPropertyExpressionOrValueAsync(partDoc, "Description", true),
-                Material = await GetPropertyExpressionOrValueAsync(partDoc, "Material"),
-                Thickness = await GetPropertyExpressionOrValueAsync(partDoc, "Thickness"),
+                Material = GetMaterialForPart(partDoc),
+                Thickness = GetThicknessForPart(partDoc).ToString("F1") + " мм", // Получаем толщину
                 ModelState = partDoc.ModelStateName,
                 OriginalQuantity = quantity,
                 Quantity = quantity,
-                Item = itemNumber
+                QuantityColor = System.Windows.Media.Brushes.Black,
+                Item = itemNumber,                               
             };
 
             // Получаем выражения и значения для пользовательских свойств
@@ -1321,6 +1329,9 @@ namespace FPECORE
             var smCompDef = partDoc.ComponentDefinition as SheetMetalComponentDefinition;
             bool hasFlatPattern = smCompDef != null && smCompDef.HasFlatPattern;
             partData.FlatPatternColor = hasFlatPattern ? System.Windows.Media.Brushes.Green : System.Windows.Media.Brushes.Red;
+
+            // Чтение значений iProperty для Автор, Ревизия, Проект, Инвентарный номер
+            ReadIPropertyValuesFromPart(partDoc, partData);
 
             return partData;
         }
@@ -2868,19 +2879,44 @@ namespace FPECORE
         public bool IsOverridden { get; set; } = false;
 
         // Методы для работы с пользовательскими свойствами
-        public void AddCustomProperty(string propertyName, string propertyValue)
+        public void AddCustomProperty(string propertyName, string propertyValue, string expressionValue = null)
         {
-            if (customProperties.ContainsKey(propertyName))
+            // Добавляем или обновляем значение кастомного свойства
+            if (CustomProperties.ContainsKey(propertyName))
             {
-                customProperties[propertyName] = propertyValue;
+                CustomProperties[propertyName] = propertyValue;
             }
             else
             {
-                customProperties.Add(propertyName, propertyValue);
+                CustomProperties.Add(propertyName, propertyValue);
             }
+
+            // Добавляем или обновляем выражение для кастомного свойства
+            if (expressionValue != null)
+            {
+                if (CustomPropertyExpressions.ContainsKey(propertyName))
+                {
+                    CustomPropertyExpressions[propertyName] = expressionValue;
+                }
+                else
+                {
+                    CustomPropertyExpressions.Add(propertyName, expressionValue);
+                }
+            }
+            else
+            {
+                // Если выражение не указано, инициализируем его пустым значением
+                if (!CustomPropertyExpressions.ContainsKey(propertyName))
+                {
+                    CustomPropertyExpressions.Add(propertyName, string.Empty);
+                }
+            }
+
             IsModified = true;  // Устанавливаем флаг изменений
             OnPropertyChanged(nameof(CustomProperties));
+            OnPropertyChanged(nameof(CustomPropertyExpressions));
         }
+
 
         public void RemoveCustomProperty(string propertyName)
         {
