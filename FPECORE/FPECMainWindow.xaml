@@ -17,7 +17,6 @@
         </Grid.RowDefinitions>
         <Button x:Name="addPresetIPropertyButton" Content="+ iProperty" Click="AddPresetIPropertyButton_Click" Height="32.5" Margin="265,0,10,48" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1"/>
         <Button x:Name="addCustomIPropertyButton" Content="+ Custom iProperty" Click="AddCustomIPropertyButton_Click" Height="32.5" Margin="265,0,0,5" VerticalAlignment="Bottom" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Padding="5,1,1,1" Width="115"/>
-        <CheckBox x:Name="expressionsCheckBox" Content="Показывать выражения" Margin="489,30,788,30" />
         <!-- Поле поиска с иконкой крестика для очистки -->
         <StackPanel x:Name="stackPanel" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,10,0" HorizontalAlignment="Right" Width="240">
             <Grid Margin="0,0,0,10" VerticalAlignment="Center" Width="{Binding Width, ElementName=stackPanel}">
@@ -40,10 +39,13 @@
                 </Button>
             </Grid>
         </StackPanel>
-        <GroupBox Header="Таблица" Margin="0,36,10,0" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Right" Width="240">
-            <StackPanel Orientation="Horizontal" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button x:Name="editButton" Content="Редактировать" Click="EditButton_Click" Margin="0,0,10,0" Width="100" />
-                <Button x:Name="saveButton" Content="Сохранить" Click="SaveButton_Click" IsEnabled="False" HorizontalContentAlignment="Center" Width="100" />
+        <GroupBox Header="Таблица" Margin="385,10,0,0" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5,0,5,0" Height="85">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Height="20" Margin="0,10,0,0" HorizontalAlignment="Left">
+                    <Button x:Name="editButton" Content="Редактировать" Click="EditButton_Click" Margin="0,0,10,0" Width="100" />
+                    <Button x:Name="saveButton" Content="Сохранить" Click="SaveButton_Click" IsEnabled="False" HorizontalContentAlignment="Center" Width="100" />
+                </StackPanel>
+                <CheckBox x:Name="expressionsCheckBox" Content="Показывать Expressions (beta)" Padding="5,-1,0,0" HorizontalAlignment="Left" Margin="0,10,0,10" />
             </StackPanel>
         </GroupBox>
         <DataGrid x:Name="partsDataGrid"
