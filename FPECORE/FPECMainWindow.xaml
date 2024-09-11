@@ -12,7 +12,7 @@
             <RowDefinition Height="100" />
             <RowDefinition Height="210"/>
             <RowDefinition />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="125" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
         <Button x:Name="addPresetIPropertyButton" Content="+ iProperty" Click="AddPresetIPropertyButton_Click" Height="32.5" Margin="265,0,10,48" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1"/>
