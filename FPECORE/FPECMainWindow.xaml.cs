@@ -252,6 +252,7 @@ namespace FPECORE
                 partsDataGrid.IsReadOnly = true;
                 editButton.Content = "Редактировать";
                 saveButton.IsEnabled = false;
+                exportButton.IsEnabled = true; // Разблокируем кнопку экспорта
 
                 // Восстанавливаем исходное состояние данных
                 for (int i = 0; i < partsData.Count; i++)
@@ -285,6 +286,7 @@ namespace FPECORE
                 partsDataGrid.IsReadOnly = false;
                 editButton.Content = "Отмена";
                 saveButton.IsEnabled = true;
+                exportButton.IsEnabled = false; // Блокируем кнопку экспорта в режиме редактирования
 
                 // Сохраняем исходное состояние данных
                 originalPartsData = partsData.Select(item => new PartData
@@ -1040,6 +1042,8 @@ namespace FPECORE
 
         private async void ScanButton_Click(object sender, RoutedEventArgs e)
         {
+            ResetEditMode(); // Сброс режима редактирования перед сканированием
+
             if (ThisApplication == null)
             {
                 MessageBoxHelper.ShowInventorNotRunningError();
@@ -1090,6 +1094,7 @@ namespace FPECORE
 
             partsData.Clear();
             itemCounter = 1;
+            UpdateEditButtonState(); // Обновляем состояние кнопки редактирования после очистки данных
 
             var progress = new Progress<PartData>(partData =>
             {
@@ -1769,13 +1774,37 @@ namespace FPECORE
             // Деактивируем кнопку "Экспорт" после завершения скрытого экспорта
             exportButton.IsEnabled = false;
         }
+        private void ResetEditMode()
+        {
+            // Сбрасываем режим редактирования
+            if (isEditing)
+            {
+                isEditing = false; // Отключаем режим редактирования
+                partsDataGrid.IsReadOnly = true; // Делаем таблицу нередактируемой
+                editButton.Content = "Редактировать"; // Меняем текст кнопки на "Редактировать"
+                saveButton.IsEnabled = false; // Деактивируем кнопку сохранения
+
+                // Обновляем IsReadOnly для каждого элемента данных
+                foreach (var item in partsData)
+                {
+                    item.IsReadOnly = true; // Устанавливаем флаг, что элемент теперь нередактируемый
+                }
+
+                // Обновляем отображение таблицы
+                partsDataGrid.Items.Refresh(); // Обновляем интерфейс, чтобы стиль ячеек обновился
+            }
+        }
+
         private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
+            ResetEditMode(); // Сброс режима редактирования перед экспортом
+
             if (isCtrlPressed)
             {
                 await ExportWithoutScan();
                 return;
-            }
+            }           
+
             if (ThisApplication == null)
             {
                 MessageBoxHelper.ShowInventorNotRunningError();
