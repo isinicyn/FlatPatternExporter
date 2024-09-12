@@ -1,12 +1,8 @@
-﻿using System.Windows;
+﻿namespace FPECORE;
 
-namespace FPECORE
+/// <summary>
+///     Interaction logic for App.xaml
+/// </summary>
+public partial class App
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : System.Windows.Application
-    {
-    }
-
 }
