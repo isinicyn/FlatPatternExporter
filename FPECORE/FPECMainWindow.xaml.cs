@@ -167,7 +167,6 @@ namespace FPECORE
 
             return result;
         }
-
         private void InitializePresetColumns()
         {
             if (PresetIProperties == null)
@@ -233,16 +232,6 @@ namespace FPECORE
                 return string.Empty;
             });
         }
-
-        //private void UpdateCustomProperties(PartDocument partDoc, PartData partData)
-        //{
-        //    foreach (var customPropertyName in partData.CustomProperties.Keys.ToList())
-        //    {
-        //        var expressionOrValue = GetPropertyExpressionOrValue(partDoc, customPropertyName);
-        //        partData.CustomProperties[customPropertyName] = expressionOrValue;
-        //    }
-        //}
-
         private async void EditButton_Click(object sender, RoutedEventArgs e)
         {
             if (isEditing)
@@ -1184,7 +1173,7 @@ namespace FPECORE
 
             if (isCancelled)
             {
-                System.Windows.MessageBox.Show("Процесс сканирования был прерван.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBoxHelper.ShowScanningCancelledInfo();
             }
         }
         private void UpdateSubfolderOptions()
@@ -1675,7 +1664,7 @@ namespace FPECORE
             if (isCancelled)
             {
                 progressLabel.Text = $"Статус: Прервано ({elapsedTime})";
-                System.Windows.MessageBox.Show("Процесс экспорта был прерван.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBoxHelper.ShowExportCancelledInfo();
             }
             else
             {
@@ -1907,7 +1896,7 @@ namespace FPECORE
             var itemsWithoutFlatPattern = selectedItems.Where(p => p.FlatPatternColor == System.Windows.Media.Brushes.Red).ToList();
             if (itemsWithoutFlatPattern.Count == selectedItems.Count)
             {
-                System.Windows.MessageBox.Show("Выбранные файлы не содержат разверток.", "Информация", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBoxHelper.ShowNoFlatPatternWarning();
                 return;
             }
 
@@ -3020,23 +3009,7 @@ namespace FPECORE
         public static void ShowNoFlatPatternWarning()
         {
             System.Windows.MessageBox.Show("Выбранные файлы не содержат разверток.", "Информация", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-
-        public static void ShowPartNotFoundError(string partNumber, string filePath = null)
-        {
-            string message;
-
-            if (string.IsNullOrEmpty(filePath))
-            {
-                message = $"Файл, связанный с номером детали {partNumber}, не найден среди открытых документов.";
-            }
-            else
-            {
-                message = $"Файл по пути {filePath}, связанный с номером детали {partNumber}, не найден.";
-            }
-
-            System.Windows.MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        } 
 
         public static void ShowExportCompletedInfo(int processedCount, int skippedCount, string elapsedTime)
         {
