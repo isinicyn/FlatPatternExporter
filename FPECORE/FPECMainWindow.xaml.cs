@@ -350,27 +350,29 @@ public partial class MainWindow : Window
         if (_isEditing) // Применяем изменения только в режиме редактирования
         {
             if (expressionsCheckBox.IsChecked == true)
+            {
                 // Показываем выражения
                 foreach (var item in _partsData)
                 {
-                    item.PartNumber = item.PartNumberExpression; // Показываем выражение
-                    item.Description = item.DescriptionExpression; // Показываем выражение
+                    item.SetPartNumberWithoutModification(item.PartNumberExpression); // Показываем выражение
+                    item.SetDescriptionWithoutModification(item.DescriptionExpression); // Показываем выражение
 
                     foreach (var customProperty in item.CustomProperties.Keys.ToList())
-                        item.CustomProperties[customProperty] =
-                            item.CustomPropertyExpressions[customProperty]; // Показываем выражение
+                        item.SetCustomPropertyWithoutModification(customProperty, item.CustomPropertyExpressions[customProperty]); // Показываем выражение
                 }
+            }
             else
+            {
                 // Показываем обычные значения
                 foreach (var item in _partsData)
                 {
-                    item.PartNumber = item.PartNumber; // Показываем значение
-                    item.Description = item.Description; // Показываем значение
+                    item.SetPartNumberWithoutModification(item.PartNumber); // Показываем значение
+                    item.SetDescriptionWithoutModification(item.Description); // Показываем значение
 
                     foreach (var customProperty in item.CustomProperties.Keys.ToList())
-                        item.CustomProperties[customProperty] =
-                            item.CustomProperties[customProperty]; // Показываем значение
+                        item.SetCustomPropertyWithoutModification(customProperty, item.CustomProperties[customProperty]); // Показываем значение
                 }
+            }
 
             partsDataGrid.Items.Refresh(); // Обновляем таблицу после изменения
         }
@@ -2677,9 +2679,12 @@ public class PartData : INotifyPropertyChanged
         get => partNumber;
         set
         {
-            partNumber = value;
-            IsModified = true; // Устанавливаем флаг изменений при изменении
-            OnPropertyChanged();
+            if (partNumber != value)
+            {
+                partNumber = value;
+                IsModified = true; // Устанавливаем флаг изменений при изменении
+                OnPropertyChanged();
+            }
         }
     }
 
@@ -2700,9 +2705,12 @@ public class PartData : INotifyPropertyChanged
         get => description;
         set
         {
-            description = value;
-            IsModified = true; // Устанавливаем флаг изменений при изменении
-            OnPropertyChanged();
+            if (description != value)
+            {
+                description = value;
+                IsModified = true; // Устанавливаем флаг изменений при изменении
+                OnPropertyChanged();
+            }
         }
     }
 
@@ -2763,14 +2771,53 @@ public class PartData : INotifyPropertyChanged
     public string Project { get; set; }
     public string StockNumber { get; set; }
 
+    // Методы для установки значений без модификации флага IsModified
+    public void SetPartNumberWithoutModification(string value)
+    {
+        if (partNumber != value)
+        {
+            partNumber = value;
+            OnPropertyChanged(nameof(PartNumber));
+        }
+    }
+
+    public void SetDescriptionWithoutModification(string value)
+    {
+        if (description != value)
+        {
+            description = value;
+            OnPropertyChanged(nameof(Description));
+        }
+    }
+
+    public void SetCustomPropertyWithoutModification(string propertyName, string value)
+    {
+        if (CustomProperties.ContainsKey(propertyName))
+        {
+            if (CustomProperties[propertyName] != value)
+            {
+                CustomProperties[propertyName] = value;
+                OnPropertyChanged(nameof(CustomProperties));
+            }
+        }
+        else
+        {
+            CustomProperties.Add(propertyName, value);
+            OnPropertyChanged(nameof(CustomProperties));
+        }
+    }
+
     // Свойство для контроля редактируемости
     public bool IsReadOnly
     {
         get => isReadOnly;
         set
         {
-            isReadOnly = value;
-            OnPropertyChanged();
+            if (isReadOnly != value)
+            {
+                isReadOnly = value;
+                OnPropertyChanged();
+            }
         }
     }
 
@@ -2780,8 +2827,11 @@ public class PartData : INotifyPropertyChanged
         get => isModified;
         set
         {
-            isModified = value;
-            OnPropertyChanged();
+            if (isModified != value)
+            {
+                isModified = value;
+                OnPropertyChanged();
+            }
         }
     }
 
@@ -2791,8 +2841,14 @@ public class PartData : INotifyPropertyChanged
     // Реализация интерфейса INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
 
-    // Методы для работы с пользовательскими свойствами
-    public void AddCustomProperty(string propertyName, string propertyValue, string expressionValue = null)
+    protected void OnPropertyChanged([CallerMemberName] string name = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
+
+// Методы для работы с пользовательскими свойствами
+public void AddCustomProperty(string propertyName, string propertyValue, string expressionValue = null)
     {
         // Добавляем или обновляем значение кастомного свойства
         if (CustomProperties.ContainsKey(propertyName))
@@ -2829,11 +2885,6 @@ public class PartData : INotifyPropertyChanged
             IsModified = true; // Устанавливаем флаг изменений
             OnPropertyChanged(nameof(CustomProperties));
         }
-    }
-
-    protected void OnPropertyChanged([CallerMemberName] string name = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
 
