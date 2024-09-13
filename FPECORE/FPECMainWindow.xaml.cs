@@ -122,36 +122,18 @@ public partial class MainWindow : Window
             new() { InternalName = "ID", DisplayName = "#Нумерация", InventorPropertyName = "Item" },
             new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber" },
             new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description" },
-            new()
-            {
-                InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState"
-            },
+            new() { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState" },
             new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material" },
             new() { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness" },
             new() { InternalName = "Количество", DisplayName = "Количество", InventorPropertyName = "Quantity" },
-            new()
-            {
-                InternalName = "Изображение детали", DisplayName = "Изображение детали",
-                InventorPropertyName = "Preview"
-            },
-            new()
-            {
-                InternalName = "Изображение развертки", DisplayName = "Изображение развертки",
-                InventorPropertyName = "DxfPreview"
-            },
+            new() { InternalName = "Изображение детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview" },
+            new() { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview" },
 
             // Добавление новых предустановленных свойств
-            new()
-            {
-                InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author"
-            }, //, ShouldBeAddedOnInit = true or false
+            new() { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author" }, //, ShouldBeAddedOnInit = true or false
             new() { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision Number" },
             new() { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project" },
-            new()
-            {
-                InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер",
-                InventorPropertyName = "Stock Number"
-            }
+            new() { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "Stock Number" }
         };
 
         // Устанавливаем DataContext для текущего окна, объединяя данные из LayerSettingsWindow и других источников
