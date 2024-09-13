@@ -1,9 +1,33 @@
-﻿<Window x:Class="FPECORE.SelectIPropertyWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Выбор iProperty" Width="250" Height="400" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FAFAFA">
-    <Grid Margin="10">
+﻿<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:av="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    mc:Ignorable="av" x:Class="FPECORE.SelectIPropertyWindow"
+    Title="Customization" Width="230" Background="#FAFAFA" 
+    WindowStyle="None" ResizeMode="NoResize" 
+    WindowStartupLocation="CenterScreen"
+    SizeToContent="Height">
+    <Grid Margin="0">
+        <!-- Заголовок окна с кнопкой закрытия -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Border Background="#F5F5F5" Height="30" VerticalAlignment="Center" BorderThickness="0">
+            <DockPanel LastChildFill="False" MouseDown="WindowHeader_MouseDown">
+                <TextBlock Text="Выберите iProperty" FontWeight="Bold" Foreground="#555" FontSize="12" Margin="10,0,0,0" Width="185" VerticalAlignment="Center"/>
+                <Button Content="X" Width="25" Height="25" DockPanel.Dock="Right" 
+                        VerticalAlignment="Center" HorizontalAlignment="Right" 
+                        Background="#C80000" Foreground="White" 
+                        BorderBrush="{x:Null}" Click="CloseWindow_Click" />
+            </DockPanel>
+        </Border>
+
+        <!-- Основное содержимое -->
         <ListBox x:Name="iPropertyListBox" 
+                 Grid.Row="1"
                  ItemsSource="{Binding AvailableProperties}" 
                  SelectionMode="Single" 
                  AllowDrop="True" 
@@ -11,23 +35,25 @@
                  Drop="iPropertyListBox_Drop"
                  MouseDoubleClick="iPropertyListBox_MouseDoubleClick"
                  Background="Transparent"
-                 BorderThickness="0">
+                 BorderThickness="0.5,0.5,0.5,0.5" 
+                 av:ItemsSource="{av:SampleData ItemCount=5}"
+                 MaxHeight="300">
+            <ListBox.BorderBrush>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
+            </ListBox.BorderBrush>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border Background="White" 
-                            BorderBrush="#E0E0E0" 
-                            BorderThickness="1"
-                            Padding="3"
-                            HorizontalAlignment="Stretch"
-                            Margin="1"
-                            Height="25">
+                    <Border Background="#F0F0F0" 
+                            BorderBrush="#C0C0C0" 
+                            BorderThickness="1,1,1,1"
+                            Padding="2,2,2,2"
+                            SnapsToDevicePixels="True" Width="215" Margin="0,0,0,0" Height="22.5">
                         <TextBlock Text="{Binding DisplayName}" 
-                                   FontWeight="Medium" 
+                                   FontWeight="Bold" 
                                    VerticalAlignment="Center"
-                                   HorizontalAlignment="Center" 
+                                   HorizontalAlignment="Left" 
                                    Foreground="#333333"
-                                   Width="190"
-                                   FontSize="12"/>
+                                   FontSize="11" Margin="5,0,0,0"/>
                     </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>

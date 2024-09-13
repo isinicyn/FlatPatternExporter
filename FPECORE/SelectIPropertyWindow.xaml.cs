@@ -107,8 +107,17 @@ public partial class SelectIPropertyWindow : Window
         _isMouseOverDataGrid = false;
     }
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    private void CloseWindow_Click(object sender, RoutedEventArgs e)
     {
-        Close();
+        // Закрываем окно
+        this.Close();
     }
+    private void WindowHeader_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.LeftButton == MouseButtonState.Pressed)
+        {
+            this.DragMove();
+        }
+    }
+
 }
