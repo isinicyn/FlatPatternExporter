@@ -1,0 +1,39 @@
+﻿<Window x:Class="FPECORE.ConflictDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Детали конфликта обозначений" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FAFAFA" SizeToContent="WidthAndHeight">
+    <Grid Margin="10,10,10,10" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок окна -->
+        <TextBlock Text="Конфликты обозначений" FontWeight="Bold" FontSize="16" Grid.Row="0" Margin="0,0,0,20"/>
+
+        <!-- Иерархическое отображение конфликтов (TreeView) -->
+        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,10">
+            <Label Content="Конфликтующие обозначения и файлы:" FontWeight="Bold"/>
+            <TreeView x:Name="conflictTreeView" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="1" Padding="0,10,10,10"
+                      PreviewMouseRightButtonDown="ConflictTreeView_PreviewMouseRightButtonDown">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding FileNames}">
+                        <TextBlock Text="{Binding PartNumber}" />
+                        <HierarchicalDataTemplate.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Tag="{Binding}" />
+                            </DataTemplate>
+                        </HierarchicalDataTemplate.ItemTemplate>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </StackPanel>
+
+        <!-- Кнопки "ОК" и "Отмена" -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Отмена" Width="100" Margin="0,0,10,0" Click="CancelButton_Click" Background="#E0E0E0" BorderBrush="#CCCCCC" Padding="5"/>
+            <Button Content="ОК" Width="100" Click="OkButton_Click" Background="#4CAF50" Foreground="White" BorderBrush="#388E3C" Padding="5"/>
+        </StackPanel>
+    </Grid>
+</Window>
