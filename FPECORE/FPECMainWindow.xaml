@@ -569,6 +569,7 @@
             </TabItem>
             <TabItem Header="Имя выгружаемого файла"/>
         </TabControl>
-        <TextBlock Name="VersionTextBlock" VerticalAlignment="Center" Margin="0,0,25,0" HorizontalAlignment="Right" Text="Версия программы: x.x.x.x + xxxxxxx" Grid.Row="4"/>
+        <TextBlock Name="VersionTextBlock" VerticalAlignment="Center" Margin="0,0,75,0" HorizontalAlignment="Right" Text="Версия программы: x.x.x.x + xxxxxxx" Grid.Row="4"/>
+        <Button Content="ABOUT" Click="AboutButton_Click" Margin="0,4,25,4" Grid.Row="4" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Right" Padding="1,1,1,1" FontWeight="Bold" />
     </Grid>
 </Window>

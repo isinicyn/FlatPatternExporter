@@ -2795,6 +2795,12 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         return string.Empty;
     }
+    private void AboutButton_Click(object sender, RoutedEventArgs e)
+    {
+        // Создаём и показываем окно "О программе"
+        var aboutWindow = new AboutWindow();
+        aboutWindow.ShowDialog();  // Открывает окно как модальное (дожидается его закрытия)
+    }
 }
 
 public class PartData : INotifyPropertyChanged
