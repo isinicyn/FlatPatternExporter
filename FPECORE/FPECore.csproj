@@ -19,7 +19,7 @@
       <Output TaskParameter="ConsoleOutput" PropertyName="CommitHash" />
     </Exec>
     <PropertyGroup>
-      <AssemblyFileVersion>1.0.0.$(RevisionNumber)</AssemblyFileVersion>
+      <AssemblyFileVersion>1.1.0.$(RevisionNumber)</AssemblyFileVersion>
       <FileVersion>$(AssemblyFileVersion)</FileVersion>
       <InformationalVersion>$(AssemblyFileVersion)+$(CommitHash)</InformationalVersion>
     </PropertyGroup>
