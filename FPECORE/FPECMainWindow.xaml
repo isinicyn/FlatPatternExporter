@@ -45,34 +45,36 @@
         </Button>
 
         <!-- Поле поиска с иконкой крестика для очистки -->
-        <StackPanel x:Name="stackPanel" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,10,0" HorizontalAlignment="Right" Width="240">
-            <Grid Margin="0,0,0,10" VerticalAlignment="Center" Width="{Binding Width, ElementName=stackPanel}">
-                <TextBox x:Name="searchTextBox" 
+        <GroupBox Header="Список данных деталей" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="5,0,5,0" Height="120" Margin="0,5,10,0" Grid.RowSpan="2">
+            <StackPanel VerticalAlignment="Center">
+                <StackPanel x:Name="stackPanel">
+                    <Grid Margin="0,0,0,10" VerticalAlignment="Center" Width="{Binding Width, ElementName=stackPanel}">
+                        <TextBox x:Name="searchTextBox" 
                          VerticalContentAlignment="Center"
                          Padding="5,0,30,0"
                          TextChanged="SearchTextBox_TextChanged"
                          GotFocus="SearchTextBox_GotFocus"
-                         LostFocus="SearchTextBox_LostFocus" HorizontalAlignment="Center" VerticalAlignment="Center" Height="20" Width="{Binding Width, ElementName=stackPanel}"/>
-                <Button x:Name="clearSearchButton" 
+                         LostFocus="SearchTextBox_LostFocus" VerticalAlignment="Center" Height="20"/>
+                        <Button x:Name="clearSearchButton" 
                         Content="✖"
                         Width="20"
                         Height="20"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center" 
                         Click="ClearSearchButton_Click" FontSize="8" Background="{x:Null}" Visibility="Collapsed">
-                    <Button.BorderBrush>
-                        <SolidColorBrush Color="#FF707070" Opacity="0"/>
-                    </Button.BorderBrush>
-                </Button>
-            </Grid>
-        </StackPanel>
-        <GroupBox Header="Таблица свойств" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="5,0,5,0" Height="85" Margin="0,36,10,0" Grid.RowSpan="2" Width="240">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" Height="20" Margin="0,10,0,0" HorizontalAlignment="Left">
-                    <Button x:Name="editButton" Content="Редактировать" Click="EditButton_Click" Margin="0,0,10,0" Width="100" />
-                    <Button x:Name="saveButton" Content="Сохранить" Click="SaveButton_Click" IsEnabled="False" HorizontalContentAlignment="Center" Width="100" />
+                            <Button.BorderBrush>
+                                <SolidColorBrush Color="#FF707070" Opacity="0"/>
+                            </Button.BorderBrush>
+                        </Button>
+                    </Grid>
                 </StackPanel>
-                <CheckBox x:Name="expressionsCheckBox" Content="Показывать Expressions (beta)" Padding="5,-1,0,0" HorizontalAlignment="Left" Margin="0,10,0,10" />
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Height="25" HorizontalAlignment="Left">
+                        <Button x:Name="editButton" Content="Редактировать" Click="EditButton_Click" Margin="0,0,10,0" Width="100" />
+                        <Button x:Name="saveButton" Content="Сохранить" Click="SaveButton_Click" IsEnabled="False" HorizontalContentAlignment="Center" Width="100" />
+                    </StackPanel>
+                    <CheckBox x:Name="expressionsCheckBox" Content="Показывать Expressions (beta)" Padding="5,-1,0,0" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                </StackPanel>
             </StackPanel>
         </GroupBox>
         <DataGrid x:Name="partsDataGrid"
@@ -389,21 +391,38 @@
             <TabItem Header="Основные">
                 <Grid Background="White">
                     <GroupBox Header="Папка экспорта" Margin="742,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="140">
-                        <StackPanel Orientation="Vertical" Margin="10,5,10,0">
-                            <RadioButton x:Name="chooseFolderRadioButton" Content="Указать папку в процессе экспорта" Margin="0,5,0,0" GroupName="ExportFolderOptions"  Checked="ChooseFolderRadioButton_Checked"/>
-                            <RadioButton x:Name="componentFolderRadioButton" Content="Папка компонента" Margin="0,5,0,0" GroupName="ExportFolderOptions" Checked="ComponentFolderRadioButton_Checked"/>
-                            <RadioButton x:Name="partFolderRadioButton" Content="Рядом с деталью" Margin="0,5,0,0" GroupName="ExportFolderOptions" Checked="PartFolderRadioButton_Checked"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                <RadioButton x:Name="fixedFolderRadioButton" Content="Фиксированная папка" VerticalAlignment="Center" GroupName="ExportFolderOptions" Checked="FixedFolderRadioButton_Checked"/>
-                                <Button x:Name="selectFixedFolderButton" Content="..." Width="30" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Click="SelectFixedFolderButton_Click"/>
-                                <TextBlock x:Name="fixedFolderPathTextBlock" Text="Путь не выбран" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0" Width="275" TextTrimming="CharacterEllipsis" Opacity="0.75"/>
+                        <Grid Margin="10,5,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="85*"/>
+                                <RowDefinition Height="27*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Левая колонка -->
+                            <StackPanel Orientation="Vertical" Grid.Column="0">
+                                <RadioButton x:Name="chooseFolderRadioButton" Content="Указать папку в процессе экспорта" Margin="0,5,0,0" GroupName="ExportFolderOptions" Checked="ChooseFolderRadioButton_Checked" />
+                                <RadioButton x:Name="componentFolderRadioButton" Content="Папка компонента" Margin="0,5,0,0" GroupName="ExportFolderOptions" Checked="ComponentFolderRadioButton_Checked" />
+                                <RadioButton x:Name="partFolderRadioButton" Content="Рядом с деталью" Margin="0,5,0,0" GroupName="ExportFolderOptions" Checked="PartFolderRadioButton_Checked" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                <CheckBox x:Name="enableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsEnabled="False" Checked="EnableSubfolderCheckBox_Checked" Unchecked="EnableSubfolderCheckBox_Unchecked" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |"/>
-                                <TextBox x:Name="subfolderNameTextBox" Width="127" Height="20" Margin="32,0,0,0" VerticalAlignment="Center" IsEnabled="False" TextChanged="SubfolderNameTextBox_TextChanged"/>
+
+                            <!-- Правая колонка -->
+                            <StackPanel Grid.Column="1">
+                                <CheckBox x:Name="enableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsEnabled="False" Checked="EnableSubfolderCheckBox_Checked" Unchecked="EnableSubfolderCheckBox_Unchecked" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="10,5,0,0" HorizontalAlignment="Right" />
+                                <TextBox x:Name="subfolderNameTextBox" Width="118" Height="20" IsEnabled="False" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Right" Margin="10,5,0,0" />
                             </StackPanel>
-                        </StackPanel>
+
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Left" Grid.ColumnSpan="2">
+                                <RadioButton x:Name="fixedFolderRadioButton" Content="Фиксированная папка" VerticalAlignment="Center" GroupName="ExportFolderOptions" Checked="FixedFolderRadioButton_Checked" />
+                                <Button x:Name="selectFixedFolderButton" Content="..." Width="30" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Click="SelectFixedFolderButton_Click" />
+                                <TextBlock x:Name="fixedFolderPathTextBlock" Text="Путь не выбран" Margin="10,0,0,0" TextTrimming="CharacterEllipsis" Opacity="0.75" VerticalAlignment="Center" Width="260" />
+                            </StackPanel>
+
+                        </Grid>
                     </GroupBox>
+
 
                     <GroupBox Header="Базовые настройки" Margin="10,10,0,0" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left">
                         <StackPanel Margin="10,5,10,5" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -482,7 +501,6 @@
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
-
                 </Grid>
             </TabItem>
             <TabItem Header="Настройка слоев">
