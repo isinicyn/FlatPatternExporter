@@ -1299,6 +1299,7 @@ public partial class MainWindow : Window
         // Возвращаем курсор на правильное место после удаления символов
         textBox.CaretIndex = Math.Max(caretIndex, 0);
     }
+    // Метод для получения и установки информации о проекте
     private void SetProjectFolderInfo()
     {
         try
@@ -1311,7 +1312,10 @@ public partial class MainWindow : Window
             var projectWorkspacePath = activeProject.WorkspacePath;
 
             // Обновляем текст радиокнопки
-            projectFolderRadioButton.Content = $"Папка проекта: {projectName} {projectWorkspacePath}";
+            //projectFolderRadioButton.Content = $"Папка проекта [{projectName}] {projectWorkspacePath}";
+
+            // Обновляем TextBlock с названием проекта
+            this.projectName.Text = $"Проект: {projectName}";
         }
         catch (Exception ex)
         {

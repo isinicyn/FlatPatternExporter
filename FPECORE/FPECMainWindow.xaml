@@ -368,12 +368,19 @@
         </StackPanel>
         <Border Grid.Row="4" Background="LightGray" Height="25" VerticalAlignment="Center">
             <StackPanel x:Name="bottomPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Opacity="0.75">
+                <TextBlock x:Name="projectName" Text="Проект: " Foreground="Black" Margin="10,0"/>
+                <Separator Width="16" Margin="10,0,10,0" Background="#FFADADAD" UseLayoutRounding="False" Cursor="" VerticalContentAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" RenderTransformOrigin="0.5,0.5">
+                    <Separator.RenderTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="-90"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Separator.RenderTransform>
+                </Separator>
                 <TextBlock x:Name="fileCountLabelBottom" Text="Найдено файлов для экспорта: " Foreground="Black" Margin="10,0"/>
                 <Separator Width="16" Margin="10,0,10,0" Background="#FFADADAD" UseLayoutRounding="False" Cursor="" VerticalContentAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" RenderTransformOrigin="0.5,0.5">
                     <Separator.RenderTransform>
                         <TransformGroup>
-                            <ScaleTransform/>
-                            <SkewTransform/>
                             <RotateTransform Angle="-90"/>
                             <TranslateTransform/>
                         </TransformGroup>
