@@ -8,10 +8,10 @@
             <TextBlock Text="Введите имя Custom IProperty:" FontWeight="Bold" FontSize="16" Margin="0,0,0,15"/>
 
             <!-- Поле ввода имени Custom IProperty -->
-            <TextBox x:Name="propertyNameTextBox" Height="30" VerticalContentAlignment="Center" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="1" Padding="5" TextChanged="PropertyNameTextBox_TextChanged"/>
+            <TextBox x:Name="PropertyNameTextBox" Height="30" VerticalContentAlignment="Center" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="1" Padding="5" TextChanged="PropertyNameTextBox_TextChanged"/>
 
             <!-- Кнопка OK -->
-            <Button x:Name="okButton" Content="OK" IsDefault="True" Click="OkButton_Click" Height="35" Margin="0,15,0,0" IsEnabled="False" Background="#4CAF50" BorderBrush="#388E3C" Padding="5">
+            <Button x:Name="OkButton" Content="OK" IsDefault="True" Click="OkButton_Click" Height="35" Margin="0,15,0,0" IsEnabled="False" Background="#4CAF50" BorderBrush="#388E3C" Padding="5">
                 <Button.Style>
                     <Style TargetType="Button">
                         <Setter Property="Foreground" Value="White"/>

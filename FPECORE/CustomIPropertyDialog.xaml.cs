@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace FPECORE;
 
-public partial class CustomIPropertyDialog : Window
+public partial class CustomIPropertyDialog
 {
     public CustomIPropertyDialog()
     {
@@ -14,7 +14,7 @@ public partial class CustomIPropertyDialog : Window
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
-        CustomPropertyName = propertyNameTextBox.Text;
+        CustomPropertyName = PropertyNameTextBox.Text;
         DialogResult = true;
         Close();
     }
@@ -22,6 +22,6 @@ public partial class CustomIPropertyDialog : Window
     private void PropertyNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         // Активируем кнопку OK только если текстовое поле не пустое
-        okButton.IsEnabled = !string.IsNullOrWhiteSpace(propertyNameTextBox.Text);
+        OkButton.IsEnabled = !string.IsNullOrWhiteSpace(PropertyNameTextBox.Text);
     }
 }
