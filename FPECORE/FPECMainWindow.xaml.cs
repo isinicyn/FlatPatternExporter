@@ -76,26 +76,26 @@ public partial class MainWindow : Window
         InitializeComponent();
         InitializeInventor();
         InitializeProjectFolder(); // Инициализация папки проекта при запуске
-        partsDataGrid.ItemsSource = _partsData;
-        multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true;
+        PartsDataGrid.ItemsSource = _partsData;
+        MultiplierTextBox.IsEnabled = IncludeQuantityInFileNameCheckBox.IsChecked == true;
         UpdateFileCountLabel(0);
-        clearButton.IsEnabled = false;
-        partsDataGrid.PreviewMouseDown += PartsDataGrid_PreviewMouseDown;
-        partsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
-        partsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
-        partsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
-        partsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
-        chooseFolderRadioButton.IsChecked = true;
+        ClearButton.IsEnabled = false;
+        PartsDataGrid.PreviewMouseDown += PartsDataGrid_PreviewMouseDown;
+        PartsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
+        PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
+        PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
+        PartsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
+        ChooseFolderRadioButton.IsChecked = true;
 
-        partsDataGrid.DragOver += PartsDataGrid_DragOver;
-        partsDataGrid.DragLeave += PartsDataGrid_DragLeave;
+        PartsDataGrid.DragOver += PartsDataGrid_DragOver;
+        PartsDataGrid.DragLeave += PartsDataGrid_DragLeave;
 
         // Инициализация CollectionViewSource для фильтрации
         _partsDataView = new CollectionViewSource { Source = _partsData };
         _partsDataView.Filter += PartsData_Filter;
 
         // Устанавливаем ItemsSource для DataGrid
-        partsDataGrid.ItemsSource = _partsDataView.View;
+        PartsDataGrid.ItemsSource = _partsDataView.View;
 
         // Подписываемся на событие изменения коллекции
         _partsData.CollectionChanged += PartsData_CollectionChanged;
@@ -110,8 +110,8 @@ public partial class MainWindow : Window
         _searchDelayTimer.Tick += SearchDelayTimer_Tick;
 
         // Установка начального текста для searchTextBox
-        searchTextBox.Text = PlaceholderText;
-        searchTextBox.Foreground = Brushes.Gray;
+        SearchTextBox.Text = PlaceholderText;
+        SearchTextBox.Foreground = Brushes.Gray;
 
         // Создаем экземпляр MainWindow из LayerSettingsApp
         var layerSettingsWindow = new LayerSettingsApp.MainWindow();
@@ -188,7 +188,7 @@ public partial class MainWindow : Window
         var result = false;
 
         // Используем Dispatcher для доступа к UI-элементам
-        Dispatcher.Invoke(() => { result = partsDataGrid.Columns.Any(c => c.Header.ToString() == columnName); });
+        Dispatcher.Invoke(() => { result = PartsDataGrid.Columns.Any(c => c.Header.ToString() == columnName); });
 
         return result;
     }
@@ -250,10 +250,10 @@ public partial class MainWindow : Window
         {
             // Отключаем режим редактирования
             _isEditing = false;
-            partsDataGrid.IsReadOnly = true;
-            editButton.Content = "Редактировать";
-            saveButton.IsEnabled = false;
-            exportButton.IsEnabled = true; // Разблокируем кнопку экспорта
+            PartsDataGrid.IsReadOnly = true;
+            EditButton.Content = "Редактировать";
+            SaveButton.IsEnabled = false;
+            ExportButton.IsEnabled = true; // Разблокируем кнопку экспорта
 
             // Восстанавливаем исходное состояние данных
             for (var i = 0; i < _partsData.Count; i++)
@@ -277,16 +277,16 @@ public partial class MainWindow : Window
                 currentItem.IsReadOnly = originalItem.IsReadOnly;
             }
 
-            partsDataGrid.Items.Refresh(); // Обновляем таблицу
+            PartsDataGrid.Items.Refresh(); // Обновляем таблицу
         }
         else
         {
             // Включаем режим редактирования
             _isEditing = true;
-            partsDataGrid.IsReadOnly = false;
-            editButton.Content = "Отмена";
-            saveButton.IsEnabled = true;
-            exportButton.IsEnabled = false; // Блокируем кнопку экспорта в режиме редактирования
+            PartsDataGrid.IsReadOnly = false;
+            EditButton.Content = "Отмена";
+            SaveButton.IsEnabled = true;
+            ExportButton.IsEnabled = false; // Блокируем кнопку экспорта в режиме редактирования
 
             // Сохраняем исходное состояние данных
             _originalPartsData = _partsData.Select(item => new PartData
@@ -311,7 +311,7 @@ public partial class MainWindow : Window
             }
 
             // Если чекбокс активен, отображаем выражения
-            if (expressionsCheckBox.IsChecked == true)
+            if (ExpressionsCheckBox.IsChecked == true)
                 foreach (var item in _partsData)
                 {
                     item.PartNumber = item.PartNumberExpression; // Показываем выражение
@@ -327,7 +327,7 @@ public partial class MainWindow : Window
                                 item.CustomProperties[customProperty]; // Оставляем значение
                 }
 
-            partsDataGrid.Items.Refresh(); // Обновляем таблицу
+            PartsDataGrid.Items.Refresh(); // Обновляем таблицу
         }
 
         UpdateEditButtonState();
@@ -337,7 +337,7 @@ public partial class MainWindow : Window
     {
         if (_isEditing) // Применяем изменения только в режиме редактирования
         {
-            if (expressionsCheckBox.IsChecked == true)
+            if (ExpressionsCheckBox.IsChecked == true)
             {
                 // Показываем выражения
                 foreach (var item in _partsData)
@@ -362,16 +362,16 @@ public partial class MainWindow : Window
                 }
             }
 
-            partsDataGrid.Items.Refresh(); // Обновляем таблицу после изменения
+            PartsDataGrid.Items.Refresh(); // Обновляем таблицу после изменения
         }
     }
 
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         _isEditing = false;
-        partsDataGrid.IsReadOnly = true;
-        editButton.Content = "Редактировать";
-        saveButton.IsEnabled = false;
+        PartsDataGrid.IsReadOnly = true;
+        EditButton.Content = "Редактировать";
+        SaveButton.IsEnabled = false;
 
         foreach (var item in _partsData)
         {
@@ -384,7 +384,7 @@ public partial class MainWindow : Window
         }
 
         _originalPartsData.Clear(); // Очищаем сохранённые оригинальные данные
-        partsDataGrid.Items.Refresh();
+        PartsDataGrid.Items.Refresh();
 
         // Восстанавливаем состояние кнопки
         UpdateEditButtonState();
@@ -455,13 +455,13 @@ public partial class MainWindow : Window
         // Если данные в таблице присутствуют, и не активирован режим редактирования
         if (_partsData != null && _partsData.Count > 0)
         {
-            editButton.IsEnabled = true; // Кнопка "Редактировать/Отмена" всегда активна, если есть данные
-            saveButton.IsEnabled = _isEditing; // Кнопка "Сохранить" активна только в режиме редактирования
+            EditButton.IsEnabled = true; // Кнопка "Редактировать/Отмена" всегда активна, если есть данные
+            SaveButton.IsEnabled = _isEditing; // Кнопка "Сохранить" активна только в режиме редактирования
         }
         else
         {
-            editButton.IsEnabled = false; // Деактивируем кнопку, если данных нет
-            saveButton.IsEnabled = false; // Деактивируем кнопку сохранения, если данных нет
+            EditButton.IsEnabled = false; // Деактивируем кнопку, если данных нет
+            SaveButton.IsEnabled = false; // Деактивируем кнопку сохранения, если данных нет
         }
     }
 
@@ -497,32 +497,32 @@ public partial class MainWindow : Window
         while (source != null && !(source is DataGrid)) source = VisualTreeHelper.GetParent(source);
 
         // Если DataGrid не найден (клик был вне DataGrid), сбрасываем выделение
-        if (source == null) partsDataGrid.UnselectAll();
+        if (source == null) PartsDataGrid.UnselectAll();
     }
 
     private void ClearSearchButton_Click(object sender, RoutedEventArgs e)
     {
         // Очищаем текстовое поле и восстанавливаем PlaceholderText
-        searchTextBox.Text = string.Empty;
-        searchTextBox.Text = PlaceholderText;
-        searchTextBox.Foreground = Brushes.Gray;
-        clearSearchButton.Visibility = Visibility.Collapsed;
-        searchTextBox.CaretIndex = 0; // Перемещаем курсор в начало
+        SearchTextBox.Text = string.Empty;
+        SearchTextBox.Text = PlaceholderText;
+        SearchTextBox.Foreground = Brushes.Gray;
+        ClearSearchButton.Visibility = Visibility.Collapsed;
+        SearchTextBox.CaretIndex = 0; // Перемещаем курсор в начало
     }
 
     private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (searchTextBox.Text == PlaceholderText)
+        if (SearchTextBox.Text == PlaceholderText)
         {
             _actualSearchText = string.Empty;
-            clearSearchButton.Visibility = Visibility.Collapsed;
+            ClearSearchButton.Visibility = Visibility.Collapsed;
             return;
         }
 
-        _actualSearchText = searchTextBox.Text.Trim().ToLower();
+        _actualSearchText = SearchTextBox.Text.Trim().ToLower();
 
         // Показываем или скрываем кнопку очистки в зависимости от наличия текста
-        clearSearchButton.Visibility =
+        ClearSearchButton.Visibility =
             string.IsNullOrEmpty(_actualSearchText) ? Visibility.Collapsed : Visibility.Visible;
 
         // Перезапуск таймера при изменении текста
@@ -532,21 +532,21 @@ public partial class MainWindow : Window
 
     private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
     {
-        if (searchTextBox.Text == PlaceholderText)
+        if (SearchTextBox.Text == PlaceholderText)
         {
-            searchTextBox.Text = string.Empty;
-            searchTextBox.Foreground = Brushes.Black;
+            SearchTextBox.Text = string.Empty;
+            SearchTextBox.Foreground = Brushes.Black;
         }
     }
 
     private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(searchTextBox.Text))
+        if (string.IsNullOrWhiteSpace(SearchTextBox.Text))
         {
-            searchTextBox.Text = PlaceholderText;
-            searchTextBox.Foreground = Brushes.Gray;
+            SearchTextBox.Text = PlaceholderText;
+            SearchTextBox.Foreground = Brushes.Gray;
             _actualSearchText = string.Empty; // Очищаем фактический текст поиска
-            clearSearchButton.Visibility = Visibility.Collapsed; // Скрываем кнопку очистки
+            ClearSearchButton.Visibility = Visibility.Collapsed; // Скрываем кнопку очистки
         }
     }
 
@@ -607,15 +607,15 @@ public partial class MainWindow : Window
             if (droppedData != null && !IsColumnPresent(droppedData.InternalName))
             {
                 // Определяем позицию мыши
-                var position = e.GetPosition(partsDataGrid);
+                var position = e.GetPosition(PartsDataGrid);
 
                 // Найти колонку, перед которой должна быть вставлена новая колонка
                 var insertIndex = -1;
                 double totalWidth = 0;
 
-                for (var i = 0; i < partsDataGrid.Columns.Count; i++)
+                for (var i = 0; i < PartsDataGrid.Columns.Count; i++)
                 {
-                    totalWidth += partsDataGrid.Columns[i].ActualWidth;
+                    totalWidth += PartsDataGrid.Columns[i].ActualWidth;
                     if (position.X < totalWidth)
                     {
                         insertIndex = i;
@@ -663,20 +663,20 @@ public partial class MainWindow : Window
 
             // Применяем специальный стиль для колонки "Количество"
             if (iProperty.InternalName == "Количество")
-                textColumn.ElementStyle = partsDataGrid.FindResource("QuantityCellStyle") as Style;
+                textColumn.ElementStyle = PartsDataGrid.FindResource("QuantityCellStyle") as Style;
             else
                 // Применяем стиль CenteredCellStyle для всех остальных текстовых колонок
-                textColumn.ElementStyle = partsDataGrid.FindResource("CenteredCellStyle") as Style;
+                textColumn.ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style;
 
             column = textColumn;
         }
 
         // Если указан индекс вставки, вставляем колонку в нужное место
-        if (insertIndex.HasValue && insertIndex.Value >= 0 && insertIndex.Value < partsDataGrid.Columns.Count)
-            partsDataGrid.Columns.Insert(insertIndex.Value, column);
+        if (insertIndex.HasValue && insertIndex.Value >= 0 && insertIndex.Value < PartsDataGrid.Columns.Count)
+            PartsDataGrid.Columns.Insert(insertIndex.Value, column);
         else
             // В противном случае добавляем колонку в конец
-            partsDataGrid.Columns.Add(column);
+            PartsDataGrid.Columns.Add(column);
 
         // Обновляем список доступных свойств
         var selectIPropertyWindow =
@@ -715,8 +715,8 @@ public partial class MainWindow : Window
         };
 
         // Создаем и добавляем Adorner
-        _adornerLayer = AdornerLayer.GetAdornerLayer(partsDataGrid);
-        _headerAdorner = new HeaderAdorner(partsDataGrid, header);
+        _adornerLayer = AdornerLayer.GetAdornerLayer(PartsDataGrid);
+        _headerAdorner = new HeaderAdorner(PartsDataGrid, header);
         _adornerLayer.Add(_headerAdorner);
 
         // Изначально размещаем Adorner там, где находится заголовок
@@ -757,12 +757,12 @@ public partial class MainWindow : Window
         };
 
         // Создаем и добавляем Adorner
-        _adornerLayer = AdornerLayer.GetAdornerLayer(partsDataGrid);
-        _headerAdorner = new HeaderAdorner(partsDataGrid, header);
+        _adornerLayer = AdornerLayer.GetAdornerLayer(PartsDataGrid);
+        _headerAdorner = new HeaderAdorner(PartsDataGrid, header);
         _adornerLayer.Add(_headerAdorner);
 
         // Изначально размещаем Adorner там, где находится заголовок
-        var position = Mouse.GetPosition(partsDataGrid);
+        var position = Mouse.GetPosition(PartsDataGrid);
         _headerAdorner.RenderTransform = new TranslateTransform(
             position.X - _headerAdorner.DesiredSize.Width / 2,
             position.Y - _headerAdorner.DesiredSize.Height / 2
@@ -778,10 +778,10 @@ public partial class MainWindow : Window
         UpdateAdornerPosition(null);
 
         // Получаем текущую позицию мыши относительно DataGrid
-        var position = e.GetPosition(partsDataGrid);
+        var position = e.GetPosition(PartsDataGrid);
 
         // Проверяем, если мышь вышла за границы DataGrid
-        if (position.X > partsDataGrid.ActualWidth || position.Y < 0 || position.Y > partsDataGrid.ActualHeight)
+        if (position.X > PartsDataGrid.ActualWidth || position.Y < 0 || position.Y > PartsDataGrid.ActualHeight)
         {
             _isColumnDraggedOutside = true;
             SetAdornerColor(Brushes.Red); // Меняем цвет на красный и добавляем надпись "УДАЛИТЬ"
@@ -838,10 +838,10 @@ public partial class MainWindow : Window
             var columnName = _reorderingColumn.Header.ToString();
 
             // Убираем колонку из DataGrid
-            var columnToRemove = partsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == columnName);
+            var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == columnName);
             if (columnToRemove != null)
             {
-                partsDataGrid.Columns.Remove(columnToRemove);
+                PartsDataGrid.Columns.Remove(columnToRemove);
 
                 // Удаляем кастомное свойство из списка и данных деталей
                 RemoveCustomIPropertyColumn(columnName);
@@ -912,7 +912,7 @@ public partial class MainWindow : Window
         if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
         {
             _isCtrlPressed = true;
-            exportButton.IsEnabled = true;
+            ExportButton.IsEnabled = true;
         }
     }
 
@@ -921,7 +921,7 @@ public partial class MainWindow : Window
         if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
         {
             _isCtrlPressed = false;
-            exportButton.IsEnabled = _partsData.Count > 0; // Восстанавливаем исходное состояние кнопки
+            ExportButton.IsEnabled = _partsData.Count > 0; // Восстанавливаем исходное состояние кнопки
         }
     }
 
@@ -934,23 +934,23 @@ public partial class MainWindow : Window
 
     private void EnableSplineReplacementCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
     {
-        var isChecked = enableSplineReplacementCheckBox.IsChecked == true;
-        splineReplacementComboBox.IsEnabled = isChecked;
-        splineToleranceTextBox.IsEnabled = isChecked;
+        var isChecked = EnableSplineReplacementCheckBox.IsChecked == true;
+        SplineReplacementComboBox.IsEnabled = isChecked;
+        SplineToleranceTextBox.IsEnabled = isChecked;
 
-        if (isChecked && splineReplacementComboBox.SelectedIndex == -1)
-            splineReplacementComboBox.SelectedIndex = 0; // По умолчанию выбираем "Линии"
+        if (isChecked && SplineReplacementComboBox.SelectedIndex == -1)
+            SplineReplacementComboBox.SelectedIndex = 0; // По умолчанию выбираем "Линии"
     }
 
     private void PrepareExportOptions(out string options)
     {
         var sb = new StringBuilder();
 
-        sb.Append($"AcadVersion={((ComboBoxItem)acadVersionComboBox.SelectedItem).Content}");
+        sb.Append($"AcadVersion={((ComboBoxItem)AcadVersionComboBox.SelectedItem).Content}");
 
-        if (enableSplineReplacementCheckBox.IsChecked == true)
+        if (EnableSplineReplacementCheckBox.IsChecked == true)
         {
-            var splineTolerance = splineToleranceTextBox.Text;
+            var splineTolerance = SplineToleranceTextBox.Text;
 
             // Получаем текущий разделитель дробной части из системных настроек
             var decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
@@ -958,9 +958,9 @@ public partial class MainWindow : Window
             // Заменяем разделитель на актуальный
             splineTolerance = splineTolerance.Replace('.', decimalSeparator).Replace(',', decimalSeparator);
 
-            if (splineReplacementComboBox.SelectedIndex == 0) // Линии
+            if (SplineReplacementComboBox.SelectedIndex == 0) // Линии
                 sb.Append($"&SimplifySplines=True&SplineTolerance={splineTolerance}");
-            else if (splineReplacementComboBox.SelectedIndex == 1) // Дуги
+            else if (SplineReplacementComboBox.SelectedIndex == 1) // Дуги
                 sb.Append($"&SimplifySplines=True&SimplifyAsTangentArcs=True&SplineTolerance={splineTolerance}");
         }
         else
@@ -968,11 +968,11 @@ public partial class MainWindow : Window
             sb.Append("&SimplifySplines=False");
         }
 
-        if (mergeProfilesIntoPolylineCheckBox.IsChecked == true) sb.Append("&MergeProfilesIntoPolyline=True");
+        if (MergeProfilesIntoPolylineCheckBox.IsChecked == true) sb.Append("&MergeProfilesIntoPolyline=True");
 
-        if (rebaseGeometryCheckBox.IsChecked == true) sb.Append("&RebaseGeometry=True");
+        if (RebaseGeometryCheckBox.IsChecked == true) sb.Append("&RebaseGeometry=True");
 
-        if (trimCenterlinesCheckBox.IsChecked == true) // Проверяем новое поле TrimCenterlinesAtContour
+        if (TrimCenterlinesCheckBox.IsChecked == true) // Проверяем новое поле TrimCenterlinesAtContour
             sb.Append("&TrimCenterlinesAtContour=True");
 
         options = sb.ToString();
@@ -1003,7 +1003,7 @@ public partial class MainWindow : Window
             partData.QuantityColor = multiplier > 1 ? Brushes.Blue : Brushes.Black;
         }
 
-        partsDataGrid.Items.Refresh();
+        PartsDataGrid.Items.Refresh();
     }
 
     private async void ScanButton_Click(object sender, RoutedEventArgs e)
@@ -1024,10 +1024,10 @@ public partial class MainWindow : Window
             return;
         }
 
-        var isBackgroundMode = backgroundModeCheckBox.IsChecked == true;
+        var isBackgroundMode = BackgroundModeCheckBox.IsChecked == true;
         if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = true;
 
-        modelStateInfoRunBottom.Text = string.Empty;
+        ModelStateInfoRunBottom.Text = string.Empty;
 
         if (doc.DocumentType != DocumentTypeEnum.kAssemblyDocumentObject &&
             doc.DocumentType != DocumentTypeEnum.kPartDocumentObject)
@@ -1038,12 +1038,12 @@ public partial class MainWindow : Window
         }
 
         ResetProgressBar();
-        progressBar.IsIndeterminate = true;
-        progressLabel.Text = "Статус: Сбор данных...";
-        scanButton.IsEnabled = false;
-        cancelButton.IsEnabled = true;
-        exportButton.IsEnabled = false;
-        clearButton.IsEnabled = false;
+        ProgressBar.IsIndeterminate = true;
+        ProgressLabel.Text = "Статус: Сбор данных...";
+        ScanButton.IsEnabled = false;
+        CancelButton.IsEnabled = true;
+        ExportButton.IsEnabled = false;
+        ClearButton.IsEnabled = false;
         _isScanning = true;
         _isCancelled = false;
 
@@ -1065,7 +1065,7 @@ public partial class MainWindow : Window
         {
             partData.Item = _itemCounter;
             _partsData.Add(partData);
-            partsDataGrid.Items.Refresh();
+            PartsDataGrid.Items.Refresh();
             _itemCounter++;
         });
 
@@ -1073,10 +1073,10 @@ public partial class MainWindow : Window
         {
             var asmDoc = (AssemblyDocument)doc;
             var sheetMetalParts = new Dictionary<string, int>();
-            if (traverseRadioButton.IsChecked == true)
+            if (TraverseRadioButton.IsChecked == true)
                 await Task.Run(() =>
                     ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
-            else if (bomRadioButton.IsChecked == true)
+            else if (BomRadioButton.IsChecked == true)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
             partCount = sheetMetalParts.Count;
             partNumber = GetProperty(asmDoc.PropertySets["Design Tracking Properties"], "Part Number");
@@ -1124,21 +1124,21 @@ public partial class MainWindow : Window
         stopwatch.Stop();
         var elapsedTime = GetElapsedTime(stopwatch.Elapsed);
 
-        if (int.TryParse(multiplierTextBox.Text, out var multiplier) && multiplier > 0)
+        if (int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
             UpdateQuantitiesWithMultiplier(multiplier);
 
         _isScanning = false;
-        progressBar.IsIndeterminate = false;
-        progressBar.Value = 0;
-        progressLabel.Text = _isCancelled ? $"Статус: Прервано ({elapsedTime})" : $"Статус: Готово ({elapsedTime})";
-        bottomPanel.Opacity = 1.0;
+        ProgressBar.IsIndeterminate = false;
+        ProgressBar.Value = 0;
+        ProgressLabel.Text = _isCancelled ? $"Статус: Прервано ({elapsedTime})" : $"Статус: Готово ({elapsedTime})";
+        BottomPanel.Opacity = 1.0;
         UpdateDocumentInfo(documentType, partNumber, description, doc);
         UpdateFileCountLabel(_isCancelled ? 0 : partCount);
 
-        scanButton.IsEnabled = true;
-        cancelButton.IsEnabled = false;
-        exportButton.IsEnabled = partCount > 0 && !_isCancelled;
-        clearButton.IsEnabled = _partsData.Count > 0;
+        ScanButton.IsEnabled = true;
+        CancelButton.IsEnabled = false;
+        ExportButton.IsEnabled = partCount > 0 && !_isCancelled;
+        ClearButton.IsEnabled = _partsData.Count > 0;
         _lastScannedDocument = _isCancelled ? null : doc;
 
         if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
@@ -1176,7 +1176,7 @@ public partial class MainWindow : Window
                     "Конфликт обозначений",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
 
-                conflictFilesButton.IsEnabled = true; // Включаем кнопку для просмотра подробностей о конфликтах
+                ConflictFilesButton.IsEnabled = true; // Включаем кнопку для просмотра подробностей о конфликтах
                 _conflictFileDetails = conflictingPartNumbers; // Сохраняем подробную информацию о конфликтах для вывода при нажатии кнопки
             });
         }
@@ -1184,7 +1184,7 @@ public partial class MainWindow : Window
         {
             await Dispatcher.InvokeAsync(() =>
             {
-                conflictFilesButton.IsEnabled = false; // Отключаем кнопку, если нет конфликтов
+                ConflictFilesButton.IsEnabled = false; // Отключаем кнопку, если нет конфликтов
             });
         }
     }
@@ -1269,17 +1269,17 @@ public partial class MainWindow : Window
     private void UpdateSubfolderOptions()
     {
         // Опция "В папку с деталью" - чекбокс и текстовое поле должны быть отключены
-        if (partFolderRadioButton.IsChecked == true)
+        if (PartFolderRadioButton.IsChecked == true)
         {
-            enableSubfolderCheckBox.IsEnabled = false;
-            enableSubfolderCheckBox.IsChecked = false;
-            subfolderNameTextBox.IsEnabled = false;
+            EnableSubfolderCheckBox.IsEnabled = false;
+            EnableSubfolderCheckBox.IsChecked = false;
+            SubfolderNameTextBox.IsEnabled = false;
         }
         else
         {
             // Для всех остальных опций чекбокс активен
-            enableSubfolderCheckBox.IsEnabled = true;
-            subfolderNameTextBox.IsEnabled = enableSubfolderCheckBox.IsChecked == true;
+            EnableSubfolderCheckBox.IsEnabled = true;
+            SubfolderNameTextBox.IsEnabled = EnableSubfolderCheckBox.IsChecked == true;
         }
     }
 
@@ -1315,7 +1315,7 @@ public partial class MainWindow : Window
             //projectFolderRadioButton.Content = $"Папка проекта [{projectName}] {projectWorkspacePath}";
 
             // Обновляем TextBlock с названием проекта
-            this.projectName.Text = $"Проект: {projectName}";
+            this.ProjectName.Text = $"Проект: {projectName}";
         }
         catch (Exception ex)
         {
@@ -1357,13 +1357,13 @@ public partial class MainWindow : Window
 
     private void EnableSubfolderCheckBox_Checked(object sender, RoutedEventArgs e)
     {
-        subfolderNameTextBox.IsEnabled = true;
+        SubfolderNameTextBox.IsEnabled = true;
     }
 
     private void EnableSubfolderCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
-        subfolderNameTextBox.IsEnabled = false;
-        subfolderNameTextBox.Text = string.Empty;
+        SubfolderNameTextBox.IsEnabled = false;
+        SubfolderNameTextBox.Text = string.Empty;
     }
 
     private string GetProperty(PropertySet propertySet, string propertyName)
@@ -1687,9 +1687,9 @@ public partial class MainWindow : Window
 
             if (_fixedFolderPath.Length > 40)
                 // Гарантируем, что показываем именно последние 40 символов
-                fixedFolderPathTextBlock.Text = "..." + _fixedFolderPath.Substring(_fixedFolderPath.Length - 40);
+                FixedFolderPathTextBlock.Text = "..." + _fixedFolderPath.Substring(_fixedFolderPath.Length - 40);
             else
-                fixedFolderPathTextBlock.Text = _fixedFolderPath;
+                FixedFolderPathTextBlock.Text = _fixedFolderPath;
         }
     }
 
@@ -1700,7 +1700,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     multiplier = 1; // Присваиваем значение по умолчанию
 
     // Обрабатываем выбор радио-кнопки
-    if (chooseFolderRadioButton.IsChecked == true)
+    if (ChooseFolderRadioButton.IsChecked == true)
     {
         // Открываем диалог выбора папки
         var dialog = new FolderBrowserDialog();
@@ -1709,12 +1709,12 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         else
             return false;
     }
-    else if (componentFolderRadioButton.IsChecked == true)
+    else if (ComponentFolderRadioButton.IsChecked == true)
     {
         // Папка компонента
         targetDir = Path.GetDirectoryName(_thisApplication.ActiveDocument.FullFileName);
     }
-    else if (fixedFolderRadioButton.IsChecked == true)
+    else if (FixedFolderRadioButton.IsChecked == true)
     {
         if (string.IsNullOrEmpty(_fixedFolderPath))
         {
@@ -1724,7 +1724,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         targetDir = _fixedFolderPath;
     }
-    else if (projectFolderRadioButton.IsChecked == true) // Новый код для выбора папки проекта
+    else if (ProjectFolderRadioButton.IsChecked == true) // Новый код для выбора папки проекта
     {
         try
         {
@@ -1742,24 +1742,24 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
     }
 
-    if (enableSubfolderCheckBox.IsChecked == true && !string.IsNullOrEmpty(subfolderNameTextBox.Text))
+    if (EnableSubfolderCheckBox.IsChecked == true && !string.IsNullOrEmpty(SubfolderNameTextBox.Text))
     {
-        targetDir = Path.Combine(targetDir, subfolderNameTextBox.Text);
+        targetDir = Path.Combine(targetDir, SubfolderNameTextBox.Text);
         if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
     }
 
-    if (includeQuantityInFileNameCheckBox.IsChecked == true && !int.TryParse(multiplierTextBox.Text, out multiplier))
+    if (IncludeQuantityInFileNameCheckBox.IsChecked == true && !int.TryParse(MultiplierTextBox.Text, out multiplier))
     {
         MessageBox.Show("Введите допустимое целое число для множителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         return false;
     }
 
-    cancelButton.IsEnabled = true;
+    CancelButton.IsEnabled = true;
     _isCancelled = false;
 
-    progressBar.IsIndeterminate = false;
-    progressBar.Value = 0;
-    progressLabel.Text = "Статус: Экспорт данных...";
+    ProgressBar.IsIndeterminate = false;
+    ProgressBar.Value = 0;
+    ProgressLabel.Text = "Статус: Экспорт данных...";
 
     stopwatch = Stopwatch.StartNew();
 
@@ -1771,18 +1771,18 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         stopwatch.Stop();
         var elapsedTime = GetElapsedTime(stopwatch.Elapsed);
 
-        cancelButton.IsEnabled = false;
-        scanButton.IsEnabled = true; // Активируем кнопку "Сканировать" после завершения экспорта
-        clearButton.IsEnabled = _partsData.Count > 0; // Активируем кнопку "Очистить" после завершения экспорта
+        CancelButton.IsEnabled = false;
+        ScanButton.IsEnabled = true; // Активируем кнопку "Сканировать" после завершения экспорта
+        ClearButton.IsEnabled = _partsData.Count > 0; // Активируем кнопку "Очистить" после завершения экспорта
 
         if (isCancelled)
         {
-            progressLabel.Text = $"Статус: Прервано ({elapsedTime})";
+            ProgressLabel.Text = $"Статус: Прервано ({elapsedTime})";
             MessageBoxHelper.ShowExportCancelledInfo();
         }
         else
         {
-            progressLabel.Text = $"Статус: Завершено ({elapsedTime})";
+            ProgressLabel.Text = $"Статус: Завершено ({elapsedTime})";
             MessageBoxHelper.ShowExportCompletedInfo(processedCount, skippedCount, elapsedTime);
         }
     }
@@ -1807,8 +1807,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch)) return;
 
-        clearButton.IsEnabled = false;
-        scanButton.IsEnabled = false;
+        ClearButton.IsEnabled = false;
+        ScanButton.IsEnabled = false;
 
         var processedCount = 0;
         var skippedCount = 0;
@@ -1819,10 +1819,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         if (doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
         {
             var asmDoc = (AssemblyDocument)doc;
-            if (traverseRadioButton.IsChecked == true)
+            if (TraverseRadioButton.IsChecked == true)
                 await Task.Run(() =>
                     ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
-            else if (bomRadioButton.IsChecked == true)
+            else if (BomRadioButton.IsChecked == true)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
 
             // Создаем временный список PartData для экспорта
@@ -1864,14 +1864,14 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             }
         }
 
-        clearButton.IsEnabled = true;
-        scanButton.IsEnabled = true;
+        ClearButton.IsEnabled = true;
+        ScanButton.IsEnabled = true;
 
         // Здесь мы НЕ обновляем fileCountLabelBottom
         FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
 
         // Деактивируем кнопку "Экспорт" после завершения скрытого экспорта
-        exportButton.IsEnabled = false;
+        ExportButton.IsEnabled = false;
     }
 
     private void ResetEditMode()
@@ -1880,16 +1880,16 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         if (_isEditing)
         {
             _isEditing = false; // Отключаем режим редактирования
-            partsDataGrid.IsReadOnly = true; // Делаем таблицу нередактируемой
-            editButton.Content = "Редактировать"; // Меняем текст кнопки на "Редактировать"
-            saveButton.IsEnabled = false; // Деактивируем кнопку сохранения
+            PartsDataGrid.IsReadOnly = true; // Делаем таблицу нередактируемой
+            EditButton.Content = "Редактировать"; // Меняем текст кнопки на "Редактировать"
+            SaveButton.IsEnabled = false; // Деактивируем кнопку сохранения
 
             // Обновляем IsReadOnly для каждого элемента данных
             foreach (var item in
                      _partsData) item.IsReadOnly = true; // Устанавливаем флаг, что элемент теперь нередактируемый
 
             // Обновляем отображение таблицы
-            partsDataGrid.Items.Refresh(); // Обновляем интерфейс, чтобы стиль ячеек обновился
+            PartsDataGrid.Items.Refresh(); // Обновляем интерфейс, чтобы стиль ячеек обновился
         }
     }
 
@@ -1909,7 +1909,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
-        var isBackgroundMode = backgroundModeCheckBox.IsChecked == true;
+        var isBackgroundMode = BackgroundModeCheckBox.IsChecked == true;
         if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = true;
 
         Document? doc = _thisApplication.ActiveDocument;
@@ -1923,7 +1923,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         {
             MessageBox.Show("Активный документ изменился. Пожалуйста, повторите сканирование перед экспортом.",
                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            multiplierTextBox.Text = "1";
+            MultiplierTextBox.Text = "1";
             return;
         }
 
@@ -1933,8 +1933,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
-        clearButton.IsEnabled = false;
-        scanButton.IsEnabled = false;
+        ClearButton.IsEnabled = false;
+        ScanButton.IsEnabled = false;
 
         var processedCount = 0;
         var skippedCount = 0;
@@ -1943,10 +1943,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         {
             var asmDoc = (AssemblyDocument)doc;
             var sheetMetalParts = new Dictionary<string, int>();
-            if (traverseRadioButton.IsChecked == true)
+            if (TraverseRadioButton.IsChecked == true)
                 await Task.Run(() =>
                     ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
-            else if (bomRadioButton.IsChecked == true)
+            else if (BomRadioButton.IsChecked == true)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
 
             await ExportDXFFiles(sheetMetalParts, targetDir, multiplier, stopwatch);
@@ -1960,12 +1960,12 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 MessageBoxHelper.ShowNotSheetMetalWarning();
         }
 
-        clearButton.IsEnabled = true;
-        scanButton.IsEnabled = true;
+        ClearButton.IsEnabled = true;
+        ScanButton.IsEnabled = true;
 
         if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
 
-        exportButton.IsEnabled = true;
+        ExportButton.IsEnabled = true;
     }
 
     private string GetElapsedTime(TimeSpan timeSpan)
@@ -1977,7 +1977,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private async void ExportSelectedDXF_Click(object sender, RoutedEventArgs e)
     {
-        var selectedItems = partsDataGrid.SelectedItems.Cast<PartData>().ToList();
+        var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
         if (selectedItems.Count == 0)
         {
             MessageBox.Show("Выберите строки для экспорта.", "Информация", MessageBoxButton.OK,
@@ -2004,8 +2004,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch)) return;
 
-        clearButton.IsEnabled = false; // Деактивируем кнопку "Очистить" в процессе экспорта
-        scanButton.IsEnabled = false; // Деактивируем кнопку "Сканировать" в процессе экспорта
+        ClearButton.IsEnabled = false; // Деактивируем кнопку "Очистить" в процессе экспорта
+        ScanButton.IsEnabled = false; // Деактивируем кнопку "Сканировать" в процессе экспорта
 
         var processedCount = 0;
         var skippedCount = itemsWithoutFlatPattern.Count;
@@ -2018,14 +2018,14 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         UpdateFileCountLabel(selectedItems.Count);
 
-        clearButton.IsEnabled = true; // Активируем кнопку "Очистить" после завершения экспорта
-        scanButton.IsEnabled = true; // Активируем кнопку "Сканировать" после завершения экспорта
+        ClearButton.IsEnabled = true; // Активируем кнопку "Очистить" после завершения экспорта
+        ScanButton.IsEnabled = true; // Активируем кнопку "Сканировать" после завершения экспорта
         FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
     }
 
     private void OverrideQuantity_Click(object sender, RoutedEventArgs e)
     {
-        var selectedItems = partsDataGrid.SelectedItems.Cast<PartData>().ToList();
+        var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
         if (selectedItems.Count == 0)
         {
             MessageBox.Show("Выберите строки для переопределения количества.", "Информация", MessageBoxButton.OK,
@@ -2046,7 +2046,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 item.QuantityColor = Brushes.Red; // Переопределенное количество окрашивается в красный цвет
             }
 
-            partsDataGrid.Items.Refresh();
+            PartsDataGrid.Items.Refresh();
         }
     }
 
@@ -2060,17 +2060,17 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         // Выполняем доступ к элементам управления через Dispatcher
         Dispatcher.Invoke(() =>
         {
-            organizeByMaterial = organizeByMaterialCheckBox.IsChecked == true;
-            organizeByThickness = organizeByThicknessCheckBox.IsChecked == true;
-            includeQuantityInFileName = includeQuantityInFileNameCheckBox.IsChecked == true;
+            organizeByMaterial = OrganizeByMaterialCheckBox.IsChecked == true;
+            organizeByThickness = OrganizeByThicknessCheckBox.IsChecked == true;
+            includeQuantityInFileName = IncludeQuantityInFileNameCheckBox.IsChecked == true;
         });
 
         var totalParts = partsDataList.Count();
 
         Dispatcher.Invoke(() =>
         {
-            progressBar.Maximum = totalParts;
-            progressBar.Value = 0;
+            ProgressBar.Maximum = totalParts;
+            ProgressBar.Value = 0;
         });
 
         var localProcessedCount = processedCount;
@@ -2086,7 +2086,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             // Доступ к RadioButton через Dispatcher для потока безопасности
             Dispatcher.Invoke(() =>
             {
-                if (partFolderRadioButton.IsChecked == true)
+                if (PartFolderRadioButton.IsChecked == true)
                 {
                     targetDir = GetPartDocumentFullPath(partNumber);
                     targetDir = Path.GetDirectoryName(targetDir);
@@ -2226,7 +2226,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 {
                     partData.ProcessingColor = exportSuccess ? Brushes.Green : Brushes.Red;
                     partData.DxfPreview = dxfPreview;
-                    partsDataGrid.Items.Refresh();
+                    PartsDataGrid.Items.Refresh();
                 });
 
                 if (exportSuccess)
@@ -2234,7 +2234,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 else
                     localSkippedCount++;
 
-                Dispatcher.Invoke(() => { progressBar.Value = Math.Min(localProcessedCount, progressBar.Maximum); });
+                Dispatcher.Invoke(() => { ProgressBar.Value = Math.Min(localProcessedCount, ProgressBar.Maximum); });
             }
             catch (Exception ex)
             {
@@ -2248,7 +2248,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         Dispatcher.Invoke(() =>
         {
-            progressBar.Value = progressBar.Maximum; // Установка значения 100% по завершению
+            ProgressBar.Value = ProgressBar.Maximum; // Установка значения 100% по завершению
         });
     }
 
@@ -2367,75 +2367,75 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private void IncludeQuantityInFileNameCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
     {
-        multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true;
-        if (!multiplierTextBox.IsEnabled)
+        MultiplierTextBox.IsEnabled = IncludeQuantityInFileNameCheckBox.IsChecked == true;
+        if (!MultiplierTextBox.IsEnabled)
         {
-            multiplierTextBox.Text = "1";
+            MultiplierTextBox.Text = "1";
             UpdateQuantitiesWithMultiplier(1);
         }
     }
 
     private void MultiplierTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (int.TryParse(multiplierTextBox.Text, out var multiplier) && multiplier > 0)
+        if (int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
         {
             UpdateQuantitiesWithMultiplier(multiplier);
 
             // Проверка на null перед изменением видимости кнопки
-            if (clearMultiplierButton != null)
-                clearMultiplierButton.Visibility = multiplier > 1 ? Visibility.Visible : Visibility.Collapsed;
+            if (ClearMultiplierButton != null)
+                ClearMultiplierButton.Visibility = multiplier > 1 ? Visibility.Visible : Visibility.Collapsed;
         }
         else
         {
             // Если введенное значение некорректное, сбрасываем текст на "1" и скрываем кнопку сброса
-            multiplierTextBox.Text = "1";
+            MultiplierTextBox.Text = "1";
             UpdateQuantitiesWithMultiplier(1);
 
-            if (clearMultiplierButton != null) clearMultiplierButton.Visibility = Visibility.Collapsed;
+            if (ClearMultiplierButton != null) ClearMultiplierButton.Visibility = Visibility.Collapsed;
         }
     }
 
     private void ClearMultiplierButton_Click(object sender, RoutedEventArgs e)
     {
         // Сбрасываем множитель на 1
-        multiplierTextBox.Text = "1";
+        MultiplierTextBox.Text = "1";
         UpdateQuantitiesWithMultiplier(1);
 
         // Скрываем кнопку сброса
-        clearMultiplierButton.Visibility = Visibility.Collapsed;
+        ClearMultiplierButton.Visibility = Visibility.Collapsed;
     }
 
     private void UpdateFileCountLabel(int count)
     {
-        fileCountLabelBottom.Text = $"Найдено листовых деталей: {count}";
+        FileCountLabelBottom.Text = $"Найдено листовых деталей: {count}";
     }
 
 
     private void ResetProgressBar()
     {
-        progressBar.IsIndeterminate = false;
-        progressBar.Minimum = 0;
-        progressBar.Maximum = 100;
-        progressBar.Value = 0;
-        progressLabel.Text = "Статус: ";
+        ProgressBar.IsIndeterminate = false;
+        ProgressBar.Minimum = 0;
+        ProgressBar.Maximum = 100;
+        ProgressBar.Value = 0;
+        ProgressLabel.Text = "Статус: ";
         UpdateFileCountLabel(0); // Использование метода для сброса счетчика
-        bottomPanel.Opacity = 0.75;
-        documentInfoLabel.Text = string.Empty;
+        BottomPanel.Opacity = 0.75;
+        DocumentInfoLabel.Text = string.Empty;
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
         _isCancelled = true;
-        cancelButton.IsEnabled = false;
+        CancelButton.IsEnabled = false;
 
         if (!_isScanning)
         {
             // If not scanning, reset the UI
             ResetProgressBar();
-            bottomPanel.Opacity = 0.75;
-            documentInfoLabel.Text = "";
-            exportButton.IsEnabled = false;
-            clearButton.IsEnabled = _partsData.Count > 0; // Обновляем состояние кнопки "Очистить"
+            BottomPanel.Opacity = 0.75;
+            DocumentInfoLabel.Text = "";
+            ExportButton.IsEnabled = false;
+            ClearButton.IsEnabled = _partsData.Count > 0; // Обновляем состояние кнопки "Очистить"
             _lastScannedDocument = null;
             UpdateFileCountLabel(0);
         }
@@ -2445,9 +2445,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         if (string.IsNullOrEmpty(documentType) && string.IsNullOrEmpty(partNumber) && string.IsNullOrEmpty(description))
         {
-            documentInfoLabel.Text = string.Empty;
-            modelStateInfoRunBottom.Text = string.Empty; // Обновленное имя элемента
-            bottomPanel.Opacity = 0.75;
+            DocumentInfoLabel.Text = string.Empty;
+            ModelStateInfoRunBottom.Text = string.Empty; // Обновленное имя элемента
+            BottomPanel.Opacity = 0.75;
             UpdateFileCountLabel(0); // Использование метода для сброса счетчика
             return;
         }
@@ -2456,42 +2456,42 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             doc is AssemblyDocument asmDoc ? GetModelStateName(asmDoc) :
             "Ошибка получения имени";
 
-        documentInfoLabel.Text = $"Тип документа: {documentType}\nОбозначение: {partNumber}\nОписание: {description}";
+        DocumentInfoLabel.Text = $"Тип документа: {documentType}\nОбозначение: {partNumber}\nОписание: {description}";
 
         if (modelStateInfo == "[Primary]" || modelStateInfo == "[Основной]")
         {
-            modelStateInfoRunBottom.Text = "[Основной]";
-            modelStateInfoRunBottom.Foreground =
+            ModelStateInfoRunBottom.Text = "[Основной]";
+            ModelStateInfoRunBottom.Foreground =
                 new SolidColorBrush(Colors.Black); // Цвет текста - черный (по умолчанию)
         }
         else
         {
-            modelStateInfoRunBottom.Text = modelStateInfo;
-            modelStateInfoRunBottom.Foreground = new SolidColorBrush(Colors.Red); // Цвет текста - красный
+            ModelStateInfoRunBottom.Text = modelStateInfo;
+            ModelStateInfoRunBottom.Foreground = new SolidColorBrush(Colors.Red); // Цвет текста - красный
         }
 
         UpdateFileCountLabel(_partsData.Count); // Использование метода для обновления счетчика
-        bottomPanel.Opacity = 1.0;
+        BottomPanel.Opacity = 1.0;
     }
 
     private void ClearList_Click(object sender, RoutedEventArgs e)
     {
         // Очищаем данные в таблице или любом другом источнике данных
         _partsData.Clear();
-        progressBar.Value = 0;
-        progressLabel.Text = "Статус: ";
-        documentInfoLabel.Text = string.Empty;
-        modelStateInfoRunBottom.Text = string.Empty;
-        bottomPanel.Opacity = 0.5;
-        exportButton.IsEnabled = false;
-        clearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки
+        ProgressBar.Value = 0;
+        ProgressLabel.Text = "Статус: ";
+        DocumentInfoLabel.Text = string.Empty;
+        ModelStateInfoRunBottom.Text = string.Empty;
+        BottomPanel.Opacity = 0.5;
+        ExportButton.IsEnabled = false;
+        ClearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки
 
         // Обнуляем информацию о документе
         UpdateDocumentInfo(string.Empty, string.Empty, string.Empty, null);
         UpdateFileCountLabel(0); // Сброс счетчика файлов
 
         // Отключаем кнопку "Анализ обозначений" и очищаем список конфликтов
-        conflictFilesButton.IsEnabled = false;
+        ConflictFilesButton.IsEnabled = false;
         _conflictFileDetails.Clear(); // Очищаем список с конфликтами (или используем нужную коллекцию)
 
         // Обновляем состояние кнопки после очистки данных
@@ -2505,7 +2505,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private void OpenFileLocation_Click(object sender, RoutedEventArgs e)
     {
-        var selectedItems = partsDataGrid.SelectedItems.Cast<PartData>().ToList();
+        var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
         if (selectedItems.Count == 0)
         {
             MessageBox.Show("Выберите строки для открытия расположения файла.", "Информация", MessageBoxButton.OK,
@@ -2546,7 +2546,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private void OpenSelectedModels_Click(object sender, RoutedEventArgs e)
     {
-        var selectedItems = partsDataGrid.SelectedItems.Cast<PartData>().ToList();
+        var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
         if (selectedItems.Count == 0)
         {
             MessageBox.Show("Выберите строки для открытия моделей.", "Информация", MessageBoxButton.OK,
@@ -2604,7 +2604,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private void partsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         // Активация пункта "Редактировать iProperty" только при выборе одной строки
-        editIPropertyMenuItem.IsEnabled = partsDataGrid.SelectedItems.Count == 1;
+        EditIPropertyMenuItem.IsEnabled = PartsDataGrid.SelectedItems.Count == 1;
     }
 
     private async void AddCustomIPropertyButton_Click(object sender, RoutedEventArgs e)
@@ -2623,7 +2623,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             }
 
             // Проверка на существование колонки
-            if (partsDataGrid.Columns.Any(c => c.Header as string == customPropertyName))
+            if (PartsDataGrid.Columns.Any(c => c.Header as string == customPropertyName))
             {
                 MessageBox.Show($"Столбец с именем '{customPropertyName}' уже существует.", "Предупреждение",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -2636,7 +2636,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             AddCustomIPropertyColumn(customPropertyName);
 
             // Если включен фоновый режим, отключаем взаимодействие с UI
-            if (backgroundModeCheckBox.IsChecked == true)
+            if (BackgroundModeCheckBox.IsChecked == true)
                 _thisApplication.UserInterfaceManager.UserInteractionDisabled = true;
 
             try
@@ -2647,7 +2647,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             finally
             {
                 // Восстанавливаем взаимодействие с UI после завершения асинхронной операции
-                if (backgroundModeCheckBox.IsChecked == true)
+                if (BackgroundModeCheckBox.IsChecked == true)
                     _thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
             }
         }
@@ -2664,10 +2664,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             partData.AddCustomProperty(customPropertyName, propertyValue);
 
             // Обновляем UI
-            partsDataGrid.Items.Refresh();
+            PartsDataGrid.Items.Refresh();
 
             // Проверяем, включен ли фоновый режим
-            if (backgroundModeCheckBox.IsChecked == true)
+            if (BackgroundModeCheckBox.IsChecked == true)
                 // Дополнительная задержка для плавности и снижения нагрузки на UI
                 await Task.Delay(50);
         }
@@ -2676,8 +2676,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private void RemoveCustomIPropertyColumn(string propertyName)
     {
         // Удаление столбца из DataGrid
-        var columnToRemove = partsDataGrid.Columns.FirstOrDefault(c => c.Header as string == propertyName);
-        if (columnToRemove != null) partsDataGrid.Columns.Remove(columnToRemove);
+        var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header as string == propertyName);
+        if (columnToRemove != null) PartsDataGrid.Columns.Remove(columnToRemove);
 
         // Удаление всех данных, связанных с этим Custom IProperty
         foreach (var partData in _partsData)
@@ -2686,13 +2686,13 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         // Обновляем список доступных свойств
         _customPropertiesList.Remove(propertyName); // Не забудьте удалить свойство из списка доступных свойств
-        partsDataGrid.Items.Refresh();
+        PartsDataGrid.Items.Refresh();
     }
 
     private void AddCustomIPropertyColumn(string propertyName)
     {
         // Проверяем, существует ли уже колонка с таким именем или заголовком
-        if (partsDataGrid.Columns.Any(c => c.Header as string == propertyName))
+        if (PartsDataGrid.Columns.Any(c => c.Header as string == propertyName))
         {
             MessageBox.Show($"Столбец с именем '{propertyName}' уже существует.", "Предупреждение", MessageBoxButton.OK,
                 MessageBoxImage.Warning);
@@ -2711,15 +2711,15 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         };
 
         // Применяем стиль CenteredCellStyle
-        column.ElementStyle = partsDataGrid.FindResource("CenteredCellStyle") as Style;
+        column.ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style;
 
-        partsDataGrid.Columns.Add(column);
+        PartsDataGrid.Columns.Add(column);
     }
 
     private void EditIProperty_Click(object sender, RoutedEventArgs e)
     {
-        var selectedItem = partsDataGrid.SelectedItem as PartData;
-        if (selectedItem == null || partsDataGrid.SelectedItems.Count != 1)
+        var selectedItem = PartsDataGrid.SelectedItem as PartData;
+        if (selectedItem == null || PartsDataGrid.SelectedItems.Count != 1)
         {
             MessageBox.Show("Выберите одну строку для редактирования iProperty.", "Информация", MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -2746,7 +2746,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 selectedItem.Description = editDialog.Description;
 
                 // Обновляем данные в таблице
-                partsDataGrid.Items.Refresh();
+                PartsDataGrid.Items.Refresh();
             }
             else
             {
