@@ -2424,6 +2424,7 @@ public partial class MainWindow : Window
 
     private void ClearList_Click(object sender, RoutedEventArgs e)
     {
+        // Очищаем данные в таблице или любом другом источнике данных
         _partsData.Clear();
         progressBar.Value = 0;
         progressLabel.Text = "Статус: ";
@@ -2436,6 +2437,10 @@ public partial class MainWindow : Window
         // Обнуляем информацию о документе
         UpdateDocumentInfo(string.Empty, string.Empty, string.Empty, null);
         UpdateFileCountLabel(0); // Сброс счетчика файлов
+
+        // Отключаем кнопку "Анализ обозначений" и очищаем список конфликтов
+        conflictFilesButton.IsEnabled = false;
+        _conflictFileDetails.Clear(); // Очищаем список с конфликтами (или используем нужную коллекцию)
 
         // Обновляем состояние кнопки после очистки данных
         UpdateEditButtonState();

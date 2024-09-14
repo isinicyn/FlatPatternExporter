@@ -17,7 +17,32 @@
         </Grid.RowDefinitions>
         <Button x:Name="addPresetIPropertyButton" Content="+ iProperty" Click="AddPresetIPropertyButton_Click" Height="32.5" Margin="265,0,10,48" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1"/>
         <Button x:Name="addCustomIPropertyButton" Content="+ Custom iProperty" Click="AddCustomIPropertyButton_Click" Height="32.5" Margin="265,0,0,5" VerticalAlignment="Bottom" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Padding="5,1,1,1" Width="115"/>
-        <Button Name="conflictFilesButton" Content="Анализ обозначений" IsEnabled="False" Click="ConflictFilesButton_Click" Margin="0,0,10,5" Width="150" Height="34" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+        <Button Name="conflictFilesButton" 
+                Content="Анализ обозначений" 
+                IsEnabled="False" 
+                Click="ConflictFilesButton_Click" 
+                Margin="0,0,10,5" 
+                Width="150" 
+                Height="34" 
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Right">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="BorderBrush" Value="Gray"/>
+                    <!-- Обычная рамка -->
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <!-- Толщина рамки по умолчанию -->
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="True">
+                            <Setter Property="BorderBrush" Value="Red"/>
+                            <!-- Рамка становится красной, если кнопка активна -->
+                            <Setter Property="BorderThickness" Value="2"/>
+                            <!-- Изменяем толщину рамки, если кнопка активна -->
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
 
         <!-- Поле поиска с иконкой крестика для очистки -->
         <StackPanel x:Name="stackPanel" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,10,10,0" HorizontalAlignment="Right" Width="240">
