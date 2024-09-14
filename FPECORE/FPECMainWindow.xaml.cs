@@ -75,6 +75,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         InitializeInventor();
+        InitializeProjectFolder(); // Инициализация папки проекта при запуске
         partsDataGrid.ItemsSource = _partsData;
         multiplierTextBox.IsEnabled = includeQuantityInFileNameCheckBox.IsChecked == true;
         UpdateFileCountLabel(0);
@@ -1298,7 +1299,38 @@ public partial class MainWindow : Window
         // Возвращаем курсор на правильное место после удаления символов
         textBox.CaretIndex = Math.Max(caretIndex, 0);
     }
+    private void SetProjectFolderInfo()
+    {
+        try
+        {
+            // Получаем текущий активный проект
+            var activeProject = _thisApplication.DesignProjectManager.ActiveDesignProject;
 
+            // Извлекаем название и путь проекта
+            var projectName = activeProject.Name;
+            var projectWorkspacePath = activeProject.WorkspacePath;
+
+            // Обновляем текст радиокнопки
+            projectFolderRadioButton.Content = $"Папка проекта: {projectName} {projectWorkspacePath}";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Не удалось получить информацию о проекте: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    // Вызываем при инициализации приложения
+    private void InitializeProjectFolder()
+    {
+        SetProjectFolderInfo(); // Устанавливаем информацию о проекте
+    }
+
+    // Обновленный метод для обработки нажатия радиокнопки
+    private void ProjectFolderRadioButton_Checked(object sender, RoutedEventArgs e)
+    {
+        SetProjectFolderInfo(); // Устанавливаем информацию о проекте при выборе радиокнопки
+        UpdateSubfolderOptions();
+    }
     private void PartFolderRadioButton_Checked(object sender, RoutedEventArgs e)
     {
         UpdateSubfolderOptions();
@@ -1657,62 +1689,78 @@ public partial class MainWindow : Window
         }
     }
 
-    private bool PrepareForExport(out string targetDir, out int multiplier, out Stopwatch stopwatch)
+private bool PrepareForExport(out string targetDir, out int multiplier, out Stopwatch stopwatch)
+{
+    stopwatch = new Stopwatch();
+    targetDir = string.Empty;
+    multiplier = 1; // Присваиваем значение по умолчанию
+
+    // Обрабатываем выбор радио-кнопки
+    if (chooseFolderRadioButton.IsChecked == true)
     {
-        stopwatch = new Stopwatch();
-        targetDir = string.Empty;
-        multiplier = 1; // Присваиваем значение по умолчанию
-
-        if (chooseFolderRadioButton.IsChecked == true)
+        // Открываем диалог выбора папки
+        var dialog = new FolderBrowserDialog();
+        if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            targetDir = dialog.SelectedPath;
+        else
+            return false;
+    }
+    else if (componentFolderRadioButton.IsChecked == true)
+    {
+        // Папка компонента
+        targetDir = Path.GetDirectoryName(_thisApplication.ActiveDocument.FullFileName);
+    }
+    else if (fixedFolderRadioButton.IsChecked == true)
+    {
+        if (string.IsNullOrEmpty(_fixedFolderPath))
         {
-            // Открываем диалог выбора папки
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                targetDir = dialog.SelectedPath;
-            else
-                return false;
-        }
-        else if (componentFolderRadioButton.IsChecked == true)
-        {
-            // Папка компонента
-            targetDir = Path.GetDirectoryName(_thisApplication.ActiveDocument.FullFileName);
-        }
-        else if (fixedFolderRadioButton.IsChecked == true)
-        {
-            if (string.IsNullOrEmpty(_fixedFolderPath))
-            {
-                MessageBox.Show("Выберите фиксированную папку.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-
-            targetDir = _fixedFolderPath;
-        }
-
-        if (enableSubfolderCheckBox.IsChecked == true && !string.IsNullOrEmpty(subfolderNameTextBox.Text))
-        {
-            targetDir = Path.Combine(targetDir, subfolderNameTextBox.Text);
-            if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
-        }
-
-        if (includeQuantityInFileNameCheckBox.IsChecked == true &&
-            !int.TryParse(multiplierTextBox.Text, out multiplier))
-        {
-            MessageBox.Show("Введите допустимое целое число для множителя.", "Ошибка", MessageBoxButton.OK,
-                MessageBoxImage.Error);
+            MessageBox.Show("Выберите фиксированную папку.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             return false;
         }
 
-        cancelButton.IsEnabled = true;
-        _isCancelled = false;
-
-        progressBar.IsIndeterminate = false;
-        progressBar.Value = 0;
-        progressLabel.Text = "Статус: Экспорт данных...";
-
-        stopwatch = Stopwatch.StartNew();
-
-        return true;
+        targetDir = _fixedFolderPath;
     }
+    else if (projectFolderRadioButton.IsChecked == true) // Новый код для выбора папки проекта
+    {
+        try
+        {
+            targetDir = _thisApplication.DesignProjectManager.ActiveDesignProject.WorkspacePath;
+            if (string.IsNullOrEmpty(targetDir))
+            {
+                MessageBox.Show("Не удалось получить путь проекта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка при получении папки проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            return false;
+        }
+    }
+
+    if (enableSubfolderCheckBox.IsChecked == true && !string.IsNullOrEmpty(subfolderNameTextBox.Text))
+    {
+        targetDir = Path.Combine(targetDir, subfolderNameTextBox.Text);
+        if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
+    }
+
+    if (includeQuantityInFileNameCheckBox.IsChecked == true && !int.TryParse(multiplierTextBox.Text, out multiplier))
+    {
+        MessageBox.Show("Введите допустимое целое число для множителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        return false;
+    }
+
+    cancelButton.IsEnabled = true;
+    _isCancelled = false;
+
+    progressBar.IsIndeterminate = false;
+    progressBar.Value = 0;
+    progressLabel.Text = "Статус: Экспорт данных...";
+
+    stopwatch = Stopwatch.StartNew();
+
+    return true;
+}
 
     private void FinalizeExport(bool isCancelled, Stopwatch stopwatch, int processedCount, int skippedCount)
     {
