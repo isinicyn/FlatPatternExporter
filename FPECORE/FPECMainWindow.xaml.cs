@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -1099,7 +1100,7 @@ public partial class MainWindow : Window
             });
 
             // Вызов проверки конфликтов после завершения сканирования
-            CheckForPartNumberConflicts(asmDoc.ComponentDefinition.BOM);
+            CheckForPartNumberConflictsAsync(asmDoc.ComponentDefinition.BOM);
         }
         else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
@@ -1145,107 +1146,110 @@ public partial class MainWindow : Window
     }
 
     // Функция для проверки конфликта обозначений в BOM
-    private void CheckForPartNumberConflicts(BOM bom)
+    private async Task CheckForPartNumberConflictsAsync(BOM bom)
     {
-        var partNumbers = new Dictionary<string, List<(string PartNumber, string FileName)>>(); // Словарь для обозначений и файлов
+        var partNumbers = new ConcurrentDictionary<string, List<(string PartNumber, string FileName)>>(); // Используем ConcurrentDictionary для потокобезопасности
         _conflictingParts.Clear(); // Очищаем список конфликтов перед началом проверки
 
-        // Начинаем рекурсивную обработку BOM
+        var tasks = new List<Task>(); // Список задач для параллельного выполнения
+
+        // Проходим по каждому BOMView
         foreach (BOMView bomView in bom.BOMViews)
         {
-            ProcessBOMRowsForConflicts(bomView, partNumbers);
+            tasks.Add(Task.Run(() => ProcessBOMRowsForConflictsAsync(bomView, partNumbers)));
         }
 
-        var conflictMessage = new StringBuilder(); // Для общего предупреждения о конфликтах
+        await Task.WhenAll(tasks); // Ожидаем завершения всех задач
 
-        // Проверка на наличие конфликтов (если в списке больше одного элемента, то это конфликт)
-        foreach (var entry in partNumbers)
+        // Оставляем только те записи, у которых больше одного файла (т.е. есть конфликт)
+        var conflictingPartNumbers = partNumbers.Where(p => p.Value.Count > 1).ToDictionary(p => p.Key, p => p.Value);
+
+        if (conflictingPartNumbers.Any())
         {
-            if (entry.Value.Count > 1)
-            {
-                _conflictingParts.AddRange(entry.Value.Select(v => new PartData { PartNumber = v.PartNumber }));
+            _conflictingParts.AddRange(conflictingPartNumbers.SelectMany(entry => entry.Value.Select(v => new PartData { PartNumber = v.PartNumber })));
 
-                // Добавляем информацию о конфликте в сообщение
-                conflictMessage.AppendLine($"Обозначение: {entry.Key}");
-            }
-        }
-
-        // Проверка на наличие конфликтов и отображение общего предупреждения
-        if (_conflictingParts.Count > 0)
-        {
             // Используем Dispatcher для обновления UI
-            Dispatcher.Invoke(() =>
+            await Dispatcher.InvokeAsync(() =>
             {
                 MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели с одинаковыми обозначениями, что может привести к ошибкам. Модели должны иметь уникальные обозначения.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для анализа данных.",
                     "Конфликт обозначений",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
 
                 conflictFilesButton.IsEnabled = true; // Включаем кнопку для просмотра подробностей о конфликтах
-                _conflictFileDetails = partNumbers; // Сохраняем подробную информацию о конфликтах для вывода при нажатии кнопки
+                _conflictFileDetails = conflictingPartNumbers; // Сохраняем подробную информацию о конфликтах для вывода при нажатии кнопки
             });
         }
         else
         {
-            // Используем Dispatcher для обновления UI
-            Dispatcher.Invoke(() =>
+            await Dispatcher.InvokeAsync(() =>
             {
                 conflictFilesButton.IsEnabled = false; // Отключаем кнопку, если нет конфликтов
             });
         }
     }
-
-    private void ProcessBOMRowsForConflicts(BOMView bomView, Dictionary<string, List<(string PartNumber, string FileName)>> partNumbers)
+    private async Task ProcessBOMRowsForConflictsAsync(BOMView bomView, ConcurrentDictionary<string, List<(string PartNumber, string FileName)>> partNumbers)
     {
+        // Параллельно обрабатываем строки BOM
+        var tasks = new List<Task>();
+
         foreach (BOMRow row in bomView.BOMRows)
         {
-            var componentDefinitions = row.ComponentDefinitions;
-
-            foreach (ComponentDefinition componentDefinition in componentDefinitions)
+            // Исключаем библиотечные и приобретённые компоненты
+            if (row.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure || row.BOMStructure == BOMStructureEnum.kPhantomBOMStructure)
             {
-                if (_isCancelled) return;
+                continue; // Пропускаем библиотечные и приобретённые компоненты
+            }
 
-                var document = componentDefinition.Document as Document; // Явное приведение к типу Document
-
-                if (document != null)
+            foreach (ComponentDefinition componentDefinition in row.ComponentDefinitions)
+            {
+                tasks.Add(Task.Run(() =>
                 {
-                    if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-                    {
-                        var partDocument = document as PartDocument;
-                        if (partDocument != null)
-                        {
-                            var partNumber = GetProperty(partDocument.PropertySets["Design Tracking Properties"], "Part Number");
-                            var fileName = partDocument.FullFileName; // Получаем полное имя файла
+                    if (_isCancelled) return; // Прерываем выполнение, если операция была отменена
 
-                            // Если уже есть такая деталь в словаре, значит, есть конфликт
-                            if (partNumbers.ContainsKey(partNumber))
+                    var document = componentDefinition.Document as Document;
+
+                    if (document != null)
+                    {
+                        if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
+                        {
+                            var partDocument = document as PartDocument;
+
+                            // Проверяем, что это листовая деталь
+                            if (partDocument != null && partDocument.ComponentDefinition is SheetMetalComponentDefinition)
                             {
-                                // Проверяем, не добавлен ли уже этот файл в список
-                                if (!partNumbers[partNumber].Any(p => p.FileName == fileName))
+                                var partNumber = GetProperty(partDocument.PropertySets["Design Tracking Properties"], "Part Number");
+                                var fileName = partDocument.FullFileName;
+
+                                // Если обозначение уже существует, проверяем на конфликт
+                                partNumbers.AddOrUpdate(partNumber,
+                                    new List<(string PartNumber, string FileName)> { (partNumber, fileName) },
+                                    (key, existingList) =>
+                                    {
+                                        if (!existingList.Any(p => p.FileName == fileName))
+                                        {
+                                            existingList.Add((partNumber, fileName)); // Добавляем файл к существующему конфликту
+                                        }
+                                        return existingList;
+                                    });
+                            }
+                        }
+                        else if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+                        {
+                            var asmDoc = document as AssemblyDocument;
+                            if (asmDoc != null)
+                            {
+                                foreach (BOMView subBomView in asmDoc.ComponentDefinition.BOM.BOMViews)
                                 {
-                                    partNumbers[partNumber].Add((partNumber, fileName)); // Добавляем файл к существующему конфликту
+                                    ProcessBOMRowsForConflictsAsync(subBomView, partNumbers).Wait();
                                 }
                             }
-                            else
-                            {
-                                partNumbers[partNumber] = new List<(string PartNumber, string FileName)> { (partNumber, fileName) };
-                            }
                         }
                     }
-                    else if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
-                    {
-                        var asmDoc = document as AssemblyDocument;
-                        if (asmDoc != null)
-                        {
-                            // Рекурсивно обрабатываем BOM подсборки
-                            foreach (BOMView subBomView in asmDoc.ComponentDefinition.BOM.BOMViews)
-                            {
-                                ProcessBOMRowsForConflicts(subBomView, partNumbers);
-                            }
-                        }
-                    }
-                }
+                }));
             }
         }
+
+        await Task.WhenAll(tasks); // Ожидаем завершения всех задач
     }
     private void ConflictFilesButton_Click(object sender, RoutedEventArgs e)
     {
