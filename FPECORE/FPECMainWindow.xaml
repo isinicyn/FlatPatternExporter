@@ -24,7 +24,7 @@
                 Height="75" 
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Left" 
-                Margin="385,0,0,5">
+                Margin="390,0,0,5">
             <Button.Content>
                 <TextBlock Text="Анализ обозначений" 
                            TextWrapping="Wrap" 
@@ -66,7 +66,7 @@
                 </Button>
             </Grid>
         </StackPanel>
-        <GroupBox Header="Таблица" Margin="490,10,0,0" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5,0,5,0" Height="85">
+        <GroupBox Header="Таблица свойств" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="5,0,5,0" Height="85" Margin="0,36,10,0" Grid.RowSpan="2" Width="240">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" Height="20" Margin="0,10,0,0" HorizontalAlignment="Left">
                     <Button x:Name="editButton" Content="Редактировать" Click="EditButton_Click" Margin="0,0,10,0" Width="100" />
@@ -396,7 +396,7 @@
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <RadioButton x:Name="fixedFolderRadioButton" Content="Фиксированная папка" VerticalAlignment="Center" GroupName="ExportFolderOptions" Checked="FixedFolderRadioButton_Checked"/>
                                 <Button x:Name="selectFixedFolderButton" Content="..." Width="30" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Click="SelectFixedFolderButton_Click"/>
-                                <TextBlock x:Name="fixedFolderPathTextBlock" Text="Путь не выбран" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0" Width="250" TextTrimming="CharacterEllipsis" Opacity="0.75"/>
+                                <TextBlock x:Name="fixedFolderPathTextBlock" Text="Путь не выбран" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0" Width="275" TextTrimming="CharacterEllipsis" Opacity="0.75"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                 <CheckBox x:Name="enableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsEnabled="False" Checked="EnableSubfolderCheckBox_Checked" Unchecked="EnableSubfolderCheckBox_Unchecked" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |"/>

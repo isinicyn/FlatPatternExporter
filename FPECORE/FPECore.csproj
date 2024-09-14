@@ -20,6 +20,10 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
+<PropertyGroup>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- Для x64 -->
+</PropertyGroup>
+
   <Target Name="SetVersionInfo" BeforeTargets="GetAssemblyVersion">
     <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="RevisionNumber" />
@@ -67,21 +71,6 @@
     <Reference Include="Autodesk.Inventor.Interop">
       <HintPath>C:\Program Files\Autodesk\Inventor 2025\Bin\Autodesk.Inventor.Interop.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
+  </ItemGroup>  
 
 </Project>
