@@ -1,6 +1,7 @@
 ﻿<Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:av="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     mc:Ignorable="av" x:Class="FPECORE.SelectIPropertyWindow"
@@ -8,6 +9,17 @@
     WindowStyle="None" ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"
     SizeToContent="WidthAndHeight">
+    <Window.Resources>
+        <!-- CollectionViewSource для сортировки -->
+        <CollectionViewSource x:Key="SortedProperties"
+                              Source="{Binding AvailableProperties}">
+            <CollectionViewSource.SortDescriptions>
+                <!-- Сортировка по полю DisplayName -->
+                <scm:SortDescription PropertyName="DisplayName" Direction="Ascending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </Window.Resources>
+
     <Grid Margin="0">
         <!-- Заголовок окна с кнопкой закрытия -->
         <Grid.RowDefinitions>
@@ -28,7 +40,7 @@
         <!-- Основное содержимое -->
         <ListBox x:Name="iPropertyListBox" 
                  Grid.Row="1"
-                 ItemsSource="{Binding AvailableProperties}" 
+                 ItemsSource="{Binding Source={StaticResource SortedProperties}}" 
                  SelectionMode="Single" 
                  AllowDrop="True" 
                  PreviewMouseMove="iPropertyListBox_PreviewMouseMove"

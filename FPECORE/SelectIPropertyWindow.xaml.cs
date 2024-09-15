@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using Application = System.Windows.Application;
 using DragDropEffects = System.Windows.DragDropEffects;
@@ -19,8 +21,10 @@ public partial class SelectIPropertyWindow : Window
     public SelectIPropertyWindow(ObservableCollection<PresetIProperty> presetIProperties, MainWindow mainWindow)
     {
         InitializeComponent();
+
         _presetIProperties = presetIProperties;
         _mainWindow = mainWindow; // Сохраняем ссылку на MainWindow
+
         AvailableProperties =
             new ObservableCollection<PresetIProperty>(_presetIProperties.Where(p =>
                 !_mainWindow.IsColumnPresent(p.InternalName)));
@@ -29,6 +33,13 @@ public partial class SelectIPropertyWindow : Window
 
         // Подписка на событие изменения коллекции PresetIProperties
         _presetIProperties.CollectionChanged += PresetIProperties_CollectionChanged;
+
+        // Устанавливаем ItemsSource после инициализации компонентов
+        iPropertyListBox.ItemsSource = AvailableProperties;
+
+        // Настраиваем сортировку для элементов ListBox
+        var collectionView = CollectionViewSource.GetDefaultView(iPropertyListBox.ItemsSource);
+        collectionView.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
     }
 
     public ObservableCollection<PresetIProperty> AvailableProperties { get; set; }
