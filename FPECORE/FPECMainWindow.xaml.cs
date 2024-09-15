@@ -125,6 +125,8 @@ public partial class MainWindow : Window
         // Инициализация предустановленных колонок
         PresetIProperties = new ObservableCollection<PresetIProperty>
 {
+    new() { InternalName = "Имя файла", DisplayName = "Имя файла", InventorPropertyName = "FileName" },
+    new() { InternalName = "Полное имя файла", DisplayName = "Полное имя файла", InventorPropertyName = "FullFileName" },
     new() { InternalName = "ID", DisplayName = "Нумерация", InventorPropertyName = "Item" },
     new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber" },
     new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description" },
@@ -1407,6 +1409,9 @@ public partial class MainWindow : Window
     private void ReadIPropertyValuesFromPart(PartDocument partDoc, PartData partData)
     {
         var propertySets = partDoc.PropertySets;
+        // Считывание имени файла и полного пути
+        partData.FullFileName = partDoc.FullFileName; // Полное имя файла с путем
+        partData.FileName = Path.GetFileNameWithoutExtension(partDoc.FullFileName); // Имя файла без расширения
 
         // Набор свойств: Summary Information
         if (IsColumnPresent("Автор")) partData.Author = GetProperty(propertySets["Summary Information"], "Author");
@@ -2865,8 +2870,8 @@ public class PartData : INotifyPropertyChanged
     private int quantity;
     private Brush quantityColor;
     private string thickness;
-
-    // Существующие свойства
+    public string FileName { get; set; }
+    public string FullFileName { get; set; }
     public string Author { get; set; }
     public string Revision { get; set; }
     public string Project { get; set; }
