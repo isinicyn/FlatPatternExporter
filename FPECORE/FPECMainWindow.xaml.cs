@@ -197,13 +197,13 @@ public partial class MainWindow : Window
         var fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
         var assemblyVersion = assembly.GetName().Version?.ToString();
 
-        // Если версия содержит commit hash, обрезаем его до 7 символов
-        if (informationalVersion != null && informationalVersion.Contains("+"))
+        // Если версия содержит commit hash, убираем дублирование и заменяем "+" на ":"
+        if (informationalVersion != null && informationalVersion.Contains(":"))
         {
-            // Разбиваем строку на части и обрезаем commit hash до 7 символов
-            var parts = informationalVersion.Split('+');
-            var shortCommitHash = parts[1].Length > 7 ? parts[1].Substring(0, 7) : parts[1];
-            informationalVersion = $"{parts[0]}+{shortCommitHash}";
+            // Разбиваем строку на части (версия:хеш) и берем только нужные части
+            var parts = informationalVersion.Split(':');
+            var shortCommitHash = parts.Length > 1 ? parts[1].Substring(0, 7) : string.Empty;
+            informationalVersion = $"{parts[0]}:{shortCommitHash}"; // Форматируем версию с ":" и хешом
         }
 
         // Возвращаем обрезанную версию или другие версии
@@ -2850,9 +2850,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     }
     private void AboutButton_Click(object sender, RoutedEventArgs e)
     {
-        // Создаём и показываем окно "О программе"
-        var aboutWindow = new AboutWindow();
-        aboutWindow.ShowDialog();  // Открывает окно как модальное (дожидается его закрытия)
+        var aboutWindow = new AboutWindow(this); // Передаем текущий экземпляр MainWindow
+        aboutWindow.ShowDialog(); // Отображаем окно как диалоговое
     }
 }
 

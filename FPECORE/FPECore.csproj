@@ -32,11 +32,14 @@
       <Output TaskParameter="ConsoleOutput" PropertyName="CommitHash" />
     </Exec>
     <PropertyGroup>
-      <AssemblyFileVersion>1.2.0.$(RevisionNumber)</AssemblyFileVersion>
-      <FileVersion>$(AssemblyFileVersion)</FileVersion>
-      <InformationalVersion>$(AssemblyFileVersion)+$(CommitHash)</InformationalVersion>
+      <VersionPrefix>1.2.0</VersionPrefix>
+      <VersionSuffix>$(RevisionNumber)</VersionSuffix>
+      <AssemblyVersion>$(VersionPrefix).$(VersionSuffix)</AssemblyVersion>
+      <FileVersion>$(VersionPrefix).$(VersionSuffix)</FileVersion>
+      <InformationalVersion>$(VersionPrefix).$(VersionSuffix) build:$(CommitHash)</InformationalVersion>
     </PropertyGroup>
-    <Message Text="Assembly File Version: $(AssemblyFileVersion)" Importance="high" />
+    <Message Text="Assembly Version: $(AssemblyVersion)" Importance="high" />
+    <Message Text="File Version: $(FileVersion)" Importance="high" />
     <Message Text="Informational Version: $(InformationalVersion)" Importance="high" />
   </Target>
 
