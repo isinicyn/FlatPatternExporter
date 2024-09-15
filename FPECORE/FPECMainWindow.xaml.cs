@@ -162,7 +162,7 @@ public partial class MainWindow : Window
     new() { InternalName = "Масса", DisplayName = "Масса", InventorPropertyName = "Mass" },
     new() { InternalName = "Площадь поверхности", DisplayName = "Площадь поверхности", InventorPropertyName = "SurfaceArea" },
     new() { InternalName = "Объем", DisplayName = "Объем", InventorPropertyName = "Volume" },
-    new() { InternalName = "Правило ЛМ", DisplayName = "Правило ЛМ", InventorPropertyName = "SheetMetalRule" },
+    new() { InternalName = "Правило ЛМ", DisplayName = "Правило листового металла", InventorPropertyName = "SheetMetalRule" },
     new() { InternalName = "Ширина развертки", DisplayName = "Ширина развертки", InventorPropertyName = "FlatPatternWidth" },
     new() { InternalName = "Длинна развертки", DisplayName = "Длинна развертки", InventorPropertyName = "FlatPatternLength" },
     new() { InternalName = "Площадь развертки", DisplayName = "Площадь развертки", InventorPropertyName = "FlatPatternArea" },

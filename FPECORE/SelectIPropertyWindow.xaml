@@ -8,7 +8,7 @@
     Title="Customization" Width="230" Background="#FAFAFA" 
     WindowStyle="None" ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"
-    SizeToContent="WidthAndHeight">
+    SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">
     <Window.Resources>
         <!-- CollectionViewSource для сортировки -->
         <CollectionViewSource x:Key="SortedProperties"
@@ -47,8 +47,7 @@
                  Drop="iPropertyListBox_Drop"
                  MouseDoubleClick="iPropertyListBox_MouseDoubleClick"
                  Background="Transparent"
-                 BorderThickness="0.5,0.5,0.5,0.5"
-                 MaxHeight="300" av:ItemsSource="{av:SampleData ItemCount=5}">
+                 BorderThickness="0.5,0.5,0.5,0.5" av:ItemsSource="{av:SampleData ItemCount=5}">
             <ListBox.BorderBrush>
                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
             </ListBox.BorderBrush>

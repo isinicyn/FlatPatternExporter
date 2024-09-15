@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
+using Clipboard = System.Windows.Clipboard;
 
 namespace FPECORE
 {
@@ -96,6 +97,10 @@ namespace FPECORE
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+        private void CopyVersionToClipboard_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(VersionTextBlock.Text);
         }
     }
 }

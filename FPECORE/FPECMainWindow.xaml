@@ -43,7 +43,7 @@
                 </Style>
             </Button.Style>
         </Button>
-        <GroupBox Header="Список данных деталей" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="5,0,5,0" Height="120" Margin="0,5,10,0"
+        <GroupBox Header="Список данных деталей" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="5,0,5,0" Height="120" Margin="0,5,90,0"
                   Grid.Row="0" Grid.RowSpan="2">
             <StackPanel VerticalAlignment="Center">
                 <StackPanel x:Name="StackPanel">
@@ -352,8 +352,10 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Margin="10,10,10,10" Grid.Row="3">
+        <StackPanel Margin="10,10,10,0" Grid.Row="3" VerticalAlignment="Top">
             <ProgressBar x:Name="ProgressBar" Height="20" Margin="0,0,0,10"/>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Margin="10,40,0,10" HorizontalAlignment="Left" Width="250">
             <TextBlock x:Name="ProgressLabel" Text="Статус: " Margin="0,0,0,10"/>
             <TextBlock>
                 <Run x:Name="DocumentInfoLabel" Text="" Foreground="Black"/>
@@ -569,7 +571,54 @@
             </TabItem>
             <TabItem Header="Имя выгружаемого файла"/>
         </TabControl>
-        <TextBlock Name="VersionTextBlock" VerticalAlignment="Center" Margin="0,0,75,0" HorizontalAlignment="Right" Text="Версия программы: x.x.x.x + xxxxxxx" Grid.Row="4"/>
-        <Button Content="ABOUT" Click="AboutButton_Click" Margin="0,4,25,4" Grid.Row="4" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Right" Padding="1,1,1,1" FontWeight="Bold" />
+        <TextBlock Name="VersionTextBlock" VerticalAlignment="Center" Margin="0,0,25,0" HorizontalAlignment="Right" Text="Версия программы: x.x.x.x + xxxxxxx" Grid.Row="4"/>
+        <Button Content="About" Click="AboutButton_Click" Margin="0,14,10,186" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="73" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" Grid.RowSpan="2" FontWeight="Bold">
+            <Button.Background>
+                <ImageBrush ImageSource="/Resources/Pic/Beta1.png" TileMode="None" Stretch="Uniform" Opacity="1">
+                    <ImageBrush.RelativeTransform>
+                        <TransformGroup>
+                            <ScaleTransform CenterY="0.75" CenterX="0.5" ScaleY="0.75" ScaleX="0.75"/>
+                            <SkewTransform CenterX="0.5" CenterY="0.75"/>
+                            <RotateTransform CenterX="0.5" CenterY="0.75"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </ImageBrush.RelativeTransform>
+                </ImageBrush>
+            </Button.Background>
+            <Button.Style>
+                <Style TargetType="Button">
+                    <!-- Убираем стандартный фон при наведении -->
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="#FFACACAC"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,5,0,0"/>
+                                    <!-- Прижимаем текст к верху -->
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+
+                    <!-- Триггер для изменения границы при наведении -->
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="#0078D4"/>
+                            <!-- Цвет границы при наведении -->
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <!-- Увеличиваем толщину границы -->
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="BorderBrush" Value="#003778"/>
+                            <!-- Цвет границы при нажатии -->
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
     </Grid>
 </Window>

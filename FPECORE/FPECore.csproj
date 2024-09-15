@@ -41,6 +41,11 @@
   </Target>
 
   <ItemGroup>
+    <None Remove="Resources\Pic\Beta1.png" />
+    <None Remove="Resources\Pic\copy-icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <COMReference Include="InventorApprentice">
       <WrapperTool>tlbimp</WrapperTool>
       <VersionMinor>0</VersionMinor>
@@ -71,6 +76,15 @@
     <Reference Include="Autodesk.Inventor.Interop">
       <HintPath>C:\Program Files\Autodesk\Inventor 2025\Bin\Autodesk.Inventor.Interop.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Pic\Beta1.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Pic\copy-icon.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>  
 
 </Project>
