@@ -318,7 +318,7 @@
                 </DataGridTextColumn>
 
                 <!-- Колонка с количеством деталей -->
-                <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="Auto">
+                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
                         <StaticResource ResourceKey="QuantityCellStyle"/>
                     </DataGridTextColumn.ElementStyle>

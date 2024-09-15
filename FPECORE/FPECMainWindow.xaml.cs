@@ -125,13 +125,13 @@ public partial class MainWindow : Window
         // Инициализация предустановленных колонок
         PresetIProperties = new ObservableCollection<PresetIProperty>
         {
-            new() { InternalName = "ID", DisplayName = "#Нумерация", InventorPropertyName = "Item" },
+            new() { InternalName = "ID", DisplayName = "Нумерация", InventorPropertyName = "Item" },
             new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber" },
             new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description" },
             new() { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState" },
             new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material" },
             new() { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness" },
-            new() { InternalName = "Количество", DisplayName = "Количество", InventorPropertyName = "Quantity" },
+            new() { InternalName = "Кол-во", DisplayName = "Количество", InventorPropertyName = "Quantity" },
             new() { InternalName = "Изображение детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview" },
             new() { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview" },
 
