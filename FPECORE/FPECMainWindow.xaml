@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:LayerSettingsApp;assembly=LayerSettings"
         PreviewMouseLeftButtonDown="MainWindow_PreviewMouseLeftButtonDown"
-        Title="Экспорт DXF" Width="1740"
+        Title="FPEx" Width="1740"
         MinHeight="850" MinWidth="1410"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Height="850">
 
