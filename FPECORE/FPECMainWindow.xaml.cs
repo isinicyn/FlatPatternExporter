@@ -137,9 +137,9 @@ public partial class MainWindow : Window
 
             // Добавление новых предустановленных свойств
             new() { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author" }, //, ShouldBeAddedOnInit = true or false
-            new() { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision Number" },
+            new() { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision" },
             new() { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project" },
-            new() { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "Stock Number" }
+            new() { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "StockNumber" }
         };
 
         // Устанавливаем DataContext для текущего окна, объединяя данные из LayerSettingsWindow и других источников
@@ -1388,10 +1388,10 @@ public partial class MainWindow : Window
 
         // Проверка и чтение свойства "Revision"
         if (IsColumnPresent("Ревизия"))
-            partData.Revision = GetProperty(propertySets["Design Tracking Properties"], "Revision Number");
+            partData.Revision = GetProperty(propertySets["Summary Information"], "Revision Number");
 
         // Проверка и чтение свойства "Project"
-        if (IsColumnPresent("Проект")) partData.Project = GetProperty(propertySets["Summary Information"], "Project");
+        if (IsColumnPresent("Проект")) partData.Project = GetProperty(propertySets["Design Tracking Properties"], "Project");
 
         // Проверка и чтение свойства "Stock number"
         if (IsColumnPresent("Инвентарный номер"))
