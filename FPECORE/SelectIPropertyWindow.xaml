@@ -7,7 +7,7 @@
     Title="Customization" Width="230" Background="#FAFAFA" 
     WindowStyle="None" ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"
-    SizeToContent="Height">
+    SizeToContent="WidthAndHeight">
     <Grid Margin="0">
         <!-- Заголовок окна с кнопкой закрытия -->
         <Grid.RowDefinitions>

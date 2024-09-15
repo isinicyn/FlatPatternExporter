@@ -318,14 +318,14 @@
                 </DataGridTextColumn>
 
                 <!-- Колонка с количеством деталей -->
-                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="Auto">
+                <DataGridTextColumn Header="Кол." Binding="{Binding Quantity}" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
                         <StaticResource ResourceKey="QuantityCellStyle"/>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
                 <!-- Колонка с изображением детали -->
-                <DataGridTemplateColumn Header="Изображение детали" Width="Auto">
+                <DataGridTemplateColumn Header="Изобр. детали" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image Source="{Binding Preview}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -334,7 +334,7 @@
                 </DataGridTemplateColumn>
 
                 <!-- Колонка с изображением развертки -->
-                <DataGridTemplateColumn Header="Изображение развертки" Width="Auto">
+                <DataGridTemplateColumn Header="Изобр. развертки" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image Source="{Binding DxfPreview}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -343,7 +343,7 @@
                 </DataGridTemplateColumn>
 
                 <!-- Колонка с индикатором обработки -->
-                <DataGridTemplateColumn Header="Обработано" Width="Auto" IsReadOnly="False" CanUserSort="False" CanUserReorder="False">
+                <DataGridTemplateColumn Header="Обр." Width="Auto" IsReadOnly="False" CanUserSort="False" CanUserReorder="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Border x:Name="ProcessingStatus" Width="10" Height="10" BorderBrush="DarkGray" BorderThickness="1" Background="{Binding ProcessingColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -416,8 +416,10 @@
                             </StackPanel>
                             <!-- Правая колонка -->
                             <StackPanel Grid.Row="0" Grid.Column="1">
-                                <CheckBox x:Name="EnableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsEnabled="False" Checked="EnableSubfolderCheckBox_Checked" Unchecked="EnableSubfolderCheckBox_Unchecked" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="10,5,0,0" HorizontalAlignment="Right" />
-                                <TextBox x:Name="SubfolderNameTextBox" Width="118" Height="20" IsEnabled="False" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Right" Margin="10,5,0,0" />
+                                <CheckBox x:Name="EnableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsEnabled="False" Checked="EnableSubfolderCheckBox_Checked" Unchecked="EnableSubfolderCheckBox_Unchecked" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="50,5,0,0" HorizontalAlignment="Left" />
+                                <TextBox x:Name="SubfolderNameTextBox" Width="118" Height="20" IsEnabled="False" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Left" Margin="50,5,0,0" />
+                                <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="Сортировать по материалу" Margin="50,5,0,0"/>
+                                <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="Сортировать по толщине" Margin="50,5,0,0"/>
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Left" Grid.ColumnSpan="2"
@@ -432,13 +434,11 @@
 
 
                     <GroupBox Header="Базовые настройки" Margin="10,10,0,0" Height="140" VerticalAlignment="Top" HorizontalAlignment="Left">
-                        <StackPanel Margin="10,5,10,5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <StackPanel Margin="10,5,10,5" HorizontalAlignment="Center" VerticalAlignment="Top">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                 <RadioButton x:Name="TraverseRadioButton" Content="Перебор" IsChecked="False" Margin="0,0,10,0"/>
                                 <RadioButton x:Name="BomRadioButton" Content="Спецификация" IsChecked="True"/>
                             </StackPanel>
-                            <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="Сортировать по материалу" Margin="0,0,0,5"/>
-                            <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="Сортировать по толщине" Margin="0,0,0,5"/>
                             <CheckBox x:Name="IncludeQuantityInFileNameCheckBox" Content="Записать количество в имя файла" Margin="0,0,0,5"
                                 Checked="IncludeQuantityInFileNameCheckBox_CheckedChanged"
                                 Unchecked="IncludeQuantityInFileNameCheckBox_CheckedChanged"/>
