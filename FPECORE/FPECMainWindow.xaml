@@ -396,7 +396,7 @@
         <TabControl Margin="10,10,10,10" Grid.Row="1">
             <TabItem Header="Основные">
                 <Grid Background="White">
-                    <GroupBox Header="Папка экспорта" Margin="742,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="140">
+                    <GroupBox Header="Папка экспорта" Margin="732,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="140">
                         <Grid Margin="10,5,10,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="85*"/>
