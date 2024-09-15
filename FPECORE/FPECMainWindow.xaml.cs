@@ -124,23 +124,48 @@ public partial class MainWindow : Window
 
         // Инициализация предустановленных колонок
         PresetIProperties = new ObservableCollection<PresetIProperty>
-        {
-            new() { InternalName = "ID", DisplayName = "Нумерация", InventorPropertyName = "Item" },
-            new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber" },
-            new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description" },
-            new() { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState" },
-            new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material" },
-            new() { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness" },
-            new() { InternalName = "Кол-во", DisplayName = "Количество", InventorPropertyName = "Quantity" },
-            new() { InternalName = "Изображение детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview" },
-            new() { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview" },
-
-            // Добавление новых предустановленных свойств
-            new() { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author" }, //, ShouldBeAddedOnInit = true or false
-            new() { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision" },
-            new() { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project" },
-            new() { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "StockNumber" }
-        };
+{
+    new() { InternalName = "ID", DisplayName = "Нумерация", InventorPropertyName = "Item" },
+    new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber" },
+    new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description" },
+    new() { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState" },
+    new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material" },
+    new() { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness" },
+    new() { InternalName = "Кол-во", DisplayName = "Количество", InventorPropertyName = "Quantity" },
+    new() { InternalName = "Изображение детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview" },
+    new() { InternalName = "Изображение развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview" },
+    new() { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author" },
+    new() { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision" },
+    new() { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project" },
+    new() { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "StockNumber" },
+    new() { InternalName = "Название", DisplayName = "Название", InventorPropertyName = "Title" },
+    new() { InternalName = "Тема", DisplayName = "Тема", InventorPropertyName = "Subject" },
+    new() { InternalName = "Ключевые слова", DisplayName = "Ключевые слова", InventorPropertyName = "Keywords" },
+    new() { InternalName = "Примечание", DisplayName = "Примечание", InventorPropertyName = "Comments" },
+    new() { InternalName = "Категория", DisplayName = "Категория", InventorPropertyName = "Category" },
+    new() { InternalName = "Менеджер", DisplayName = "Менеджер", InventorPropertyName = "Manager" },
+    new() { InternalName = "Компания", DisplayName = "Компания", InventorPropertyName = "Company" },
+    new() { InternalName = "Время создания", DisplayName = "Время создания", InventorPropertyName = "CreationTime" },
+    new() { InternalName = "Сметчик", DisplayName = "Сметчик", InventorPropertyName = "CostCenter" },
+    new() { InternalName = "Проверил", DisplayName = "Проверил", InventorPropertyName = "CheckedBy" },
+    new() { InternalName = "Нормоконтроль", DisplayName = "Нормоконтроль", InventorPropertyName = "EngApprovedBy" },
+    new() { InternalName = "Статус", DisplayName = "Статус", InventorPropertyName = "UserStatus" },
+    new() { InternalName = "Веб-ссылка", DisplayName = "Веб-ссылка", InventorPropertyName = "CatalogWebLink" },
+    new() { InternalName = "Поставщик", DisplayName = "Поставщик", InventorPropertyName = "Vendor" },
+    new() { InternalName = "Утвердил", DisplayName = "Утвердил", InventorPropertyName = "MfgApprovedBy" },
+    new() { InternalName = "Статус разработки", DisplayName = "Статус разработки", InventorPropertyName = "DesignStatus" },
+    new() { InternalName = "Проектировщик", DisplayName = "Проектировщик", InventorPropertyName = "Designer" },
+    new() { InternalName = "Инженер", DisplayName = "Инженер", InventorPropertyName = "Engineer" },
+    new() { InternalName = "Нач. отдела", DisplayName = "Нач. отдела", InventorPropertyName = "Authority" },
+    new() { InternalName = "Масса", DisplayName = "Масса", InventorPropertyName = "Mass" },
+    new() { InternalName = "Площадь поверхности", DisplayName = "Площадь поверхности", InventorPropertyName = "SurfaceArea" },
+    new() { InternalName = "Объем", DisplayName = "Объем", InventorPropertyName = "Volume" },
+    new() { InternalName = "Правило ЛМ", DisplayName = "Правило ЛМ", InventorPropertyName = "SheetMetalRule" },
+    new() { InternalName = "Ширина развертки", DisplayName = "Ширина развертки", InventorPropertyName = "FlatPatternWidth" },
+    new() { InternalName = "Длинна развертки", DisplayName = "Длинна развертки", InventorPropertyName = "FlatPatternLength" },
+    new() { InternalName = "Площадь развертки", DisplayName = "Площадь развертки", InventorPropertyName = "FlatPatternArea" },
+    new() { InternalName = "Отделка", DisplayName = "Отделка", InventorPropertyName = "Appearance" }
+};
 
         // Устанавливаем DataContext для текущего окна, объединяя данные из LayerSettingsWindow и других источников
         DataContext = this;
@@ -1383,19 +1408,42 @@ public partial class MainWindow : Window
     {
         var propertySets = partDoc.PropertySets;
 
-        // Проверка и чтение свойства "Author"
+        // Набор свойств: Summary Information
         if (IsColumnPresent("Автор")) partData.Author = GetProperty(propertySets["Summary Information"], "Author");
+        if (IsColumnPresent("Ревизия")) partData.Revision = GetProperty(propertySets["Summary Information"], "Revision Number");
+        if (IsColumnPresent("Название")) partData.Title = GetProperty(propertySets["Summary Information"], "Title");
+        if (IsColumnPresent("Тема")) partData.Subject = GetProperty(propertySets["Summary Information"], "Subject");
+        if (IsColumnPresent("Ключевые слова")) partData.Keywords = GetProperty(propertySets["Summary Information"], "Keywords");
+        if (IsColumnPresent("Примечание")) partData.Comments = GetProperty(propertySets["Summary Information"], "Comments");
 
-        // Проверка и чтение свойства "Revision"
-        if (IsColumnPresent("Ревизия"))
-            partData.Revision = GetProperty(propertySets["Summary Information"], "Revision Number");
+        // Набор свойств: Document Summary Information
+        if (IsColumnPresent("Категория")) partData.Category = GetProperty(propertySets["Document Summary Information"], "Category");
+        if (IsColumnPresent("Менеджер")) partData.Manager = GetProperty(propertySets["Document Summary Information"], "Manager");
+        if (IsColumnPresent("Компания")) partData.Company = GetProperty(propertySets["Document Summary Information"], "Company");
 
-        // Проверка и чтение свойства "Project"
+        // Набор свойств: Design Tracking Properties
         if (IsColumnPresent("Проект")) partData.Project = GetProperty(propertySets["Design Tracking Properties"], "Project");
-
-        // Проверка и чтение свойства "Stock number"
-        if (IsColumnPresent("Инвентарный номер"))
-            partData.StockNumber = GetProperty(propertySets["Design Tracking Properties"], "Stock Number");
+        if (IsColumnPresent("Инвентарный номер")) partData.StockNumber = GetProperty(propertySets["Design Tracking Properties"], "Stock Number");
+        if (IsColumnPresent("Время создания")) partData.CreationTime = GetProperty(propertySets["Design Tracking Properties"], "Creation Time");
+        if (IsColumnPresent("Сметчик")) partData.CostCenter = GetProperty(propertySets["Design Tracking Properties"], "Cost Center");
+        if (IsColumnPresent("Проверил")) partData.CheckedBy = GetProperty(propertySets["Design Tracking Properties"], "Checked By");
+        if (IsColumnPresent("Нормоконтроль")) partData.EngApprovedBy = GetProperty(propertySets["Design Tracking Properties"], "Engr Approved By");
+        if (IsColumnPresent("Статус")) partData.UserStatus = GetProperty(propertySets["Design Tracking Properties"], "User Status");
+        if (IsColumnPresent("Веб-ссылка")) partData.CatalogWebLink = GetProperty(propertySets["Design Tracking Properties"], "Catalog Web Link");
+        if (IsColumnPresent("Поставщик")) partData.Vendor = GetProperty(propertySets["Design Tracking Properties"], "Vendor");
+        if (IsColumnPresent("Утвердил")) partData.MfgApprovedBy = GetProperty(propertySets["Design Tracking Properties"], "Mfg Approved By");
+        if (IsColumnPresent("Статус разработки")) partData.DesignStatus = GetProperty(propertySets["Design Tracking Properties"], "Design Status");
+        if (IsColumnPresent("Проектировщик")) partData.Designer = GetProperty(propertySets["Design Tracking Properties"], "Designer");
+        if (IsColumnPresent("Инженер")) partData.Engineer = GetProperty(propertySets["Design Tracking Properties"], "Engineer");
+        if (IsColumnPresent("Нач. отдела")) partData.Authority = GetProperty(propertySets["Design Tracking Properties"], "Authority");
+        if (IsColumnPresent("Масса")) partData.Mass = GetProperty(propertySets["Design Tracking Properties"], "Mass");
+        if (IsColumnPresent("Площадь поверхности")) partData.SurfaceArea = GetProperty(propertySets["Design Tracking Properties"], "SurfaceArea");
+        if (IsColumnPresent("Объем")) partData.Volume = GetProperty(propertySets["Design Tracking Properties"], "Volume");
+        if (IsColumnPresent("Правило ЛМ")) partData.SheetMetalRule = GetProperty(propertySets["Design Tracking Properties"], "Sheet Metal Rule");
+        if (IsColumnPresent("Ширина развертки")) partData.FlatPatternWidth = GetProperty(propertySets["Design Tracking Properties"], "Flat Pattern Width");
+        if (IsColumnPresent("Длинна развертки")) partData.FlatPatternLength = GetProperty(propertySets["Design Tracking Properties"], "Flat Pattern Length");
+        if (IsColumnPresent("Площадь развертки")) partData.FlatPatternArea = GetProperty(propertySets["Design Tracking Properties"], "Flat Pattern Area");
+        if (IsColumnPresent("Отделка")) partData.Appearance = GetProperty(propertySets["Design Tracking Properties"], "Appearance");
     }
 
     private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, BOM bom, int itemNumber,
@@ -2818,6 +2866,39 @@ public class PartData : INotifyPropertyChanged
     private Brush quantityColor;
     private string thickness;
 
+    // Существующие свойства
+    public string Author { get; set; }
+    public string Revision { get; set; }
+    public string Project { get; set; }
+    public string StockNumber { get; set; }
+    public string Title { get; set; }
+    public string Subject { get; set; }
+    public string Keywords { get; set; }
+    public string Comments { get; set; }
+    public string Category { get; set; }
+    public string Manager { get; set; }
+    public string Company { get; set; }
+    public string CreationTime { get; set; }
+    public string CostCenter { get; set; }
+    public string CheckedBy { get; set; }
+    public string EngApprovedBy { get; set; }
+    public string UserStatus { get; set; }
+    public string CatalogWebLink { get; set; }
+    public string Vendor { get; set; }
+    public string MfgApprovedBy { get; set; }
+    public string DesignStatus { get; set; }
+    public string Designer { get; set; }
+    public string Engineer { get; set; }
+    public string Authority { get; set; }
+    public string Mass { get; set; }
+    public string SurfaceArea { get; set; }
+    public string Volume { get; set; }
+    public string SheetMetalRule { get; set; }
+    public string FlatPatternWidth { get; set; }
+    public string FlatPatternLength { get; set; }
+    public string FlatPatternArea { get; set; }
+    public string Appearance { get; set; }
+
     // Выражения (если они есть)
     public string PartNumberExpression { get; set; }
     public string DescriptionExpression { get; set; }
@@ -2938,48 +3019,6 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    // Новые свойства для хранения значений iProperty
-    public string Author { get; set; }
-    public string Revision { get; set; }
-    public string Project { get; set; }
-    public string StockNumber { get; set; }
-
-    // Методы для установки значений без модификации флага IsModified
-    public void SetPartNumberWithoutModification(string value)
-    {
-        if (partNumber != value)
-        {
-            partNumber = value;
-            OnPropertyChanged(nameof(PartNumber));
-        }
-    }
-
-    public void SetDescriptionWithoutModification(string value)
-    {
-        if (description != value)
-        {
-            description = value;
-            OnPropertyChanged(nameof(Description));
-        }
-    }
-
-    public void SetCustomPropertyWithoutModification(string propertyName, string value)
-    {
-        if (CustomProperties.ContainsKey(propertyName))
-        {
-            if (CustomProperties[propertyName] != value)
-            {
-                CustomProperties[propertyName] = value;
-                OnPropertyChanged(nameof(CustomProperties));
-            }
-        }
-        else
-        {
-            CustomProperties.Add(propertyName, value);
-            OnPropertyChanged(nameof(CustomProperties));
-        }
-    }
-
     // Свойство для контроля редактируемости
     public bool IsReadOnly
     {
@@ -3019,9 +3058,8 @@ public class PartData : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
-
-// Методы для работы с пользовательскими свойствами
-public void AddCustomProperty(string propertyName, string propertyValue, string expressionValue = null)
+    // Методы для работы с пользовательскими свойствами
+    public void AddCustomProperty(string propertyName, string propertyValue, string expressionValue = null)
     {
         // Добавляем или обновляем значение кастомного свойства
         if (CustomProperties.ContainsKey(propertyName))
@@ -3049,13 +3087,48 @@ public void AddCustomProperty(string propertyName, string propertyValue, string 
         OnPropertyChanged(nameof(CustomPropertyExpressions));
     }
 
-
     public void RemoveCustomProperty(string propertyName)
     {
         if (customProperties.ContainsKey(propertyName))
         {
             customProperties.Remove(propertyName);
             IsModified = true; // Устанавливаем флаг изменений
+            OnPropertyChanged(nameof(CustomProperties));
+        }
+    }
+
+    // Методы для установки значений без модификации флага IsModified
+    public void SetPartNumberWithoutModification(string value)
+    {
+        if (partNumber != value)
+        {
+            partNumber = value;
+            OnPropertyChanged(nameof(PartNumber));
+        }
+    }
+
+    public void SetDescriptionWithoutModification(string value)
+    {
+        if (description != value)
+        {
+            description = value;
+            OnPropertyChanged(nameof(Description));
+        }
+    }
+
+    public void SetCustomPropertyWithoutModification(string propertyName, string value)
+    {
+        if (CustomProperties.ContainsKey(propertyName))
+        {
+            if (CustomProperties[propertyName] != value)
+            {
+                CustomProperties[propertyName] = value;
+                OnPropertyChanged(nameof(CustomProperties));
+            }
+        }
+        else
+        {
+            CustomProperties.Add(propertyName, value);
             OnPropertyChanged(nameof(CustomProperties));
         }
     }
