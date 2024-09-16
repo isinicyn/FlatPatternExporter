@@ -190,26 +190,22 @@ public partial class MainWindow : Window
     public string GetVersion()
     {
         var assembly = Assembly.GetExecutingAssembly();
+        var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        Console.WriteLine($"Raw Informational Version: {informationalVersion}");
 
-        // Попытка получить информацию о версии из различных атрибутов
-        var informationalVersion =
-            assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-        var fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
-        var assemblyVersion = assembly.GetName().Version?.ToString();
-
-        // Если версия содержит commit hash, убираем дублирование и заменяем "+" на ":"
-        if (informationalVersion != null && informationalVersion.Contains(":"))
+        if (informationalVersion != null && informationalVersion.Contains("build:"))
         {
-            // Разбиваем строку на части (версия:хеш) и берем только нужные части
-            var parts = informationalVersion.Split(':');
-            var shortCommitHash = parts.Length > 1 ? parts[1].Substring(0, 7) : string.Empty;
-            informationalVersion = $"{parts[0]}:{shortCommitHash}"; // Форматируем версию с ":" и хешом
+            var parts = informationalVersion.Split(new[] { "build:" }, StringSplitOptions.None);
+            if (parts.Length > 1)
+            {
+                var version = parts[0].Trim();
+                var shortCommitHash = parts[1].Split('+')[0].Trim(); // Берем только часть до '+'
+                return $"{version} build:{shortCommitHash}";
+            }
         }
 
-        // Возвращаем обрезанную версию или другие версии
-        return informationalVersion ?? fileVersion ?? assemblyVersion ?? "Версия неизвестна";
+        return informationalVersion ?? "Версия неизвестна";
     }
-
     public bool IsColumnPresent(string columnName)
     {
         var result = false;

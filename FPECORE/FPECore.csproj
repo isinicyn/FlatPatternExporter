@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>FPExport.ico</ApplicationIcon>	
-  <AssemblyVersion>1.0.0.0</AssemblyVersion>	
+  
   <StartupObject>FPECORE.App</StartupObject>
   </PropertyGroup>
 
@@ -24,11 +24,16 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- Для x64 -->
 </PropertyGroup>
 
+  <PropertyGroup>
+    <SourceRevisionId></SourceRevisionId>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
   <Target Name="SetVersionInfo" BeforeTargets="GetAssemblyVersion">
     <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="RevisionNumber" />
     </Exec>
-    <Exec Command="git rev-parse --short HEAD" ConsoleToMSBuild="true">
+    <Exec Command="git rev-parse --short=7 HEAD" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="CommitHash" />
     </Exec>
     <PropertyGroup>
@@ -38,9 +43,16 @@
       <FileVersion>$(VersionPrefix).$(VersionSuffix)</FileVersion>
       <InformationalVersion>$(VersionPrefix).$(VersionSuffix) build:$(CommitHash)</InformationalVersion>
     </PropertyGroup>
+    
+    <!-- Добавляем подробное логирование -->
+    <Message Text="VersionPrefix: $(VersionPrefix)" Importance="high" />
+    <Message Text="VersionSuffix: $(VersionSuffix)" Importance="high" />
+    <Message Text="RevisionNumber: $(RevisionNumber)" Importance="high" />
+    <Message Text="CommitHash: $(CommitHash)" Importance="high" />
     <Message Text="Assembly Version: $(AssemblyVersion)" Importance="high" />
     <Message Text="File Version: $(FileVersion)" Importance="high" />
     <Message Text="Informational Version: $(InformationalVersion)" Importance="high" />
+    <Message Text="SourceRevisionId: $(SourceRevisionId)" Importance="high" />
   </Target>
 
   <ItemGroup>
