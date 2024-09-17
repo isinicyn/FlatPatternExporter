@@ -1218,10 +1218,11 @@ public partial class MainWindow : Window
 
         foreach (BOMRow row in bomView.BOMRows)
         {
-            // Исключаем библиотечные и приобретённые компоненты
-            if (row.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure || row.BOMStructure == BOMStructureEnum.kPhantomBOMStructure)
+            // Исключаем ссылочные и покупные компоненты
+            if (row.BOMStructure == BOMStructureEnum.kReferenceBOMStructure ||
+                row.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure)
             {
-                continue; // Пропускаем библиотечные и приобретённые компоненты
+                continue; // Пропускаем ссылочные и покупные компоненты
             }
 
             foreach (ComponentDefinition componentDefinition in row.ComponentDefinitions)
@@ -1629,13 +1630,19 @@ public partial class MainWindow : Window
 
             if (occ.Suppressed) continue;
 
+            // Проверяем BOMStructure для всех типов компонентов
+            if (occ.BOMStructure == BOMStructureEnum.kReferenceBOMStructure ||
+                occ.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure)
+            {
+                continue; // Пропускаем ссылочные и покупные компоненты
+            }
+
             try
             {
                 if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
                 {
                     var partDoc = occ.Definition.Document as PartDocument;
-                    if (partDoc != null && partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}" &&
-                        occ.BOMStructure != BOMStructureEnum.kReferenceBOMStructure)
+                    if (partDoc != null && partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
                     {
                         var partNumber = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number");
                         if (!string.IsNullOrEmpty(partNumber))
@@ -1649,6 +1656,7 @@ public partial class MainWindow : Window
                 }
                 else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
                 {
+                    // Рекурсивно обрабатываем подсборки, только если они не ссылочные и не покупные
                     ProcessComponentOccurrences((ComponentOccurrences)occ.SubOccurrences, sheetMetalParts);
                 }
             }
@@ -1662,7 +1670,6 @@ public partial class MainWindow : Window
             }
         }
     }
-
     private void ProcessBOM(BOM bom, Dictionary<string, int> sheetMetalParts)
     {
         BOMView? bomView = null;
@@ -1683,6 +1690,10 @@ public partial class MainWindow : Window
         {
             if (_isCancelled) break;
 
+            // Эта проверка уже корректно фильтрует покупные и ссылочные компоненты
+            if (row.BOMStructure == BOMStructureEnum.kReferenceBOMStructure ||
+                row.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure) continue;
+
             try
             {
                 var componentDefinition = row.ComponentDefinitions[1];
@@ -1691,14 +1702,10 @@ public partial class MainWindow : Window
                 var document = componentDefinition.Document as Document;
                 if (document == null) continue;
 
-                if (row.BOMStructure == BOMStructureEnum.kReferenceBOMStructure ||
-                    row.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure) continue;
-
                 if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
                 {
                     var partDoc = document as PartDocument;
-                    if (partDoc != null && partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}" &&
-                        row.BOMStructure != BOMStructureEnum.kReferenceBOMStructure)
+                    if (partDoc != null && partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
                     {
                         var partNumber = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number");
                         if (!string.IsNullOrEmpty(partNumber))
@@ -1726,7 +1733,6 @@ public partial class MainWindow : Window
             }
         }
     }
-
     private void SelectFixedFolderButton_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new FolderBrowserDialog();
