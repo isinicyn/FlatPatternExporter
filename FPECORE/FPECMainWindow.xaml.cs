@@ -57,10 +57,11 @@ public partial class MainWindow : Window
     private readonly List<string> _customPropertiesList = new();
     private string _fixedFolderPath = string.Empty;
     private bool _isCancelled;
-
     private bool _isCtrlPressed;
     private bool _isEditing;
     private bool _isScanning;
+    private bool _excludeReferenceParts = true;
+    private bool _excludePurchasedParts = true;
     private int _itemCounter = 1; // Инициализация счетчика пунктов
     private Document? _lastScannedDocument;
     private List<PartData> _originalPartsData = new(); // Для хранения исходного состояния
@@ -86,6 +87,10 @@ public partial class MainWindow : Window
         PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
         PartsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
         ChooseFolderRadioButton.IsChecked = true;
+        ExcludeReferencePartsCheckBox.Checked += UpdateExcludeReferencePartsState;
+        ExcludeReferencePartsCheckBox.Unchecked += UpdateExcludeReferencePartsState;
+        ExcludePurchasedPartsCheckBox.Checked += UpdateExcludePurchasedPartsState;
+        ExcludePurchasedPartsCheckBox.Unchecked += UpdateExcludePurchasedPartsState;
 
         PartsDataGrid.DragOver += PartsDataGrid_DragOver;
         PartsDataGrid.DragLeave += PartsDataGrid_DragLeave;
@@ -1213,23 +1218,17 @@ public partial class MainWindow : Window
     }
     private async Task ProcessBOMRowsForConflictsAsync(BOMView bomView, ConcurrentDictionary<string, List<(string PartNumber, string FileName)>> partNumbers)
     {
-        // Параллельно обрабатываем строки BOM
         var tasks = new List<Task>();
 
         foreach (BOMRow row in bomView.BOMRows)
         {
-            // Исключаем ссылочные и покупные компоненты
-            if (row.BOMStructure == BOMStructureEnum.kReferenceBOMStructure ||
-                row.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure)
-            {
-                continue; // Пропускаем ссылочные и покупные компоненты
-            }
+            if (ShouldExcludeComponent(row.BOMStructure)) continue;
 
             foreach (ComponentDefinition componentDefinition in row.ComponentDefinitions)
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    if (_isCancelled) return; // Прерываем выполнение, если операция была отменена
+                    if (_isCancelled) return;
 
                     var document = componentDefinition.Document as Document;
 
@@ -1239,20 +1238,18 @@ public partial class MainWindow : Window
                         {
                             var partDocument = document as PartDocument;
 
-                            // Проверяем, что это листовая деталь
                             if (partDocument != null && partDocument.ComponentDefinition is SheetMetalComponentDefinition)
                             {
                                 var partNumber = GetProperty(partDocument.PropertySets["Design Tracking Properties"], "Part Number");
                                 var fileName = partDocument.FullFileName;
 
-                                // Если обозначение уже существует, проверяем на конфликт
                                 partNumbers.AddOrUpdate(partNumber,
                                     new List<(string PartNumber, string FileName)> { (partNumber, fileName) },
                                     (key, existingList) =>
                                     {
                                         if (!existingList.Any(p => p.FileName == fileName))
                                         {
-                                            existingList.Add((partNumber, fileName)); // Добавляем файл к существующему конфликту
+                                            existingList.Add((partNumber, fileName));
                                         }
                                         return existingList;
                                     });
@@ -1274,7 +1271,7 @@ public partial class MainWindow : Window
             }
         }
 
-        await Task.WhenAll(tasks); // Ожидаем завершения всех задач
+        await Task.WhenAll(tasks);
     }
     private void ConflictFilesButton_Click(object sender, RoutedEventArgs e)
     {
@@ -1630,12 +1627,7 @@ public partial class MainWindow : Window
 
             if (occ.Suppressed) continue;
 
-            // Проверяем BOMStructure для всех типов компонентов
-            if (occ.BOMStructure == BOMStructureEnum.kReferenceBOMStructure ||
-                occ.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure)
-            {
-                continue; // Пропускаем ссылочные и покупные компоненты
-            }
+            if (ShouldExcludeComponent(occ.BOMStructure)) continue;
 
             try
             {
@@ -1656,7 +1648,6 @@ public partial class MainWindow : Window
                 }
                 else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
                 {
-                    // Рекурсивно обрабатываем подсборки, только если они не ссылочные и не покупные
                     ProcessComponentOccurrences((ComponentOccurrences)occ.SubOccurrences, sheetMetalParts);
                 }
             }
@@ -1690,9 +1681,7 @@ public partial class MainWindow : Window
         {
             if (_isCancelled) break;
 
-            // Эта проверка уже корректно фильтрует покупные и ссылочные компоненты
-            if (row.BOMStructure == BOMStructureEnum.kReferenceBOMStructure ||
-                row.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure) continue;
+            if (ShouldExcludeComponent(row.BOMStructure)) continue;
 
             try
             {
@@ -1732,6 +1721,25 @@ public partial class MainWindow : Window
                 // Обработка общих ошибок
             }
         }
+    }
+    private bool ShouldExcludeComponent(BOMStructureEnum bomStructure)
+    {
+        if (_excludeReferenceParts && bomStructure == BOMStructureEnum.kReferenceBOMStructure)
+            return true;
+
+        if (_excludePurchasedParts && bomStructure == BOMStructureEnum.kPurchasedBOMStructure)
+            return true;
+
+        return false;
+    }
+    private void UpdateExcludeReferencePartsState(object sender, RoutedEventArgs e)
+    {
+        _excludeReferenceParts = ExcludeReferencePartsCheckBox.IsChecked ?? true;
+    }
+
+    private void UpdateExcludePurchasedPartsState(object sender, RoutedEventArgs e)
+    {
+        _excludePurchasedParts = ExcludePurchasedPartsCheckBox.IsChecked ?? true;
     }
     private void SelectFixedFolderButton_Click(object sender, RoutedEventArgs e)
     {
