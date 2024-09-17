@@ -62,6 +62,8 @@ public partial class MainWindow : Window
     private bool _isScanning;
     private bool _excludeReferenceParts = true;
     private bool _excludePurchasedParts = true;
+    private bool _includeLibraryComponents = false;
+    private List<string> _libraryPaths = new List<string>();
     private int _itemCounter = 1; // Инициализация счетчика пунктов
     private Document? _lastScannedDocument;
     private List<PartData> _originalPartsData = new(); // Для хранения исходного состояния
@@ -91,6 +93,10 @@ public partial class MainWindow : Window
         ExcludeReferencePartsCheckBox.Unchecked += UpdateExcludeReferencePartsState;
         ExcludePurchasedPartsCheckBox.Checked += UpdateExcludePurchasedPartsState;
         ExcludePurchasedPartsCheckBox.Unchecked += UpdateExcludePurchasedPartsState;
+        IncludeLibraryComponentsCheckBox.Checked += UpdateIncludeLibraryComponentsState;
+        IncludeLibraryComponentsCheckBox.Unchecked += UpdateIncludeLibraryComponentsState;
+        // Инициализация путей библиотек
+        InitializeLibraryPaths();
 
         PartsDataGrid.DragOver += PartsDataGrid_DragOver;
         PartsDataGrid.DragLeave += PartsDataGrid_DragLeave;
@@ -1222,18 +1228,19 @@ public partial class MainWindow : Window
 
         foreach (BOMRow row in bomView.BOMRows)
         {
-            if (ShouldExcludeComponent(row.BOMStructure)) continue;
-
             foreach (ComponentDefinition componentDefinition in row.ComponentDefinitions)
             {
                 tasks.Add(Task.Run(() =>
                 {
                     if (_isCancelled) return;
 
-                    var document = componentDefinition.Document as Document;
-
-                    if (document != null)
+                    try
                     {
+                        var document = componentDefinition.Document as Document;
+                        if (document == null) return;
+
+                        if (ShouldExcludeComponent(row.BOMStructure, document.FullFileName)) return;
+
                         if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
                         {
                             var partDocument = document as PartDocument;
@@ -1266,6 +1273,11 @@ public partial class MainWindow : Window
                                 }
                             }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Логирование ошибки
+                        Debug.WriteLine($"Ошибка при проверке конфликтов: {ex.Message}");
                     }
                 }));
             }
@@ -1627,10 +1639,24 @@ public partial class MainWindow : Window
 
             if (occ.Suppressed) continue;
 
-            if (ShouldExcludeComponent(occ.BOMStructure)) continue;
-
             try
             {
+                string fullFileName = "";
+                if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
+                {
+                    var partDoc = occ.Definition.Document as PartDocument;
+                    if (partDoc != null)
+                        fullFileName = partDoc.FullFileName;
+                }
+                else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+                {
+                    var asmDoc = occ.Definition.Document as AssemblyDocument;
+                    if (asmDoc != null)
+                        fullFileName = asmDoc.FullFileName;
+                }
+
+                if (ShouldExcludeComponent(occ.BOMStructure, fullFileName)) continue;
+
                 if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
                 {
                     var partDoc = occ.Definition.Document as PartDocument;
@@ -1651,13 +1677,10 @@ public partial class MainWindow : Window
                     ProcessComponentOccurrences((ComponentOccurrences)occ.SubOccurrences, sheetMetalParts);
                 }
             }
-            catch (COMException ex)
-            {
-                // Обработка ошибок COM
-            }
             catch (Exception ex)
             {
-                // Обработка общих ошибок
+                // Логирование ошибки
+                Debug.WriteLine($"Ошибка при обработке компонента: {ex.Message}");
             }
         }
     }
@@ -1681,8 +1704,6 @@ public partial class MainWindow : Window
         {
             if (_isCancelled) break;
 
-            if (ShouldExcludeComponent(row.BOMStructure)) continue;
-
             try
             {
                 var componentDefinition = row.ComponentDefinitions[1];
@@ -1690,6 +1711,8 @@ public partial class MainWindow : Window
 
                 var document = componentDefinition.Document as Document;
                 if (document == null) continue;
+
+                if (ShouldExcludeComponent(row.BOMStructure, document.FullFileName)) continue;
 
                 if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
                 {
@@ -1712,22 +1735,46 @@ public partial class MainWindow : Window
                     if (asmDoc != null) ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts);
                 }
             }
-            catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80070057))
-            {
-                // Обработка ошибок COM
-            }
             catch (Exception ex)
             {
-                // Обработка общих ошибок
+                // Логирование ошибки
+                Debug.WriteLine($"Ошибка при обработке строки BOM: {ex.Message}");
             }
         }
     }
-    private bool ShouldExcludeComponent(BOMStructureEnum bomStructure)
+    private void InitializeLibraryPaths()
+    {
+        try
+        {
+            var project = _thisApplication.DesignProjectManager.ActiveDesignProject;
+            foreach (ProjectPath projectPath in project.LibraryPaths)
+            {
+                _libraryPaths.Add(projectPath.Path);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка при инициализации путей библиотек: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void UpdateIncludeLibraryComponentsState(object sender, RoutedEventArgs e)
+    {
+        _includeLibraryComponents = IncludeLibraryComponentsCheckBox.IsChecked ?? false;
+    }
+    private bool IsLibraryComponent(string fullFileName)
+    {
+        return _libraryPaths.Any(path => fullFileName.StartsWith(path, StringComparison.OrdinalIgnoreCase));
+    }
+    private bool ShouldExcludeComponent(BOMStructureEnum bomStructure, string fullFileName)
     {
         if (_excludeReferenceParts && bomStructure == BOMStructureEnum.kReferenceBOMStructure)
             return true;
 
         if (_excludePurchasedParts && bomStructure == BOMStructureEnum.kPurchasedBOMStructure)
+            return true;
+
+        if (!_includeLibraryComponents && !string.IsNullOrEmpty(fullFileName) && IsLibraryComponent(fullFileName))
             return true;
 
         return false;
