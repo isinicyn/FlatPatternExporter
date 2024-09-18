@@ -923,24 +923,39 @@ public partial class MainWindow : Window
     {
         try
         {
-            _thisApplication = (Application)MarshalCore.GetActiveObject("Inventor.Application") ??
-                              throw new InvalidOperationException("Не удалось получить активный объект Inventor.");
+            _thisApplication = (Application)MarshalCore.GetActiveObject("Inventor.Application");
+            if (_thisApplication != null)
+            {
+                InitializeProjectAndLibraryData();
+            }
         }
         catch (COMException)
         {
             MessageBox.Show(
                 "Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.", "Ошибка",
                 MessageBoxButton.OK, MessageBoxImage.Error);
-            Close();
         }
         catch (Exception ex)
         {
             MessageBox.Show("Произошла ошибка при подключении к Inventor: " + ex.Message, "Ошибка", MessageBoxButton.OK,
                 MessageBoxImage.Error);
-            Close();
         }
     }
-
+    private void InitializeProjectAndLibraryData()
+    {
+        if (_thisApplication != null)
+        {
+            try
+            {
+                SetProjectFolderInfo();
+                InitializeLibraryPaths();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при инициализации данных проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+    }
     private void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
@@ -1042,12 +1057,16 @@ public partial class MainWindow : Window
 
     private async void ScanButton_Click(object sender, RoutedEventArgs e)
     {
-        ResetEditMode(); // Сброс режима редактирования перед сканированием
+        ResetEditMode();
 
         if (_thisApplication == null)
         {
-            MessageBoxHelper.ShowInventorNotRunningError();
-            return;
+            InitializeInventor();
+            if (_thisApplication == null)
+            {
+                MessageBoxHelper.ShowInventorNotRunningError();
+                return;
+            }
         }
 
         // Проверка на наличие активного документа
@@ -1335,27 +1354,20 @@ public partial class MainWindow : Window
     // Метод для получения и установки информации о проекте
     private void SetProjectFolderInfo()
     {
+        if (_thisApplication == null) return;
+
         try
         {
-            // Получаем текущий активный проект
             var activeProject = _thisApplication.DesignProjectManager.ActiveDesignProject;
-
-            // Извлекаем название и путь проекта
             var projectName = activeProject.Name;
             var projectWorkspacePath = activeProject.WorkspacePath;
-
-            // Обновляем текст радиокнопки
-            //projectFolderRadioButton.Content = $"Папка проекта [{projectName}] {projectWorkspacePath}";
-
-            // Обновляем TextBlock с названием проекта
-            this.ProjectName.Text = $"Проект: {projectName}";
+            ProjectName.Text = $"Проект: {projectName}";
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Не удалось получить информацию о проекте: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
-
     // Вызываем при инициализации приложения
     private void InitializeProjectFolder()
     {
@@ -1744,6 +1756,8 @@ public partial class MainWindow : Window
     }
     private void InitializeLibraryPaths()
     {
+        if (_thisApplication == null) return;
+
         try
         {
             var project = _thisApplication.DesignProjectManager.ActiveDesignProject;
@@ -1757,7 +1771,6 @@ public partial class MainWindow : Window
             MessageBox.Show($"Ошибка при инициализации путей библиотек: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
-
     private void UpdateIncludeLibraryComponentsState(object sender, RoutedEventArgs e)
     {
         _includeLibraryComponents = IncludeLibraryComponentsCheckBox.IsChecked ?? false;
