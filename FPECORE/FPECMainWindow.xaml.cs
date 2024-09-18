@@ -370,37 +370,39 @@ public partial class MainWindow : Window
 
     private void ExpressionsCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
     {
-        if (_isEditing) // Применяем изменения только в режиме редактирования
+        if (_isEditing)
         {
             if (ExpressionsCheckBox.IsChecked == true)
             {
-                // Показываем выражения
                 foreach (var item in _partsData)
                 {
-                    item.SetPartNumberWithoutModification(item.PartNumberExpression); // Показываем выражение
-                    item.SetDescriptionWithoutModification(item.DescriptionExpression); // Показываем выражение
+                    item.SetPartNumberWithoutModification(item.PartNumberExpression);
+                    item.SetDescriptionWithoutModification(item.DescriptionExpression);
 
                     foreach (var customProperty in item.CustomProperties.Keys.ToList())
-                        item.SetCustomPropertyWithoutModification(customProperty, item.CustomPropertyExpressions[customProperty]); // Показываем выражение
+                    {
+                        if (item.CustomPropertyExpressions.ContainsKey(customProperty))
+                            item.SetCustomPropertyWithoutModification(customProperty, item.CustomPropertyExpressions[customProperty]);
+                    }
                 }
             }
             else
             {
-                // Показываем обычные значения
                 foreach (var item in _partsData)
                 {
-                    item.SetPartNumberWithoutModification(item.PartNumber); // Показываем значение
-                    item.SetDescriptionWithoutModification(item.Description); // Показываем значение
+                    item.SetPartNumberWithoutModification(item.PartNumber);
+                    item.SetDescriptionWithoutModification(item.Description);
 
                     foreach (var customProperty in item.CustomProperties.Keys.ToList())
-                        item.SetCustomPropertyWithoutModification(customProperty, item.CustomProperties[customProperty]); // Показываем значение
+                    {
+                        item.SetCustomPropertyWithoutModification(customProperty, item.CustomProperties[customProperty]);
+                    }
                 }
             }
 
-            PartsDataGrid.Items.Refresh(); // Обновляем таблицу после изменения
+            PartsDataGrid.Items.Refresh();
         }
     }
-
     private async void SaveButton_Click(object sender, RoutedEventArgs e)
     {
         _isEditing = false;
@@ -2776,7 +2778,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         {
             var customPropertyName = inputDialog.CustomPropertyName;
 
-            // Проверка на существование в списке пользовательских свойств
             if (_customPropertiesList.Contains(customPropertyName))
             {
                 MessageBox.Show($"Свойство '{customPropertyName}' уже добавлено.", "Предупреждение",
@@ -2784,7 +2785,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 return;
             }
 
-            // Проверка на существование колонки
             if (PartsDataGrid.Columns.Any(c => c.Header as string == customPropertyName))
             {
                 MessageBox.Show($"Столбец с именем '{customPropertyName}' уже существует.", "Предупреждение",
@@ -2794,47 +2794,36 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
             _customPropertiesList.Add(customPropertyName);
 
-            // Добавляем новую колонку в DataGrid
             AddCustomIPropertyColumn(customPropertyName);
 
-            // Если включен фоновый режим, отключаем взаимодействие с UI
             if (BackgroundModeCheckBox.IsChecked == true)
                 _thisApplication.UserInterfaceManager.UserInteractionDisabled = true;
 
             try
             {
-                // Заполняем значения Custom iProperty для уже существующих деталей асинхронно
                 await FillCustomPropertyAsync(customPropertyName);
             }
             finally
             {
-                // Восстанавливаем взаимодействие с UI после завершения асинхронной операции
                 if (BackgroundModeCheckBox.IsChecked == true)
                     _thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
             }
         }
     }
-
     private async Task FillCustomPropertyAsync(string customPropertyName)
     {
         foreach (var partData in _partsData)
         {
-            // Получаем значение custom iProperty асинхронно
-            var propertyValue = await Task.Run(() => GetCustomIPropertyValue(partData.PartNumber, customPropertyName));
+            var (value, expression) = await Task.Run(() => GetCustomIPropertyValue(partData.PartNumber, customPropertyName));
 
-            // Добавляем значение в коллекцию свойств для конкретного элемента
-            partData.AddCustomProperty(customPropertyName, propertyValue);
+            partData.AddCustomProperty(customPropertyName, value, expression);
 
-            // Обновляем UI
             PartsDataGrid.Items.Refresh();
 
-            // Проверяем, включен ли фоновый режим
             if (BackgroundModeCheckBox.IsChecked == true)
-                // Дополнительная задержка для плавности и снижения нагрузки на UI
                 await Task.Delay(50);
         }
     }
-
     private void RemoveCustomIPropertyColumn(string propertyName)
     {
         // Удаление столбца из DataGrid
@@ -2932,7 +2921,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
     }
 
-    private string GetCustomIPropertyValue(string partNumber, string propertyName)
+    private (string Value, string Expression) GetCustomIPropertyValue(string partNumber, string propertyName)
     {
         try
         {
@@ -2941,21 +2930,33 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             {
                 var propertySet = partDoc.PropertySets["Inventor User Defined Properties"];
 
-                // Проверяем, существует ли свойство в данном PropertySet
-                if (propertySet[propertyName] is Property property) return property.Value?.ToString() ?? string.Empty;
+                if (propertySet[propertyName] is Property property)
+                {
+                    string value = property.Value?.ToString() ?? string.Empty;
+                    string expression = string.Empty;
+                    try
+                    {
+                        expression = property.Expression;
+                    }
+                    catch
+                    {
+                        // Если выражение недоступно, оставляем его пустым
+                    }
+                    return (value, expression);
+                }
             }
         }
         catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
         {
-            // Ловим ошибку и возвращаем пустую строку
-            return string.Empty;
+            // Ловим ошибку и возвращаем пустые строки
+            return (string.Empty, string.Empty);
         }
         catch (Exception ex)
         {
             MessageBoxHelper.ShowErrorMessage($"Ошибка при получении свойства {propertyName}: {ex.Message}");
         }
 
-        return string.Empty;
+        return (string.Empty, string.Empty);
     }
     private void AboutButton_Click(object sender, RoutedEventArgs e)
     {
@@ -3172,34 +3173,22 @@ public class PartData : INotifyPropertyChanged
     }
 
     // Методы для работы с пользовательскими свойствами
-    public void AddCustomProperty(string propertyName, string propertyValue, string expressionValue = null)
+    public void AddCustomProperty(string propertyName, string propertyValue, string expressionValue)
     {
-        // Добавляем или обновляем значение кастомного свойства
         if (CustomProperties.ContainsKey(propertyName))
             CustomProperties[propertyName] = propertyValue;
         else
             CustomProperties.Add(propertyName, propertyValue);
 
-        // Добавляем или обновляем выражение для кастомного свойства
-        if (expressionValue != null)
-        {
-            if (CustomPropertyExpressions.ContainsKey(propertyName))
-                CustomPropertyExpressions[propertyName] = expressionValue;
-            else
-                CustomPropertyExpressions.Add(propertyName, expressionValue);
-        }
+        if (CustomPropertyExpressions.ContainsKey(propertyName))
+            CustomPropertyExpressions[propertyName] = expressionValue;
         else
-        {
-            // Если выражение не указано, инициализируем его пустым значением
-            if (!CustomPropertyExpressions.ContainsKey(propertyName))
-                CustomPropertyExpressions.Add(propertyName, string.Empty);
-        }
+            CustomPropertyExpressions.Add(propertyName, expressionValue);
 
-        IsModified = true; // Устанавливаем флаг изменений
+        IsModified = true;
         OnPropertyChanged(nameof(CustomProperties));
         OnPropertyChanged(nameof(CustomPropertyExpressions));
     }
-
     public void RemoveCustomProperty(string propertyName)
     {
         if (customProperties.ContainsKey(propertyName))
