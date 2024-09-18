@@ -47,6 +47,7 @@ namespace FPECORE;
 
 public partial class MainWindow : Window
 {
+    private bool _hasMissingReferences = false;
     private const string PlaceholderText = "Поиск...";
     private AdornerLayer _adornerLayer;
     private HeaderAdorner _headerAdorner;
@@ -1057,7 +1058,7 @@ public partial class MainWindow : Window
 
     private async void ScanButton_Click(object sender, RoutedEventArgs e)
     {
-        ResetEditMode();
+        ResetEditMode(); // Сброс режима редактирования перед сканированием
 
         if (_thisApplication == null)
         {
@@ -1099,6 +1100,7 @@ public partial class MainWindow : Window
         ClearButton.IsEnabled = false;
         _isScanning = true;
         _isCancelled = false;
+        _hasMissingReferences = false; // Сброс флага потерянных ссылок
 
         var stopwatch = Stopwatch.StartNew();
 
@@ -1196,9 +1198,16 @@ public partial class MainWindow : Window
 
         if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
 
-        if (_isCancelled) MessageBoxHelper.ShowScanningCancelledInfo();
+        if (_isCancelled)
+        {
+            MessageBoxHelper.ShowScanningCancelledInfo();
+        }
+        else if (_hasMissingReferences)
+        {
+            MessageBox.Show("В сборке обнаружены компоненты с потерянными ссылками. Некоторые данные могли быть пропущены.",
+                "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
-
     // Функция для проверки конфликта обозначений в BOM
     private async Task CheckForPartNumberConflictsAsync(BOM bom)
     {
@@ -1698,60 +1707,90 @@ public partial class MainWindow : Window
     }
     private void ProcessBOM(BOM bom, Dictionary<string, int> sheetMetalParts)
     {
-        BOMView? bomView = null;
-        foreach (BOMView view in bom.BOMViews)
+        try
         {
-            bomView = view;
-            break;
-        }
+            BOMView? bomView = null;
+            foreach (BOMView view in bom.BOMViews)
+            {
+                bomView = view;
+                break;
+            }
 
-        if (bomView == null)
-        {
-            MessageBox.Show("Не найдено ни одного представления спецификации.", "Ошибка", MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            return;
-        }
+            if (bomView == null)
+            {
+                MessageBox.Show("Не найдено ни одного представления спецификации.", "Ошибка", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return;
+            }
 
-        foreach (BOMRow row in bomView.BOMRows)
-        {
-            if (_isCancelled) break;
-
+            BOMRow[] bomRows;
             try
             {
-                var componentDefinition = row.ComponentDefinitions[1];
-                if (componentDefinition == null) continue;
-
-                var document = componentDefinition.Document as Document;
-                if (document == null) continue;
-
-                if (ShouldExcludeComponent(row.BOMStructure, document.FullFileName)) continue;
-
-                if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-                {
-                    var partDoc = document as PartDocument;
-                    if (partDoc != null && partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
-                    {
-                        var partNumber = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number");
-                        if (!string.IsNullOrEmpty(partNumber))
-                        {
-                            if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
-                                sheetMetalParts[partNumber] += row.ItemQuantity;
-                            else
-                                sheetMetalParts.Add(partNumber, row.ItemQuantity);
-                        }
-                    }
-                }
-                else if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
-                {
-                    var asmDoc = document as AssemblyDocument;
-                    if (asmDoc != null) ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts);
-                }
+                bomRows = bomView.BOMRows.Cast<BOMRow>().ToArray();
             }
-            catch (Exception ex)
+            catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
             {
-                // Логирование ошибки
-                Debug.WriteLine($"Ошибка при обработке строки BOM: {ex.Message}");
+                _hasMissingReferences = true;
+                Debug.WriteLine("Ошибка при доступе к BOMRows. Возможно, в сборке есть потерянные ссылки.");
+                return;
             }
+
+            foreach (BOMRow row in bomRows)
+            {
+                if (_isCancelled) break;
+
+                try
+                {
+                    ProcessBOMRow(row, sheetMetalParts);
+                }
+                catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
+                {
+                    _hasMissingReferences = true;
+                    Debug.WriteLine($"Обнаружен компонент с потерянной ссылкой: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Ошибка при обработке строки BOM: {ex.Message}");
+                    _hasMissingReferences = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Общая ошибка при обработке BOM: {ex.Message}");
+            _hasMissingReferences = true;
+        }
+    }
+
+    private void ProcessBOMRow(BOMRow row, Dictionary<string, int> sheetMetalParts)
+    {
+        var componentDefinition = row.ComponentDefinitions[1];
+        if (componentDefinition == null) return;
+
+        var document = componentDefinition.Document as Document;
+        if (document == null) return;
+
+        if (ShouldExcludeComponent(row.BOMStructure, document.FullFileName)) return;
+
+        if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
+        {
+            var partDoc = document as PartDocument;
+            if (partDoc != null && partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
+            {
+                var partNumber = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number");
+                if (!string.IsNullOrEmpty(partNumber))
+                {
+                    if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
+                        sheetMetalParts[partNumber] += row.ItemQuantity;
+                    else
+                        sheetMetalParts.Add(partNumber, row.ItemQuantity);
+                }
+            }
+        }
+        else if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+        {
+            var asmDoc = document as AssemblyDocument;
+            if (asmDoc != null) ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts);
         }
     }
     private void InitializeLibraryPaths()
