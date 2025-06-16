@@ -75,7 +75,7 @@
 
   <ItemGroup>
     <Reference Include="Autodesk.Inventor.Interop">
-      <HintPath>C:\Program Files\Autodesk\Inventor 2025\Bin\Autodesk.Inventor.Interop.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Inventor 2026\Bin\Public Assemblies\Autodesk.Inventor.Interop.dll</HintPath>
     </Reference>
   </ItemGroup>
 
