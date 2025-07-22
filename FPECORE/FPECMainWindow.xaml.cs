@@ -124,13 +124,10 @@ public partial class MainWindow : Window
         SearchTextBox.Text = PlaceholderText;
         SearchTextBox.Foreground = Brushes.Gray;
 
-        // Создаем экземпляр LayerSettings окна
-        var layerSettingsWindow = new LayerSettingsWindow();
-
-        // Используем его данные для настройки LayerSettings
-        LayerSettings = layerSettingsWindow.LayerSettings;
-        AvailableColors = layerSettingsWindow.AvailableColors;
-        LineTypes = layerSettingsWindow.LineTypes;
+        // Инициализируем настройки слоев
+        LayerSettings = LayerSettingsHelper.InitializeLayerSettings();
+        AvailableColors = LayerSettingsHelper.GetAvailableColors();
+        LineTypes = LayerSettingsHelper.GetLineTypes();
 
 
         // Инициализация предустановленных колонок
@@ -180,7 +177,7 @@ public partial class MainWindow : Window
     new() { InternalName = "Отделка", DisplayName = "Отделка", InventorPropertyName = "Appearance" }
 };
 
-        // Устанавливаем DataContext для текущего окна, объединяя данные из LayerSettingsWindow и других источников
+        // Устанавливаем DataContext для текущего окна
         DataContext = this;
 
         // Инициализация DataGrid с предустановленными колонками
