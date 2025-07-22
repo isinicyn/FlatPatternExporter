@@ -23,7 +23,6 @@ using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using DefineEdge;
 using Inventor;
-using LayerSettingsApp;
 using Application = Inventor.Application;
 using Binding = System.Windows.Data.Binding;
 using Brush = System.Windows.Media.Brush;
@@ -125,8 +124,8 @@ public partial class MainWindow : Window
         SearchTextBox.Text = PlaceholderText;
         SearchTextBox.Foreground = Brushes.Gray;
 
-        // Создаем экземпляр MainWindow из LayerSettingsApp
-        var layerSettingsWindow = new LayerSettingsApp.MainWindow();
+        // Создаем экземпляр LayerSettings окна
+        var layerSettingsWindow = new LayerSettingsWindow();
 
         // Используем его данные для настройки LayerSettings
         LayerSettings = layerSettingsWindow.LayerSettings;
@@ -2310,11 +2309,11 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                             if (layer.SelectedLineType != "Default")
                                 layerOptionsBuilder.Append(
-                                    $"&{layer.DisplayName}LineType={LayerSettingsApp.MainWindow.GetLineTypeValue(layer.SelectedLineType)}");
+                                    $"&{layer.DisplayName}LineType={LayerSettingsHelper.GetLineTypeValue(layer.SelectedLineType)}");
 
                             if (layer.SelectedColor != "White")
                                 layerOptionsBuilder.Append(
-                                    $"&{layer.DisplayName}Color={LayerSettingsApp.MainWindow.GetColorValue(layer.SelectedColor)}");
+                                    $"&{layer.DisplayName}Color={LayerSettingsHelper.GetColorValue(layer.SelectedColor)}");
                         }
 
                         if (invisibleLayersBuilder.Length > 0)

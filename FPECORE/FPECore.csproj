@@ -69,9 +69,6 @@
     <PackageReference Include="stdole" Version="17.14.40260" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\LayerSettings\LayerSettings\LayerSettings.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Autodesk.Inventor.Interop">
