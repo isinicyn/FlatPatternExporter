@@ -66,7 +66,7 @@
 
   <ItemGroup>
     <PackageReference Include="netDxf.netstandard" Version="3.0.1" />
-    <PackageReference Include="stdole" Version="17.11.40262" />
+    <PackageReference Include="stdole" Version="17.14.40260" />
   </ItemGroup>
 
   <ItemGroup>
@@ -75,7 +75,7 @@
 
   <ItemGroup>
     <Reference Include="Autodesk.Inventor.Interop">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Inventor 2026\Bin\Public Assemblies\Autodesk.Inventor.Interop.dll</HintPath>
+      <HintPath>C:\Program Files\Autodesk\Inventor 2026\Bin\Public Assemblies\Autodesk.Inventor.Interop.dll</HintPath>
     </Reference>
   </ItemGroup>
 
