@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace FPECORE
+namespace FlatPatternExporter
 {
     public class ColorToBrushConverter : IValueConverter
     {

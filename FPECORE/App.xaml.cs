@@ -1,4 +1,4 @@
-﻿namespace FPECORE;
+﻿namespace FlatPatternExporter;
 
 /// <summary>
 ///     Interaction logic for App.xaml

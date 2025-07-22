@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using MessageBox = System.Windows.MessageBox;
 
-namespace FPECORE;
+namespace FlatPatternExporter;
 
 public partial class OverrideQuantityDialog : Window
 {

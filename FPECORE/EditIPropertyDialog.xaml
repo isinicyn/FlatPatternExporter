@@ -1,4 +1,4 @@
-﻿<Window x:Class="FPECORE.EditIPropertyDialog"
+﻿<Window x:Class="FlatPatternExporter.EditIPropertyDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Редактировать iProperty" Width="420" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FAFAFA" Height="285">

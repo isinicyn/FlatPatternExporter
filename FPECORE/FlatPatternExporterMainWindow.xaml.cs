@@ -40,9 +40,9 @@ using Size = System.Windows.Size;
 using Style = System.Windows.Style;
 using TextBox = System.Windows.Controls.TextBox;
 
-namespace FPECORE;
+namespace FlatPatternExporter;
 
-public partial class MainWindow : Window
+public partial class FlatPatternExporterMainWindow : Window
 {
     private bool _hasMissingReferences = false;
     private const string PlaceholderText = "Поиск...";
@@ -72,7 +72,7 @@ public partial class MainWindow : Window
     private List<PartData> _conflictingParts = new(); // Список конфликтующих файлов
     private Dictionary<string, List<(string PartNumber, string FileName)>> _conflictFileDetails = new();
 
-    public MainWindow()
+    public FlatPatternExporterMainWindow()
     {
         InitializeComponent();
         InitializeInventor();

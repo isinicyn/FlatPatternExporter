@@ -6,7 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using MessageBox = System.Windows.MessageBox;
 
-namespace FPECORE;
+namespace FlatPatternExporter;
 
 public partial class ConflictDetailsWindow
 {

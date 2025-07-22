@@ -4,7 +4,7 @@
     xmlns:av="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-    mc:Ignorable="av" x:Class="FPECORE.SelectIPropertyWindow"
+    mc:Ignorable="av" x:Class="FlatPatternExporter.SelectIPropertyWindow"
     Title="Customization" Width="230" Background="#FAFAFA" 
     WindowStyle="None" ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"

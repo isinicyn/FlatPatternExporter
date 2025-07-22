@@ -4,14 +4,14 @@ using System.Reflection;
 using System.Windows;
 using Clipboard = System.Windows.Clipboard;
 
-namespace FPECORE
+namespace FlatPatternExporter
 {
     public partial class AboutWindow : Window
     {
-        private readonly MainWindow _mainWindow; // Ссылка на главное окно
+        private readonly FlatPatternExporterMainWindow _mainWindow; // Ссылка на главное окно
 
         // Конструктор, принимающий ссылку на главное окно
-        public AboutWindow(MainWindow mainWindow)
+        public AboutWindow(FlatPatternExporterMainWindow mainWindow)
         {
             InitializeComponent();
             _mainWindow = mainWindow; // Сохраняем ссылку на главное окно

@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace FPECORE;
+namespace FlatPatternExporter;
 
 public partial class EditIPropertyDialog
 {

@@ -9,7 +9,13 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>FPExport.ico</ApplicationIcon>	
   
-  <StartupObject>FPECORE.App</StartupObject>
+    <StartupObject>FlatPatternExporter.App</StartupObject>
+    
+    <!-- Метаданные приложения -->
+    <AssemblyTitle>FlatPatternExporter</AssemblyTitle>
+    <AssemblyDescription>Приложение для экспорта разверток деталей из листового металла из Autodesk Inventor</AssemblyDescription>
+    <AssemblyProduct>FlatPatternExporter</AssemblyProduct>
+    <AssemblyCopyright>Copyright © 2024</AssemblyCopyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

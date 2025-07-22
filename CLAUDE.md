@@ -19,16 +19,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Сборка проекта
 ```bash
 # Собрать решение
-dotnet build FPECORE.sln --configuration Release
+dotnet build FlatPatternExporter.sln --configuration Release
 
 # Собрать конкретную конфигурацию для x64
-dotnet build FPECORE.sln --configuration Release --arch x64
+dotnet build FlatPatternExporter.sln --configuration Release --arch x64
 ```
 
 ### Запуск приложения
 ```bash
 # Запустить в режиме отладки
-dotnet run --project FPECORE\FPECore.csproj
+dotnet run --project FPECORE\FlatPatternExporter.csproj
 ```
 
 ## Архитектура
@@ -41,7 +41,7 @@ dotnet run --project FPECORE\FPECore.csproj
 ### Ключевые компоненты
 
 **Основные окна**:
-- `FPECMainWindow` - Главное окно приложения для экспорта разверток со встроенным функционалом управления слоями
+- `FlatPatternExporterMainWindow` - Главное окно приложения для экспорта разверток со встроенным функционалом управления слоями
 - `ConflictDetailsWindow` - Окно деталей конфликтов
 - `AboutWindow` - Окно "О программе"
 

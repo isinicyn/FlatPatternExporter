@@ -1,7 +1,7 @@
-﻿<UserControl x:Class="FPECORE.LayerSettingControl"
+﻿<UserControl x:Class="FlatPatternExporter.LayerSettingControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FPECORE" HorizontalAlignment="Left">
+             xmlns:local="clr-namespace:FlatPatternExporter" HorizontalAlignment="Left">
     <UserControl.Resources>
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>

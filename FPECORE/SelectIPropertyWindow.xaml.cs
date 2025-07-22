@@ -14,16 +14,16 @@ using DragEventArgs = System.Windows.DragEventArgs;
 using ListBox = System.Windows.Controls.ListBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
-namespace FPECORE
+namespace FlatPatternExporter
 {
     public partial class SelectIPropertyWindow : Window
     {
         private bool _isMouseOverDataGrid; // Добавили переменную
-        private readonly MainWindow _mainWindow; // Поле для хранения ссылки на MainWindow
+        private readonly FlatPatternExporterMainWindow _mainWindow; // Поле для хранения ссылки на MainWindow
         private readonly ObservableCollection<PresetIProperty> _presetIProperties;
         private bool _isUpdatingAvailableProperties = false; // Flag to prevent premature closure
 
-        public SelectIPropertyWindow(ObservableCollection<PresetIProperty> presetIProperties, MainWindow mainWindow)
+        public SelectIPropertyWindow(ObservableCollection<PresetIProperty> presetIProperties, FlatPatternExporterMainWindow mainWindow)
         {
             InitializeComponent();
 
@@ -139,7 +139,7 @@ namespace FPECORE
                     AvailableProperties.Remove(selectedProperty);
 
                     // Обновляем отображение в DataGrid
-                    var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+                    var mainWindow = Application.Current.Windows.OfType<FlatPatternExporterMainWindow>().FirstOrDefault();
                     mainWindow?.AddIPropertyColumn(selectedProperty);
                 }
             }
