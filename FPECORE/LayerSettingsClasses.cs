@@ -119,12 +119,6 @@ namespace FPECORE
             }
         }
 
-        private static readonly char[] InvalidCharacters = new[] { '<', '>', '/', '\\', '\"', ':', ';', '?', '*', '|', ',', '=' };
-
-        private bool ContainsInvalidCharacters(string input)
-        {
-            return input.IndexOfAny(InvalidCharacters) >= 0;
-        }
 
         public string OriginalName { get; set; } // Оригинальное имя слоя, например, IV_BEND
 
