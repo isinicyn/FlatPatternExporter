@@ -27,7 +27,6 @@ using Application = Inventor.Application;
 using Binding = System.Windows.Data.Binding;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
-using Button = System.Windows.Controls.Button;
 using Color = System.Windows.Media.Color;
 using DragEventArgs = System.Windows.DragEventArgs;
 using File = System.IO.File;
@@ -40,7 +39,6 @@ using Path = System.IO.Path;
 using Size = System.Windows.Size;
 using Style = System.Windows.Style;
 using TextBox = System.Windows.Controls.TextBox;
-using TreeView = System.Windows.Controls.TreeView;
 
 namespace FPECORE;
 
