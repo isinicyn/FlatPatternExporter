@@ -28,7 +28,7 @@ dotnet build FlatPatternExporter.sln --configuration Release --arch x64
 ### Запуск приложения
 ```bash
 # Запустить в режиме отладки
-dotnet run --project FPECORE\FlatPatternExporter.csproj
+dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 ```
 
 ## Архитектура
