@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -258,9 +257,6 @@ public partial class FlatPatternExporterMainWindow : Window
         });
     }
 
-
-
-
     private void PartsDataGrid_DragOver(object sender, DragEventArgs e)
     {
         // Уведомляем SelectIPropertyWindow, что курсор находится над DataGrid
@@ -288,8 +284,6 @@ public partial class FlatPatternExporterMainWindow : Window
 
         // Если были созданы дополнительные потоки, убедитесь, что они завершены
     }
-
-
 
     private void AddPresetIPropertyButton_Click(object sender, RoutedEventArgs e)
     {
@@ -346,14 +340,11 @@ public partial class FlatPatternExporterMainWindow : Window
         _searchDelayTimer.Stop();
         _searchDelayTimer.Start();
     }
-
-
     private void SearchDelayTimer_Tick(object sender, EventArgs e)
     {
         _searchDelayTimer.Stop();
         _partsDataView.View.Refresh(); // Обновление фильтрации
     }
-
     private void PartsData_Filter(object sender, FilterEventArgs e)
     {
         if (e.Item is PartData partData)
@@ -480,12 +471,6 @@ public partial class FlatPatternExporterMainWindow : Window
         var selectIPropertyWindow =
             System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
         selectIPropertyWindow?.UpdateAvailableProperties();
-    }
-
-    private void AddPartData(PartData partData)
-    {
-        _partsData.Add(partData);
-        _partsDataView.View.Refresh(); // Обновляем фильтрацию и отображение
     }
 
     private void PartsDataGrid_ColumnReordering(object sender, DataGridColumnReorderingEventArgs e)
