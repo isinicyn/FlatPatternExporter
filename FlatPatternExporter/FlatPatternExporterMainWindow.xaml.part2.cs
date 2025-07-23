@@ -64,6 +64,11 @@ public partial class FlatPatternExporterMainWindow : Window
         if (IsColumnPresent("Длинна развертки")) partData.FlatPatternLength = GetProperty(propertySets["Design Tracking Properties"], "Flat Pattern Length");
         if (IsColumnPresent("Площадь развертки")) partData.FlatPatternArea = GetProperty(propertySets["Design Tracking Properties"], "Flat Pattern Area");
         if (IsColumnPresent("Отделка")) partData.Appearance = GetProperty(propertySets["Design Tracking Properties"], "Appearance");
+        
+        // Основные свойства всегда читаются для корректной работы приложения
+        partData.PartNumber = GetProperty(propertySets["Design Tracking Properties"], "Part Number");
+        partData.Description = GetProperty(propertySets["Design Tracking Properties"], "Description");
+        partData.Material = GetProperty(propertySets["Design Tracking Properties"], "Material");
     }
 
     private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, BOM bom, int itemNumber,
@@ -79,9 +84,6 @@ public partial class FlatPatternExporterMainWindow : Window
         // Создаем новый объект PartData и заполняем его основными свойствами
         var partData = new PartData
         {
-            PartNumber = await GetPropertyExpressionOrValueAsync(partDoc, "Part Number"),
-            Description = await GetPropertyExpressionOrValueAsync(partDoc, "Description"),
-            Material = GetMaterialForPart(partDoc),
             Thickness = GetThicknessForPart(partDoc).ToString("F1") + " мм", // Получаем толщину
             ModelState = partDoc.ModelStateName,
             OriginalQuantity = quantity,
@@ -811,7 +813,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 if (partDoc == null) throw new Exception("Файл детали не найден или не может быть открыт");
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
-                var material = GetMaterialForPart(partDoc);
+                var material = partData.Material;
                 var thickness = GetThicknessForPart(partDoc);
 
                 var materialDir = organizeByMaterial ? Path.Combine(targetDir, material) : targetDir;
@@ -1030,19 +1032,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         return null; // Возвращаем null, если документ не найден
     }
 
-    private string GetMaterialForPart(PartDocument partDoc)
-    {
-        try
-        {
-            return GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Material");
-        }
-        catch (Exception)
-        {
-            // Обработка ошибок получения материала
-        }
-
-        return "Ошибка получения имени";
-    }
 
     private double GetThicknessForPart(PartDocument partDoc)
     {
