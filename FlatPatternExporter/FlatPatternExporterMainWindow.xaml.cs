@@ -824,7 +824,8 @@ public partial class FlatPatternExporterMainWindow : Window
             InitializeInventor();
             if (_thisApplication == null)
             {
-                MessageBoxHelper.ShowInventorNotRunningError();
+                MessageBox.Show("Inventor не запущен. Пожалуйста, запустите Inventor и попробуйте снова.", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
         }
@@ -833,7 +834,8 @@ public partial class FlatPatternExporterMainWindow : Window
         Document? doc = _thisApplication.ActiveDocument;
         if (doc == null)
         {
-            MessageBoxHelper.ShowNoDocumentOpenWarning();
+            MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -957,7 +959,8 @@ public partial class FlatPatternExporterMainWindow : Window
 
         if (_isCancelled)
         {
-            MessageBoxHelper.ShowScanningCancelledInfo();
+            MessageBox.Show("Процесс сканирования был прерван.", "Информация", MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
         else if (_hasMissingReferences)
         {
@@ -1402,56 +1405,6 @@ public class HeaderAdorner : Adorner
     }
 }
 
-public static class MessageBoxHelper
-{
-    public static void ShowInventorNotRunningError()
-    {
-        MessageBox.Show("Inventor не запущен. Пожалуйста, запустите Inventor и попробуйте снова.", "Ошибка",
-            MessageBoxButton.OK, MessageBoxImage.Error);
-    }
-
-    public static void ShowNoDocumentOpenWarning()
-    {
-        MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",
-            MessageBoxButton.OK, MessageBoxImage.Warning);
-    }
-
-    public static void ShowScanningCancelledInfo()
-    {
-        MessageBox.Show("Процесс сканирования был прерван.", "Информация", MessageBoxButton.OK,
-            MessageBoxImage.Information);
-    }
-
-    public static void ShowExportCancelledInfo()
-    {
-        MessageBox.Show("Процесс экспорта был прерван.", "Информация", MessageBoxButton.OK,
-            MessageBoxImage.Information);
-    }
-
-    public static void ShowNoFlatPatternWarning()
-    {
-        MessageBox.Show("Выбранные файлы не содержат разверток.", "Информация", MessageBoxButton.OK,
-            MessageBoxImage.Warning);
-    }
-
-    public static void ShowExportCompletedInfo(int processedCount, int skippedCount, string elapsedTime)
-    {
-        MessageBox.Show(
-            $"Экспорт DXF завершен.\nВсего файлов обработано: {processedCount + skippedCount}\nПропущено (без разверток): {skippedCount}\nВсего экспортировано: {processedCount}\nВремя выполнения: {elapsedTime}",
-            "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-    }
-
-    public static void ShowErrorMessage(string message)
-    {
-        MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-    }
-
-    public static void ShowNotSheetMetalWarning()
-    {
-        MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK,
-            MessageBoxImage.Warning);
-    }
-}
 
 public class PresetIProperty
 {

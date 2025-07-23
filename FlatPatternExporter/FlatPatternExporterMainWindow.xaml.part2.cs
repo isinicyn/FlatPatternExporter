@@ -524,12 +524,15 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         if (isCancelled)
         {
             ProgressLabel.Text = $"Статус: Прервано ({elapsedTime})";
-            MessageBoxHelper.ShowExportCancelledInfo();
+            MessageBox.Show("Процесс экспорта был прерван.", "Информация", MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
         else
         {
             ProgressLabel.Text = $"Статус: Завершено ({elapsedTime})";
-            MessageBoxHelper.ShowExportCompletedInfo(processedCount, skippedCount, elapsedTime);
+            MessageBox.Show(
+                $"Экспорт DXF завершен.\nВсего файлов обработано: {processedCount + skippedCount}\nПропущено (без разверток): {skippedCount}\nВсего экспортировано: {processedCount}\nВремя выполнения: {elapsedTime}",
+                "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 
@@ -540,14 +543,16 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         if (_thisApplication == null)
         {
-            MessageBoxHelper.ShowInventorNotRunningError();
+            MessageBox.Show("Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.", "Ошибка",
+                MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
         Document doc = _thisApplication.ActiveDocument;
         if (doc == null)
         {
-            MessageBoxHelper.ShowNoDocumentOpenWarning();
+            MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -606,7 +611,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             }
             else
             {
-                MessageBoxHelper.ShowNotSheetMetalWarning();
+                MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
         }
 
@@ -632,7 +638,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         if (_thisApplication == null)
         {
-            MessageBoxHelper.ShowInventorNotRunningError();
+            MessageBox.Show("Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.", "Ошибка",
+                MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
@@ -641,7 +648,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         Document? doc = _thisApplication.ActiveDocument;
         if (doc == null)
         {
-            MessageBoxHelper.ShowNoDocumentOpenWarning();
+            MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -683,7 +691,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             if (partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
                 await ExportSinglePartDXF(partDoc, targetDir, multiplier, stopwatch);
             else
-                MessageBoxHelper.ShowNotSheetMetalWarning();
+                MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
         }
 
         ClearButton.IsEnabled = true;
@@ -714,7 +723,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         var itemsWithoutFlatPattern = selectedItems.Where(p => p.FlatPatternColor == Brushes.Red).ToList();
         if (itemsWithoutFlatPattern.Count == selectedItems.Count)
         {
-            MessageBoxHelper.ShowNoFlatPatternWarning();
+            MessageBox.Show("Выбранные файлы не содержат разверток.", "Информация", MessageBoxButton.OK,
+                MessageBoxImage.Warning);
             return;
         }
 
@@ -1463,7 +1473,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
         catch (Exception ex)
         {
-            MessageBoxHelper.ShowErrorMessage($"Ошибка при получении свойства {propertyName}: {ex.Message}");
+            MessageBox.Show($"Ошибка при получении свойства {propertyName}: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         return string.Empty;
