@@ -38,35 +38,79 @@
         </Border>
 
         <!-- Основное содержимое -->
-        <ListBox x:Name="IPropertyListBox" 
-                 Grid.Row="1"
-                 ItemsSource="{Binding Source={StaticResource SortedProperties}}" 
-                 SelectionMode="Single" 
-                 AllowDrop="True" 
-                 PreviewMouseMove="iPropertyListBox_PreviewMouseMove"
-                 Drop="iPropertyListBox_Drop"
-                 MouseDoubleClick="iPropertyListBox_MouseDoubleClick"
-                 Background="Transparent"
-                 BorderThickness="0.5,0.5,0.5,0.5" av:ItemsSource="{av:SampleData ItemCount=5}">
-            <ListBox.BorderBrush>
-                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
-            </ListBox.BorderBrush>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Border Background="#F0F0F0" 
-                            BorderBrush="#C0C0C0" 
-                            BorderThickness="1,1,1,1"
-                            Padding="2,2,2,2"
-                            SnapsToDevicePixels="True" Width="215" Margin="0,0,0,0" Height="22.5">
-                        <TextBlock Text="{Binding DisplayName}" 
-                                   FontWeight="Bold" 
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Left" 
-                                   Foreground="#333333"
-                                   FontSize="11" Margin="5,0,0,0"/>
-                    </Border>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="35"/>
+            </Grid.RowDefinitions>
+            
+            <ListBox x:Name="IPropertyListBox" 
+                     Grid.Row="0"
+                     ItemsSource="{Binding Source={StaticResource SortedProperties}}" 
+                     SelectionMode="Single" 
+                     AllowDrop="True" 
+                     PreviewMouseMove="iPropertyListBox_PreviewMouseMove"
+                     Drop="iPropertyListBox_Drop"
+                     MouseDoubleClick="iPropertyListBox_MouseDoubleClick"
+                     Background="Transparent"
+                     BorderThickness="0.5,0.5,0.5,0" av:ItemsSource="{av:SampleData ItemCount=5}">
+                <ListBox.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
+                </ListBox.BorderBrush>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="#F0F0F0" 
+                                BorderBrush="#C0C0C0" 
+                                BorderThickness="1,1,1,1"
+                                Padding="2,2,2,2"
+                                SnapsToDevicePixels="True" Width="215" Margin="0,0,0,0" Height="22.5">
+                            <TextBlock Text="{Binding DisplayName}" 
+                                       FontWeight="Bold" 
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Left" 
+                                       Foreground="#333333"
+                                       FontSize="11" Margin="5,0,0,0"/>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            
+            <!-- Поле для добавления custom property -->
+            <Border Grid.Row="1" Background="#F5F5F5" BorderThickness="0.5,0,0.5,0.5">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
+                </Border.BorderBrush>
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="30"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBox x:Name="CustomPropertyTextBox" 
+                             Grid.Column="0"
+                             Height="25"
+                             VerticalContentAlignment="Center"
+                             Background="White"
+                             BorderBrush="#C0C0C0"
+                             BorderThickness="1"
+                             Padding="5,0"
+                             TextChanged="CustomPropertyTextBox_TextChanged"/>
+                    
+                    <Button x:Name="AddCustomPropertyButton"
+                            Grid.Column="1"
+                            Content="+"
+                            Width="25"
+                            Height="25"
+                            Background="#4CAF50"
+                            Foreground="White"
+                            BorderBrush="#388E3C"
+                            BorderThickness="1"
+                            FontWeight="Bold"
+                            FontSize="14"
+                            IsEnabled="False"
+                            Click="AddCustomPropertyButton_Click"/>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

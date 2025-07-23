@@ -168,5 +168,57 @@ namespace FlatPatternExporter
                 this.DragMove();
             }
         }
+
+        private void CustomPropertyTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Активируем кнопку '+' только если текстовое поле не пустое
+            AddCustomPropertyButton.IsEnabled = !string.IsNullOrWhiteSpace(CustomPropertyTextBox.Text);
+        }
+
+        private async void AddCustomPropertyButton_Click(object sender, RoutedEventArgs e)
+        {
+            string customPropertyName = CustomPropertyTextBox.Text;
+            
+            if (!string.IsNullOrWhiteSpace(customPropertyName))
+            {
+                // Проверяем, не добавлено ли уже это свойство
+                if (_mainWindow._customPropertiesList.Contains(customPropertyName))
+                {
+                    System.Windows.MessageBox.Show($"Свойство '{customPropertyName}' уже добавлено.", "Предупреждение",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (_mainWindow.PartsDataGrid.Columns.Any(c => c.Header as string == customPropertyName))
+                {
+                    System.Windows.MessageBox.Show($"Столбец с именем '{customPropertyName}' уже существует.", "Предупреждение",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Добавляем в список custom properties
+                _mainWindow._customPropertiesList.Add(customPropertyName);
+
+                // Создаем колонку
+                _mainWindow.AddCustomIPropertyColumn(customPropertyName);
+
+                // Заполняем данные из Inventor
+                if (_mainWindow.BackgroundModeCheckBox.IsChecked == true)
+                    _mainWindow._thisApplication.UserInterfaceManager.UserInteractionDisabled = true;
+
+                try
+                {
+                    await _mainWindow.FillCustomPropertyAsync(customPropertyName);
+                }
+                finally
+                {
+                    if (_mainWindow.BackgroundModeCheckBox.IsChecked == true)
+                        _mainWindow._thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+                }
+
+                // Очищаем текстовое поле
+                CustomPropertyTextBox.Text = "";
+            }
+        }
     }
 }

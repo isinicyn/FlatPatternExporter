@@ -1332,46 +1332,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         EditIPropertyMenuItem.IsEnabled = PartsDataGrid.SelectedItems.Count == 1;
     }
 
-    private async void AddCustomIPropertyButton_Click(object sender, RoutedEventArgs e)
-    {
-        var inputDialog = new CustomIPropertyDialog();
-        if (inputDialog.ShowDialog() == true)
-        {
-            var customPropertyName = inputDialog.CustomPropertyName;
-
-            if (_customPropertiesList.Contains(customPropertyName))
-            {
-                MessageBox.Show($"Свойство '{customPropertyName}' уже добавлено.", "Предупреждение",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (PartsDataGrid.Columns.Any(c => c.Header as string == customPropertyName))
-            {
-                MessageBox.Show($"Столбец с именем '{customPropertyName}' уже существует.", "Предупреждение",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            _customPropertiesList.Add(customPropertyName);
-
-            AddCustomIPropertyColumn(customPropertyName);
-
-            if (BackgroundModeCheckBox.IsChecked == true)
-                _thisApplication.UserInterfaceManager.UserInteractionDisabled = true;
-
-            try
-            {
-                await FillCustomPropertyAsync(customPropertyName);
-            }
-            finally
-            {
-                if (BackgroundModeCheckBox.IsChecked == true)
-                    _thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
-            }
-        }
-    }
-    private async Task FillCustomPropertyAsync(string customPropertyName)
+    public async Task FillCustomPropertyAsync(string customPropertyName)
     {
         foreach (var partData in _partsData)
         {
@@ -1401,7 +1362,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         PartsDataGrid.Items.Refresh();
     }
 
-    private void AddCustomIPropertyColumn(string propertyName)
+    public void AddCustomIPropertyColumn(string propertyName)
     {
         // Проверяем, существует ли уже колонка с таким именем или заголовком
         if (PartsDataGrid.Columns.Any(c => c.Header as string == propertyName))

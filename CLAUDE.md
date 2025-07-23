@@ -46,9 +46,8 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `AboutWindow` - Окно "О программе"
 
 **Диалоги управления свойствами**:
-- `CustomIPropertyDialog` - Диалог пользовательских свойств
 - `EditIPropertyDialog` - Диалог редактирования свойств
-- `SelectIPropertyWindow` - Окно выбора свойств
+- `SelectIPropertyWindow` - Окно выбора свойств с интегрированным функционалом добавления пользовательских свойств
 - `OverrideQuantityDialog` - Диалог переопределения количества
 
 **Компоненты LayerSettings** (интегрированы):
@@ -81,6 +80,11 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Генерирует настраиваемые строки экспорта для DXF
 - Анализирует конфликты обозначений деталей
 - Поддерживает пакетный экспорт с миниатюрами разверток
+
+### Управление пользовательскими свойствами (Custom iProperties)
+- Добавление пользовательских свойств через текстовое поле в окне выбора свойств
+- Автоматическое заполнение данных из "Inventor User Defined Properties"
+- Поддержка фонового режима обработки
 
 ## Заметки по разработке
 

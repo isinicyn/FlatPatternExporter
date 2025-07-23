@@ -48,7 +48,7 @@ public partial class FlatPatternExporterMainWindow : Window
     private DataGridColumn _reorderingColumn;
     private string _actualSearchText = string.Empty; // Поле для хранения фактического текста поиска
 
-    private readonly List<string> _customPropertiesList = new();
+    public readonly List<string> _customPropertiesList = new();
     private string _fixedFolderPath = string.Empty;
     private bool _isCancelled;
     private bool _isCtrlPressed;
@@ -62,7 +62,7 @@ public partial class FlatPatternExporterMainWindow : Window
     private readonly ObservableCollection<PartData> _partsData = new();
     private readonly CollectionViewSource _partsDataView;
     private readonly DispatcherTimer _searchDelayTimer;
-    private Application _thisApplication;
+    public Application _thisApplication;
     private List<PartData> _conflictingParts = new(); // Список конфликтующих файлов
     private Dictionary<string, List<(string PartNumber, string FileName)>> _conflictFileDetails = new();
 
