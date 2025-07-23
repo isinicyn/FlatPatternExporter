@@ -121,7 +121,8 @@
               Drop="partsDataGrid_Drop" 
               AllowDrop="True"
               RowHeaderWidth="0"
-              LoadingRow="partsDataGrid_LoadingRow">
+              LoadingRow="partsDataGrid_LoadingRow"
+              ContextMenuOpening="partsDataGrid_ContextMenuOpening">
 
             <!-- Контекстное меню -->
             <DataGrid.ContextMenu>
@@ -201,6 +202,7 @@
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                     <Setter Property="BorderBrush" Value="#FFE0DDDD"/>
                     <Setter Property="BorderThickness" Value="0,0,1,0"/>
+                    <Setter Property="ContextMenu" Value="{x:Null}"/>
                 </Style>
 
                 <!-- Стиль для заголовка строки (кнопка выделения всей строки) -->
@@ -209,6 +211,7 @@
                     <Setter Property="BorderBrush" Value="#FFE0DDDD"/>
                     <Setter Property="BorderThickness" Value="0,0,1,1"/>
                     <Setter Property="Width" Value="15"/>
+                    <Setter Property="ContextMenu" Value="{x:Null}"/>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="DataGridRowHeader">

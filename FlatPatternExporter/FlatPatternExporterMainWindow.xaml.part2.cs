@@ -1409,8 +1409,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description", editDialog.Description);
 
                 // Сохраняем изменения и закрываем документ
-                partDoc.Save();
-                // partDoc.Close(); // Можно закрыть документ, если он не нужен больше открыт
+                partDoc.Save2();
 
                 // Обновляем свойства детали в таблице
                 selectedItem.PartNumber = editDialog.PartNumber;
