@@ -1034,7 +1034,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         try
         {
-            return partDoc.ComponentDefinition.Material.Name;
+            return GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Material");
         }
         catch (Exception)
         {
