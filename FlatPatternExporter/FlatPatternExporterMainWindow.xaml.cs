@@ -73,7 +73,6 @@ public partial class FlatPatternExporterMainWindow : Window
         MultiplierTextBox.IsEnabled = IncludeQuantityInFileNameCheckBox.IsChecked == true;
         UpdateFileCountLabel(0);
         ClearButton.IsEnabled = false;
-        PartsDataGrid.PreviewMouseDown += PartsDataGrid_PreviewMouseDown;
         PartsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
         PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
@@ -501,52 +500,6 @@ public partial class FlatPatternExporterMainWindow : Window
 
         // Изначально размещаем Adorner там, где находится заголовок
         UpdateAdornerPosition(e);
-    }
-
-    private void PartsDataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed)
-        {
-            // Определяем, кликнул ли пользователь на заголовке колонки
-            var header = e.OriginalSource as FrameworkElement;
-            if (header?.Parent is DataGridColumnHeader columnHeader)
-                // Начинаем перетаскивание
-                StartColumnReordering(columnHeader.Column);
-        }
-    }
-
-    private void StartColumnReordering(DataGridColumn column)
-    {
-        _reorderingColumn = column;
-        _isColumnDraggedOutside = false;
-
-        // Создаем фантомный заголовок с фиксированным размером
-        var header = new TextBlock
-        {
-            Text = _reorderingColumn.Header.ToString(),
-            Background = Brushes.LightGray,
-            FontSize = 12, // Установите желаемый размер шрифта
-            Padding = new Thickness(5),
-            Opacity = 0.7, // Полупрозрачность
-            TextAlignment = TextAlignment.Center,
-            Width = _reorderingColumn.ActualWidth,
-            Height = 30,
-            VerticalAlignment = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            IsHitTestVisible = false
-        };
-
-        // Создаем и добавляем Adorner
-        _adornerLayer = AdornerLayer.GetAdornerLayer(PartsDataGrid);
-        _headerAdorner = new HeaderAdorner(PartsDataGrid, header);
-        _adornerLayer.Add(_headerAdorner);
-
-        // Изначально размещаем Adorner там, где находится заголовок
-        var position = Mouse.GetPosition(PartsDataGrid);
-        _headerAdorner.RenderTransform = new TranslateTransform(
-            position.X - _headerAdorner.DesiredSize.Width / 2,
-            position.Y - _headerAdorner.DesiredSize.Height / 2
-        );
     }
 
     private void PartsDataGrid_PreviewMouseMove(object sender, MouseEventArgs e)
