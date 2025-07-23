@@ -872,8 +872,7 @@ public partial class FlatPatternExporterMainWindow : Window
             else if (BomRadioButton.IsChecked == true)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
             partCount = sheetMetalParts.Count;
-            partNumber = GetProperty(asmDoc.PropertySets["Design Tracking Properties"], "Part Number");
-            description = GetProperty(asmDoc.PropertySets["Design Tracking Properties"], "Description");
+            (partNumber, description) = GetDocumentProperties((Document)asmDoc);
             modelStateInfo = asmDoc.ComponentDefinition.BOM.BOMViews[1].ModelStateMemberName;
 
             var itemCounter = 1;
@@ -902,8 +901,7 @@ public partial class FlatPatternExporterMainWindow : Window
             if (partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
             {
                 partCount = 1;
-                partNumber = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number");
-                description = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description");
+                (partNumber, description) = GetDocumentProperties((Document)partDoc);
 
                 var partData = await GetPartDataAsync(partNumber, 1, null, 1, partDoc);
                 if (partData != null)
@@ -1157,6 +1155,13 @@ public partial class FlatPatternExporterMainWindow : Window
     {
         SubfolderNameTextBox.IsEnabled = false;
         SubfolderNameTextBox.Text = string.Empty;
+    }
+
+    private (string partNumber, string description) GetDocumentProperties(Document document)
+    {
+        var partNumber = GetProperty(document.PropertySets["Design Tracking Properties"], "Part Number");
+        var description = GetProperty(document.PropertySets["Design Tracking Properties"], "Description");
+        return (partNumber, description);
     }
 
     private string GetProperty(PropertySet propertySet, string propertyName)
