@@ -477,20 +477,12 @@ public partial class FlatPatternExporterMainWindow : Window
         _reorderingColumn = e.Column;
         _isColumnDraggedOutside = false;
 
-        // Создаем фантомный заголовок с фиксированным размером
+        // Создаем фантомный заголовок используя стиль из XAML
         var header = new TextBlock
         {
             Text = _reorderingColumn.Header.ToString(),
-            Background = Brushes.LightGray,
-            FontSize = 12, // Установите желаемый размер шрифта
-            Padding = new Thickness(5),
-            Opacity = 0.7, // Полупрозрачность
-            TextAlignment = TextAlignment.Center,
             Width = _reorderingColumn.ActualWidth,
-            Height = 30,
-            VerticalAlignment = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            IsHitTestVisible = false
+            Style = (Style)FindResource("PhantomColumnHeaderStyle")
         };
 
         // Создаем и добавляем Adorner
@@ -530,24 +522,15 @@ public partial class FlatPatternExporterMainWindow : Window
     {
         if (_headerAdorner != null && _headerAdorner.Child is TextBlock textBlock)
         {
-            textBlock.Background = color;
-
             if (color == Brushes.Red)
             {
                 textBlock.Text = $"❎ {_reorderingColumn.Header}";
-                textBlock.Foreground = Brushes.White; // Белый текст на красном фоне
-                textBlock.FontWeight = FontWeights.Bold; // Жирный шрифт для улучшенной видимости
-                textBlock.Padding = new Thickness(5); // Дополнительное внутреннее пространство
-                textBlock.TextAlignment = TextAlignment.Center; // Центрирование текста
-                textBlock.VerticalAlignment = VerticalAlignment.Center;
-                textBlock.HorizontalAlignment = HorizontalAlignment.Center;
+                textBlock.Style = (Style)FindResource("PhantomColumnHeaderDeleteStyle");
             }
             else
             {
                 textBlock.Text = _reorderingColumn.Header.ToString();
-                textBlock.Foreground = Brushes.Black; // Черный текст на сером фоне
-                textBlock.FontWeight = FontWeights.Normal;
-                textBlock.Padding = new Thickness(5);
+                textBlock.Style = (Style)FindResource("PhantomColumnHeaderStyle");
             }
 
             // Убираем фиксированные размеры и устанавливаем авторазмеры

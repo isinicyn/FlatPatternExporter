@@ -7,6 +7,30 @@
         MinHeight="850" MinWidth="1410"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Height="850">
 
+    <Window.Resources>
+        <!-- Стиль для фантомного заголовка колонки при перетаскивании -->
+        <Style x:Key="PhantomColumnHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Opacity" Value="0.7"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Setter Property="Background" Value="LightGray"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+        </Style>
+        
+        <!-- Стиль для фантомного заголовка в режиме удаления -->
+        <Style x:Key="PhantomColumnHeaderDeleteStyle" TargetType="TextBlock" BasedOn="{StaticResource PhantomColumnHeaderStyle}">
+            <Setter Property="Background" Value="Red"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
