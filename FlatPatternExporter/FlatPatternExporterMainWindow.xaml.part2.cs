@@ -156,44 +156,18 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private string GetModelStateName(PartDocument partDoc)
+    private string GetModelStateName(Document doc)
     {
         try
         {
-            var modelStates = partDoc.ComponentDefinition.ModelStates;
-            if (modelStates.Count > 0)
-            {
-                var activeStateName = modelStates.ActiveModelState.Name;
-                return activeStateName;
-            }
+            return doc.ModelStateName ?? "Ошибка получения имени";
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Ошибка при получении Model State: {ex.Message}", "Ошибка", MessageBoxButton.OK,
                 MessageBoxImage.Error);
+            return "Ошибка получения имени";
         }
-
-        return "Ошибка получения имени";
-    }
-
-    private string GetModelStateName(AssemblyDocument asmDoc)
-    {
-        try
-        {
-            var modelStates = asmDoc.ComponentDefinition.ModelStates;
-            if (modelStates.Count > 0)
-            {
-                var activeStateName = modelStates.ActiveModelState.Name;
-                return activeStateName;
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Ошибка при получении Model State: {ex.Message}", "Ошибка", MessageBoxButton.OK,
-                MessageBoxImage.Error);
-        }
-
-        return "Ошибка получения имени";
     }
 
     private async Task<BitmapImage> GetThumbnailAsync(PartDocument document)
@@ -1188,9 +1162,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
-        var modelStateInfo = doc is PartDocument partDoc ? GetModelStateName(partDoc) :
-            doc is AssemblyDocument asmDoc ? GetModelStateName(asmDoc) :
-            "Ошибка получения имени";
+        var modelStateInfo = GetModelStateName(doc);
 
         DocumentInfoLabel.Text = $"Тип документа: {documentType}\nОбозначение: {partNumber}\nОписание: {description}";
 
