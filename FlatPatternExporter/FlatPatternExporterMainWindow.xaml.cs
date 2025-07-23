@@ -41,7 +41,6 @@ namespace FlatPatternExporter;
 public partial class FlatPatternExporterMainWindow : Window
 {
     private bool _hasMissingReferences = false;
-    private const string PlaceholderText = "Поиск...";
     private AdornerLayer _adornerLayer;
     private HeaderAdorner _headerAdorner;
     private bool _isColumnDraggedOutside;
@@ -109,9 +108,6 @@ public partial class FlatPatternExporterMainWindow : Window
         };
         _searchDelayTimer.Tick += SearchDelayTimer_Tick;
 
-        // Установка начального текста для searchTextBox
-        SearchTextBox.Text = PlaceholderText;
-        SearchTextBox.Foreground = Brushes.Gray;
 
         // Инициализируем настройки слоев
         LayerSettings = LayerSettingsHelper.InitializeLayerSettings();
@@ -332,23 +328,14 @@ public partial class FlatPatternExporterMainWindow : Window
 
     private void ClearSearchButton_Click(object sender, RoutedEventArgs e)
     {
-        // Очищаем текстовое поле и восстанавливаем PlaceholderText
+        // Очищаем текстовое поле
         SearchTextBox.Text = string.Empty;
-        SearchTextBox.Text = PlaceholderText;
-        SearchTextBox.Foreground = Brushes.Gray;
         ClearSearchButton.Visibility = Visibility.Collapsed;
-        SearchTextBox.CaretIndex = 0; // Перемещаем курсор в начало
+        SearchTextBox.Focus(); // Устанавливаем фокус на поле поиска
     }
 
     private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (SearchTextBox.Text == PlaceholderText)
-        {
-            _actualSearchText = string.Empty;
-            ClearSearchButton.Visibility = Visibility.Collapsed;
-            return;
-        }
-
         _actualSearchText = SearchTextBox.Text.Trim().ToLower();
 
         // Показываем или скрываем кнопку очистки в зависимости от наличия текста
@@ -360,25 +347,6 @@ public partial class FlatPatternExporterMainWindow : Window
         _searchDelayTimer.Start();
     }
 
-    private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
-    {
-        if (SearchTextBox.Text == PlaceholderText)
-        {
-            SearchTextBox.Text = string.Empty;
-            SearchTextBox.Foreground = Brushes.Black;
-        }
-    }
-
-    private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(SearchTextBox.Text))
-        {
-            SearchTextBox.Text = PlaceholderText;
-            SearchTextBox.Foreground = Brushes.Gray;
-            _actualSearchText = string.Empty; // Очищаем фактический текст поиска
-            ClearSearchButton.Visibility = Visibility.Collapsed; // Скрываем кнопку очистки
-        }
-    }
 
     private void SearchDelayTimer_Tick(object sender, EventArgs e)
     {

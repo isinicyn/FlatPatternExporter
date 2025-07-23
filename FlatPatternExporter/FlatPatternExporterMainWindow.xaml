@@ -51,8 +51,43 @@
                          VerticalContentAlignment="Center"
                          Padding="5,0,30,0"
                          TextChanged="SearchTextBox_TextChanged"
-                         GotFocus="SearchTextBox_GotFocus"
-                         LostFocus="SearchTextBox_LostFocus" VerticalAlignment="Center" Height="20"/>
+                         VerticalAlignment="Center" Height="20">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="TextBox">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                                    <Grid>
+                                                        <ScrollViewer x:Name="PART_ContentHost" 
+                                                                      VerticalAlignment="Center" 
+                                                                      Margin="{TemplateBinding Padding}"/>
+                                                        <TextBlock Text="Поиск..." 
+                                                                   Foreground="Gray" 
+                                                                   VerticalAlignment="Center" 
+                                                                   Margin="{TemplateBinding Padding}"
+                                                                   IsHitTestVisible="False">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" Value="">
+                                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
                         <Button x:Name="ClearSearchButton" 
                         Content="✖"
                         Width="20"
