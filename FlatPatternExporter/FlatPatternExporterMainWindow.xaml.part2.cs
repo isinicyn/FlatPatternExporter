@@ -636,8 +636,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
-        var isBackgroundMode = BackgroundModeCheckBox.IsChecked == true;
-        if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = true;
+        SetInventorUserInterfaceState(true);
 
         Document? doc = _thisApplication.ActiveDocument;
         if (doc == null)
@@ -656,7 +655,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch))
         {
-            if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+            SetInventorUserInterfaceState(false);
             return;
         }
 
@@ -690,7 +689,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ClearButton.IsEnabled = true;
         ScanButton.IsEnabled = true;
 
-        if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+        SetInventorUserInterfaceState(false);
 
         ExportButton.IsEnabled = true;
     }
@@ -1342,8 +1341,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
             PartsDataGrid.Items.Refresh();
 
-            if (BackgroundModeCheckBox.IsChecked == true)
-                await Task.Delay(50);
+            await Task.Delay(50);
         }
     }
     private void RemoveCustomIPropertyColumn(string propertyName)

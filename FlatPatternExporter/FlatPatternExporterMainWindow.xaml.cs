@@ -203,6 +203,18 @@ public partial class FlatPatternExporterMainWindow : Window
 
         return informationalVersion ?? "Версия неизвестна";
     }
+
+    /// <summary>
+    /// Централизованный метод для управления интерфейсом Inventor
+    /// </summary>
+    /// <param name="disableInteraction">true - отключить взаимодействие с пользователем, false - включить</param>
+    public void SetInventorUserInterfaceState(bool disableInteraction)
+    {
+        if (_thisApplication?.UserInterfaceManager != null)
+        {
+            _thisApplication.UserInterfaceManager.UserInteractionDisabled = disableInteraction;
+        }
+    }
     public bool IsColumnPresent(string columnName)
     {
         var result = false;
@@ -857,8 +869,7 @@ public partial class FlatPatternExporterMainWindow : Window
             return;
         }
 
-        var isBackgroundMode = BackgroundModeCheckBox.IsChecked == true;
-        if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = true;
+        SetInventorUserInterfaceState(true);
 
         ModelStateInfoRunBottom.Text = string.Empty;
 
@@ -974,7 +985,7 @@ public partial class FlatPatternExporterMainWindow : Window
         ClearButton.IsEnabled = _partsData.Count > 0;
         _lastScannedDocument = _isCancelled ? null : doc;
 
-        if (isBackgroundMode) _thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+        SetInventorUserInterfaceState(false);
 
         if (_isCancelled)
         {

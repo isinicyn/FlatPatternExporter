@@ -443,8 +443,6 @@
                             <CheckBox x:Name="IncludeQuantityInFileNameCheckBox" Content="Записать количество в имя файла" Margin="0,0,0,5"
                                 Checked="IncludeQuantityInFileNameCheckBox_CheckedChanged"
                                 Unchecked="IncludeQuantityInFileNameCheckBox_CheckedChanged"/>
-                            <CheckBox x:Name="BackgroundModeCheckBox" Content="Фоновый режим" Margin="0,0,0,5" IsChecked="True"
-                            ToolTip="Если включено, Inventor будет работать в фоновом режиме, ускоряя загрузку и выгрузку данных."/>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Header="Настройки экспорта DXF" Margin="254,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="140">

@@ -203,8 +203,7 @@ namespace FlatPatternExporter
                 _mainWindow.AddCustomIPropertyColumn(customPropertyName);
 
                 // Заполняем данные из Inventor
-                if (_mainWindow.BackgroundModeCheckBox.IsChecked == true)
-                    _mainWindow._thisApplication.UserInterfaceManager.UserInteractionDisabled = true;
+                _mainWindow.SetInventorUserInterfaceState(true);
 
                 try
                 {
@@ -212,8 +211,7 @@ namespace FlatPatternExporter
                 }
                 finally
                 {
-                    if (_mainWindow.BackgroundModeCheckBox.IsChecked == true)
-                        _mainWindow._thisApplication.UserInterfaceManager.UserInteractionDisabled = false;
+                    _mainWindow.SetInventorUserInterfaceState(false);
                 }
 
                 // Очищаем текстовое поле
