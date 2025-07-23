@@ -80,9 +80,7 @@ public partial class FlatPatternExporterMainWindow : Window
         var partData = new PartData
         {
             PartNumber = await GetPropertyExpressionOrValueAsync(partDoc, "Part Number"),
-            PartNumberExpression = await GetPropertyExpressionOrValueAsync(partDoc, "Part Number", true),
             Description = await GetPropertyExpressionOrValueAsync(partDoc, "Description"),
-            DescriptionExpression = await GetPropertyExpressionOrValueAsync(partDoc, "Description", true),
             Material = GetMaterialForPart(partDoc),
             Thickness = GetThicknessForPart(partDoc).ToString("F1") + " мм", // Получаем толщину
             ModelState = partDoc.ModelStateName,
@@ -92,14 +90,12 @@ public partial class FlatPatternExporterMainWindow : Window
             Item = itemNumber
         };
 
-        // Получаем выражения и значения для пользовательских свойств
+        // Получаем значения для пользовательских свойств
         foreach (var customProperty in _customPropertiesList)
         {
             // Асинхронно получаем значения пользовательских свойств
             partData.CustomProperties[customProperty] =
                 await GetPropertyExpressionOrValueAsync(partDoc, customProperty);
-            partData.CustomPropertyExpressions[customProperty] =
-                await GetPropertyExpressionOrValueAsync(partDoc, customProperty, true);
         }
 
         // Асинхронно получаем превью-изображение (если доступно)
@@ -624,28 +620,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ExportButton.IsEnabled = false;
     }
 
-    private void ResetEditMode()
-    {
-        // Сбрасываем режим редактирования
-        if (_isEditing)
-        {
-            _isEditing = false; // Отключаем режим редактирования
-            PartsDataGrid.IsReadOnly = true; // Делаем таблицу нередактируемой
-            EditButton.Content = "Редактировать"; // Меняем текст кнопки на "Редактировать"
-            SaveButton.IsEnabled = false; // Деактивируем кнопку сохранения
-
-            // Обновляем IsReadOnly для каждого элемента данных
-            foreach (var item in
-                     _partsData) item.IsReadOnly = true; // Устанавливаем флаг, что элемент теперь нередактируемый
-
-            // Обновляем отображение таблицы
-            PartsDataGrid.Items.Refresh(); // Обновляем интерфейс, чтобы стиль ячеек обновился
-        }
-    }
 
     private async void ExportButton_Click(object sender, RoutedEventArgs e)
     {
-        ResetEditMode(); // Сброс режима редактирования перед экспортом
 
         if (_isCtrlPressed)
         {
@@ -1244,8 +1221,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ConflictFilesButton.IsEnabled = false;
         _conflictFileDetails.Clear(); // Очищаем список с конфликтами (или используем нужную коллекцию)
 
-        // Обновляем состояние кнопки после очистки данных
-        UpdateEditButtonState();
     }
 
     private void partsDataGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -1400,9 +1375,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         foreach (var partData in _partsData)
         {
-            var (value, expression) = await Task.Run(() => GetCustomIPropertyValue(partData.PartNumber, customPropertyName));
+            var value = await Task.Run(() => GetCustomIPropertyValue(partData.PartNumber, customPropertyName));
 
-            partData.AddCustomProperty(customPropertyName, value, expression);
+            partData.AddCustomProperty(customPropertyName, value);
 
             PartsDataGrid.Items.Refresh();
 
@@ -1507,7 +1482,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
     }
 
-    private (string Value, string Expression) GetCustomIPropertyValue(string partNumber, string propertyName)
+    private string GetCustomIPropertyValue(string partNumber, string propertyName)
     {
         try
         {
@@ -1519,30 +1494,21 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 if (propertySet[propertyName] is Property property)
                 {
                     string value = property.Value?.ToString() ?? string.Empty;
-                    string expression = string.Empty;
-                    try
-                    {
-                        expression = property.Expression;
-                    }
-                    catch
-                    {
-                        // Если выражение недоступно, оставляем его пустым
-                    }
-                    return (value, expression);
+                    return value;
                 }
             }
         }
         catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
         {
-            // Ловим ошибку и возвращаем пустые строки
-            return (string.Empty, string.Empty);
+            // Ловим ошибку и возвращаем пустую строку
+            return string.Empty;
         }
         catch (Exception ex)
         {
             MessageBoxHelper.ShowErrorMessage($"Ошибка при получении свойства {propertyName}: {ex.Message}");
         }
 
-        return (string.Empty, string.Empty);
+        return string.Empty;
     }
     private void AboutButton_Click(object sender, RoutedEventArgs e)
     {

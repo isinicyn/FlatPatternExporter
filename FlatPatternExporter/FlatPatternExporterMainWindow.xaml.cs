@@ -52,7 +52,6 @@ public partial class FlatPatternExporterMainWindow : Window
     private string _fixedFolderPath = string.Empty;
     private bool _isCancelled;
     private bool _isCtrlPressed;
-    private bool _isEditing;
     private bool _isScanning;
     private bool _excludeReferenceParts = true;
     private bool _excludePurchasedParts = true;
@@ -60,7 +59,6 @@ public partial class FlatPatternExporterMainWindow : Window
     private List<string> _libraryPaths = new List<string>();
     private int _itemCounter = 1; // Инициализация счетчика пунктов
     private Document? _lastScannedDocument;
-    private List<PartData> _originalPartsData = new(); // Для хранения исходного состояния
     private readonly ObservableCollection<PartData> _partsData = new();
     private readonly CollectionViewSource _partsDataView;
     private readonly DispatcherTimer _searchDelayTimer;
@@ -102,10 +100,7 @@ public partial class FlatPatternExporterMainWindow : Window
         // Устанавливаем ItemsSource для DataGrid
         PartsDataGrid.ItemsSource = _partsDataView.View;
 
-        // Подписываемся на событие изменения коллекции
-        _partsData.CollectionChanged += PartsData_CollectionChanged;
 
-        UpdateEditButtonState(); // Обновляем состояние кнопки после загрузки данных
 
         // Настраиваем таймер для задержки поиска
         _searchDelayTimer = new DispatcherTimer
@@ -232,8 +227,7 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private async Task<string> GetPropertyExpressionOrValueAsync(PartDocument partDoc, string propertyName,
-        bool getExpression = false)
+    private async Task<string> GetPropertyExpressionOrValueAsync(PartDocument partDoc, string propertyName)
     {
         return await Task.Run(() =>
         {
@@ -244,205 +238,20 @@ public partial class FlatPatternExporterMainWindow : Window
                 foreach (Property prop in propSet)
                     if (prop.Name == propertyName)
                     {
-                        if (getExpression)
-                            // Попытка получить выражение
-                            try
-                            {
-                                var expression = prop.Expression;
-                                if (!string.IsNullOrEmpty(expression)) return expression; // Возвращаем выражение
-                            }
-                            catch (Exception)
-                            {
-                                // Если нет выражения, вернем значение
-                                return prop.Value?.ToString() ?? string.Empty;
-                            }
-
                         return prop.Value?.ToString() ?? string.Empty;
                     }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка при получении выражения или значения для {propertyName}: {ex.Message}");
+                Debug.WriteLine($"Ошибка при получении значения для {propertyName}: {ex.Message}");
             }
 
             return string.Empty;
         });
     }
 
-    private async void EditButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_isEditing)
-        {
-            // Отключаем режим редактирования
-            _isEditing = false;
-            PartsDataGrid.IsReadOnly = true;
-            EditButton.Content = "Редактировать";
-            SaveButton.IsEnabled = false;
-            ExportButton.IsEnabled = true; // Разблокируем кнопку экспорта
 
-            // Восстанавливаем исходное состояние данных
-            for (var i = 0; i < _partsData.Count; i++)
-            {
-                var currentItem = _partsData[i];
-                var originalItem = _originalPartsData[i];
 
-                currentItem.PartNumber = originalItem.PartNumber; // Восстанавливаем значение
-                currentItem.OriginalPartNumber =
-                    originalItem.OriginalPartNumber; // Восстанавливаем оригинальный PartNumber
-                currentItem.Description = originalItem.Description; // Восстанавливаем значение
-
-                // Восстанавливаем кастомные свойства
-                foreach (var key in currentItem.CustomProperties.Keys.ToList())
-                    currentItem.CustomProperties[key] = originalItem.CustomProperties.ContainsKey(key)
-                        ? originalItem.CustomProperties[key]
-                        : currentItem.CustomProperties[key];
-
-                // Восстанавливаем флаги
-                currentItem.IsModified = originalItem.IsModified;
-                currentItem.IsReadOnly = originalItem.IsReadOnly;
-            }
-
-            PartsDataGrid.Items.Refresh(); // Обновляем таблицу
-        }
-        else
-        {
-            // Включаем режим редактирования
-            _isEditing = true;
-            PartsDataGrid.IsReadOnly = false;
-            EditButton.Content = "Отмена";
-            SaveButton.IsEnabled = true;
-            ExportButton.IsEnabled = false; // Блокируем кнопку экспорта в режиме редактирования
-
-            // Сохраняем исходное состояние данных
-            _originalPartsData = _partsData.Select(item => new PartData
-            {
-                PartNumber = item.PartNumber,
-                OriginalPartNumber = item.OriginalPartNumber, // Сохраняем оригинальный PartNumber
-                PartNumberExpression = item.PartNumberExpression,
-                Description = item.Description,
-                DescriptionExpression = item.DescriptionExpression,
-                CustomProperties = new Dictionary<string, string>(item.CustomProperties),
-                CustomPropertyExpressions = new Dictionary<string, string>(item.CustomPropertyExpressions),
-                IsModified = item.IsModified, // Сохраняем состояние флага
-                IsReadOnly = item.IsReadOnly // Сохраняем состояние флага
-            }).ToList();
-
-            // Разрешаем редактирование и сбрасываем флаг изменений
-            foreach (var item in _partsData)
-            {
-                item.IsModified = false; // Обнуляем флаг изменений
-                item.OriginalPartNumber = item.PartNumber; // Сохраняем оригинальный PartNumber перед редактированием
-                item.IsReadOnly = false; // Разрешаем редактирование
-            }
-
-            // Если чекбокс активен, отображаем выражения
-            if (ExpressionsCheckBox.IsChecked == true)
-                foreach (var item in _partsData)
-                {
-                    item.PartNumber = item.PartNumberExpression; // Показываем выражение
-                    item.Description = item.DescriptionExpression; // Показываем выражение
-
-                    foreach (var customProperty in item.CustomProperties.Keys.ToList())
-                        // Проверяем наличие ключа перед доступом к выражению
-                        if (item.CustomPropertyExpressions.ContainsKey(customProperty))
-                            item.CustomProperties[customProperty] =
-                                item.CustomPropertyExpressions[customProperty]; // Показываем выражение
-                        else
-                            item.CustomProperties[customProperty] =
-                                item.CustomProperties[customProperty]; // Оставляем значение
-                }
-
-            PartsDataGrid.Items.Refresh(); // Обновляем таблицу
-        }
-
-        UpdateEditButtonState();
-    }
-
-    private void ExpressionsCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
-    {
-        if (_isEditing)
-        {
-            if (ExpressionsCheckBox.IsChecked == true)
-            {
-                foreach (var item in _partsData)
-                {
-                    item.SetPartNumberWithoutModification(item.PartNumberExpression);
-                    item.SetDescriptionWithoutModification(item.DescriptionExpression);
-
-                    foreach (var customProperty in item.CustomProperties.Keys.ToList())
-                    {
-                        if (item.CustomPropertyExpressions.ContainsKey(customProperty))
-                            item.SetCustomPropertyWithoutModification(customProperty, item.CustomPropertyExpressions[customProperty]);
-                    }
-                }
-            }
-            else
-            {
-                foreach (var item in _partsData)
-                {
-                    item.SetPartNumberWithoutModification(item.PartNumber);
-                    item.SetDescriptionWithoutModification(item.Description);
-
-                    foreach (var customProperty in item.CustomProperties.Keys.ToList())
-                    {
-                        item.SetCustomPropertyWithoutModification(customProperty, item.CustomProperties[customProperty]);
-                    }
-                }
-            }
-
-            PartsDataGrid.Items.Refresh();
-        }
-    }
-    private async void SaveButton_Click(object sender, RoutedEventArgs e)
-    {
-        _isEditing = false;
-        PartsDataGrid.IsReadOnly = true;
-        EditButton.Content = "Редактировать";
-        SaveButton.IsEnabled = false;
-
-        foreach (var item in _partsData)
-        {
-            if (item.IsModified) // Сохраняем только изменённые элементы
-                await SaveIPropertyChangesAsync(item);
-
-            // После успешного сохранения сбрасываем флаг IsModified и делаем строки только для чтения
-            item.IsModified = false;
-            item.IsReadOnly = true;
-        }
-
-        _originalPartsData.Clear(); // Очищаем сохранённые оригинальные данные
-        PartsDataGrid.Items.Refresh();
-
-        // Восстанавливаем состояние кнопки
-        UpdateEditButtonState();
-    }
-
-    private async Task SaveIPropertyChangesAsync(PartData item)
-    {
-        try
-        {
-            var partDoc = OpenPartDocument(item.OriginalPartNumber);
-            if (partDoc != null)
-            {
-                SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number", item.PartNumber);
-                SetProperty(partDoc.PropertySets["Design Tracking Properties"], "Description", item.Description);
-
-                await Task.Run(() =>
-                {
-                    partDoc.Save2();
-                    partDoc.Close();
-                });
-
-                // После успешного сохранения сбрасываем флаг
-                item.IsModified = false;
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK,
-                MessageBoxImage.Error);
-        }
-    }
 
     private void PartsDataGrid_DragOver(object sender, DragEventArgs e)
     {
@@ -472,25 +281,7 @@ public partial class FlatPatternExporterMainWindow : Window
         // Если были созданы дополнительные потоки, убедитесь, что они завершены
     }
 
-    private void PartsData_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-    {
-        UpdateEditButtonState(); // Обновляем состояние кнопки при изменении данных
-    }
 
-    private void UpdateEditButtonState()
-    {
-        // Если данные в таблице присутствуют, и не активирован режим редактирования
-        if (_partsData != null && _partsData.Count > 0)
-        {
-            EditButton.IsEnabled = true; // Кнопка "Редактировать/Отмена" всегда активна, если есть данные
-            SaveButton.IsEnabled = _isEditing; // Кнопка "Сохранить" активна только в режиме редактирования
-        }
-        else
-        {
-            EditButton.IsEnabled = false; // Деактивируем кнопку, если данных нет
-            SaveButton.IsEnabled = false; // Деактивируем кнопку сохранения, если данных нет
-        }
-    }
 
     private void AddPresetIPropertyButton_Click(object sender, RoutedEventArgs e)
     {
@@ -715,9 +506,6 @@ public partial class FlatPatternExporterMainWindow : Window
     {
         _partsData.Add(partData);
         _partsDataView.View.Refresh(); // Обновляем фильтрацию и отображение
-
-        // Обновляем состояние кнопки после добавления данных
-        UpdateEditButtonState();
     }
 
     private void PartsDataGrid_ColumnReordering(object sender, DataGridColumnReorderingEventArgs e)
@@ -1050,7 +838,6 @@ public partial class FlatPatternExporterMainWindow : Window
 
     private async void ScanButton_Click(object sender, RoutedEventArgs e)
     {
-        ResetEditMode(); // Сброс режима редактирования перед сканированием
 
         if (_thisApplication == null)
         {
@@ -1106,7 +893,6 @@ public partial class FlatPatternExporterMainWindow : Window
 
         _partsData.Clear();
         _itemCounter = 1;
-        UpdateEditButtonState(); // Обновляем состояние кнопки редактирования после очистки данных
 
         var progress = new Progress<PartData>(partData =>
         {
@@ -1431,11 +1217,8 @@ public class PartData : INotifyPropertyChanged
     // Пользовательские iProperty
     private Dictionary<string, string> customProperties = new();
     private string description;
-    private bool isModified; // Флаг для отслеживания изменений
-    private bool isReadOnly = true;
     private int item;
     private string material;
-    private string originalPartNumber; // Хранит оригинальный PartNumber
     private string partNumber;
     private int quantity;
     private Brush quantityColor;
@@ -1474,9 +1257,6 @@ public class PartData : INotifyPropertyChanged
     public string FlatPatternArea { get; set; }
     public string Appearance { get; set; }
 
-    // Выражения (если они есть)
-    public string PartNumberExpression { get; set; }
-    public string DescriptionExpression { get; set; }
 
     public Dictionary<string, string> CustomProperties
     {
@@ -1488,8 +1268,6 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    // Выражения для пользовательских iProperty
-    public Dictionary<string, string> CustomPropertyExpressions { get; set; } = new();
 
     // Порядковый номер элемента
     public int Item
@@ -1511,21 +1289,11 @@ public class PartData : INotifyPropertyChanged
             if (partNumber != value)
             {
                 partNumber = value;
-                IsModified = true; // Устанавливаем флаг изменений при изменении
                 OnPropertyChanged();
             }
         }
     }
 
-    public string OriginalPartNumber
-    {
-        get => originalPartNumber;
-        set
-        {
-            originalPartNumber = value;
-            OnPropertyChanged();
-        }
-    }
 
     public string ModelState { get; set; }
 
@@ -1537,7 +1305,6 @@ public class PartData : INotifyPropertyChanged
             if (description != value)
             {
                 description = value;
-                IsModified = true; // Устанавливаем флаг изменений при изменении
                 OnPropertyChanged();
             }
         }
@@ -1549,7 +1316,6 @@ public class PartData : INotifyPropertyChanged
         set
         {
             material = value;
-            IsModified = true; // Устанавливаем флаг изменений при изменении
             OnPropertyChanged();
         }
     }
@@ -1560,7 +1326,6 @@ public class PartData : INotifyPropertyChanged
         set
         {
             thickness = value;
-            IsModified = true; // Устанавливаем флаг изменений при изменении
             OnPropertyChanged();
         }
     }
@@ -1573,7 +1338,6 @@ public class PartData : INotifyPropertyChanged
         set
         {
             quantity = value;
-            IsModified = true; // Устанавливаем флаг изменений при изменении
             OnPropertyChanged();
         }
     }
@@ -1594,33 +1358,7 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    // Свойство для контроля редактируемости
-    public bool IsReadOnly
-    {
-        get => isReadOnly;
-        set
-        {
-            if (isReadOnly != value)
-            {
-                isReadOnly = value;
-                OnPropertyChanged();
-            }
-        }
-    }
 
-    // Флаг для отслеживания изменений
-    public bool IsModified
-    {
-        get => isModified;
-        set
-        {
-            if (isModified != value)
-            {
-                isModified = value;
-                OnPropertyChanged();
-            }
-        }
-    }
 
     // Флаг переопределения
     public bool IsOverridden { get; set; }
@@ -1634,67 +1372,24 @@ public class PartData : INotifyPropertyChanged
     }
 
     // Методы для работы с пользовательскими свойствами
-    public void AddCustomProperty(string propertyName, string propertyValue, string expressionValue)
+    public void AddCustomProperty(string propertyName, string propertyValue)
     {
         if (CustomProperties.ContainsKey(propertyName))
             CustomProperties[propertyName] = propertyValue;
         else
             CustomProperties.Add(propertyName, propertyValue);
 
-        if (CustomPropertyExpressions.ContainsKey(propertyName))
-            CustomPropertyExpressions[propertyName] = expressionValue;
-        else
-            CustomPropertyExpressions.Add(propertyName, expressionValue);
-
-        IsModified = true;
         OnPropertyChanged(nameof(CustomProperties));
-        OnPropertyChanged(nameof(CustomPropertyExpressions));
     }
     public void RemoveCustomProperty(string propertyName)
     {
         if (customProperties.ContainsKey(propertyName))
         {
             customProperties.Remove(propertyName);
-            IsModified = true; // Устанавливаем флаг изменений
             OnPropertyChanged(nameof(CustomProperties));
         }
     }
 
-    // Методы для установки значений без модификации флага IsModified
-    public void SetPartNumberWithoutModification(string value)
-    {
-        if (partNumber != value)
-        {
-            partNumber = value;
-            OnPropertyChanged(nameof(PartNumber));
-        }
-    }
-
-    public void SetDescriptionWithoutModification(string value)
-    {
-        if (description != value)
-        {
-            description = value;
-            OnPropertyChanged(nameof(Description));
-        }
-    }
-
-    public void SetCustomPropertyWithoutModification(string propertyName, string value)
-    {
-        if (CustomProperties.ContainsKey(propertyName))
-        {
-            if (CustomProperties[propertyName] != value)
-            {
-                CustomProperties[propertyName] = value;
-                OnPropertyChanged(nameof(CustomProperties));
-            }
-        }
-        else
-        {
-            CustomProperties.Add(propertyName, value);
-            OnPropertyChanged(nameof(CustomProperties));
-        }
-    }
 }
 
 public class HeaderAdorner : Adorner
