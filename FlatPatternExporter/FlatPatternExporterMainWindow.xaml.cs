@@ -735,12 +735,6 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private double GetColumnStartX(DataGrid dataGrid, int columnIndex)
-    {
-        double startX = 0;
-        for (var i = 0; i < columnIndex; i++) startX += dataGrid.Columns[i].ActualWidth;
-        return startX;
-    }
 
     private void EnableSplineReplacementCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
     {
