@@ -442,7 +442,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 }
             };
             // Устанавливаем привязку данных для колонки изображения
-            (column as DataGridTemplateColumn).CellTemplate.VisualTree.SetBinding(Image.SourceProperty,
+            (column as DataGridTemplateColumn)?.CellTemplate?.VisualTree?.SetBinding(Image.SourceProperty,
                 new Binding(iProperty.InventorPropertyName));
         }
         else
@@ -524,12 +524,12 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             if (color == Brushes.Red)
             {
-                textBlock.Text = $"❎ {_reorderingColumn.Header}";
+                textBlock.Text = $"❎ {_reorderingColumn?.Header}";
                 textBlock.Style = (Style)FindResource("PhantomColumnHeaderDeleteStyle");
             }
             else
             {
-                textBlock.Text = _reorderingColumn.Header.ToString();
+                textBlock.Text = _reorderingColumn?.Header?.ToString() ?? string.Empty;
                 textBlock.Style = (Style)FindResource("PhantomColumnHeaderStyle");
             }
 
@@ -707,7 +707,9 @@ public partial class FlatPatternExporterMainWindow : Window
     private void MultiplierTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
         // Проверяем текущий текст вместе с новым вводом
-        var newText = (sender as TextBox).Text.Insert((sender as TextBox).CaretIndex, e.Text);
+        var textBox = sender as TextBox;
+        if (textBox == null) return;
+        var newText = textBox.Text.Insert(textBox.CaretIndex, e.Text);
 
         // Проверяем, является ли текст положительным числом больше нуля
         e.Handled = !IsTextAllowed(newText);
@@ -920,17 +922,21 @@ public partial class FlatPatternExporterMainWindow : Window
     {
         var forbiddenChars = "\\/:*?\"<>|";
         var textBox = sender as TextBox;
-        var caretIndex = textBox.CaretIndex;
+        var caretIndex = textBox?.CaretIndex ?? 0;
 
-        foreach (var ch in forbiddenChars)
-            if (textBox.Text.Contains(ch))
-            {
-                textBox.Text = textBox.Text.Replace(ch.ToString(), string.Empty);
-                caretIndex--; // Уменьшаем позицию курсора на 1
-            }
+        if (textBox != null)
+        {
+            foreach (var ch in forbiddenChars)
+                if (textBox.Text.Contains(ch))
+                {
+                    textBox.Text = textBox.Text.Replace(ch.ToString(), string.Empty);
+                    caretIndex--; // Уменьшаем позицию курсора на 1
+                }
+        }
 
         // Возвращаем курсор на правильное место после удаления символов
-        textBox.CaretIndex = Math.Max(caretIndex, 0);
+        if (textBox != null)
+            textBox.CaretIndex = Math.Max(caretIndex, 0);
     }
     // Метод для получения и установки информации о проекте
     private void SetProjectFolderInfo()

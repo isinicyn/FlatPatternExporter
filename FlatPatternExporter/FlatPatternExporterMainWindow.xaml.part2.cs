@@ -503,7 +503,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     else if (ComponentFolderRadioButton.IsChecked == true)
     {
         // Папка компонента
-        targetDir = Path.GetDirectoryName(_thisApplication.ActiveDocument.FullFileName)!;
+        targetDir = Path.GetDirectoryName(_thisApplication?.ActiveDocument?.FullFileName) ?? string.Empty;
     }
     else if (FixedFolderRadioButton.IsChecked == true)
     {
@@ -519,7 +519,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         try
         {
-            targetDir = _thisApplication.DesignProjectManager.ActiveDesignProject.WorkspacePath;
+            targetDir = _thisApplication?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? string.Empty;
             if (string.IsNullOrEmpty(targetDir))
             {
                 MessageBox.Show("Не удалось получить путь проекта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -1089,7 +1089,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private PartDocument? OpenPartDocument(string partNumber)
     {
-        var docs = _thisApplication.Documents;
+        var docs = _thisApplication?.Documents;
+        if (docs == null) return null;
 
         // Попытка найти открытый документ
         foreach (Document doc in docs)
@@ -1339,7 +1340,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 try
                 {
                     // Открытие документа в Inventor
-                    _thisApplication.Documents.Open(fullPath);
+                    _thisApplication?.Documents?.Open(fullPath);
                 }
                 catch (Exception ex)
                 {
@@ -1354,7 +1355,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private string? GetPartDocumentFullPath(string partNumber)
     {
-        var docs = _thisApplication.Documents;
+        var docs = _thisApplication?.Documents;
+        if (docs == null) return null;
 
         // Попытка найти открытый документ
         foreach (Document doc in docs)
