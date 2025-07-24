@@ -136,7 +136,7 @@ public partial class FlatPatternExporterMainWindow : Window
         if (IsColumnPresent("Отделка")) partData.Appearance = GetProperty(designTrackingProps, "Appearance");
     }
 
-    private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, BOM bom, int itemNumber,
+    private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, BOM? bom, int itemNumber,
         PartDocument? partDoc = null)
     {
         // Открываем документ, если он не передан

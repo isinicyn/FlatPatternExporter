@@ -37,10 +37,10 @@ namespace FlatPatternExporter;
 public partial class FlatPatternExporterMainWindow : Window
 {
     private bool _hasMissingReferences = false;
-    private AdornerLayer _adornerLayer;
-    private HeaderAdorner _headerAdorner;
+    private AdornerLayer? _adornerLayer;
+    private HeaderAdorner? _headerAdorner;
     private bool _isColumnDraggedOutside;
-    private DataGridColumn _reorderingColumn;
+    private DataGridColumn? _reorderingColumn;
     private string _actualSearchText = string.Empty; // Поле для хранения фактического текста поиска
 
     public readonly List<string> _customPropertiesList = new();
@@ -57,7 +57,7 @@ public partial class FlatPatternExporterMainWindow : Window
     private readonly ObservableCollection<PartData> _partsData = new();
     private readonly CollectionViewSource _partsDataView;
     private readonly DispatcherTimer _searchDelayTimer;
-    public Application _thisApplication;
+    public Application? _thisApplication;
     private List<PartData> _conflictingParts = new(); // Список конфликтующих файлов
     private Dictionary<string, List<(string PartNumber, string FileName)>> _conflictFileDetails = new();
     private readonly ConcurrentDictionary<string, List<(string PartNumber, string FileName)>> _partNumberTracker = new(); // Для отслеживания конфликтов во время сканирования
@@ -552,6 +552,7 @@ public partial class FlatPatternExporterMainWindow : Window
         if (_reorderingColumn != null && _isColumnDraggedOutside)
         {
             var columnName = _reorderingColumn.Header.ToString();
+            if (string.IsNullOrEmpty(columnName)) return;
 
             // Убираем колонку из DataGrid
             var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == columnName);
@@ -586,7 +587,7 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private void UpdateAdornerPosition(DataGridColumnReorderingEventArgs e)
+    private void UpdateAdornerPosition(DataGridColumnReorderingEventArgs? e)
     {
         if (_headerAdorner == null)
             return;
@@ -1051,7 +1052,7 @@ public partial class FlatPatternExporterMainWindow : Window
         try
         {
             var property = propertySet[propertyName];
-            return property.Value.ToString();
+            return property.Value.ToString() ?? string.Empty;
         }
         catch (Exception)
         {
