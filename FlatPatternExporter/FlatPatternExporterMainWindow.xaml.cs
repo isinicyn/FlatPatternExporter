@@ -1075,52 +1075,52 @@ public class PartData : INotifyPropertyChanged
     
     // === КАТЕГОРИЯ 2: СВОЙСТВА ДОКУМЕНТА (НЕ IPROPERTY) ===
     // Базовые свойства файла документа, считываемые напрямую из API Inventor
-    public string FileName { get; set; } // Path.GetFileNameWithoutExtension()
-    public string FullFileName { get; set; } // partDoc.FullFileName
-    public string ModelState { get; set; } // partDoc.ModelStateName
-    private string thickness; // SheetMetalComponentDefinition.Thickness
-    public BitmapImage Preview { get; set; } // apprenticeDoc.Thumbnail
-    public Brush FlatPatternColor { get; set; } // smCompDef.HasFlatPattern
+    public string FileName { get; set; } = string.Empty; // Path.GetFileNameWithoutExtension()
+    public string FullFileName { get; set; } = string.Empty; // partDoc.FullFileName
+    public string ModelState { get; set; } = string.Empty; // partDoc.ModelStateName
+    private string thickness = string.Empty; // SheetMetalComponentDefinition.Thickness
+    public BitmapImage? Preview { get; set; } // apprenticeDoc.Thumbnail
+    public Brush FlatPatternColor { get; set; } = Brushes.Transparent; // smCompDef.HasFlatPattern
     
     // === КАТЕГОРИЯ 3: ОСНОВНЫЕ IPROPERTIES ===
     // Ключевые iProperty из "Design Tracking Properties", всегда необходимые
-    private string partNumber;
-    private string description;
-    private string material;
+    private string partNumber = string.Empty;
+    private string description = string.Empty;
+    private string material = string.Empty;
     
     // === КАТЕГОРИЯ 4: РАСШИРЕННЫЕ IPROPERTIES ===
     // Опциональные iProperty из различных наборов свойств
-    public string Author { get; set; }
-    public string Revision { get; set; }
-    public string Project { get; set; }
-    public string StockNumber { get; set; }
-    public string Title { get; set; }
-    public string Subject { get; set; }
-    public string Keywords { get; set; }
-    public string Comments { get; set; }
-    public string Category { get; set; }
-    public string Manager { get; set; }
-    public string Company { get; set; }
-    public string CreationTime { get; set; }
-    public string CostCenter { get; set; }
-    public string CheckedBy { get; set; }
-    public string EngApprovedBy { get; set; }
-    public string UserStatus { get; set; }
-    public string CatalogWebLink { get; set; }
-    public string Vendor { get; set; }
-    public string MfgApprovedBy { get; set; }
-    public string DesignStatus { get; set; }
-    public string Designer { get; set; }
-    public string Engineer { get; set; }
-    public string Authority { get; set; }
-    public string Mass { get; set; }
-    public string SurfaceArea { get; set; }
-    public string Volume { get; set; }
-    public string SheetMetalRule { get; set; }
-    public string FlatPatternWidth { get; set; }
-    public string FlatPatternLength { get; set; }
-    public string FlatPatternArea { get; set; }
-    public string Appearance { get; set; }
+    public string Author { get; set; } = string.Empty;
+    public string Revision { get; set; } = string.Empty;
+    public string Project { get; set; } = string.Empty;
+    public string StockNumber { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Subject { get; set; } = string.Empty;
+    public string Keywords { get; set; } = string.Empty;
+    public string Comments { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
+    public string Manager { get; set; } = string.Empty;
+    public string Company { get; set; } = string.Empty;
+    public string CreationTime { get; set; } = string.Empty;
+    public string CostCenter { get; set; } = string.Empty;
+    public string CheckedBy { get; set; } = string.Empty;
+    public string EngApprovedBy { get; set; } = string.Empty;
+    public string UserStatus { get; set; } = string.Empty;
+    public string CatalogWebLink { get; set; } = string.Empty;
+    public string Vendor { get; set; } = string.Empty;
+    public string MfgApprovedBy { get; set; } = string.Empty;
+    public string DesignStatus { get; set; } = string.Empty;
+    public string Designer { get; set; } = string.Empty;
+    public string Engineer { get; set; } = string.Empty;
+    public string Authority { get; set; } = string.Empty;
+    public string Mass { get; set; } = string.Empty;
+    public string SurfaceArea { get; set; } = string.Empty;
+    public string Volume { get; set; } = string.Empty;
+    public string SheetMetalRule { get; set; } = string.Empty;
+    public string FlatPatternWidth { get; set; } = string.Empty;
+    public string FlatPatternLength { get; set; } = string.Empty;
+    public string FlatPatternArea { get; set; } = string.Empty;
+    public string Appearance { get; set; } = string.Empty;
     
     // === КАТЕГОРИЯ 5: ПОЛЬЗОВАТЕЛЬСКИЕ IPROPERTIES ===
     // Динамически добавляемые пользователем свойства из "Inventor User Defined Properties"
@@ -1135,7 +1135,7 @@ public class PartData : INotifyPropertyChanged
     
     // === КАТЕГОРИЯ 7: СВОЙСТВА СОСТОЯНИЯ ОБРАБОТКИ ===
     // Свойства, устанавливаемые во время экспорта и обработки
-    public BitmapImage DxfPreview { get; set; } // Миниатюра развертки (генерируется)
+    public BitmapImage? DxfPreview { get; set; } // Миниатюра развертки (генерируется)
     public Brush ProcessingColor { get; set; } = Brushes.Transparent; // Индикатор состояния экспорта
 
     // === СВОЙСТВА С УВЕДОМЛЕНИЯМИ ===
