@@ -55,7 +55,7 @@ namespace FlatPatternExporter
         public List<PresetIProperty> SelectedProperties { get; }
 
         // Обработчик события изменения коллекции AvailableProperties
-        private void AvailableProperties_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void AvailableProperties_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (!_isUpdatingAvailableProperties && AvailableProperties.Count == 0)
             {
@@ -65,7 +65,7 @@ namespace FlatPatternExporter
         }
 
         // Обработчик события изменения коллекции PresetIProperties
-        private void PresetIProperties_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void PresetIProperties_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // Обновляем список AvailableProperties при изменении коллекции PresetIProperties
             UpdateAvailableProperties();
