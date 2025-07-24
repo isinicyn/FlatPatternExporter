@@ -142,6 +142,7 @@
               HorizontalGridLinesBrush="#EAEAEA"
               VerticalGridLinesBrush="#EAEAEA"
               SelectionMode="Extended"
+              SelectionChanged="partsDataGrid_SelectionChanged"
               Drop="partsDataGrid_Drop" 
               AllowDrop="True"
               RowHeaderWidth="0"
