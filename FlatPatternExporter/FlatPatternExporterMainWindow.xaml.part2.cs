@@ -21,54 +21,119 @@ namespace FlatPatternExporter;
 
 public partial class FlatPatternExporterMainWindow : Window
 {
-    private void ReadIPropertyValuesFromPart(PartDocument partDoc, PartData partData)
+    /// <summary>
+    /// Общий метод для чтения всех свойств из документа
+    /// </summary>
+    private void ReadAllPropertiesFromPart(PartDocument partDoc, PartData partData)
+    {
+        // КАТЕГОРИЯ 2: Свойства документа (не iProperty)
+        ReadDocumentProperties(partDoc, partData);
+        
+        // КАТЕГОРИЯ 3: Основные iProperty (всегда нужны)
+        ReadCoreIProperties(partDoc, partData);
+        
+        // КАТЕГОРИЯ 4: Расширенные iProperty (опционально)
+        ReadExtendedIProperties(partDoc, partData);
+    }
+    
+    /// <summary>
+    /// КАТЕГОРИЯ 2: Чтение свойств документа (не iProperty)
+    /// </summary>
+    private void ReadDocumentProperties(PartDocument partDoc, PartData partData)
+    {
+        partData.FullFileName = partDoc.FullFileName;
+        partData.FileName = Path.GetFileNameWithoutExtension(partDoc.FullFileName);
+        partData.ModelState = partDoc.ModelStateName;
+        partData.Thickness = GetThicknessForPart(partDoc).ToString("F1") + " мм";
+    }
+    
+    /// <summary>
+    /// КАТЕГОРИЯ 3: Основные iProperty из "Design Tracking Properties"
+    /// Эти свойства всегда необходимы для корректной работы приложения
+    /// </summary>
+    private void ReadCoreIProperties(PartDocument partDoc, PartData partData)
+    {
+        var designTrackingProps = partDoc.PropertySets["Design Tracking Properties"];
+        
+        partData.PartNumber = GetProperty(designTrackingProps, "Part Number");
+        partData.Description = GetProperty(designTrackingProps, "Description");
+        partData.Material = GetProperty(designTrackingProps, "Material");
+    }
+    
+    /// <summary>
+    /// КАТЕГОРИЯ 4: Расширенные iProperty
+    /// Читаются только если соответствующие колонки присутствуют в таблице
+    /// </summary>
+    private void ReadExtendedIProperties(PartDocument partDoc, PartData partData)
     {
         var propertySets = partDoc.PropertySets;
-        // Считывание имени файла и полного пути
-        partData.FullFileName = partDoc.FullFileName; // Полное имя файла с путем
-        partData.FileName = Path.GetFileNameWithoutExtension(partDoc.FullFileName); // Имя файла без расширения
-
-        // Набор свойств: Summary Information
-        if (IsColumnPresent("Автор")) partData.Author = GetProperty(propertySets["Summary Information"], "Author");
-        if (IsColumnPresent("Ревизия")) partData.Revision = GetProperty(propertySets["Summary Information"], "Revision Number");
-        if (IsColumnPresent("Название")) partData.Title = GetProperty(propertySets["Summary Information"], "Title");
-        if (IsColumnPresent("Тема")) partData.Subject = GetProperty(propertySets["Summary Information"], "Subject");
-        if (IsColumnPresent("Ключевые слова")) partData.Keywords = GetProperty(propertySets["Summary Information"], "Keywords");
-        if (IsColumnPresent("Примечание")) partData.Comments = GetProperty(propertySets["Summary Information"], "Comments");
-
-        // Набор свойств: Document Summary Information
-        if (IsColumnPresent("Категория")) partData.Category = GetProperty(propertySets["Document Summary Information"], "Category");
-        if (IsColumnPresent("Менеджер")) partData.Manager = GetProperty(propertySets["Document Summary Information"], "Manager");
-        if (IsColumnPresent("Компания")) partData.Company = GetProperty(propertySets["Document Summary Information"], "Company");
-
-        // Набор свойств: Design Tracking Properties
-        if (IsColumnPresent("Проект")) partData.Project = GetProperty(propertySets["Design Tracking Properties"], "Project");
-        if (IsColumnPresent("Инвентарный номер")) partData.StockNumber = GetProperty(propertySets["Design Tracking Properties"], "Stock Number");
-        if (IsColumnPresent("Время создания")) partData.CreationTime = GetProperty(propertySets["Design Tracking Properties"], "Creation Time");
-        if (IsColumnPresent("Сметчик")) partData.CostCenter = GetProperty(propertySets["Design Tracking Properties"], "Cost Center");
-        if (IsColumnPresent("Проверил")) partData.CheckedBy = GetProperty(propertySets["Design Tracking Properties"], "Checked By");
-        if (IsColumnPresent("Нормоконтроль")) partData.EngApprovedBy = GetProperty(propertySets["Design Tracking Properties"], "Engr Approved By");
-        if (IsColumnPresent("Статус")) partData.UserStatus = GetProperty(propertySets["Design Tracking Properties"], "User Status");
-        if (IsColumnPresent("Веб-ссылка")) partData.CatalogWebLink = GetProperty(propertySets["Design Tracking Properties"], "Catalog Web Link");
-        if (IsColumnPresent("Поставщик")) partData.Vendor = GetProperty(propertySets["Design Tracking Properties"], "Vendor");
-        if (IsColumnPresent("Утвердил")) partData.MfgApprovedBy = GetProperty(propertySets["Design Tracking Properties"], "Mfg Approved By");
-        if (IsColumnPresent("Статус разработки")) partData.DesignStatus = GetProperty(propertySets["Design Tracking Properties"], "Design Status");
-        if (IsColumnPresent("Проектировщик")) partData.Designer = GetProperty(propertySets["Design Tracking Properties"], "Designer");
-        if (IsColumnPresent("Инженер")) partData.Engineer = GetProperty(propertySets["Design Tracking Properties"], "Engineer");
-        if (IsColumnPresent("Нач. отдела")) partData.Authority = GetProperty(propertySets["Design Tracking Properties"], "Authority");
-        if (IsColumnPresent("Масса")) partData.Mass = GetProperty(propertySets["Design Tracking Properties"], "Mass");
-        if (IsColumnPresent("Площадь поверхности")) partData.SurfaceArea = GetProperty(propertySets["Design Tracking Properties"], "SurfaceArea");
-        if (IsColumnPresent("Объем")) partData.Volume = GetProperty(propertySets["Design Tracking Properties"], "Volume");
-        if (IsColumnPresent("Правило ЛМ")) partData.SheetMetalRule = GetProperty(propertySets["Design Tracking Properties"], "Sheet Metal Rule");
-        if (IsColumnPresent("Ширина развертки")) partData.FlatPatternWidth = GetProperty(propertySets["Design Tracking Properties"], "Flat Pattern Width");
-        if (IsColumnPresent("Длинна развертки")) partData.FlatPatternLength = GetProperty(propertySets["Design Tracking Properties"], "Flat Pattern Length");
-        if (IsColumnPresent("Площадь развертки")) partData.FlatPatternArea = GetProperty(propertySets["Design Tracking Properties"], "Flat Pattern Area");
-        if (IsColumnPresent("Отделка")) partData.Appearance = GetProperty(propertySets["Design Tracking Properties"], "Appearance");
         
-        // Основные свойства всегда читаются для корректной работы приложения
-        partData.PartNumber = GetProperty(propertySets["Design Tracking Properties"], "Part Number");
-        partData.Description = GetProperty(propertySets["Design Tracking Properties"], "Description");
-        partData.Material = GetProperty(propertySets["Design Tracking Properties"], "Material");
+        // Summary Information
+        ReadSummaryInformation(propertySets, partData);
+        
+        // Document Summary Information  
+        ReadDocumentSummaryInformation(propertySets, partData);
+        
+        // Design Tracking Properties (расширенные)
+        ReadExtendedDesignTrackingProperties(propertySets, partData);
+    }
+    
+    /// <summary>
+    /// Чтение свойств из "Summary Information"
+    /// </summary>
+    private void ReadSummaryInformation(PropertySets propertySets, PartData partData)
+    {
+        var summaryInfo = propertySets["Summary Information"];
+        
+        if (IsColumnPresent("Автор")) partData.Author = GetProperty(summaryInfo, "Author");
+        if (IsColumnPresent("Ревизия")) partData.Revision = GetProperty(summaryInfo, "Revision Number");
+        if (IsColumnPresent("Название")) partData.Title = GetProperty(summaryInfo, "Title");
+        if (IsColumnPresent("Тема")) partData.Subject = GetProperty(summaryInfo, "Subject");
+        if (IsColumnPresent("Ключевые слова")) partData.Keywords = GetProperty(summaryInfo, "Keywords");
+        if (IsColumnPresent("Примечание")) partData.Comments = GetProperty(summaryInfo, "Comments");
+    }
+    
+    /// <summary>
+    /// Чтение свойств из "Document Summary Information"
+    /// </summary>
+    private void ReadDocumentSummaryInformation(PropertySets propertySets, PartData partData)
+    {
+        var docSummaryInfo = propertySets["Document Summary Information"];
+        
+        if (IsColumnPresent("Категория")) partData.Category = GetProperty(docSummaryInfo, "Category");
+        if (IsColumnPresent("Менеджер")) partData.Manager = GetProperty(docSummaryInfo, "Manager");
+        if (IsColumnPresent("Компания")) partData.Company = GetProperty(docSummaryInfo, "Company");
+    }
+    
+    /// <summary>
+    /// Чтение расширенных свойств из "Design Tracking Properties"
+    /// </summary>
+    private void ReadExtendedDesignTrackingProperties(PropertySets propertySets, PartData partData)
+    {
+        var designTrackingProps = propertySets["Design Tracking Properties"];
+        
+        if (IsColumnPresent("Проект")) partData.Project = GetProperty(designTrackingProps, "Project");
+        if (IsColumnPresent("Инвентарный номер")) partData.StockNumber = GetProperty(designTrackingProps, "Stock Number");
+        if (IsColumnPresent("Время создания")) partData.CreationTime = GetProperty(designTrackingProps, "Creation Time");
+        if (IsColumnPresent("Сметчик")) partData.CostCenter = GetProperty(designTrackingProps, "Cost Center");
+        if (IsColumnPresent("Проверил")) partData.CheckedBy = GetProperty(designTrackingProps, "Checked By");
+        if (IsColumnPresent("Нормоконтроль")) partData.EngApprovedBy = GetProperty(designTrackingProps, "Engr Approved By");
+        if (IsColumnPresent("Статус")) partData.UserStatus = GetProperty(designTrackingProps, "User Status");
+        if (IsColumnPresent("Веб-ссылка")) partData.CatalogWebLink = GetProperty(designTrackingProps, "Catalog Web Link");
+        if (IsColumnPresent("Поставщик")) partData.Vendor = GetProperty(designTrackingProps, "Vendor");
+        if (IsColumnPresent("Утвердил")) partData.MfgApprovedBy = GetProperty(designTrackingProps, "Mfg Approved By");
+        if (IsColumnPresent("Статус разработки")) partData.DesignStatus = GetProperty(designTrackingProps, "Design Status");
+        if (IsColumnPresent("Проектировщик")) partData.Designer = GetProperty(designTrackingProps, "Designer");
+        if (IsColumnPresent("Инженер")) partData.Engineer = GetProperty(designTrackingProps, "Engineer");
+        if (IsColumnPresent("Нач. отдела")) partData.Authority = GetProperty(designTrackingProps, "Authority");
+        if (IsColumnPresent("Масса")) partData.Mass = GetProperty(designTrackingProps, "Mass");
+        if (IsColumnPresent("Площадь поверхности")) partData.SurfaceArea = GetProperty(designTrackingProps, "SurfaceArea");
+        if (IsColumnPresent("Объем")) partData.Volume = GetProperty(designTrackingProps, "Volume");
+        if (IsColumnPresent("Правило ЛМ")) partData.SheetMetalRule = GetProperty(designTrackingProps, "Sheet Metal Rule");
+        if (IsColumnPresent("Ширина развертки")) partData.FlatPatternWidth = GetProperty(designTrackingProps, "Flat Pattern Width");
+        if (IsColumnPresent("Длинна развертки")) partData.FlatPatternLength = GetProperty(designTrackingProps, "Flat Pattern Length");
+        if (IsColumnPresent("Площадь развертки")) partData.FlatPatternArea = GetProperty(designTrackingProps, "Flat Pattern Area");
+        if (IsColumnPresent("Отделка")) partData.Appearance = GetProperty(designTrackingProps, "Appearance");
     }
 
     private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, BOM bom, int itemNumber,
@@ -81,35 +146,34 @@ public partial class FlatPatternExporterMainWindow : Window
             if (partDoc == null) return null;
         }
 
-        // Создаем новый объект PartData и заполняем его основными свойствами
+        // Создаем новый объект PartData
         var partData = new PartData
         {
-            Thickness = GetThicknessForPart(partDoc).ToString("F1") + " мм", // Получаем толщину
-            ModelState = partDoc.ModelStateName,
+            // КАТЕГОРИЯ 1: Системные свойства приложения
+            Item = itemNumber,
+            
+            // КАТЕГОРИЯ 6: Свойства количества и состояния
             OriginalQuantity = quantity,
             Quantity = quantity,
-            QuantityColor = Brushes.Black,
-            Item = itemNumber
+            QuantityColor = Brushes.Black
         };
 
-        // Получаем значения для пользовательских свойств
+        // КАТЕГОРИЯ 2-4: Чтение всех свойств документа и iProperty
+        ReadAllPropertiesFromPart(partDoc, partData);
+
+        // КАТЕГОРИЯ 5: Получаем значения для пользовательских iProperty
         foreach (var customProperty in _customPropertiesList)
         {
-            // Асинхронно получаем значения пользовательских свойств
             partData.CustomProperties[customProperty] =
                 await GetPropertyExpressionOrValueAsync(partDoc, customProperty);
         }
 
-        // Асинхронно получаем превью-изображение (если доступно)
+        // КАТЕГОРИЯ 2: Дополнительные свойства документа (изображения и состояние развертки)
         partData.Preview = await GetThumbnailAsync(partDoc);
-
-        // Проверяем наличие развертки для листовых деталей и задаем цвет
+        
         var smCompDef = partDoc.ComponentDefinition as SheetMetalComponentDefinition;
         var hasFlatPattern = smCompDef != null && smCompDef.HasFlatPattern;
         partData.FlatPatternColor = hasFlatPattern ? Brushes.Green : Brushes.Red;
-
-        // Чтение значений iProperty для Автор, Ревизия, Проект, Инвентарный номер
-        ReadIPropertyValuesFromPart(partDoc, partData);
 
         return partData;
     }

@@ -113,51 +113,66 @@ public partial class FlatPatternExporterMainWindow : Window
         LineTypes = LayerSettingsHelper.GetLineTypes();
 
 
-        // Инициализация предустановленных колонок
+        // Инициализация предустановленных колонок с указанием категорий
         PresetIProperties = new ObservableCollection<PresetIProperty>
 {
-    new() { InternalName = "Имя файла", DisplayName = "Имя файла", InventorPropertyName = "FileName" },
-    new() { InternalName = "Полное имя файла", DisplayName = "Полное имя файла", InventorPropertyName = "FullFileName" },
-    new() { InternalName = "ID", DisplayName = "Нумерация", InventorPropertyName = "Item" },
-    new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber" },
-    new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description" },
-    new() { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState" },
-    new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material" },
-    new() { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness" },
-    new() { InternalName = "Кол.", DisplayName = "Количество", InventorPropertyName = "Quantity" },
-    new() { InternalName = "Изобр. детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview" },
-    new() { InternalName = "Изобр. развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview" },
-    new() { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author" },
-    new() { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision" },
-    new() { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project" },
-    new() { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "StockNumber" },
-    new() { InternalName = "Название", DisplayName = "Название", InventorPropertyName = "Title" },
-    new() { InternalName = "Тема", DisplayName = "Тема", InventorPropertyName = "Subject" },
-    new() { InternalName = "Ключевые слова", DisplayName = "Ключевые слова", InventorPropertyName = "Keywords" },
-    new() { InternalName = "Примечание", DisplayName = "Примечание", InventorPropertyName = "Comments" },
-    new() { InternalName = "Категория", DisplayName = "Категория", InventorPropertyName = "Category" },
-    new() { InternalName = "Менеджер", DisplayName = "Менеджер", InventorPropertyName = "Manager" },
-    new() { InternalName = "Компания", DisplayName = "Компания", InventorPropertyName = "Company" },
-    new() { InternalName = "Время создания", DisplayName = "Время создания", InventorPropertyName = "CreationTime" },
-    new() { InternalName = "Сметчик", DisplayName = "Сметчик", InventorPropertyName = "CostCenter" },
-    new() { InternalName = "Проверил", DisplayName = "Проверил", InventorPropertyName = "CheckedBy" },
-    new() { InternalName = "Нормоконтроль", DisplayName = "Нормоконтроль", InventorPropertyName = "EngApprovedBy" },
-    new() { InternalName = "Статус", DisplayName = "Статус", InventorPropertyName = "UserStatus" },
-    new() { InternalName = "Веб-ссылка", DisplayName = "Веб-ссылка", InventorPropertyName = "CatalogWebLink" },
-    new() { InternalName = "Поставщик", DisplayName = "Поставщик", InventorPropertyName = "Vendor" },
-    new() { InternalName = "Утвердил", DisplayName = "Утвердил", InventorPropertyName = "MfgApprovedBy" },
-    new() { InternalName = "Статус разработки", DisplayName = "Статус разработки", InventorPropertyName = "DesignStatus" },
-    new() { InternalName = "Проектировщик", DisplayName = "Проектировщик", InventorPropertyName = "Designer" },
-    new() { InternalName = "Инженер", DisplayName = "Инженер", InventorPropertyName = "Engineer" },
-    new() { InternalName = "Нач. отдела", DisplayName = "Нач. отдела", InventorPropertyName = "Authority" },
-    new() { InternalName = "Масса", DisplayName = "Масса", InventorPropertyName = "Mass" },
-    new() { InternalName = "Площадь поверхности", DisplayName = "Площадь поверхности", InventorPropertyName = "SurfaceArea" },
-    new() { InternalName = "Объем", DisplayName = "Объем", InventorPropertyName = "Volume" },
-    new() { InternalName = "Правило ЛМ", DisplayName = "Правило листового металла", InventorPropertyName = "SheetMetalRule" },
-    new() { InternalName = "Ширина развертки", DisplayName = "Ширина развертки", InventorPropertyName = "FlatPatternWidth" },
-    new() { InternalName = "Длинна развертки", DisplayName = "Длинна развертки", InventorPropertyName = "FlatPatternLength" },
-    new() { InternalName = "Площадь развертки", DisplayName = "Площадь развертки", InventorPropertyName = "FlatPatternArea" },
-    new() { InternalName = "Отделка", DisplayName = "Отделка", InventorPropertyName = "Appearance" }
+    // КАТЕГОРИЯ 1: Системные свойства приложения
+    new() { InternalName = "ID", DisplayName = "Нумерация", InventorPropertyName = "Item", Category = "Системные" },
+    
+    // КАТЕГОРИЯ 2: Свойства документа (не iProperty)
+    new() { InternalName = "Имя файла", DisplayName = "Имя файла", InventorPropertyName = "FileName", Category = "Документ" },
+    new() { InternalName = "Полное имя файла", DisplayName = "Полное имя файла", InventorPropertyName = "FullFileName", Category = "Документ" },
+    new() { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState", Category = "Документ" },
+    new() { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness", Category = "Документ" },
+    new() { InternalName = "Изобр. детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview", Category = "Документ" },
+    
+    // КАТЕГОРИЯ 3: Основные iProperty
+    new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber", Category = "Основные iProperty" },
+    new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description", Category = "Основные iProperty" },
+    new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material", Category = "Основные iProperty" },
+    
+    // КАТЕГОРИЯ 4: Расширенные iProperty - Summary Information
+    new() { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author", Category = "Summary Information" },
+    new() { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision", Category = "Summary Information" },
+    new() { InternalName = "Название", DisplayName = "Название", InventorPropertyName = "Title", Category = "Summary Information" },
+    new() { InternalName = "Тема", DisplayName = "Тема", InventorPropertyName = "Subject", Category = "Summary Information" },
+    new() { InternalName = "Ключевые слова", DisplayName = "Ключевые слова", InventorPropertyName = "Keywords", Category = "Summary Information" },
+    new() { InternalName = "Примечание", DisplayName = "Примечание", InventorPropertyName = "Comments", Category = "Summary Information" },
+    
+    // КАТЕГОРИЯ 4: Расширенные iProperty - Document Summary Information
+    new() { InternalName = "Категория", DisplayName = "Категория", InventorPropertyName = "Category", Category = "Document Summary Information" },
+    new() { InternalName = "Менеджер", DisplayName = "Менеджер", InventorPropertyName = "Manager", Category = "Document Summary Information" },
+    new() { InternalName = "Компания", DisplayName = "Компания", InventorPropertyName = "Company", Category = "Document Summary Information" },
+    
+    // КАТЕГОРИЯ 4: Расширенные iProperty - Design Tracking Properties
+    new() { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project", Category = "Design Tracking Properties" },
+    new() { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "StockNumber", Category = "Design Tracking Properties" },
+    new() { InternalName = "Время создания", DisplayName = "Время создания", InventorPropertyName = "CreationTime", Category = "Design Tracking Properties" },
+    new() { InternalName = "Сметчик", DisplayName = "Сметчик", InventorPropertyName = "CostCenter", Category = "Design Tracking Properties" },
+    new() { InternalName = "Проверил", DisplayName = "Проверил", InventorPropertyName = "CheckedBy", Category = "Design Tracking Properties" },
+    new() { InternalName = "Нормоконтроль", DisplayName = "Нормоконтроль", InventorPropertyName = "EngApprovedBy", Category = "Design Tracking Properties" },
+    new() { InternalName = "Статус", DisplayName = "Статус", InventorPropertyName = "UserStatus", Category = "Design Tracking Properties" },
+    new() { InternalName = "Веб-ссылка", DisplayName = "Веб-ссылка", InventorPropertyName = "CatalogWebLink", Category = "Design Tracking Properties" },
+    new() { InternalName = "Поставщик", DisplayName = "Поставщик", InventorPropertyName = "Vendor", Category = "Design Tracking Properties" },
+    new() { InternalName = "Утвердил", DisplayName = "Утвердил", InventorPropertyName = "MfgApprovedBy", Category = "Design Tracking Properties" },
+    new() { InternalName = "Статус разработки", DisplayName = "Статус разработки", InventorPropertyName = "DesignStatus", Category = "Design Tracking Properties" },
+    new() { InternalName = "Проектировщик", DisplayName = "Проектировщик", InventorPropertyName = "Designer", Category = "Design Tracking Properties" },
+    new() { InternalName = "Инженер", DisplayName = "Инженер", InventorPropertyName = "Engineer", Category = "Design Tracking Properties" },
+    new() { InternalName = "Нач. отдела", DisplayName = "Нач. отдела", InventorPropertyName = "Authority", Category = "Design Tracking Properties" },
+    new() { InternalName = "Масса", DisplayName = "Масса", InventorPropertyName = "Mass", Category = "Design Tracking Properties" },
+    new() { InternalName = "Площадь поверхности", DisplayName = "Площадь поверхности", InventorPropertyName = "SurfaceArea", Category = "Design Tracking Properties" },
+    new() { InternalName = "Объем", DisplayName = "Объем", InventorPropertyName = "Volume", Category = "Design Tracking Properties" },
+    new() { InternalName = "Правило ЛМ", DisplayName = "Правило листового металла", InventorPropertyName = "SheetMetalRule", Category = "Design Tracking Properties" },
+    new() { InternalName = "Ширина развертки", DisplayName = "Ширина развертки", InventorPropertyName = "FlatPatternWidth", Category = "Design Tracking Properties" },
+    new() { InternalName = "Длинна развертки", DisplayName = "Длинна развертки", InventorPropertyName = "FlatPatternLength", Category = "Design Tracking Properties" },
+    new() { InternalName = "Площадь развертки", DisplayName = "Площадь развертки", InventorPropertyName = "FlatPatternArea", Category = "Design Tracking Properties" },
+    new() { InternalName = "Отделка", DisplayName = "Отделка", InventorPropertyName = "Appearance", Category = "Design Tracking Properties" },
+    
+    // КАТЕГОРИЯ 6: Свойства количества и состояния
+    new() { InternalName = "Кол.", DisplayName = "Количество", InventorPropertyName = "Quantity", Category = "Количество" },
+    
+    // КАТЕГОРИЯ 7: Свойства состояния обработки
+    new() { InternalName = "Изобр. развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", Category = "Обработка" }
 };
 
         // Устанавливаем DataContext для текущего окна
@@ -1116,17 +1131,27 @@ public partial class FlatPatternExporterMainWindow : Window
 
 public class PartData : INotifyPropertyChanged
 {
-    // Пользовательские iProperty
-    private Dictionary<string, string> customProperties = new();
-    private string description;
+    // === КАТЕГОРИЯ 1: СИСТЕМНЫЕ СВОЙСТВА ПРИЛОЖЕНИЯ ===
+    // Свойства, используемые только внутри приложения для управления таблицей
     private int item;
-    private string material;
+    
+    // === КАТЕГОРИЯ 2: СВОЙСТВА ДОКУМЕНТА (НЕ IPROPERTY) ===
+    // Базовые свойства файла документа, считываемые напрямую из API Inventor
+    public string FileName { get; set; } // Path.GetFileNameWithoutExtension()
+    public string FullFileName { get; set; } // partDoc.FullFileName
+    public string ModelState { get; set; } // partDoc.ModelStateName
+    private string thickness; // SheetMetalComponentDefinition.Thickness
+    public BitmapImage Preview { get; set; } // apprenticeDoc.Thumbnail
+    public Brush FlatPatternColor { get; set; } // smCompDef.HasFlatPattern
+    
+    // === КАТЕГОРИЯ 3: ОСНОВНЫЕ IPROPERTIES ===
+    // Ключевые iProperty из "Design Tracking Properties", всегда необходимые
     private string partNumber;
-    private int quantity;
-    private Brush quantityColor;
-    private string thickness;
-    public string FileName { get; set; }
-    public string FullFileName { get; set; }
+    private string description;
+    private string material;
+    
+    // === КАТЕГОРИЯ 4: РАСШИРЕННЫЕ IPROPERTIES ===
+    // Опциональные iProperty из различных наборов свойств
     public string Author { get; set; }
     public string Revision { get; set; }
     public string Project { get; set; }
@@ -1158,8 +1183,25 @@ public class PartData : INotifyPropertyChanged
     public string FlatPatternLength { get; set; }
     public string FlatPatternArea { get; set; }
     public string Appearance { get; set; }
+    
+    // === КАТЕГОРИЯ 5: ПОЛЬЗОВАТЕЛЬСКИЕ IPROPERTIES ===
+    // Динамически добавляемые пользователем свойства из "Inventor User Defined Properties"
+    private Dictionary<string, string> customProperties = new();
+    
+    // === КАТЕГОРИЯ 6: СВОЙСТВА КОЛИЧЕСТВА И СОСТОЯНИЯ ===
+    // Свойства для управления количеством и состоянием обработки
+    private int quantity;
+    private Brush quantityColor;
+    public int OriginalQuantity { get; set; }
+    public bool IsOverridden { get; set; }
+    
+    // === КАТЕГОРИЯ 7: СВОЙСТВА СОСТОЯНИЯ ОБРАБОТКИ ===
+    // Свойства, устанавливаемые во время экспорта и обработки
+    public BitmapImage DxfPreview { get; set; } // Миниатюра развертки (генерируется)
+    public Brush ProcessingColor { get; set; } = Brushes.Transparent; // Индикатор состояния экспорта
 
-
+    // === СВОЙСТВА С УВЕДОМЛЕНИЯМИ ===
+    
     public Dictionary<string, string> CustomProperties
     {
         get => customProperties;
@@ -1182,7 +1224,7 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    // Основные свойства детали
+    // КАТЕГОРИЯ 3: Основные iProperty с уведомлениями
     public string PartNumber
     {
         get => partNumber;
@@ -1195,9 +1237,6 @@ public class PartData : INotifyPropertyChanged
             }
         }
     }
-
-
-    public string ModelState { get; set; }
 
     public string Description
     {
@@ -1232,8 +1271,7 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    public int OriginalQuantity { get; set; }
-
+    // КАТЕГОРИЯ 6: Свойства количества и состояния с уведомлениями
     public int Quantity
     {
         get => quantity;
@@ -1243,12 +1281,6 @@ public class PartData : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
-    // Свойства для отображения изображений и цветов
-    public BitmapImage Preview { get; set; }
-    public BitmapImage DxfPreview { get; set; }
-    public Brush FlatPatternColor { get; set; }
-    public Brush ProcessingColor { get; set; } = Brushes.Transparent;
 
     public Brush QuantityColor
     {
@@ -1260,10 +1292,6 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-
-
-    // Флаг переопределения
-    public bool IsOverridden { get; set; }
 
     // Реализация интерфейса INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
@@ -1331,6 +1359,7 @@ public class PresetIProperty
     public string InternalName { get; set; } // Внутреннее имя колонки (например, "#")
     public string DisplayName { get; set; } // Псевдоним для отображения в списке выбора (например, "#Нумерация")
     public string InventorPropertyName { get; set; } // Соответствующее имя свойства iProperty в Inventor
+    public string Category { get; set; } // Категория свойства для группировки
 
     public bool ShouldBeAddedOnInit { get; set; } =
         false; // Новый флаг для определения необходимости добавления при старте
