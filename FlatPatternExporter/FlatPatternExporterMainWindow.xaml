@@ -199,6 +199,7 @@
                     </Style.Triggers>
                 </Style>
 
+
                 <Style TargetType="DataGridRow">
                     <Style.Resources>
                         <!-- Стиль для выделенной строки -->
@@ -267,12 +268,24 @@
                     <Setter Property="Foreground" Value="#333333"/>
                 </Style>
 
-                <!-- Стиль для текста внутри ячеек -->
+                <!-- Стиль для текста внутри ячеек с автоматическим назначением стиля по заголовку колонки -->
                 <Style TargetType="TextBlock">
                     <Setter Property="Padding" Value="5,2"/>
                     <Setter Property="HorizontalAlignment" Value="Center"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="Foreground" Value="#333333"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Column.Header, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="Количество">
+                            <Setter Property="Foreground" Value="{Binding QuantityColor}"/>
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Column.Header, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="Количество"/>
+                                <Condition Binding="{Binding IsOverridden}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Foreground" Value="Red"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
                 </Style>
             </DataGrid.Resources>
 

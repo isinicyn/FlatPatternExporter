@@ -456,12 +456,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 Binding = new Binding(iProperty.InventorPropertyName)
             };
 
-            // Применяем специальный стиль для колонки "Количество"
-            if (iProperty.InternalName == "Количество")
-                textColumn.ElementStyle = PartsDataGrid.FindResource("QuantityCellStyle") as Style;
-            else
-                // Применяем стиль CenteredCellStyle для всех остальных текстовых колонок
-                textColumn.ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style;
+            // Стили теперь назначаются автоматически через неявный стиль DataGridCell в XAML
 
             column = textColumn;
         }
