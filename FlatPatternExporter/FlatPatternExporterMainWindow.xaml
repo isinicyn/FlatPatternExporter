@@ -208,7 +208,20 @@
                     </Style.Triggers>
                 </Style>
 
-
+                <!-- Стиль для индикатора развертки -->
+                <Style x:Key="FlatPatternIndicatorStyle" TargetType="Border">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Width" Value="20"/>
+                    <Setter Property="Height" Value="20"/>
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="Background" Value="Red"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasFlatPattern}" Value="True">
+                            <Setter Property="Background" Value="Green"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
 
                 <Style TargetType="DataGridRow">
                     <Style.Resources>
@@ -305,12 +318,7 @@
                     </DataGridTemplateColumn.HeaderStyle>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border Background="{Binding FlatPatternColor}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Width="20"
-                    Height="20"
-                    Padding="10,5"/>
+                            <Border Style="{StaticResource FlatPatternIndicatorStyle}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

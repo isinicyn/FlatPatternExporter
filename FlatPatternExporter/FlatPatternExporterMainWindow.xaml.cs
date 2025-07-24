@@ -1082,7 +1082,7 @@ public class PartData : INotifyPropertyChanged
     public string ModelState { get; set; } = string.Empty; // partDoc.ModelStateName
     private double thickness = 0.0; // SheetMetalComponentDefinition.Thickness
     public BitmapImage? Preview { get; set; } // apprenticeDoc.Thumbnail
-    public Brush FlatPatternColor { get; set; } = Brushes.Transparent; // smCompDef.HasFlatPattern
+    public bool HasFlatPattern { get; set; } = false; // smCompDef.HasFlatPattern
     
     // === КАТЕГОРИЯ 3: ОСНОВНЫЕ IPROPERTIES ===
     // Ключевые iProperty из "Design Tracking Properties", всегда необходимые

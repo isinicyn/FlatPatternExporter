@@ -171,8 +171,7 @@ public partial class FlatPatternExporterMainWindow : Window
         partData.Preview = await GetThumbnailAsync(partDoc);
         
         var smCompDef = partDoc.ComponentDefinition as SheetMetalComponentDefinition;
-        var hasFlatPattern = smCompDef != null && smCompDef.HasFlatPattern;
-        partData.FlatPatternColor = hasFlatPattern ? Brushes.Green : Brushes.Red;
+        partData.HasFlatPattern = smCompDef != null && smCompDef.HasFlatPattern;
 
         return partData;
     }
@@ -762,7 +761,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
-        var itemsWithoutFlatPattern = selectedItems.Where(p => p.FlatPatternColor == Brushes.Red).ToList();
+        var itemsWithoutFlatPattern = selectedItems.Where(p => !p.HasFlatPattern).ToList();
         if (itemsWithoutFlatPattern.Count == selectedItems.Count)
         {
             MessageBox.Show("Выбранные файлы не содержат разверток.", "Информация", MessageBoxButton.OK,
