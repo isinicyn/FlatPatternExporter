@@ -865,8 +865,15 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             {
                 if (PartFolderRadioButton.IsChecked == true)
                 {
-                    targetDir = GetPartDocumentFullPath(partNumber);
-                    targetDir = Path.GetDirectoryName(targetDir);
+                    var partPath = GetPartDocumentFullPath(partNumber);
+                    if (!string.IsNullOrEmpty(partPath))
+                    {
+                        targetDir = Path.GetDirectoryName(partPath) ?? string.Empty;
+                    }
+                    else
+                    {
+                        targetDir = string.Empty;
+                    }
                 }
             });
 
