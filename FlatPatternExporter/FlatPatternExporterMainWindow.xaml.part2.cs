@@ -143,7 +143,7 @@ public partial class FlatPatternExporterMainWindow : Window
         if (partDoc == null)
         {
             partDoc = OpenPartDocument(partNumber);
-            if (partDoc == null) return null;
+            if (partDoc == null) return null!;
         }
 
         // Создаем новый объект PartData
@@ -182,7 +182,7 @@ public partial class FlatPatternExporterMainWindow : Window
         var searchPattern = partNumber + "*.dxf"; // Шаблон поиска
         var dxfFiles = Directory.GetFiles(dxfDirectory, searchPattern);
 
-        if (dxfFiles.Length == 0) return null;
+        if (dxfFiles.Length == 0) return null!;
 
         try
         {
@@ -190,7 +190,7 @@ public partial class FlatPatternExporterMainWindow : Window
             var generator = new DxfThumbnailGenerator.DxfThumbnailGenerator();
             var bitmap = generator.GenerateThumbnail(dxfFilePath);
 
-            BitmapImage bitmapImage = null;
+            BitmapImage? bitmapImage = null;
 
             // Инициализация изображения должна выполняться в UI потоке
             Dispatcher.Invoke(() =>
@@ -208,7 +208,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 }
             });
 
-            return bitmapImage;
+            return bitmapImage!;
         }
         catch (Exception ex)
         {
@@ -217,7 +217,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 MessageBox.Show($"Ошибка при генерации миниатюры DXF: {ex.Message}", "Ошибка", MessageBoxButton.OK,
                     MessageBoxImage.Error);
             });
-            return null;
+            return null!;
         }
     }
 
@@ -239,7 +239,7 @@ public partial class FlatPatternExporterMainWindow : Window
     {
         try
         {
-            BitmapImage bitmap = null;
+            BitmapImage? bitmap = null;
             await Dispatcher.InvokeAsync(() =>
             {
                 var apprentice = new ApprenticeServerComponent();
@@ -262,7 +262,7 @@ public partial class FlatPatternExporterMainWindow : Window
                     }
             });
 
-            return bitmap;
+            return bitmap!;
         }
         catch (Exception ex)
         {
@@ -271,7 +271,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 MessageBox.Show("Ошибка при получении миниатюры: " + ex.Message, "Ошибка", MessageBoxButton.OK,
                     MessageBoxImage.Error);
             });
-            return null;
+            return null!;
         }
     }
 
@@ -503,7 +503,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     else if (ComponentFolderRadioButton.IsChecked == true)
     {
         // Папка компонента
-        targetDir = Path.GetDirectoryName(_thisApplication.ActiveDocument.FullFileName);
+        targetDir = Path.GetDirectoryName(_thisApplication.ActiveDocument.FullFileName)!;
     }
     else if (FixedFolderRadioButton.IsChecked == true)
     {
@@ -535,7 +535,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     if (EnableSubfolderCheckBox.IsChecked == true && !string.IsNullOrEmpty(SubfolderNameTextBox.Text))
     {
-        targetDir = Path.Combine(targetDir, SubfolderNameTextBox.Text);
+        targetDir = Path.Combine(targetDir!, SubfolderNameTextBox.Text);
         if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
     }
 
@@ -584,7 +584,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private async Task ExportWithoutScan()
     {
         // Очистка таблицы перед началом скрытого экспорта
-        ClearList_Click(this, null);
+        ClearList_Click(this, null!);
 
         if (_thisApplication == null)
         {
@@ -870,7 +870,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 }
             });
 
-            PartDocument partDoc = null;
+            PartDocument? partDoc = null;
             try
             {
                 partDoc = OpenPartDocument(partNumber);
@@ -902,7 +902,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                     try
                     {
-                        string options = null;
+                        string? options = null;
                         Dispatcher.Invoke(() => PrepareExportOptions(out options));
 
                         // Интеграция настроек слоев
@@ -995,13 +995,13 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                     }
                 }
 
-                BitmapImage dxfPreview = null;
+                BitmapImage? dxfPreview = null;
                 if (generateThumbnails) dxfPreview = GenerateDxfThumbnail(thicknessDir, partNumber);
 
                 Dispatcher.Invoke(() =>
                 {
                     partData.ProcessingColor = exportSuccess ? Brushes.Green : Brushes.Red;
-                    partData.DxfPreview = dxfPreview;
+                    partData.DxfPreview = dxfPreview!;
                     PartsDataGrid.Items.Refresh();
                 });
 
@@ -1080,7 +1080,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
     }
 
-    private PartDocument OpenPartDocument(string partNumber)
+    private PartDocument? OpenPartDocument(string partNumber)
     {
         var docs = _thisApplication.Documents;
 
@@ -1248,7 +1248,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ClearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки
 
         // Обнуляем информацию о документе
-        UpdateDocumentInfo(string.Empty, string.Empty, string.Empty, null);
+        UpdateDocumentInfo(string.Empty, string.Empty, string.Empty, null!);
         UpdateFileCountLabel(0); // Сброс счетчика файлов
 
         // Отключаем кнопку "Анализ обозначений" и очищаем список конфликтов
@@ -1345,7 +1345,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
     }
 
-    private string GetPartDocumentFullPath(string partNumber)
+    private string? GetPartDocumentFullPath(string partNumber)
     {
         var docs = _thisApplication.Documents;
 
