@@ -60,6 +60,7 @@ public partial class FlatPatternExporterMainWindow : Window
     public Application _thisApplication;
     private List<PartData> _conflictingParts = new(); // Список конфликтующих файлов
     private Dictionary<string, List<(string PartNumber, string FileName)>> _conflictFileDetails = new();
+    private readonly ConcurrentDictionary<string, List<(string PartNumber, string FileName)>> _partNumberTracker = new(); // Для отслеживания конфликтов во время сканирования
 
     public FlatPatternExporterMainWindow()
     {
@@ -788,6 +789,7 @@ public partial class FlatPatternExporterMainWindow : Window
 
         _partsData.Clear();
         _itemCounter = 1;
+        _partNumberTracker.Clear(); // Очищаем трекер конфликтов
 
         var progress = new Progress<PartData>(partData =>
         {
@@ -827,8 +829,8 @@ public partial class FlatPatternExporterMainWindow : Window
                 }
             });
 
-            // Вызов проверки конфликтов после завершения сканирования
-            CheckForPartNumberConflictsAsync(asmDoc.ComponentDefinition.BOM);
+            // Вызов анализа конфликтов после завершения сканирования
+            await AnalyzePartNumberConflictsAsync();
         }
         else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
@@ -879,111 +881,6 @@ public partial class FlatPatternExporterMainWindow : Window
             MessageBox.Show("В сборке обнаружены компоненты с потерянными ссылками. Некоторые данные могли быть пропущены.",
                 "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
-    }
-    // Функция для проверки конфликта обозначений в BOM
-    private async Task CheckForPartNumberConflictsAsync(BOM bom)
-    {
-        var partNumbers = new ConcurrentDictionary<string, List<(string PartNumber, string FileName)>>(); // Используем ConcurrentDictionary для потокобезопасности
-        _conflictingParts.Clear(); // Очищаем список конфликтов перед началом проверки
-
-        var tasks = new List<Task>(); // Список задач для параллельного выполнения
-
-        // Проходим по каждому BOMView
-        foreach (BOMView bomView in bom.BOMViews)
-        {
-            tasks.Add(Task.Run(() => ProcessBOMRowsForConflictsAsync(bomView, partNumbers)));
-        }
-
-        await Task.WhenAll(tasks); // Ожидаем завершения всех задач
-
-        // Оставляем только те записи, у которых больше одного файла (т.е. есть конфликт)
-        var conflictingPartNumbers = partNumbers.Where(p => p.Value.Count > 1).ToDictionary(p => p.Key, p => p.Value);
-
-        if (conflictingPartNumbers.Any())
-        {
-            _conflictingParts.AddRange(conflictingPartNumbers.SelectMany(entry => entry.Value.Select(v => new PartData { PartNumber = v.PartNumber })));
-
-            // Используем Dispatcher для обновления UI
-            await Dispatcher.InvokeAsync(() =>
-            {
-                MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели с одинаковыми обозначениями, что может привести к ошибкам. Модели должны иметь уникальные обозначения.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для анализа данных.",
-                    "Конфликт обозначений",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                ConflictFilesButton.IsEnabled = true; // Включаем кнопку для просмотра подробностей о конфликтах
-                _conflictFileDetails = conflictingPartNumbers; // Сохраняем подробную информацию о конфликтах для вывода при нажатии кнопки
-            });
-        }
-        else
-        {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                ConflictFilesButton.IsEnabled = false; // Отключаем кнопку, если нет конфликтов
-            });
-        }
-    }
-    private async Task ProcessBOMRowsForConflictsAsync(BOMView bomView, ConcurrentDictionary<string, List<(string PartNumber, string FileName)>> partNumbers)
-    {
-        var tasks = new List<Task>();
-
-        foreach (BOMRow row in bomView.BOMRows)
-        {
-            foreach (ComponentDefinition componentDefinition in row.ComponentDefinitions)
-            {
-                tasks.Add(Task.Run(() =>
-                {
-                    if (_isCancelled) return;
-
-                    try
-                    {
-                        var document = componentDefinition.Document as Document;
-                        if (document == null) return;
-
-                        if (ShouldExcludeComponent(row.BOMStructure, document.FullFileName)) return;
-
-                        if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-                        {
-                            var partDocument = document as PartDocument;
-
-                            if (partDocument != null && partDocument.ComponentDefinition is SheetMetalComponentDefinition)
-                            {
-                                var partNumber = GetProperty(partDocument.PropertySets["Design Tracking Properties"], "Part Number");
-                                var fileName = partDocument.FullFileName;
-
-                                partNumbers.AddOrUpdate(partNumber,
-                                    new List<(string PartNumber, string FileName)> { (partNumber, fileName) },
-                                    (key, existingList) =>
-                                    {
-                                        if (!existingList.Any(p => p.FileName == fileName))
-                                        {
-                                            existingList.Add((partNumber, fileName));
-                                        }
-                                        return existingList;
-                                    });
-                            }
-                        }
-                        else if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
-                        {
-                            var asmDoc = document as AssemblyDocument;
-                            if (asmDoc != null)
-                            {
-                                foreach (BOMView subBomView in asmDoc.ComponentDefinition.BOM.BOMViews)
-                                {
-                                    ProcessBOMRowsForConflictsAsync(subBomView, partNumbers).Wait();
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // Логирование ошибки
-                        Debug.WriteLine($"Ошибка при проверке конфликтов: {ex.Message}");
-                    }
-                }));
-            }
-        }
-
-        await Task.WhenAll(tasks);
     }
     private void ConflictFilesButton_Click(object sender, RoutedEventArgs e)
     {
@@ -1097,6 +994,51 @@ public partial class FlatPatternExporterMainWindow : Window
         var partNumber = GetProperty(document.PropertySets["Design Tracking Properties"], "Part Number");
         var description = GetProperty(document.PropertySets["Design Tracking Properties"], "Description");
         return (partNumber, description);
+    }
+
+    private void AddPartToConflictTracker(string partNumber, string fileName)
+    {
+        _partNumberTracker.AddOrUpdate(partNumber,
+            new List<(string PartNumber, string FileName)> { (partNumber, fileName) },
+            (key, existingList) =>
+            {
+                if (!existingList.Any(p => p.FileName == fileName))
+                {
+                    existingList.Add((partNumber, fileName));
+                }
+                return existingList;
+            });
+    }
+
+    private async Task AnalyzePartNumberConflictsAsync()
+    {
+        _conflictingParts.Clear(); // Очищаем список конфликтов перед началом проверки
+
+        // Оставляем только те записи, у которых больше одного файла (т.е. есть конфликт)
+        var conflictingPartNumbers = _partNumberTracker.Where(p => p.Value.Count > 1).ToDictionary(p => p.Key, p => p.Value);
+
+        if (conflictingPartNumbers.Any())
+        {
+            _conflictingParts.AddRange(conflictingPartNumbers.SelectMany(entry => entry.Value.Select(v => new PartData { PartNumber = v.PartNumber })));
+
+            // Используем Dispatcher для обновления UI
+            await Dispatcher.InvokeAsync(() =>
+            {
+                MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели с одинаковыми обозначениями, что может привести к ошибкам. Модели должны иметь уникальные обозначения.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для анализа данных.",
+                    "Конфликт обозначений",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                ConflictFilesButton.IsEnabled = true; // Включаем кнопку для просмотра подробностей о конфликтах
+                _conflictFileDetails = conflictingPartNumbers; // Сохраняем подробную информацию о конфликтах для вывода при нажатии кнопки
+            });
+        }
+        else
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                ConflictFilesButton.IsEnabled = false; // Отключаем кнопку, если нет конфликтов
+            });
+        }
     }
 
     private string GetProperty(PropertySet propertySet, string propertyName)

@@ -309,6 +309,9 @@ public partial class FlatPatternExporterMainWindow : Window
                         var partNumber = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number");
                         if (!string.IsNullOrEmpty(partNumber))
                         {
+                            // Добавляем в трекер конфликтов
+                            AddPartToConflictTracker(partNumber, partDoc.FullFileName);
+                            
                             if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
                                 sheetMetalParts[partNumber]++;
                             else
@@ -403,6 +406,9 @@ public partial class FlatPatternExporterMainWindow : Window
                 var partNumber = GetProperty(partDoc.PropertySets["Design Tracking Properties"], "Part Number");
                 if (!string.IsNullOrEmpty(partNumber))
                 {
+                    // Добавляем в трекер конфликтов
+                    AddPartToConflictTracker(partNumber, partDoc.FullFileName);
+                    
                     if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
                         sheetMetalParts[partNumber] += row.ItemQuantity;
                     else
@@ -1252,6 +1258,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         // Отключаем кнопку "Анализ обозначений" и очищаем список конфликтов
         ConflictFilesButton.IsEnabled = false;
         _conflictFileDetails.Clear(); // Очищаем список с конфликтами (или используем нужную коллекцию)
+        _partNumberTracker.Clear(); // Очищаем трекер конфликтов
 
     }
 
