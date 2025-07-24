@@ -86,7 +86,7 @@ namespace FlatPatternExporter
         public bool IsCustomNameEnabled => IsVisible;
         public bool IsColorAndLineTypeEnabled => IsVisible;
 
-        private string customName;
+        private string customName = string.Empty;
         public string CustomName
         {
             get => customName;
@@ -134,9 +134,9 @@ namespace FlatPatternExporter
             SelectedLineType = "Default"; // Тип линии по умолчанию
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
