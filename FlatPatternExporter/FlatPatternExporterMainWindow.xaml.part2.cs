@@ -44,7 +44,7 @@ public partial class FlatPatternExporterMainWindow : Window
         partData.FullFileName = partDoc.FullFileName;
         partData.FileName = Path.GetFileNameWithoutExtension(partDoc.FullFileName);
         partData.ModelState = partDoc.ModelStateName;
-        partData.Thickness = GetThicknessForPart(partDoc).ToString("F1") + " мм";
+        partData.Thickness = GetThicknessForPart(partDoc);
     }
     
     /// <summary>
@@ -885,7 +885,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
                 var material = partData.Material;
-                var thickness = GetThicknessForPart(partDoc);
+                var thickness = partData.Thickness;
 
                 var materialDir = organizeByMaterial ? Path.Combine(targetDir, material) : targetDir;
                 if (!Directory.Exists(materialDir)) Directory.CreateDirectory(materialDir);

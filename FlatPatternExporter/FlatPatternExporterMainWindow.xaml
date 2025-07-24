@@ -376,7 +376,7 @@
                 </DataGridTextColumn>
 
                 <!-- Колонка с толщиной материала -->
-                <DataGridTextColumn Header="Толщина" Binding="{Binding Thickness}" Width="Auto">
+                <DataGridTextColumn Header="Толщина" Binding="{Binding Thickness, StringFormat=F1}" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
                         <StaticResource ResourceKey="CenteredCellStyle"/>
                     </DataGridTextColumn.ElementStyle>

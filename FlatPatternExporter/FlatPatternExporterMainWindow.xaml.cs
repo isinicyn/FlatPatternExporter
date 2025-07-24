@@ -371,7 +371,9 @@ public partial class FlatPatternExporterMainWindow : Window
                           partData.Description?.ToLower().Contains(_actualSearchText) == true ||
                           partData.ModelState?.ToLower().Contains(_actualSearchText) == true ||
                           partData.Material?.ToLower().Contains(_actualSearchText) == true ||
-                          partData.Thickness?.ToLower().Contains(_actualSearchText) == true ||
+                          (partData.Thickness.ToString("F1", System.Globalization.CultureInfo.InvariantCulture).ToLower().Contains(_actualSearchText) == true ||
+                           partData.Thickness.ToString("F1", System.Globalization.CultureInfo.CurrentCulture).ToLower().Contains(_actualSearchText) == true ||
+                           partData.Thickness.ToString("F0").ToLower().Contains(_actualSearchText) == true) ||
                           partData.Quantity.ToString().Contains(_actualSearchText);
 
             // Проверка на пользовательские свойства
@@ -1078,7 +1080,7 @@ public class PartData : INotifyPropertyChanged
     public string FileName { get; set; } = string.Empty; // Path.GetFileNameWithoutExtension()
     public string FullFileName { get; set; } = string.Empty; // partDoc.FullFileName
     public string ModelState { get; set; } = string.Empty; // partDoc.ModelStateName
-    private string thickness = string.Empty; // SheetMetalComponentDefinition.Thickness
+    private double thickness = 0.0; // SheetMetalComponentDefinition.Thickness
     public BitmapImage? Preview { get; set; } // apprenticeDoc.Thumbnail
     public Brush FlatPatternColor { get; set; } = Brushes.Transparent; // smCompDef.HasFlatPattern
     
@@ -1199,7 +1201,7 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    public string Thickness
+    public double Thickness
     {
         get => thickness;
         set
