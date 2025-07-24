@@ -393,14 +393,6 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private void partsDataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
-    {
-        // Устанавливаем чередование цветов
-        if (e.Row.GetIndex() % 2 == 0)
-            e.Row.Background = new SolidColorBrush(Colors.White);
-        else
-            e.Row.Background = new SolidColorBrush(Color.FromRgb(245, 245, 245)); // #F5F5F5
-    }
 
     private void partsDataGrid_Drop(object sender, DragEventArgs e)
     {

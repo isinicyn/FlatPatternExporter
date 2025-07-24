@@ -145,7 +145,7 @@
               Drop="partsDataGrid_Drop" 
               AllowDrop="True"
               RowHeaderWidth="0"
-              LoadingRow="partsDataGrid_LoadingRow"
+              AlternatingRowBackground="#F5F5F5"
               ContextMenuOpening="partsDataGrid_ContextMenuOpening">
 
             <!-- Контекстное меню -->
