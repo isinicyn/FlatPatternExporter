@@ -56,7 +56,6 @@ public partial class FlatPatternExporterMainWindow : Window
         var designTrackingProps = partDoc.PropertySets["Design Tracking Properties"];
         
         partData.PartNumber = GetProperty(designTrackingProps, "Part Number");
-        partData.Description = GetProperty(designTrackingProps, "Description");
         partData.Material = GetProperty(designTrackingProps, "Material");
     }
     
@@ -112,6 +111,7 @@ public partial class FlatPatternExporterMainWindow : Window
     {
         var designTrackingProps = propertySets["Design Tracking Properties"];
         
+        if (IsColumnPresent("Наименование")) partData.Description = GetProperty(designTrackingProps, "Description");
         if (IsColumnPresent("Проект")) partData.Project = GetProperty(designTrackingProps, "Project");
         if (IsColumnPresent("Инвентарный номер")) partData.StockNumber = GetProperty(designTrackingProps, "Stock Number");
         if (IsColumnPresent("Время создания")) partData.CreationTime = GetProperty(designTrackingProps, "Creation Time");
