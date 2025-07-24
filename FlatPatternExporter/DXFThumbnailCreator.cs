@@ -133,7 +133,11 @@ public class DxfThumbnailGenerator
                     var smoothTypeProperty = entity.GetType().GetProperty("SmoothType");
                     var smoothType = PolylineSmoothType.NoSmooth;
                     if (smoothTypeProperty != null)
-                        smoothType = (PolylineSmoothType)smoothTypeProperty.GetValue(entity);
+                    {
+                        var value = smoothTypeProperty.GetValue(entity);
+                        if (value != null)
+                            smoothType = (PolylineSmoothType)value;
+                    }
 
                     if (smoothType == PolylineSmoothType.NoSmooth)
                         for (var i = 0; i < vertexes.Count; i++)
@@ -441,8 +445,12 @@ public class DxfThumbnailGenerator
                         var positionProperty = vertex.GetType().GetProperty("Position");
                         if (positionProperty != null)
                         {
-                            var position = (Vector3)positionProperty.GetValue(vertex);
-                            vertexes.Add(position);
+                            var value = positionProperty.GetValue(vertex);
+                            if (value != null)
+                            {
+                                var position = (Vector3)value;
+                                vertexes.Add(position);
+                            }
                         }
                     }
             }
