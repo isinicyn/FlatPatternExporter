@@ -715,9 +715,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ClearButton.IsEnabled = false;
         ScanButton.IsEnabled = false;
 
-        var processedCount = 0;
-        var skippedCount = 0;
-
         if (doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
         {
             var asmDoc = (AssemblyDocument)doc;
@@ -874,7 +871,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             });
 
             PartDocument partDoc = null;
-            var isPartDocOpenedHere = false;
             try
             {
                 partDoc = OpenPartDocument(partNumber);
