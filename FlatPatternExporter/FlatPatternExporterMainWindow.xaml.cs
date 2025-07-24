@@ -830,7 +830,7 @@ public partial class FlatPatternExporterMainWindow : Window
             });
 
             // Вызов анализа конфликтов после завершения сканирования
-            await AnalyzePartNumberConflictsAsync();
+            await AnalyzePartNumberConflictsAsync(stopwatch);
         }
         else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
@@ -849,7 +849,9 @@ public partial class FlatPatternExporterMainWindow : Window
             }
         }
 
-        stopwatch.Stop();
+        // Останавливаем секундомер, если он еще не остановлен
+        if (stopwatch.IsRunning)
+            stopwatch.Stop();
         var elapsedTime = GetElapsedTime(stopwatch.Elapsed);
 
         if (int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
@@ -1010,7 +1012,7 @@ public partial class FlatPatternExporterMainWindow : Window
             });
     }
 
-    private async Task AnalyzePartNumberConflictsAsync()
+    private async Task AnalyzePartNumberConflictsAsync(Stopwatch stopwatch)
     {
         _conflictingParts.Clear(); // Очищаем список конфликтов перед началом проверки
 
@@ -1020,6 +1022,9 @@ public partial class FlatPatternExporterMainWindow : Window
         if (conflictingPartNumbers.Any())
         {
             _conflictingParts.AddRange(conflictingPartNumbers.SelectMany(entry => entry.Value.Select(v => new PartData { PartNumber = v.PartNumber })));
+
+            // Останавливаем секундомер перед показом MessageBox
+            stopwatch.Stop();
 
             // Используем Dispatcher для обновления UI
             await Dispatcher.InvokeAsync(() =>
