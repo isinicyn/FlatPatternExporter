@@ -10,7 +10,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -24,9 +23,7 @@ using Application = Inventor.Application;
 using Binding = System.Windows.Data.Binding;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
-using Color = System.Windows.Media.Color;
 using DragEventArgs = System.Windows.DragEventArgs;
-using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using Image = System.Windows.Controls.Image;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
@@ -727,7 +724,7 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             partData.IsOverridden = false; // Сброс переопределённых значений
             partData.Quantity = partData.OriginalQuantity * multiplier;
-            partData.QuantityColor = multiplier > 1 ? Brushes.Blue : Brushes.Black;
+            partData.IsMultiplied = multiplier > 1; // Устанавливаем флаг множителя
         }
 
         PartsDataGrid.Items.Refresh();
@@ -1178,9 +1175,9 @@ public class PartData : INotifyPropertyChanged
     // === КАТЕГОРИЯ 6: СВОЙСТВА КОЛИЧЕСТВА И СОСТОЯНИЯ ===
     // Свойства для управления количеством и состоянием обработки
     private int quantity;
-    private Brush quantityColor;
     public int OriginalQuantity { get; set; }
     public bool IsOverridden { get; set; }
+    public bool IsMultiplied { get; set; }
     
     // === КАТЕГОРИЯ 7: СВОЙСТВА СОСТОЯНИЯ ОБРАБОТКИ ===
     // Свойства, устанавливаемые во время экспорта и обработки
@@ -1269,15 +1266,6 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    public Brush QuantityColor
-    {
-        get => quantityColor;
-        set
-        {
-            quantityColor = value;
-            OnPropertyChanged();
-        }
-    }
 
 
     // Реализация интерфейса INotifyPropertyChanged

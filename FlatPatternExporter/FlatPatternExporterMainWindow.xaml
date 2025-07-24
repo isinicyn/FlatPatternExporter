@@ -189,15 +189,24 @@
                     <Setter Property="VerticalAlignment" Value="Center"/>
                 </Style>
 
-                <!-- Специальный стиль для колонки "Количество" с дополнительными настройками -->
+                <!-- Специальный стиль для колонки количества -->
                 <Style x:Key="QuantityCellStyle" TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}">
-                    <Setter Property="Foreground" Value="{Binding QuantityColor}"/>
                     <Style.Triggers>
+                        <!-- Приоритетный триггер для переопределенного количества (красный цвет) -->
                         <DataTrigger Binding="{Binding IsOverridden}" Value="True">
                             <Setter Property="Foreground" Value="Red"/>
                         </DataTrigger>
+                        <!-- Триггер для множителя (синий цвет) -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsOverridden}" Value="False"/>
+                                <Condition Binding="{Binding IsMultiplied}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Foreground" Value="Blue"/>
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
+
 
 
                 <Style TargetType="DataGridRow">
@@ -268,24 +277,12 @@
                     <Setter Property="Foreground" Value="#333333"/>
                 </Style>
 
-                <!-- Стиль для текста внутри ячеек с автоматическим назначением стиля по заголовку колонки -->
+                <!-- Стиль для текста внутри ячеек -->
                 <Style TargetType="TextBlock">
                     <Setter Property="Padding" Value="5,2"/>
                     <Setter Property="HorizontalAlignment" Value="Center"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="Foreground" Value="#333333"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Column.Header, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="Количество">
-                            <Setter Property="Foreground" Value="{Binding QuantityColor}"/>
-                        </DataTrigger>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Column.Header, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="Количество"/>
-                                <Condition Binding="{Binding IsOverridden}" Value="True"/>
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Foreground" Value="Red"/>
-                        </MultiDataTrigger>
-                    </Style.Triggers>
                 </Style>
             </DataGrid.Resources>
 

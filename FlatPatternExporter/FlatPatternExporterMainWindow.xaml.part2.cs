@@ -154,8 +154,7 @@ public partial class FlatPatternExporterMainWindow : Window
             
             // КАТЕГОРИЯ 6: Свойства количества и состояния
             OriginalQuantity = quantity,
-            Quantity = quantity,
-            QuantityColor = Brushes.Black
+            Quantity = quantity
         };
 
         // КАТЕГОРИЯ 2-4: Чтение всех свойств документа и iProperty
@@ -819,7 +818,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             {
                 item.Quantity = dialog.NewQuantity.Value;
                 item.IsOverridden = true;
-                item.QuantityColor = Brushes.Red; // Переопределенное количество окрашивается в красный цвет
             }
 
             PartsDataGrid.Items.Refresh();
