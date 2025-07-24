@@ -10,7 +10,7 @@ namespace FlatPatternExporter;
 
 public partial class ConflictDetailsWindow
 {
-    private string _selectedFilePath;
+    private string? _selectedFilePath;
 
     // Конструктор принимает данные о конфликтах и заполняет TreeView
     public ConflictDetailsWindow(Dictionary<string, List<(string PartNumber, string FileName)>> conflictFileDetails)
@@ -55,7 +55,7 @@ public partial class ConflictDetailsWindow
         if (treeViewItem != null && treeViewItem.Tag != null) // Только для файлов
         {
             treeViewItem.Focus(); // Фокусируемся на нужном элементе
-            _selectedFilePath = treeViewItem.Tag.ToString();
+            _selectedFilePath = treeViewItem.Tag?.ToString();
 
             var contextMenu = new ContextMenu();
             var openFileMenuItem = new MenuItem { Header = "Открыть файл" };
@@ -68,7 +68,7 @@ public partial class ConflictDetailsWindow
     }
 
     // Поиск TreeViewItem для элемента
-    private static T FindAncestor<T>(DependencyObject current) where T : DependencyObject
+    private static T? FindAncestor<T>(DependencyObject current) where T : DependencyObject
     {
         do
         {
