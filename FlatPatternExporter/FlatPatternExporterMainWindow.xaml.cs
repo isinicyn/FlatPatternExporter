@@ -1285,11 +1285,9 @@ public class HeaderAdorner : Adorner
 
 public class PresetIProperty
 {
-    public string InternalName { get; set; } // Внутреннее имя колонки (например, "#")
-    public string DisplayName { get; set; } // Псевдоним для отображения в списке выбора (например, "#Нумерация")
-    public string InventorPropertyName { get; set; } // Соответствующее имя свойства iProperty в Inventor
-    public string Category { get; set; } // Категория свойства для группировки
-
-    public bool ShouldBeAddedOnInit { get; set; } =
-        false; // Новый флаг для определения необходимости добавления при старте
+    public string InternalName { get; set; } = string.Empty; // Внутреннее имя колонки (например, "#")
+    public string DisplayName { get; set; } = string.Empty; // Псевдоним для отображения в списке выбора (например, "#Нумерация")
+    public string InventorPropertyName { get; set; } = string.Empty; // Соответствующее имя свойства iProperty в Inventor
+    public string Category { get; set; } = string.Empty; // Категория свойства для группировки
+    public bool ShouldBeAddedOnInit { get; set; } = false; // Новый флаг для определения необходимости добавления при старте
 }
