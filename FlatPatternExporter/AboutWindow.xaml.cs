@@ -37,7 +37,7 @@ namespace FlatPatternExporter
             try
             {
                 // Получаем путь к директории, где находится исполняемый файл
-                string executingDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string? executingDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 // Создаем новый процесс
                 using (var process = new Process())
@@ -48,7 +48,7 @@ namespace FlatPatternExporter
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.RedirectStandardOutput = true;
                     process.StartInfo.CreateNoWindow = true;
-                    process.StartInfo.WorkingDirectory = executingDir;
+                    process.StartInfo.WorkingDirectory = executingDir ?? AppDomain.CurrentDomain.BaseDirectory;
 
                     // Запускаем процесс
                     process.Start();
