@@ -352,7 +352,7 @@ public partial class FlatPatternExporterMainWindow : Window
         _searchDelayTimer.Stop();
         _searchDelayTimer.Start();
     }
-    private void SearchDelayTimer_Tick(object sender, EventArgs e)
+    private void SearchDelayTimer_Tick(object? sender, EventArgs e)
     {
         _searchDelayTimer.Stop();
         _partsDataView.View.Refresh(); // Обновление фильтрации
@@ -472,7 +472,7 @@ public partial class FlatPatternExporterMainWindow : Window
         selectIPropertyWindow?.UpdateAvailableProperties();
     }
 
-    private void PartsDataGrid_ColumnReordering(object sender, DataGridColumnReorderingEventArgs e)
+    private void PartsDataGrid_ColumnReordering(object? sender, DataGridColumnReorderingEventArgs e)
     {
         _reorderingColumn = e.Column;
         _isColumnDraggedOutside = false;
@@ -573,7 +573,7 @@ public partial class FlatPatternExporterMainWindow : Window
         _isColumnDraggedOutside = false;
     }
 
-    private void PartsDataGrid_ColumnReordered(object sender, DataGridColumnEventArgs e)
+    private void PartsDataGrid_ColumnReordered(object? sender, DataGridColumnEventArgs e)
     {
         _reorderingColumn = null;
         _isColumnDraggedOutside = false;
@@ -1216,9 +1216,9 @@ public class PartData : INotifyPropertyChanged
 
 
     // Реализация интерфейса INotifyPropertyChanged
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected void OnPropertyChanged([CallerMemberName] string name = null)
+    protected void OnPropertyChanged([CallerMemberName] string? name = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
