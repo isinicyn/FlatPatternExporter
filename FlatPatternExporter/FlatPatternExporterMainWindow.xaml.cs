@@ -411,7 +411,7 @@ public partial class FlatPatternExporterMainWindow : Window
         DataGridColumn column;
 
         // Проверка, если это колонка с изображением детали или развертки
-        if (iProperty.InternalName == "Изображение детали" || iProperty.InternalName == "Изображение развертки")
+        if (iProperty.InternalName == "Изобр. детали" || iProperty.InternalName == "Изобр. развертки")
         {
             column = new DataGridTemplateColumn
             {
@@ -1044,7 +1044,7 @@ public class PartData : INotifyPropertyChanged
     // === КАТЕГОРИЯ 1: СИСТЕМНЫЕ СВОЙСТВА ПРИЛОЖЕНИЯ ===
     // Свойства, используемые только внутри приложения для управления таблицей
     private int item;
-    
+
     // === КАТЕГОРИЯ 2: СВОЙСТВА ДОКУМЕНТА (НЕ IPROPERTY) ===
     // Базовые свойства файла документа, считываемые напрямую из API Inventor
     public string FileName { get; set; } = string.Empty; // Path.GetFileNameWithoutExtension()
@@ -1053,13 +1053,13 @@ public class PartData : INotifyPropertyChanged
     private double thickness = 0.0; // SheetMetalComponentDefinition.Thickness
     public BitmapImage? Preview { get; set; } // apprenticeDoc.Thumbnail
     public bool HasFlatPattern { get; set; } = false; // smCompDef.HasFlatPattern
-    
+
     // === КАТЕГОРИЯ 3: ОСНОВНЫЕ IPROPERTIES ===
     // Ключевые iProperty из "Design Tracking Properties", всегда необходимые
     private string partNumber = string.Empty;
     private string description = string.Empty;
     private string material = string.Empty;
-    
+
     // === КАТЕГОРИЯ 4: РАСШИРЕННЫЕ IPROPERTIES ===
     // Опциональные iProperty из различных наборов свойств
     public string Author { get; set; } = string.Empty;
@@ -1093,25 +1093,25 @@ public class PartData : INotifyPropertyChanged
     public string FlatPatternLength { get; set; } = string.Empty;
     public string FlatPatternArea { get; set; } = string.Empty;
     public string Appearance { get; set; } = string.Empty;
-    
+
     // === КАТЕГОРИЯ 5: ПОЛЬЗОВАТЕЛЬСКИЕ IPROPERTIES ===
     // Динамически добавляемые пользователем свойства из "Inventor User Defined Properties"
     private Dictionary<string, string> customProperties = new();
-    
+
     // === КАТЕГОРИЯ 6: СВОЙСТВА КОЛИЧЕСТВА И СОСТОЯНИЯ ===
     // Свойства для управления количеством и состоянием обработки
     private int quantity;
     public int OriginalQuantity { get; set; }
     public bool IsOverridden { get; set; }
     public bool IsMultiplied { get; set; }
-    
+
     // === КАТЕГОРИЯ 7: СВОЙСТВА СОСТОЯНИЯ ОБРАБОТКИ ===
     // Свойства, устанавливаемые во время экспорта и обработки
     public BitmapImage? DxfPreview { get; set; } // Миниатюра развертки (генерируется)
     public Brush ProcessingColor { get; set; } = Brushes.Transparent; // Индикатор состояния экспорта
 
     // === СВОЙСТВА С УВЕДОМЛЕНИЯМИ ===
-    
+
     public Dictionary<string, string> CustomProperties
     {
         get => customProperties;
