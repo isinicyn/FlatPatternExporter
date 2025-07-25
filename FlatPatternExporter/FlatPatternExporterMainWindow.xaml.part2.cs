@@ -1326,6 +1326,26 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     public async Task FillPropertyDataAsync(string propertyName)
     {
+        // Блеклист свойств, которые НЕ должны обновляться через этот метод
+        // (они заполняются при первичном сканировании или имеют специальную логику)
+        var blacklistedProperties = new HashSet<string>
+        {
+            "Item",         // Системная нумерация
+            "FileName",     // Имя файла (заполняется при сканировании)
+            "FullFileName", // Полный путь (заполняется при сканировании)  
+            "ModelState",   // Состояние модели (заполняется при сканировании)
+            "Thickness",    // Толщина (заполняется при сканировании, тип double)
+            "Preview",      // Изображение детали (тип BitmapImage)
+            "DxfPreview",   // Изображение развертки (тип BitmapImage)
+            "Quantity"      // Количество (системное свойство, тип int)
+        };
+
+        // Если свойство в блеклисте - не обрабатываем
+        if (blacklistedProperties.Contains(propertyName))
+        {
+            return;
+        }
+
         // Проверяем тип свойства один раз перед циклом
         var propInfo = typeof(PartData).GetProperty(propertyName);
         var isDedicatedProperty = propInfo != null && propInfo.PropertyType == typeof(string);
