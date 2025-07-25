@@ -246,28 +246,6 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private async Task<string> GetPropertyExpressionOrValueAsync(PartDocument partDoc, string propertyName)
-    {
-        return await Task.Run(() =>
-        {
-            try
-            {
-                var propertySets = partDoc.PropertySets;
-                foreach (PropertySet propSet in propertySets)
-                foreach (Property prop in propSet)
-                    if (prop.Name == propertyName)
-                    {
-                        return prop.Value?.ToString() ?? string.Empty;
-                    }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка при получении значения для {propertyName}: {ex.Message}");
-            }
-
-            return string.Empty;
-        });
-    }
 
     private void PartsDataGrid_DragOver(object sender, DragEventArgs e)
     {
@@ -1002,8 +980,9 @@ public partial class FlatPatternExporterMainWindow : Window
 
     private (string partNumber, string description) GetDocumentProperties(Document document)
     {
-        var partNumber = GetProperty(document.PropertySets["Design Tracking Properties"], "Part Number");
-        var description = GetProperty(document.PropertySets["Design Tracking Properties"], "Description");
+        var mgr = new PropertyManager((Document)document);
+        var partNumber = mgr.GetMappedProperty("PartNumber");
+        var description = mgr.GetMappedProperty("Description");
         return (partNumber, description);
     }
 
@@ -1055,18 +1034,6 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private string GetProperty(PropertySet propertySet, string propertyName)
-    {
-        try
-        {
-            var property = propertySet[propertyName];
-            return property.Value.ToString() ?? string.Empty;
-        }
-        catch (Exception)
-        {
-            return string.Empty;
-        }
-    }
 }
 
 public class PartData : INotifyPropertyChanged
