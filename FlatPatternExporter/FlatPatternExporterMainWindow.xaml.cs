@@ -450,6 +450,9 @@ public partial class FlatPatternExporterMainWindow : Window
         var selectIPropertyWindow =
             System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
         selectIPropertyWindow?.UpdateAvailableProperties();
+
+        // Дозаполняем данные для новой колонки (асинхронно)
+        _ = FillPropertyDataAsync(iProperty.InventorPropertyName);
     }
 
     private void PartsDataGrid_ColumnReordering(object? sender, DataGridColumnReorderingEventArgs e)

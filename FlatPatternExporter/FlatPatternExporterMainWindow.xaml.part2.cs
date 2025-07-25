@@ -1324,20 +1324,32 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         EditIPropertyMenuItem.IsEnabled = PartsDataGrid.SelectedItems.Count == 1;
     }
 
-    public async Task FillCustomPropertyAsync(string customPropertyName)
+    public async Task FillPropertyDataAsync(string propertyName)
     {
+        // Проверяем тип свойства один раз перед циклом
+        var propInfo = typeof(PartData).GetProperty(propertyName);
+        var isDedicatedProperty = propInfo != null && propInfo.PropertyType == typeof(string);
+
         foreach (var partData in _partsData)
         {
             var partDoc = OpenPartDocument(partData.PartNumber);
             if (partDoc != null)
             {
                 var mgr = new PropertyManager((Document)partDoc);
-                var value = mgr.GetMappedProperty(customPropertyName);
-                partData.AddCustomProperty(customPropertyName, value);
+                var value = mgr.GetMappedProperty(propertyName) ?? string.Empty;
+
+                if (isDedicatedProperty)
+                {
+                    propInfo!.SetValue(partData, value);
+                }
+                else
+                {
+                    // Добавляем как пользовательское свойство
+                    partData.AddCustomProperty(propertyName, value);
+                }
             }
 
             PartsDataGrid.Items.Refresh();
-
             await Task.Delay(50);
         }
     }
@@ -1382,6 +1394,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         column.ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style;
 
         PartsDataGrid.Columns.Add(column);
+
+        // Дозаполняем данные для новой колонки (асинхронно)
+        _ = FillPropertyDataAsync(propertyName);
     }
 
     private void EditIProperty_Click(object sender, RoutedEventArgs e)

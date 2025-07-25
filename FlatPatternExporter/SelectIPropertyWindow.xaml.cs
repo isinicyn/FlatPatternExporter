@@ -196,15 +196,13 @@ namespace FlatPatternExporter
                 // Добавляем в список custom properties
                 _mainWindow._customPropertiesList.Add(customPropertyName);
 
-                // Создаем колонку
-                _mainWindow.AddCustomIPropertyColumn(customPropertyName);
-
-                // Заполняем данные из Inventor
+                // Отключаем интерфейс Inventor на время операции
                 _mainWindow.SetInventorUserInterfaceState(true);
 
                 try
                 {
-                    await _mainWindow.FillCustomPropertyAsync(customPropertyName);
+                    // Создаем колонку (данные заполнятся автоматически)
+                    _mainWindow.AddCustomIPropertyColumn(customPropertyName);
                 }
                 finally
                 {
