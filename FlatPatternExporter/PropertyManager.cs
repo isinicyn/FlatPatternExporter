@@ -234,5 +234,33 @@ namespace FlatPatternExporter
                 return false;
             }
         }
+
+        /// <summary>
+        /// Проверяет, является ли состояние модели документа основным (kPrimaryModelStateType = 118017)
+        /// </summary>
+        public bool IsPrimaryModelState()
+        {
+            try
+            {
+                // Получаем активное состояние модели из ComponentDefinition
+                if (_document is PartDocument partDoc)
+                {
+                    var activeModelState = partDoc.ComponentDefinition.ModelStates.ActiveModelState;
+                    return activeModelState.ModelStateType == ModelStateTypeEnum.kPrimaryModelStateType;
+                }
+                else if (_document is AssemblyDocument asmDoc)
+                {
+                    var activeModelState = asmDoc.ComponentDefinition.ModelStates.ActiveModelState;
+                    return activeModelState.ModelStateType == ModelStateTypeEnum.kPrimaryModelStateType;
+                }
+                
+                return true; // Для других типов документов считаем основным состоянием
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка проверки типа состояния модели: {ex.Message}");
+                return true; // По умолчанию считаем основным состоянием
+            }
+        }
     }
 }

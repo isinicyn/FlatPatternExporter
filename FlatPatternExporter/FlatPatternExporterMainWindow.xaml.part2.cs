@@ -1201,11 +1201,16 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
 
         var modelStateInfo = GetModelStateName(doc);
+        var mgr = new PropertyManager(doc);
+        var isPrimaryModelState = mgr.IsPrimaryModelState();
         
         // Формируем полный текст с состоянием модели
         var fullInfo = $"Тип документа: {documentType}\nОбозначение: {partNumber}\nОписание: {description}\nСостояние модели: {modelStateInfo}";
         
         DocumentInfoLabel.Text = fullInfo;
+        
+        // Устанавливаем цвет текста в зависимости от типа состояния модели
+        DocumentInfoLabel.Foreground = isPrimaryModelState ? Brushes.Black : Brushes.Red;
 
         UpdateFileCountLabel(_partsData.Count); // Использование метода для обновления счетчика
         BottomPanel.Opacity = 1.0;
