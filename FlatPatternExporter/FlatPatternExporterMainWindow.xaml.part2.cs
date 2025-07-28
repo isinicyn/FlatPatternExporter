@@ -1171,7 +1171,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ProgressLabel.Text = "Статус: ";
         UpdateFileCountLabel(0); // Использование метода для сброса счетчика
         BottomPanel.Opacity = 0.75;
-        DocumentInfoLabel.Text = string.Empty;
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -1184,7 +1183,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             // If not scanning, reset the UI
             ResetProgressBar();
             BottomPanel.Opacity = 0.75;
-            DocumentInfoLabel.Text = "";
             ExportButton.IsEnabled = false;
             ClearButton.IsEnabled = _partsData.Count > 0; // Обновляем состояние кнопки "Очистить"
             _lastScannedDocument = null;
@@ -1196,28 +1194,21 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         if (string.IsNullOrEmpty(documentType) && string.IsNullOrEmpty(partNumber) && string.IsNullOrEmpty(description))
         {
-            DocumentInfoLabel.Text = string.Empty;
-            ModelStateInfoRunBottom.Text = string.Empty; // Обновленное имя элемента
+            DocumentInfoLabel.Text = "Информация о документе не доступна";
             BottomPanel.Opacity = 0.75;
             UpdateFileCountLabel(0); // Использование метода для сброса счетчика
             return;
         }
 
         var modelStateInfo = GetModelStateName(doc);
-
-        DocumentInfoLabel.Text = $"Тип документа: {documentType}\nОбозначение: {partNumber}\nОписание: {description}";
-
-        if (modelStateInfo == "[Primary]" || modelStateInfo == "[Основной]")
-        {
-            ModelStateInfoRunBottom.Text = "[Основной]";
-            ModelStateInfoRunBottom.Foreground =
-                new SolidColorBrush(Colors.Black); // Цвет текста - черный (по умолчанию)
-        }
-        else
-        {
-            ModelStateInfoRunBottom.Text = modelStateInfo;
-            ModelStateInfoRunBottom.Foreground = new SolidColorBrush(Colors.Red); // Цвет текста - красный
-        }
+        
+        // Нормализуем отображение состояния модели
+        var displayModelState = (modelStateInfo == "[Primary]" || modelStateInfo == "[Основной]") ? "[Основной]" : modelStateInfo;
+        
+        // Формируем полный текст с состоянием модели
+        var fullInfo = $"Тип документа: {documentType}\nОбозначение: {partNumber}\nОписание: {description}\nСостояние модели: {displayModelState}";
+        
+        DocumentInfoLabel.Text = fullInfo;
 
         UpdateFileCountLabel(_partsData.Count); // Использование метода для обновления счетчика
         BottomPanel.Opacity = 1.0;
@@ -1229,8 +1220,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         _partsData.Clear();
         ProgressBar.Value = 0;
         ProgressLabel.Text = "Статус: ";
-        DocumentInfoLabel.Text = string.Empty;
-        ModelStateInfoRunBottom.Text = string.Empty;
         BottomPanel.Opacity = 0.5;
         ExportButton.IsEnabled = false;
         ClearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки

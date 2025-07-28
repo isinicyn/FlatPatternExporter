@@ -184,6 +184,7 @@ public partial class FlatPatternExporterMainWindow : Window
         KeyUp += MainWindow_KeyUp;
 
         VersionTextBlock.Text = "Версия программы: " + GetVersion();
+        DocumentInfoLabel.Text = "Документ не выбран";
     }
 
     public ObservableCollection<LayerSetting> LayerSettings { get; set; }
@@ -742,7 +743,6 @@ public partial class FlatPatternExporterMainWindow : Window
 
         SetInventorUserInterfaceState(true);
 
-        ModelStateInfoRunBottom.Text = string.Empty;
 
         if (doc.DocumentType != DocumentTypeEnum.kAssemblyDocumentObject &&
             doc.DocumentType != DocumentTypeEnum.kPartDocumentObject)

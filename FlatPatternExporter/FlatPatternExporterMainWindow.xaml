@@ -407,9 +407,6 @@
         </StackPanel>
         <StackPanel Grid.Row="3" Margin="10,40,0,10" HorizontalAlignment="Left" Width="250">
             <TextBlock x:Name="ProgressLabel" Text="Статус: " Margin="0,0,0,10"/>
-            <TextBlock>
-                <Run x:Name="DocumentInfoLabel" Text="" Foreground="Black"/>
-            </TextBlock>
         </StackPanel>
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="75" Width="245">
             <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="0,0,10,0" Height="75" Width="75" BorderThickness="1,1,1,1" RenderTransformOrigin="0,0"/>
@@ -419,6 +416,10 @@
             </StackPanel>
             <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования"/>
         </StackPanel>
+        <Border Grid.Row="0" Margin="500,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300"
+                BorderBrush="#D0D0D0" BorderThickness="1" CornerRadius="5" Background="#F8F8F8" Padding="8">
+            <TextBlock x:Name="DocumentInfoLabel" Text="" Foreground="Black" FontSize="11" TextWrapping="Wrap"/>
+        </Border>
         <Border Grid.Row="4" Background="LightGray" Height="25" VerticalAlignment="Center">
             <StackPanel x:Name="BottomPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Opacity="0.75">
                 <TextBlock x:Name="ProjectName" Text="Проект: " Foreground="Black" Margin="10,0"/>
@@ -431,18 +432,6 @@
                     </Separator.RenderTransform>
                 </Separator>
                 <TextBlock x:Name="FileCountLabelBottom" Text="Найдено файлов для экспорта: " Foreground="Black" Margin="10,0"/>
-                <Separator Width="16" Margin="10,0,10,0" Background="#FFADADAD" UseLayoutRounding="False" Cursor="" VerticalContentAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" RenderTransformOrigin="0.5,0.5">
-                    <Separator.RenderTransform>
-                        <TransformGroup>
-                            <RotateTransform Angle="-90"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Separator.RenderTransform>
-                </Separator>
-                <TextBlock>
-                    <Run Text="Состояние модели: "/>
-                    <Run x:Name="ModelStateInfoRunBottom" Foreground="Red"/>
-                </TextBlock>
             </StackPanel>
         </Border>
         <TabControl Margin="10,10,10,10" Grid.Row="1">
