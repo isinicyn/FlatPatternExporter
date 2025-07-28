@@ -753,8 +753,11 @@ public partial class FlatPatternExporterMainWindow : Window
         }
 
         ResetProgressBar();
-        ProgressBar.IsIndeterminate = true;
-        ProgressLabel.Text = "Статус: Сбор данных...";
+        ProgressBar.IsIndeterminate = false;
+        ProgressBar.Minimum = 0;
+        ProgressBar.Maximum = 100;
+        ProgressBar.Value = 0;
+        ProgressLabel.Text = "Статус: Подготовка к сканированию...";
         ScanButton.IsEnabled = false;
         CancelButton.IsEnabled = true;
         ExportButton.IsEnabled = false;
@@ -777,7 +780,15 @@ public partial class FlatPatternExporterMainWindow : Window
         _itemCounter = 1;
         _partNumberTracker.Clear(); // Очищаем трекер конфликтов
 
-        var progress = new Progress<PartData>(partData =>
+        // Прогресс для сканирования структуры сборки
+        var scanProgress = new Progress<ScanProgress>(progress =>
+        {
+            ProgressBar.Value = progress.TotalItems > 0 ? (double)progress.ProcessedItems / progress.TotalItems * 100 : 0;
+            ProgressLabel.Text = $"Статус: {progress.CurrentOperation} - {progress.CurrentItem}";
+        });
+
+        // Прогресс для добавления готовых деталей в таблицу
+        var partProgress = new Progress<PartData>(partData =>
         {
             partData.Item = _itemCounter;
             _partsData.Add(partData);
@@ -791,14 +802,24 @@ public partial class FlatPatternExporterMainWindow : Window
             var sheetMetalParts = new Dictionary<string, int>();
             if (TraverseRadioButton.IsChecked == true)
                 await Task.Run(() =>
-                    ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
+                    ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, scanProgress));
             else if (BomRadioButton.IsChecked == true)
-                await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
+                await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, scanProgress));
             partCount = sheetMetalParts.Count;
             (partNumber, description) = GetDocumentProperties((Document)asmDoc);
             modelStateInfo = asmDoc.ComponentDefinition.BOM.BOMViews[1].ModelStateMemberName;
 
+            // Переключаем прогресс на обработку деталей
+            await Dispatcher.InvokeAsync(() =>
+            {
+                ProgressBar.Value = 0;
+                ProgressLabel.Text = "Статус: Обработка деталей...";
+            });
+
             var itemCounter = 1;
+            var totalParts = sheetMetalParts.Count;
+            var processedParts = 0;
+            
             await Task.Run(async () =>
             {
                 foreach (var part in sheetMetalParts)
@@ -809,9 +830,18 @@ public partial class FlatPatternExporterMainWindow : Window
                         itemCounter++);
                     if (partData != null)
                     {
-                        ((IProgress<PartData>)progress).Report(partData);
-                        await Task.Delay(10);
+                        ((IProgress<PartData>)partProgress).Report(partData);
                     }
+                    
+                    // Обновляем прогресс обработки деталей
+                    processedParts++;
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        ProgressBar.Value = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
+                        ProgressLabel.Text = $"Статус: Обработка деталей - {processedParts} из {totalParts}";
+                    });
+                    
+                    await Task.Delay(10);
                 }
             });
 
@@ -826,10 +856,12 @@ public partial class FlatPatternExporterMainWindow : Window
                 partCount = 1;
                 (partNumber, description) = GetDocumentProperties((Document)partDoc);
 
+                ProgressLabel.Text = "Статус: Обработка детали...";
                 var partData = await GetPartDataAsync(partNumber, 1, null, 1, partDoc);
                 if (partData != null)
                 {
-                    ((IProgress<PartData>)progress).Report(partData);
+                    ((IProgress<PartData>)partProgress).Report(partData);
+                    ProgressBar.Value = 100;
                     await Task.Delay(10);
                 }
             }
@@ -1262,5 +1294,14 @@ public class PresetIProperty
     public string InventorPropertyName { get; set; } = string.Empty; // Соответствующее имя свойства iProperty в Inventor
     public string Category { get; set; } = string.Empty; // Категория свойства для группировки
     public bool ShouldBeAddedOnInit { get; set; } = false; // Новый флаг для определения необходимости добавления при старте
+}
+
+// Структура для отслеживания прогресса сканирования
+public class ScanProgress
+{
+    public int ProcessedItems { get; set; }
+    public int TotalItems { get; set; }
+    public string CurrentOperation { get; set; } = string.Empty;
+    public string CurrentItem { get; set; } = string.Empty;
 }
 

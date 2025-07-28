@@ -212,8 +212,11 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private void ProcessComponentOccurrences(ComponentOccurrences occurrences, Dictionary<string, int> sheetMetalParts)
+    private void ProcessComponentOccurrences(ComponentOccurrences occurrences, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null)
     {
+        var totalOccurrences = occurrences.Count;
+        var processedOccurrences = 0;
+
         foreach (ComponentOccurrence occ in occurrences)
         {
             if (_isCancelled) break;
@@ -259,17 +262,37 @@ public partial class FlatPatternExporterMainWindow : Window
                 }
                 else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
                 {
-                    ProcessComponentOccurrences((ComponentOccurrences)occ.SubOccurrences, sheetMetalParts);
+                    ProcessComponentOccurrences((ComponentOccurrences)occ.SubOccurrences, sheetMetalParts); // Рекурсивный вызов без прогресса
                 }
+                
+                // Обновляем прогресс
+                processedOccurrences++;
+                scanProgress?.Report(new ScanProgress
+                {
+                    ProcessedItems = processedOccurrences,
+                    TotalItems = totalOccurrences,
+                    CurrentOperation = "Сканирование компонентов",
+                    CurrentItem = $"Компонент {processedOccurrences} из {totalOccurrences}"
+                });
             }
             catch (Exception ex)
             {
                 // Логирование ошибки
                 Debug.WriteLine($"Ошибка при обработке компонента: {ex.Message}");
+                
+                // Обновляем прогресс даже при ошибке
+                processedOccurrences++;
+                scanProgress?.Report(new ScanProgress
+                {
+                    ProcessedItems = processedOccurrences,
+                    TotalItems = totalOccurrences,
+                    CurrentOperation = "Сканирование компонентов",
+                    CurrentItem = $"Компонент {processedOccurrences} из {totalOccurrences}"
+                });
             }
         }
     }
-    private void ProcessBOM(BOM bom, Dictionary<string, int> sheetMetalParts)
+    private void ProcessBOM(BOM bom, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null)
     {
         try
         {
@@ -299,6 +322,9 @@ public partial class FlatPatternExporterMainWindow : Window
                 return;
             }
 
+            var totalRows = bomRows.Length;
+            var processedRows = 0;
+
             foreach (BOMRow row in bomRows)
             {
                 if (_isCancelled) break;
@@ -306,6 +332,16 @@ public partial class FlatPatternExporterMainWindow : Window
                 try
                 {
                     ProcessBOMRow(row, sheetMetalParts);
+                    
+                    // Обновляем прогресс
+                    processedRows++;
+                    scanProgress?.Report(new ScanProgress
+                    {
+                        ProcessedItems = processedRows,
+                        TotalItems = totalRows,
+                        CurrentOperation = "Сканирование спецификации",
+                        CurrentItem = $"Строка {processedRows} из {totalRows}"
+                    });
                 }
                 catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
                 {
@@ -358,7 +394,7 @@ public partial class FlatPatternExporterMainWindow : Window
         else if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
         {
             var asmDoc = document as AssemblyDocument;
-            if (asmDoc != null) ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts);
+            if (asmDoc != null) ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts); // Рекурсивный вызов без прогресса
         }
     }
     private void InitializeLibraryPaths()
