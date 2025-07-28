@@ -1202,11 +1202,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         var modelStateInfo = GetModelStateName(doc);
         
-        // Нормализуем отображение состояния модели
-        var displayModelState = (modelStateInfo == "[Primary]" || modelStateInfo == "[Основной]") ? "[Основной]" : modelStateInfo;
-        
         // Формируем полный текст с состоянием модели
-        var fullInfo = $"Тип документа: {documentType}\nОбозначение: {partNumber}\nОписание: {description}\nСостояние модели: {displayModelState}";
+        var fullInfo = $"Тип документа: {documentType}\nОбозначение: {partNumber}\nОписание: {description}\nСостояние модели: {modelStateInfo}";
         
         DocumentInfoLabel.Text = fullInfo;
 
