@@ -1194,7 +1194,11 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         if (string.IsNullOrEmpty(documentType) && string.IsNullOrEmpty(partNumber) && string.IsNullOrEmpty(description))
         {
-            DocumentInfoLabel.Text = "Информация о документе не доступна";
+            ProgressLabel.Text = "Статус: Информация о документе не доступна";
+            DocumentTypeLabel.Text = "";
+            PartNumberLabel.Text = "";
+            DescriptionLabel.Text = "";
+            ModelStateLabel.Text = "";
             BottomPanel.Opacity = 0.75;
             UpdateFileCountLabel(0); // Использование метода для сброса счетчика
             return;
@@ -1204,13 +1208,14 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         var mgr = new PropertyManager(doc);
         var isPrimaryModelState = mgr.IsPrimaryModelState();
         
-        // Формируем полный текст с состоянием модели
-        var fullInfo = $"Тип документа: {documentType}\nОбозначение: {partNumber}\nОписание: {description}\nСостояние модели: {modelStateInfo}";
+        // Заполняем отдельные поля в блоке информации о документе
+        DocumentTypeLabel.Text = documentType;
+        PartNumberLabel.Text = partNumber;
+        DescriptionLabel.Text = description;
+        ModelStateLabel.Text = modelStateInfo;
         
-        DocumentInfoLabel.Text = fullInfo;
-        
-        // Устанавливаем цвет текста в зависимости от типа состояния модели
-        DocumentInfoLabel.Foreground = isPrimaryModelState ? Brushes.Black : Brushes.Red;
+        // Устанавливаем цвет текста состояния модели в зависимости от типа
+        ModelStateLabel.Foreground = isPrimaryModelState ? Brushes.Black : Brushes.Red;
 
         UpdateFileCountLabel(_partsData.Count); // Использование метода для обновления счетчика
         BottomPanel.Opacity = 1.0;

@@ -184,7 +184,7 @@ public partial class FlatPatternExporterMainWindow : Window
         KeyUp += MainWindow_KeyUp;
 
         VersionTextBlock.Text = "Версия программы: " + GetVersion();
-        DocumentInfoLabel.Text = "Документ не выбран";
+        ProgressLabel.Text = "Статус: Документ не выбран";
     }
 
     public ObservableCollection<LayerSetting> LayerSettings { get; set; }

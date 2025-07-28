@@ -29,6 +29,21 @@
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
+        
+        <!-- Стили для блока информации о документе -->
+        <Style x:Key="DocumentInfoLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,3,1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        
+        <Style x:Key="DocumentInfoValueStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="0,0,0,1"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -36,7 +51,7 @@
             <RowDefinition Height="100" />
             <RowDefinition Height="210"/>
             <RowDefinition />
-            <RowDefinition Height="125" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
         <Button x:Name="AddPresetIPropertyButton" Content="+ iProperty" Click="AddPresetIPropertyButton_Click" Height="32.5" Margin="265,0,10,48" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1"/>
@@ -405,9 +420,9 @@
         <StackPanel Margin="10,10,10,0" Grid.Row="3" VerticalAlignment="Top">
             <ProgressBar x:Name="ProgressBar" Height="20" Margin="0,0,0,10"/>
         </StackPanel>
-        <StackPanel Grid.Row="3" Margin="10,40,0,10" HorizontalAlignment="Left" Width="250">
-            <TextBlock x:Name="ProgressLabel" Text="Статус: " Margin="0,0,0,10"/>
-        </StackPanel>
+        <TextBlock x:Name="ProgressLabel" Grid.Row="3" Text="Статус: " 
+                   Margin="10,40,10,10" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                   TextWrapping="Wrap" Height="Auto" MaxWidth="800"/>
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="75" Width="245">
             <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="0,0,10,0" Height="75" Width="75" BorderThickness="1,1,1,1" RenderTransformOrigin="0,0"/>
             <StackPanel Width="75" Margin="0,0,10,0">
@@ -416,9 +431,32 @@
             </StackPanel>
             <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования"/>
         </StackPanel>
-        <Border Grid.Row="0" Margin="500,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300"
-                BorderBrush="#D0D0D0" BorderThickness="1" CornerRadius="5" Background="#F8F8F8" Padding="8">
-            <TextBlock x:Name="DocumentInfoLabel" Text="" Foreground="Black" FontSize="11" TextWrapping="Wrap"/>
+        <Border Grid.Row="0" Margin="500,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="75"
+                BorderBrush="#D0D0D0" BorderThickness="1" CornerRadius="5" Background="#F8F8F8" Padding="5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Тип документа:" Style="{StaticResource DocumentInfoLabelStyle}"/>
+                <TextBlock x:Name="DocumentTypeLabel" Grid.Row="0" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}"/>
+                
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Обозначение:" Style="{StaticResource DocumentInfoLabelStyle}"/>
+                <TextBlock x:Name="PartNumberLabel" Grid.Row="1" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}"/>
+                
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание:" Style="{StaticResource DocumentInfoLabelStyle}"/>
+                <TextBlock x:Name="DescriptionLabel" Grid.Row="2" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}"/>
+                
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Состояние модели:" Style="{StaticResource DocumentInfoLabelStyle}"/>
+                <TextBlock x:Name="ModelStateLabel" Grid.Row="3" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}"/>
+            </Grid>
         </Border>
         <Border Grid.Row="4" Background="LightGray" Height="25" VerticalAlignment="Center">
             <StackPanel x:Name="BottomPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Opacity="0.75">
