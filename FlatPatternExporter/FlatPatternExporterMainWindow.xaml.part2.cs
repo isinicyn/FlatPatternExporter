@@ -1199,6 +1199,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             PartNumberLabel.Text = "";
             DescriptionLabel.Text = "";
             ModelStateLabel.Text = "";
+            IsPrimaryModelState = true; // Сбрасываем состояние модели по умолчанию
+            ModelStateLabel.Tag = true; // Сбрасываем Tag для триггера
             BottomPanel.Opacity = 0.75;
             UpdateFileCountLabel(0); // Использование метода для сброса счетчика
             return;
@@ -1214,8 +1216,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         DescriptionLabel.Text = description;
         ModelStateLabel.Text = modelStateInfo;
         
-        // Устанавливаем цвет текста состояния модели в зависимости от типа
-        ModelStateLabel.Foreground = isPrimaryModelState ? Brushes.Black : Brushes.Red;
+        // Устанавливаем свойство для триггера стиля (через Tag так как RelativeSource не работает)
+        IsPrimaryModelState = isPrimaryModelState;
+        ModelStateLabel.Tag = isPrimaryModelState;
 
         UpdateFileCountLabel(_partsData.Count); // Использование метода для обновления счетчика
         BottomPanel.Opacity = 1.0;

@@ -191,6 +191,9 @@ public partial class FlatPatternExporterMainWindow : Window
     public ObservableCollection<string> AvailableColors { get; set; }
     public ObservableCollection<string> LineTypes { get; set; }
     public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
+    
+    // Свойство для привязки состояния модели к UI (устанавливается однократно при сканировании)
+    public bool IsPrimaryModelState { get; set; } = true;
 
     public string GetVersion()
     {
@@ -1068,6 +1071,7 @@ public partial class FlatPatternExporterMainWindow : Window
             });
         }
     }
+
 
 }
 
