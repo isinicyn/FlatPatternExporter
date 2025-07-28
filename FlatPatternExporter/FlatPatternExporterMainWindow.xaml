@@ -48,7 +48,7 @@
         
         <Style x:Key="ModelStateValueStyle" TargetType="TextBlock" BasedOn="{StaticResource DocumentInfoValueStyle}">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="False">
+                <DataTrigger Binding="{Binding IsPrimaryModelState}" Value="False">
                     <Setter Property="Foreground" Value="Red"/>
                 </DataTrigger>
             </Style.Triggers>

@@ -34,7 +34,7 @@ using TextBox = System.Windows.Controls.TextBox;
 
 namespace FlatPatternExporter;
 
-public partial class FlatPatternExporterMainWindow : Window
+public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
     private bool _hasMissingReferences = false;
     private AdornerLayer? _adornerLayer;
@@ -191,9 +191,28 @@ public partial class FlatPatternExporterMainWindow : Window
     public ObservableCollection<string> AvailableColors { get; set; }
     public ObservableCollection<string> LineTypes { get; set; }
     public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
-    
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void OnPropertyChanged([CallerMemberName] string? name = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
     // Свойство для привязки состояния модели к UI (устанавливается однократно при сканировании)
-    public bool IsPrimaryModelState { get; set; } = true;
+    private bool _isPrimaryModelState = true;
+    public bool IsPrimaryModelState
+    {
+        get => _isPrimaryModelState;
+        set
+        {
+            if (_isPrimaryModelState != value)
+            {
+                _isPrimaryModelState = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public string GetVersion()
     {
