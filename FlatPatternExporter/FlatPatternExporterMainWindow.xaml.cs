@@ -1263,3 +1263,4 @@ public class PresetIProperty
     public string Category { get; set; } = string.Empty; // Категория свойства для группировки
     public bool ShouldBeAddedOnInit { get; set; } = false; // Новый флаг для определения необходимости добавления при старте
 }
+

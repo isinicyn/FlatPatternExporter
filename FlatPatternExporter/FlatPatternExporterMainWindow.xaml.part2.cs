@@ -24,10 +24,8 @@ public partial class FlatPatternExporterMainWindow : Window
     /// <summary>
     /// Общий метод для чтения всех свойств из документа с использованием PropertyManager
     /// </summary>
-    private void ReadAllPropertiesFromPart(PartDocument partDoc, PartData partData)
+    private void ReadAllPropertiesFromPart(PartDocument partDoc, PartData partData, PropertyManager mgr)
     {
-        var mgr = new PropertyManager((Document)partDoc);
-
         // КАТЕГОРИЯ 2: Свойства документа (не iProperty)
         partData.FileName = mgr.GetFileName();
         partData.FullFileName = mgr.GetFullFileName();
@@ -96,21 +94,22 @@ public partial class FlatPatternExporterMainWindow : Window
             Quantity = quantity
         };
 
+        // Создаем единый экземпляр PropertyManager для всех операций
+        var mgr = new PropertyManager((Document)partDoc);
+        
         // КАТЕГОРИЯ 2-4: Чтение всех свойств документа и iProperty
-        ReadAllPropertiesFromPart(partDoc, partData);
+        ReadAllPropertiesFromPart(partDoc, partData, mgr);
 
         // КАТЕГОРИЯ 5: Получаем значения для пользовательских iProperty
-        var mgr = new PropertyManager((Document)partDoc);
         foreach (var customProperty in _customPropertiesList)
         {
             partData.CustomProperties[customProperty] = mgr.GetMappedProperty(customProperty);
         }
 
-        // КАТЕГОРИЯ 2: Дополнительные свойства документа (изображения и состояние развертки)
+        // КАТЕГОРИЯ 2: Дополнительные свойства документа (изображения)
         partData.Preview = await GetThumbnailAsync(partDoc);
         
-        var smCompDef = partDoc.ComponentDefinition as SheetMetalComponentDefinition;
-        partData.HasFlatPattern = smCompDef != null && smCompDef.HasFlatPattern;
+        // HasFlatPattern уже установлено в ReadAllPropertiesFromPart
 
         return partData;
     }
