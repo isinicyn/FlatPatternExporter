@@ -537,20 +537,20 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (position.X > PartsDataGrid.ActualWidth || position.Y < 0 || position.Y > PartsDataGrid.ActualHeight)
         {
             _isColumnDraggedOutside = true;
-            SetAdornerColor(Brushes.Red); // Меняем цвет на красный и добавляем надпись "УДАЛИТЬ"
+            SetAdornerDeleteMode(true); // Переключаем в режим удаления
         }
         else
         {
             _isColumnDraggedOutside = false;
-            SetAdornerColor(Brushes.LightGray); // Возвращаем исходный цвет и удаляем надпись "УДАЛИТЬ"
+            SetAdornerDeleteMode(false); // Возвращаем обычный режим
         }
     }
 
-    private void SetAdornerColor(Brush color)
+    private void SetAdornerDeleteMode(bool isDeleteMode)
     {
         if (_headerAdorner != null && _headerAdorner.Child is TextBlock textBlock)
         {
-            if (color == Brushes.Red)
+            if (isDeleteMode)
             {
                 textBlock.Text = $"❎ {_reorderingColumn?.Header}";
                 textBlock.Style = (Style)FindResource("PhantomColumnHeaderDeleteStyle");
