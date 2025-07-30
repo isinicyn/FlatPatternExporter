@@ -34,6 +34,22 @@ using TextBox = System.Windows.Controls.TextBox;
 
 namespace FlatPatternExporter;
 
+public class AcadVersionItem
+{
+    public string DisplayName { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
+    
+    public override string ToString() => DisplayName;
+}
+
+public class SplineReplacementItem  
+{
+    public string DisplayName { get; set; } = string.Empty;
+    public int Index { get; set; }
+    
+    public override string ToString() => DisplayName;
+}
+
 public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
     private bool _hasMissingReferences = false;
@@ -109,6 +125,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         LayerSettings = LayerSettingsHelper.InitializeLayerSettings();
         AvailableColors = LayerSettingsHelper.GetAvailableColors();
         LineTypes = LayerSettingsHelper.GetLineTypes();
+        
+        // Инициализируем коллекции для ComboBox
+        InitializeAcadVersions();
+        InitializeSplineReplacementTypes();
 
 
         // Инициализация предустановленных колонок с указанием категорий
@@ -191,6 +211,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<string> AvailableColors { get; set; }
     public ObservableCollection<string> LineTypes { get; set; }
     public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
+    public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = new();
+    public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -670,7 +692,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         SplineReplacementComboBox.IsEnabled = isChecked;
         SplineToleranceTextBox.IsEnabled = isChecked;
 
-        if (isChecked && SplineReplacementComboBox.SelectedIndex == -1)
+        if (isChecked && SplineReplacementComboBox.SelectedItem == null)
             SplineReplacementComboBox.SelectedIndex = 0; // По умолчанию выбираем "Линии"
     }
 
@@ -678,7 +700,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         var sb = new StringBuilder();
 
-        sb.Append($"AcadVersion={((ComboBoxItem)AcadVersionComboBox.SelectedItem).Content}");
+        var selectedAcadVersion = (AcadVersionItem)AcadVersionComboBox.SelectedItem;
+        sb.Append($"AcadVersion={selectedAcadVersion?.Value ?? "2000"}");
 
         if (EnableSplineReplacementCheckBox.IsChecked == true)
         {
@@ -690,9 +713,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Заменяем разделитель на актуальный
             splineTolerance = splineTolerance.Replace('.', decimalSeparator).Replace(',', decimalSeparator);
 
-            if (SplineReplacementComboBox.SelectedIndex == 0) // Линии
+            var selectedSplineType = (SplineReplacementItem)SplineReplacementComboBox.SelectedItem;
+            if (selectedSplineType?.Index == 0) // Линии
                 sb.Append($"&SimplifySplines=True&SplineTolerance={splineTolerance}");
-            else if (SplineReplacementComboBox.SelectedIndex == 1) // Дуги
+            else if (selectedSplineType?.Index == 1) // Дуги
                 sb.Append($"&SimplifySplines=True&SimplifyAsTangentArcs=True&SplineTolerance={splineTolerance}");
         }
         else
@@ -1004,6 +1028,29 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private void InitializeProjectFolder()
     {
         SetProjectFolderInfo(); // Устанавливаем информацию о проекте
+    }
+
+    private void InitializeAcadVersions()
+    {
+        AcadVersions = new ObservableCollection<AcadVersionItem>
+        {
+            new() { DisplayName = "2018", Value = "2018" },
+            new() { DisplayName = "2013", Value = "2013" },
+            new() { DisplayName = "2010", Value = "2010" },
+            new() { DisplayName = "2007", Value = "2007" },
+            new() { DisplayName = "2004", Value = "2004" },
+            new() { DisplayName = "2000", Value = "2000" },
+            new() { DisplayName = "R12", Value = "R12" }
+        };
+    }
+
+    private void InitializeSplineReplacementTypes()
+    {
+        SplineReplacementTypes = new ObservableCollection<SplineReplacementItem>
+        {
+            new() { DisplayName = "Линии", Index = 0 },
+            new() { DisplayName = "Дуги", Index = 1 }
+        };
     }
 
     // Обновленный метод для обработки нажатия радиокнопки

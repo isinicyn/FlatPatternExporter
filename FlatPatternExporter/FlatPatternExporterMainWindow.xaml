@@ -543,15 +543,15 @@
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="10,5,10,0">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <Label Content="Версия AutoCAD:" VerticalAlignment="Center"/>
-                                <ComboBox x:Name="AcadVersionComboBox" Width="70" SelectedIndex="5" Height="20" VerticalContentAlignment="Center" Padding="5,0,5,0">
-                                    <ComboBoxItem Content="2018"/>
-                                    <ComboBoxItem Content="2013"/>
-                                    <ComboBoxItem Content="2010"/>
-                                    <ComboBoxItem Content="2007"/>
-                                    <ComboBoxItem Content="2004"/>
-                                    <ComboBoxItem Content="2000"/>
-                                    <ComboBoxItem Content="R12"/>
-                                </ComboBox>
+                                <ComboBox x:Name="AcadVersionComboBox" 
+                                          Width="70" 
+                                          Height="20" 
+                                          VerticalContentAlignment="Center" 
+                                          Padding="5,0,5,0"
+                                          ItemsSource="{Binding AcadVersions}"
+                                          DisplayMemberPath="DisplayName"
+                                          SelectedValuePath="Value"
+                                          SelectedIndex="5"/>
                             </StackPanel>
                             <CheckBox x:Name="MergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5" IsChecked="True"/>
                             <CheckBox x:Name="RebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5" IsChecked="True"/>
@@ -590,10 +590,16 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <Label Content="Тип замены:" VerticalAlignment="Center" Padding="0,5,5,5"/>
-                                <ComboBox x:Name="SplineReplacementComboBox" Width="65" VerticalContentAlignment="Center" IsEnabled="False" Height="20" Padding="5,0,5,0" Margin="2,0,0,0">
-                                    <ComboBoxItem Content="Линии"/>
-                                    <ComboBoxItem Content="Дуги"/>
-                                </ComboBox>
+                                <ComboBox x:Name="SplineReplacementComboBox" 
+                                          Width="65" 
+                                          VerticalContentAlignment="Center" 
+                                          IsEnabled="False" 
+                                          Height="20" 
+                                          Padding="5,0,5,0" 
+                                          Margin="2,0,0,0"
+                                          ItemsSource="{Binding SplineReplacementTypes}"
+                                          DisplayMemberPath="DisplayName"
+                                          SelectedValuePath="Index"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="0,5,5,5"/>
