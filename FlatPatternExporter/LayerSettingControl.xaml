@@ -5,30 +5,37 @@
     <UserControl.Resources>
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
-        <local:TextEmptyToVisibilityConverter x:Key="TextEmptyToVisibilityConverter"/>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" Margin="0,5">
         <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
           IsChecked="{Binding IsVisible, Mode=TwoWay}"
           Width="200" VerticalContentAlignment="Center"
           IsEnabled="{Binding IsCheckBoxEnabled}" FontSize="10"/>
-        <Grid Width="95" HorizontalAlignment="Right" Margin="0,0,5,0">
-            <!-- Текстбокс для пользовательского ввода -->
+        <Grid Width="95" Margin="0,0,5,0">
             <TextBox x:Name="CustomTextBox"
-             Text="{Binding CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-             Foreground="Black"
-             IsEnabled="{Binding IsCustomNameEnabled}"
-             Background="White" FontSize="10" VerticalContentAlignment="Center"
-             TextChanged="CustomTextBox_TextChanged"/>
-
-            <!-- Полупрозрачный текстблок для отображения оригинального имени слоя, когда текстбокс пуст -->
+                     Text="{Binding CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding IsCustomNameEnabled}"
+                     FontSize="10" VerticalContentAlignment="Center"
+                     Foreground="Black" Background="White"
+                     TextChanged="CustomTextBox_TextChanged"/>
             <TextBlock Text="{Binding OriginalName}"
-               Foreground="#808E8E8E"
-               IsHitTestVisible="False"
-               VerticalAlignment="Center"
-               HorizontalAlignment="Left"
-               Margin="5,0,0,0"
-               Visibility="{Binding Text, ElementName=CustomTextBox, Converter={StaticResource TextEmptyToVisibilityConverter}}" FontSize="10"/>
+                       Foreground="#808E8E8E"
+                       FontSize="10"
+                       IsHitTestVisible="False"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       Margin="5,0,0,0">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=CustomTextBox}" Value="">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
         </Grid>
         <ComboBox Width="90"
                   ItemsSource="{Binding DataContext.AvailableColors, RelativeSource={RelativeSource AncestorType=Window}}"

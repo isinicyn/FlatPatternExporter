@@ -144,40 +144,7 @@ namespace FlatPatternExporter
         public bool IsCheckBoxEnabled => DisplayName != "OuterProfileLayer";
     }
 
-    public class CustomNameForegroundConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (string.IsNullOrWhiteSpace(value?.ToString()))
-            {
-                return new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 160, 160, 160)); // Полупрозрачный цвет для пустого текста
-            }
-            return new SolidColorBrush(Colors.Black); // Черный текст для пользовательского ввода
-        }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class TextEmptyToVisibilityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            // Если поле пустое, показываем оригинальное имя слоя
-            if (string.IsNullOrWhiteSpace(value?.ToString()))
-            {
-                return Visibility.Visible;
-            }
-            return Visibility.Collapsed;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
 
     public static class LayerSettingsHelper
     {
@@ -227,49 +194,6 @@ namespace FlatPatternExporter
             return lineTypeDictionary.ContainsKey(lineTypeName) ? lineTypeDictionary[lineTypeName] : "37648";
         }
 
-        // Метод для создания строки экспорта параметров слоев
-        public static string ExportLayerOptions(ObservableCollection<LayerSetting> layerSettings)
-        {
-            StringBuilder optionsBuilder = new StringBuilder("FLAT PATTERN DXF?");
-            StringBuilder invisibleLayersBuilder = new StringBuilder();
-
-            foreach (var layer in layerSettings)
-            {
-                if (layer.HasVisibilityOption && !layer.IsVisible)
-                {
-                    // Добавляем дефолтное имя слоя в InvisibleLayers, если он не видим
-                    invisibleLayersBuilder.Append($"{layer.LayerName};");
-                    continue; // Пропускаем дальнейшую обработку
-                }
-
-                // Если есть кастомное имя, оно добавляется в строку
-                if (!string.IsNullOrWhiteSpace(layer.CustomName))
-                {
-                    optionsBuilder.Append($"&{layer.DisplayName}={layer.CustomName}");
-                }
-
-                // Если тип линии отличается от дефолтного, добавляем его
-                if (layer.SelectedLineType != "Default")
-                {
-                    optionsBuilder.Append($"&{layer.DisplayName}LineType={GetLineTypeValue(layer.SelectedLineType)}");
-                }
-
-                // Если цвет отличается от белого, добавляем его
-                if (layer.SelectedColor != "White")
-                {
-                    optionsBuilder.Append($"&{layer.DisplayName}Color={GetColorValue(layer.SelectedColor)}");
-                }
-            }
-
-            // Добавляем InvisibleLayers в конец, если есть невидимые слои
-            if (invisibleLayersBuilder.Length > 0)
-            {
-                invisibleLayersBuilder.Length -= 1; // Убираем последний символ ";"
-                optionsBuilder.Append($"&InvisibleLayers={invisibleLayersBuilder}");
-            }
-
-            return optionsBuilder.ToString();
-        }
 
         // Метод для инициализации настроек слоев
         public static ObservableCollection<LayerSetting> InitializeLayerSettings()
