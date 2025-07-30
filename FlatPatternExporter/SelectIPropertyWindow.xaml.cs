@@ -182,7 +182,7 @@ namespace FlatPatternExporter
             AddCustomPropertyButton.IsEnabled = !string.IsNullOrWhiteSpace(CustomPropertyTextBox.Text);
         }
 
-        private async void AddCustomPropertyButton_Click(object sender, RoutedEventArgs e)
+        private void AddCustomPropertyButton_Click(object sender, RoutedEventArgs e)
         {
             string customPropertyName = CustomPropertyTextBox.Text;
             
