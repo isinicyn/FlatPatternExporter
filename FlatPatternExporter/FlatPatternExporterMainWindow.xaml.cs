@@ -827,9 +827,20 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, scanProgress));
             else if (BomRadioButton.IsChecked == true)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, scanProgress));
-            partCount = sheetMetalParts.Count;
             (partNumber, description) = GetDocumentProperties((Document)asmDoc);
             modelStateInfo = asmDoc.ComponentDefinition.BOM.BOMViews[1].ModelStateMemberName;
+
+            // Анализируем конфликты и удаляем конфликтующие детали ДО обработки
+            await Dispatcher.InvokeAsync(() =>
+            {
+                ProgressLabel.Text = "Статус: Анализ конфликтов обозначений...";
+            });
+            
+            await AnalyzePartNumberConflictsAsync(stopwatch);
+            FilterConflictingParts(sheetMetalParts);
+            
+            // Подсчитываем количество деталей ПОСЛЕ фильтрации конфликтов
+            partCount = sheetMetalParts.Count;
 
             // Переключаем прогресс на обработку деталей
             await Dispatcher.InvokeAsync(() =>
@@ -866,9 +877,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     await Task.Delay(10);
                 }
             });
-
-            // Вызов анализа конфликтов после завершения сканирования
-            await AnalyzePartNumberConflictsAsync(stopwatch);
         }
         else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
@@ -1057,6 +1065,21 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             });
     }
 
+    private void FilterConflictingParts(Dictionary<string, int> sheetMetalParts)
+    {
+        // Получаем список конфликтующих обозначений
+        var conflictingPartNumbers = _partNumberTracker
+            .Where(p => p.Value.Count > 1)
+            .Select(p => p.Key)
+            .ToHashSet();
+
+        // Удаляем конфликтующие детали из sheetMetalParts
+        foreach (var conflictingPartNumber in conflictingPartNumbers)
+        {
+            sheetMetalParts.Remove(conflictingPartNumber);
+        }
+    }
+
     private async Task AnalyzePartNumberConflictsAsync(Stopwatch stopwatch)
     {
         _conflictingParts.Clear(); // Очищаем список конфликтов перед началом проверки
@@ -1074,7 +1097,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Используем Dispatcher для обновления UI
             await Dispatcher.InvokeAsync(() =>
             {
-                MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели с одинаковыми обозначениями, что может привести к ошибкам. Модели должны иметь уникальные обозначения.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для анализа данных.",
+                MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для просмотра деталей конфликтов.",
                     "Конфликт обозначений",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
 
