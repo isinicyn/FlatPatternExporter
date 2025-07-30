@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Controls;
 using Application = System.Windows.Application;
@@ -95,9 +96,21 @@ namespace FlatPatternExporter
             if (e.LeftButton == MouseButtonState.Pressed && IPropertyListBox.SelectedItem != null)
             {
                 var listBox = sender as ListBox;
-                if (listBox?.SelectedItem is PresetIProperty selectedProperty)
+                var selectedItem = IPropertyListBox.SelectedItem as PresetIProperty;
+
+                if (listBox != null && selectedItem != null)
                 {
-                    DragDrop.DoDragDrop(listBox, selectedProperty, DragDropEffects.Move);
+                    // Убедимся, что мышь находится над элементом списка, а не над заголовком группы
+                    var element = e.OriginalSource as DependencyObject;
+                    while (element != null && !(element is ListBoxItem))
+                    {
+                        element = VisualTreeHelper.GetParent(element);
+                    }
+
+                    if (element is ListBoxItem)
+                    {
+                        DragDrop.DoDragDrop(listBox, selectedItem, DragDropEffects.Move);
+                    }
                 }
             }
         }

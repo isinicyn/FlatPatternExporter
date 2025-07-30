@@ -65,6 +65,11 @@
                 <!-- Стиль для группировки -->
                 <ListBox.GroupStyle>
                     <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="AllowDrop" Value="False"/>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
                                 <Border Background="#E0E0E0" 
