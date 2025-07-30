@@ -419,7 +419,21 @@
                 <DataGridTemplateColumn Header="Обр." Width="Auto" IsReadOnly="False" CanUserSort="False" CanUserReorder="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border x:Name="ProcessingStatus" Width="10" Height="10" BorderBrush="DarkGray" BorderThickness="1" Background="{Binding ProcessingColor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Width="10" Height="10" BorderBrush="DarkGray" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ProcessingStatus}" Value="Success">
+                                                <Setter Property="Background" Value="Green"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ProcessingStatus}" Value="Error">
+                                                <Setter Property="Background" Value="Red"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

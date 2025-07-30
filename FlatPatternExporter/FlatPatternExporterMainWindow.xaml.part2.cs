@@ -10,7 +10,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Inventor;
 using Binding = System.Windows.Data.Binding;
-using Brushes = System.Windows.Media.Brushes;
 using File = System.IO.File;
 using MessageBox = System.Windows.MessageBox;
 using Path = System.IO.Path;
@@ -984,7 +983,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                 Dispatcher.Invoke(() =>
                 {
-                    partData.ProcessingColor = exportSuccess ? Brushes.Green : Brushes.Red;
+                    partData.ProcessingStatus = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Error;
                     partData.DxfPreview = dxfPreview!;
                     PartsDataGrid.Items.Refresh();
                 });

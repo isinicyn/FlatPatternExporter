@@ -21,8 +21,6 @@ using DefineEdge;
 using Inventor;
 using Application = Inventor.Application;
 using Binding = System.Windows.Data.Binding;
-using Brush = System.Windows.Media.Brush;
-using Brushes = System.Windows.Media.Brushes;
 using DragEventArgs = System.Windows.DragEventArgs;
 using Image = System.Windows.Controls.Image;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -1241,7 +1239,7 @@ public class PartData : INotifyPropertyChanged
     // === КАТЕГОРИЯ 7: СВОЙСТВА СОСТОЯНИЯ ОБРАБОТКИ ===
     // Свойства, устанавливаемые во время экспорта и обработки
     public BitmapImage? DxfPreview { get; set; } // Миниатюра развертки (генерируется)
-    public Brush ProcessingColor { get; set; } = Brushes.Transparent; // Индикатор состояния экспорта
+    public ProcessingStatus ProcessingStatus { get; set; } = ProcessingStatus.NotProcessed; // Индикатор состояния экспорта
 
     // === СВОЙСТВА С УВЕДОМЛЕНИЯМИ ===
 
@@ -1425,5 +1423,13 @@ public class PartConflictInfo
     {
         return UniqueId.GetHashCode();
     }
+}
+
+// Enum для статуса обработки экспорта
+public enum ProcessingStatus
+{
+    NotProcessed,   // Не обработан (прозрачный)
+    Success,        // Успешно экспортирован (зеленый)
+    Error          // Ошибка экспорта (красный)
 }
 
