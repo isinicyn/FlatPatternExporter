@@ -40,15 +40,8 @@ namespace FlatPatternExporter
             // Подписка на событие изменения коллекции PresetIProperties
             _presetIProperties.CollectionChanged += PresetIProperties_CollectionChanged;
 
-            // Устанавливаем ItemsSource после инициализации коллекции
-            IPropertyListBox.ItemsSource = AvailableProperties;
-
-            // Настраиваем сортировку для элементов ListBox
-            var collectionView = CollectionViewSource.GetDefaultView(IPropertyListBox.ItemsSource);
-            if (collectionView != null)
-            {
-                collectionView.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
-            }
+            // ItemsSource теперь установлен через CollectionViewSource в XAML
+            // для обеспечения группировки по категориям
         }
 
         public ObservableCollection<PresetIProperty> AvailableProperties { get; set; }
@@ -86,6 +79,10 @@ namespace FlatPatternExporter
                         AvailableProperties.Add(property);
                     }
                 }
+                
+                // Принудительно обновляем CollectionViewSource для корректного отображения группировки
+                var groupedPropertiesResource = FindResource("GroupedProperties") as CollectionViewSource;
+                groupedPropertiesResource?.View?.Refresh();
             }
             finally
             {

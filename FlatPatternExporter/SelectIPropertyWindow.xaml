@@ -10,11 +10,15 @@
     WindowStartupLocation="CenterScreen"
     SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">
     <Window.Resources>
-        <!-- CollectionViewSource для сортировки -->
-        <CollectionViewSource x:Key="SortedProperties"
+        <!-- CollectionViewSource для группировки по категориям -->
+        <CollectionViewSource x:Key="GroupedProperties"
                               Source="{Binding AvailableProperties}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Category" />
+            </CollectionViewSource.GroupDescriptions>
             <CollectionViewSource.SortDescriptions>
-                <!-- Сортировка по полю DisplayName -->
+                <!-- Сначала сортируем по категории, затем по DisplayName -->
+                <scm:SortDescription PropertyName="Category" Direction="Ascending" />
                 <scm:SortDescription PropertyName="DisplayName" Direction="Ascending" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
@@ -29,7 +33,7 @@
 
         <Border Background="#F5F5F5" Height="30" VerticalAlignment="Center" BorderThickness="0">
             <DockPanel LastChildFill="False" MouseDown="WindowHeader_MouseDown">
-                <TextBlock Text="Выберите iProperty" FontWeight="Bold" Foreground="#555" FontSize="12" Margin="10,0,0,0" Width="185" VerticalAlignment="Center"/>
+                <TextBlock Text="Выберите Property" FontWeight="Bold" Foreground="#555" FontSize="12" Margin="10,0,0,0" Width="185" VerticalAlignment="Center"/>
                 <Button Content="X" Width="25" Height="25" DockPanel.Dock="Right" 
                         VerticalAlignment="Center" HorizontalAlignment="Right" 
                         Background="#C80000" Foreground="White" 
@@ -46,7 +50,7 @@
             
             <ListBox x:Name="IPropertyListBox" 
                      Grid.Row="0"
-                     ItemsSource="{Binding Source={StaticResource SortedProperties}}" 
+                     ItemsSource="{Binding Source={StaticResource GroupedProperties}}" 
                      SelectionMode="Single" 
                      AllowDrop="True" 
                      PreviewMouseMove="iPropertyListBox_PreviewMouseMove"
@@ -57,6 +61,28 @@
                 <ListBox.BorderBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
                 </ListBox.BorderBrush>
+                
+                <!-- Стиль для группировки -->
+                <ListBox.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <Border Background="#E0E0E0" 
+                                        BorderBrush="#B0B0B0" 
+                                        BorderThickness="1"
+                                        Margin="0,2,0,0"
+                                        Padding="5,3">
+                                    <TextBlock Text="{Binding Name}" 
+                                               FontWeight="Bold" 
+                                               FontSize="10" 
+                                               Foreground="#444444"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListBox.GroupStyle>
+                
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Background="#F0F0F0" 
