@@ -8,6 +8,13 @@
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Height="850">
 
     <Window.Resources>
+        <!-- Кисти для чередования строк -->
+        <SolidColorBrush x:Key="EvenRowBrush" Color="White"/>
+        <SolidColorBrush x:Key="OddRowBrush" Color="#F5F5F5"/>
+        
+        <!-- Конвертер для определения четности строки по ID -->
+        <local:ItemIndexToBackgroundConverter x:Key="ItemIndexToBackgroundConverter"/>
+        
         <!-- Стиль для фантомного заголовка колонки при перетаскивании -->
         <Style x:Key="PhantomColumnHeaderStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>
@@ -169,7 +176,6 @@
               Drop="partsDataGrid_Drop" 
               AllowDrop="True"
               RowHeaderWidth="0"
-              AlternatingRowBackground="#F5F5F5"
               ContextMenuOpening="partsDataGrid_ContextMenuOpening">
 
             <!-- Контекстное меню -->
@@ -237,14 +243,15 @@
                         <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="LightBlue"/>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
                     </Style.Resources>
-                    <Style.Triggers>
-                        <Trigger Property="AlternationIndex" Value="0">
-                            <Setter Property="Background" Value="White"/>
-                        </Trigger>
-                        <Trigger Property="AlternationIndex" Value="1">
-                            <Setter Property="Background" Value="#F5F5F5"/>
-                        </Trigger>
-                    </Style.Triggers>
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource ItemIndexToBackgroundConverter}">
+                                <Binding/>
+                                <Binding RelativeSource="{RelativeSource AncestorType=DataGrid}" Path="ItemsSource"/>
+                                <Binding RelativeSource="{RelativeSource Self}"/>
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
                 </Style>
 
                 <!-- Стиль для заголовков столбцов -->

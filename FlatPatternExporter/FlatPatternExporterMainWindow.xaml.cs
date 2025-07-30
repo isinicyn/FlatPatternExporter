@@ -1433,3 +1433,32 @@ public enum ProcessingStatus
     Error          // Ошибка экспорта (красный)
 }
 
+// Конвертер для определения четности строки по позиции в отсортированной коллекции
+public class ItemIndexToBackgroundConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values.Length >= 3 && values[0] is PartData currentItem && values[1] is System.Collections.IEnumerable itemsSource && values[2] is FrameworkElement element)
+        {
+            // Получаем текущий порядок элементов в коллекции (учитывая сортировку и фильтрацию)
+            var items = itemsSource.Cast<PartData>().ToList();
+            var index = items.IndexOf(currentItem);
+            
+            if (index >= 0)
+            {
+                // Четные позиции (0, 2, 4...) получают четную кисть, нечетные (1, 3, 5...) - нечетную
+                var resourceKey = index % 2 == 0 ? "EvenRowBrush" : "OddRowBrush";
+                return element.FindResource(resourceKey);
+            }
+        }
+        
+        // Возвращаем белый цвет по умолчанию, если что-то пошло не так
+        return System.Windows.Media.Brushes.White;
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
