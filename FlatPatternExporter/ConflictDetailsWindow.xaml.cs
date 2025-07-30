@@ -13,14 +13,14 @@ public partial class ConflictDetailsWindow
     private string? _selectedFilePath;
 
     // Конструктор принимает данные о конфликтах и заполняет TreeView
-    public ConflictDetailsWindow(Dictionary<string, List<(string PartNumber, string FileName)>> conflictFileDetails)
+    public ConflictDetailsWindow(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
     {
         InitializeComponent();
         PopulateTreeView(conflictFileDetails);
     }
 
     // Заполняем TreeView данными о конфликтах
-    private void PopulateTreeView(Dictionary<string, List<(string PartNumber, string FileName)>> conflictFileDetails)
+    private void PopulateTreeView(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
     {
         foreach (var entry in conflictFileDetails)
         {
@@ -32,13 +32,13 @@ public partial class ConflictDetailsWindow
                 Tag = null // На уровне обозначений не указываем файл
             };
 
-            // Файлы как дочерние элементы
-            foreach (var fileInfo in entry.Value)
+            // Файлы и состояния модели как дочерние элементы
+            foreach (var conflictInfo in entry.Value)
             {
                 var fileItem = new TreeViewItem
                 {
-                    Header = $"Файл: {fileInfo.FileName}",
-                    Tag = fileInfo.FileName // Сохраняем путь к файлу в Tag для дальнейшего использования
+                    Header = $"Файл: {conflictInfo.FileName} | Состояние: {conflictInfo.ModelState}",
+                    Tag = conflictInfo.FileName // Сохраняем путь к файлу в Tag для дальнейшего использования
                 };
                 partNumberItem.Items.Add(fileItem);
             }

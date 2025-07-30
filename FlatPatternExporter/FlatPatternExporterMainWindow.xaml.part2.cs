@@ -250,7 +250,8 @@ public partial class FlatPatternExporterMainWindow : Window
                         if (!string.IsNullOrEmpty(partNumber))
                         {
                             // Добавляем в трекер конфликтов
-                            AddPartToConflictTracker(partNumber, partDoc.FullFileName);
+                            var modelState = mgr.GetModelState();
+                            AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
                             
                             if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
                                 sheetMetalParts[partNumber]++;
@@ -381,7 +382,8 @@ public partial class FlatPatternExporterMainWindow : Window
                 if (!string.IsNullOrEmpty(partNumber))
                 {
                     // Добавляем в трекер конфликтов
-                    AddPartToConflictTracker(partNumber, partDoc.FullFileName);
+                    var modelState = mgr.GetModelState();
+                    AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
                     
                     if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
                         sheetMetalParts[partNumber] += row.ItemQuantity;

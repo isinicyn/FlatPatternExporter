@@ -59,8 +59,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly DispatcherTimer _searchDelayTimer;
     public Application? _thisApplication;
     private List<PartData> _conflictingParts = new(); // Список конфликтующих файлов
-    private Dictionary<string, List<(string PartNumber, string FileName)>> _conflictFileDetails = new();
-    private readonly ConcurrentDictionary<string, List<(string PartNumber, string FileName)>> _partNumberTracker = new(); // Для отслеживания конфликтов во время сканирования
+    private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = new();
+    private readonly ConcurrentDictionary<string, List<PartConflictInfo>> _partNumberTracker = new(); // Для отслеживания конфликтов во время сканирования
 
     public FlatPatternExporterMainWindow()
     {
@@ -1051,15 +1051,23 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         return (partNumber, description);
     }
 
-    private void AddPartToConflictTracker(string partNumber, string fileName)
+    private void AddPartToConflictTracker(string partNumber, string fileName, string modelState)
     {
+        var conflictInfo = new PartConflictInfo
+        {
+            PartNumber = partNumber,
+            FileName = fileName,
+            ModelState = modelState
+        };
+        
         _partNumberTracker.AddOrUpdate(partNumber,
-            new List<(string PartNumber, string FileName)> { (partNumber, fileName) },
+            new List<PartConflictInfo> { conflictInfo },
             (key, existingList) =>
             {
-                if (!existingList.Any(p => p.FileName == fileName))
+                // Проверяем, есть ли уже такой же файл + состояние модели
+                if (!existingList.Any(p => p.UniqueId == conflictInfo.UniqueId))
                 {
-                    existingList.Add((partNumber, fileName));
+                    existingList.Add(conflictInfo);
                 }
                 return existingList;
             });
@@ -1097,7 +1105,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Используем Dispatcher для обновления UI
             await Dispatcher.InvokeAsync(() =>
             {
-                MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для просмотра деталей конфликтов.",
+                MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для просмотра деталей конфликтов.",
                     "Конфликт обозначений",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
 
@@ -1349,5 +1357,26 @@ public class ScanProgress
     public int TotalItems { get; set; }
     public string CurrentOperation { get; set; } = string.Empty;
     public string CurrentItem { get; set; } = string.Empty;
+}
+
+// Структура для детальной информации о конфликтах обозначений
+public class PartConflictInfo
+{
+    public string PartNumber { get; set; } = string.Empty;
+    public string FileName { get; set; } = string.Empty;
+    public string ModelState { get; set; } = string.Empty;
+    
+    // Уникальный идентификатор для сравнения
+    public string UniqueId => $"{FileName}|{ModelState}";
+    
+    public override bool Equals(object? obj)
+    {
+        return obj is PartConflictInfo other && UniqueId == other.UniqueId;
+    }
+    
+    public override int GetHashCode()
+    {
+        return UniqueId.GetHashCode();
+    }
 }
 
