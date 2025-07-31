@@ -414,35 +414,22 @@ public partial class FlatPatternExporterMainWindow : Window
             MessageBox.Show($"Ошибка при инициализации путей библиотек: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
-    private void UpdateIncludeLibraryComponentsState(object sender, RoutedEventArgs e)
-    {
-        _includeLibraryComponents = IncludeLibraryComponentsCheckBox.IsChecked ?? false;
-    }
     private bool IsLibraryComponent(string fullFileName)
     {
         return _libraryPaths.Any(path => fullFileName.StartsWith(path, StringComparison.OrdinalIgnoreCase));
     }
     private bool ShouldExcludeComponent(BOMStructureEnum bomStructure, string fullFileName)
     {
-        if (_excludeReferenceParts && bomStructure == BOMStructureEnum.kReferenceBOMStructure)
+        if (ExcludeReferenceParts && bomStructure == BOMStructureEnum.kReferenceBOMStructure)
             return true;
 
-        if (_excludePurchasedParts && bomStructure == BOMStructureEnum.kPurchasedBOMStructure)
+        if (ExcludePurchasedParts && bomStructure == BOMStructureEnum.kPurchasedBOMStructure)
             return true;
 
-        if (!_includeLibraryComponents && !string.IsNullOrEmpty(fullFileName) && IsLibraryComponent(fullFileName))
+        if (!IncludeLibraryComponents && !string.IsNullOrEmpty(fullFileName) && IsLibraryComponent(fullFileName))
             return true;
 
         return false;
-    }
-    private void UpdateExcludeReferencePartsState(object sender, RoutedEventArgs e)
-    {
-        _excludeReferenceParts = ExcludeReferencePartsCheckBox.IsChecked ?? true;
-    }
-
-    private void UpdateExcludePurchasedPartsState(object sender, RoutedEventArgs e)
-    {
-        _excludePurchasedParts = ExcludePurchasedPartsCheckBox.IsChecked ?? true;
     }
     private void SelectFixedFolderButton_Click(object sender, RoutedEventArgs e)
     {
@@ -465,56 +452,61 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     targetDir = string.Empty;
     multiplier = 1; // Присваиваем значение по умолчанию
 
-    // Обрабатываем выбор радио-кнопки
-    if (ChooseFolderRadioButton.IsChecked == true)
+    // Обрабатываем выбор папки экспорта через enum
+    switch (SelectedExportFolder)
     {
-        // Открываем диалог выбора папки
-        var dialog = new FolderBrowserDialog();
-        if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            targetDir = dialog.SelectedPath;
-        else
-            return false;
-    }
-    else if (ComponentFolderRadioButton.IsChecked == true)
-    {
-        // Папка компонента
-        targetDir = Path.GetDirectoryName(_thisApplication?.ActiveDocument?.FullFileName) ?? string.Empty;
-    }
-    else if (FixedFolderRadioButton.IsChecked == true)
-    {
-        if (string.IsNullOrEmpty(_fixedFolderPath))
-        {
-            MessageBox.Show("Выберите фиксированную папку.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            return false;
-        }
-
-        targetDir = _fixedFolderPath;
-    }
-    else if (ProjectFolderRadioButton.IsChecked == true) // Новый код для выбора папки проекта
-    {
-        try
-        {
-            targetDir = _thisApplication?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? string.Empty;
-            if (string.IsNullOrEmpty(targetDir))
+        case ExportFolderType.ChooseFolder:
+            // Открываем диалог выбора папки
+            var dialog = new FolderBrowserDialog();
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                targetDir = dialog.SelectedPath;
+            else
+                return false;
+            break;
+            
+        case ExportFolderType.ComponentFolder:
+            // Папка компонента
+            targetDir = Path.GetDirectoryName(_thisApplication?.ActiveDocument?.FullFileName) ?? string.Empty;
+            break;
+            
+        case ExportFolderType.FixedFolder:
+            if (string.IsNullOrEmpty(_fixedFolderPath))
             {
-                MessageBox.Show("Не удалось получить путь проекта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Выберите фиксированную папку.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Ошибка при получении папки проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            return false;
-        }
+            targetDir = _fixedFolderPath;
+            break;
+            
+        case ExportFolderType.ProjectFolder:
+            try
+            {
+                targetDir = _thisApplication?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? string.Empty;
+                if (string.IsNullOrEmpty(targetDir))
+                {
+                    MessageBox.Show("Не удалось получить путь проекта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при получении папки проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+            break;
+            
+        case ExportFolderType.PartFolder:
+            // Обрабатывается отдельно в ExportDXF методе
+            break;
     }
 
-    if (EnableSubfolderCheckBox.IsChecked == true && !string.IsNullOrEmpty(SubfolderNameTextBox.Text))
+    if (EnableSubfolder && !string.IsNullOrEmpty(SubfolderNameTextBox.Text))
     {
         targetDir = Path.Combine(targetDir!, SubfolderNameTextBox.Text);
         if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
     }
 
-    if (IncludeQuantityInFileNameCheckBox.IsChecked == true && !int.TryParse(MultiplierTextBox.Text, out multiplier))
+    if (IncludeQuantityInFileName && !int.TryParse(MultiplierTextBox.Text, out multiplier))
     {
         MessageBox.Show("Введите допустимое целое число для множителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         return false;
@@ -590,10 +582,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         if (doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
         {
             var asmDoc = (AssemblyDocument)doc;
-            if (TraverseRadioButton.IsChecked == true)
+            if (SelectedProcessingMethod == ProcessingMethod.Traverse)
                 await Task.Run(() =>
                     ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
-            else if (BomRadioButton.IsChecked == true)
+            else if (SelectedProcessingMethod == ProcessingMethod.BOM)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
 
             // Создаем временный список PartData для экспорта
@@ -695,10 +687,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         {
             var asmDoc = (AssemblyDocument)doc;
             var sheetMetalParts = new Dictionary<string, int>();
-            if (TraverseRadioButton.IsChecked == true)
+            if (SelectedProcessingMethod == ProcessingMethod.Traverse)
                 await Task.Run(() =>
                     ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
-            else if (BomRadioButton.IsChecked == true)
+            else if (SelectedProcessingMethod == ProcessingMethod.BOM)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
 
             await ExportDXFFiles(sheetMetalParts, targetDir, multiplier, stopwatch);
@@ -810,13 +802,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         var organizeByThickness = false;
         var includeQuantityInFileName = false;
 
-        // Выполняем доступ к элементам управления через Dispatcher
-        Dispatcher.Invoke(() =>
-        {
-            organizeByMaterial = OrganizeByMaterialCheckBox.IsChecked == true;
-            organizeByThickness = OrganizeByThicknessCheckBox.IsChecked == true;
-            includeQuantityInFileName = IncludeQuantityInFileNameCheckBox.IsChecked == true;
-        });
+        // Используем свойства вместо прямого обращения к элементам управления
+        organizeByMaterial = OrganizeByMaterial;
+        organizeByThickness = OrganizeByThickness;
+        includeQuantityInFileName = IncludeQuantityInFileName;
 
         var totalParts = partsDataList.Count();
 
@@ -836,22 +825,19 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             var partNumber = partData.PartNumber;
             var qty = partData.IsOverridden ? partData.Quantity : partData.OriginalQuantity * multiplier;
 
-            // Доступ к RadioButton через Dispatcher для потока безопасности
-            Dispatcher.Invoke(() =>
+            // Обработка для PartFolder через свойство
+            if (SelectedExportFolder == ExportFolderType.PartFolder)
             {
-                if (PartFolderRadioButton.IsChecked == true)
+                var partPath = GetPartDocumentFullPath(partNumber);
+                if (!string.IsNullOrEmpty(partPath))
                 {
-                    var partPath = GetPartDocumentFullPath(partNumber);
-                    if (!string.IsNullOrEmpty(partPath))
-                    {
-                        targetDir = Path.GetDirectoryName(partPath) ?? string.Empty;
-                    }
-                    else
-                    {
-                        targetDir = string.Empty;
-                    }
+                    targetDir = Path.GetDirectoryName(partPath) ?? string.Empty;
                 }
-            });
+                else
+                {
+                    targetDir = string.Empty;
+                }
+            }
 
             PartDocument? partDoc = null;
             try
@@ -1116,15 +1102,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
     }
 
-    private void IncludeQuantityInFileNameCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
-    {
-        MultiplierTextBox.IsEnabled = IncludeQuantityInFileNameCheckBox.IsChecked == true;
-        if (!MultiplierTextBox.IsEnabled)
-        {
-            MultiplierTextBox.Text = "1";
-            UpdateQuantitiesWithMultiplier(1);
-        }
-    }
 
     private void MultiplierTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {

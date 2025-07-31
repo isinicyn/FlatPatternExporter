@@ -32,6 +32,21 @@ using TextBox = System.Windows.Controls.TextBox;
 
 namespace FlatPatternExporter;
 
+public enum ExportFolderType
+{
+    ChooseFolder = 0,      // Указать папку в процессе экспорта
+    ComponentFolder = 1,   // Папка компонента
+    PartFolder = 2,        // Рядом с деталью
+    ProjectFolder = 3,     // Папка проекта
+    FixedFolder = 4        // Фиксированная папка
+}
+
+public enum ProcessingMethod
+{
+    Traverse = 0,          // Перебор
+    BOM = 1               // Спецификация
+}
+
 public class AcadVersionItem
 {
     public string DisplayName { get; set; } = string.Empty;
@@ -65,6 +80,16 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private bool _excludeReferenceParts = true;
     private bool _excludePurchasedParts = true;
     private bool _includeLibraryComponents = false;
+    private bool _organizeByMaterial = false;
+    private bool _organizeByThickness = false;
+    private bool _includeQuantityInFileName = false;
+    private bool _enableSplineReplacement = false;
+    private ProcessingMethod _selectedProcessingMethod = ProcessingMethod.BOM; // Спецификация выбрана по умолчанию
+    private bool _mergeProfilesIntoPolyline = true;
+    private bool _rebaseGeometry = true;
+    private bool _trimCenterlines = false;
+    private ExportFolderType _selectedExportFolder = ExportFolderType.ChooseFolder;
+    private bool _enableSubfolder = false;
     private List<string> _libraryPaths = new List<string>();
     private int _itemCounter = 1; // Инициализация счетчика пунктов
     private Document? _lastScannedDocument;
@@ -82,20 +107,29 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         InitializeInventor();
         InitializeProjectFolder(); // Инициализация папки проекта при запуске
         PartsDataGrid.ItemsSource = _partsData;
-        MultiplierTextBox.IsEnabled = IncludeQuantityInFileNameCheckBox.IsChecked == true;
         UpdateFileCountLabel(0);
         ClearButton.IsEnabled = false;
         PartsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
         PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
         PartsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
-        ChooseFolderRadioButton.IsChecked = true;
-        ExcludeReferencePartsCheckBox.Checked += UpdateExcludeReferencePartsState;
-        ExcludeReferencePartsCheckBox.Unchecked += UpdateExcludeReferencePartsState;
-        ExcludePurchasedPartsCheckBox.Checked += UpdateExcludePurchasedPartsState;
-        ExcludePurchasedPartsCheckBox.Unchecked += UpdateExcludePurchasedPartsState;
-        IncludeLibraryComponentsCheckBox.Checked += UpdateIncludeLibraryComponentsState;
-        IncludeLibraryComponentsCheckBox.Unchecked += UpdateIncludeLibraryComponentsState;
+        // ChooseFolderRadioButton.IsChecked = true; // Заменено на свойство
+        
+        // Инициализация значений свойств
+        ExcludeReferenceParts = true;
+        ExcludePurchasedParts = true;
+        IncludeLibraryComponents = false;
+        OrganizeByMaterial = false;
+        OrganizeByThickness = false;
+        IncludeQuantityInFileName = false;
+        EnableSplineReplacement = false;
+        SelectedProcessingMethod = ProcessingMethod.BOM;
+        MergeProfilesIntoPolyline = true;
+        RebaseGeometry = true;
+        TrimCenterlines = false;
+        SelectedExportFolder = ExportFolderType.ChooseFolder;
+        EnableSubfolder = false;
+        
         // Инициализация путей библиотек
         InitializeLibraryPaths();
 
@@ -211,6 +245,190 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
     public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = new();
     public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = new();
+
+    // Публичные свойства для привязки данных CheckBox
+    public bool ExcludeReferenceParts
+    {
+        get => _excludeReferenceParts;
+        set
+        {
+            if (_excludeReferenceParts != value)
+            {
+                _excludeReferenceParts = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool ExcludePurchasedParts
+    {
+        get => _excludePurchasedParts;
+        set
+        {
+            if (_excludePurchasedParts != value)
+            {
+                _excludePurchasedParts = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool IncludeLibraryComponents
+    {
+        get => _includeLibraryComponents;
+        set
+        {
+            if (_includeLibraryComponents != value)
+            {
+                _includeLibraryComponents = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool OrganizeByMaterial
+    {
+        get => _organizeByMaterial;
+        set
+        {
+            if (_organizeByMaterial != value)
+            {
+                _organizeByMaterial = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool OrganizeByThickness
+    {
+        get => _organizeByThickness;
+        set
+        {
+            if (_organizeByThickness != value)
+            {
+                _organizeByThickness = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool IncludeQuantityInFileName
+    {
+        get => _includeQuantityInFileName;
+        set
+        {
+            if (_includeQuantityInFileName != value)
+            {
+                _includeQuantityInFileName = value;
+                OnPropertyChanged();
+                if (!value)
+                {
+                    MultiplierTextBox.Text = "1";
+                    UpdateQuantitiesWithMultiplier(1);
+                }
+            }
+        }
+    }
+
+    public bool EnableSplineReplacement
+    {
+        get => _enableSplineReplacement;
+        set
+        {
+            if (_enableSplineReplacement != value)
+            {
+                _enableSplineReplacement = value;
+                OnPropertyChanged();
+                if (value && SplineReplacementComboBox.SelectedItem == null)
+                    SplineReplacementComboBox.SelectedIndex = 0;
+            }
+        }
+    }
+
+    public ProcessingMethod SelectedProcessingMethod
+    {
+        get => _selectedProcessingMethod;
+        set
+        {
+            if (_selectedProcessingMethod != value)
+            {
+                _selectedProcessingMethod = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool MergeProfilesIntoPolyline
+    {
+        get => _mergeProfilesIntoPolyline;
+        set
+        {
+            if (_mergeProfilesIntoPolyline != value)
+            {
+                _mergeProfilesIntoPolyline = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool RebaseGeometry
+    {
+        get => _rebaseGeometry;
+        set
+        {
+            if (_rebaseGeometry != value)
+            {
+                _rebaseGeometry = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool TrimCenterlines
+    {
+        get => _trimCenterlines;
+        set
+        {
+            if (_trimCenterlines != value)
+            {
+                _trimCenterlines = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public ExportFolderType SelectedExportFolder
+    {
+        get => _selectedExportFolder;
+        set
+        {
+            if (_selectedExportFolder != value)
+            {
+                _selectedExportFolder = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsSubfolderCheckBoxEnabled)); // Уведомляем о изменении IsEnabled
+                UpdateSubfolderOptionsFromProperty();
+            }
+        }
+    }
+
+    public bool EnableSubfolder
+    {
+        get => _enableSubfolder;
+        set
+        {
+            if (_enableSubfolder != value)
+            {
+                _enableSubfolder = value;
+                OnPropertyChanged();
+                if (!value && SubfolderNameTextBox != null)
+                    SubfolderNameTextBox.Text = string.Empty;
+            }
+        }
+    }
+
+    // Вычисляемое свойство для IsEnabled чекбокса подпапки
+    public bool IsSubfolderCheckBoxEnabled => SelectedExportFolder != ExportFolderType.PartFolder;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -684,15 +902,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
 
-    private void EnableSplineReplacementCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
-    {
-        var isChecked = EnableSplineReplacementCheckBox.IsChecked == true;
-        SplineReplacementComboBox.IsEnabled = isChecked;
-        SplineToleranceTextBox.IsEnabled = isChecked;
-
-        if (isChecked && SplineReplacementComboBox.SelectedItem == null)
-            SplineReplacementComboBox.SelectedIndex = 0; // По умолчанию выбираем "Линии"
-    }
 
     private void PrepareExportOptions(out string options)
     {
@@ -701,7 +910,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var selectedAcadVersion = (AcadVersionItem)AcadVersionComboBox.SelectedItem;
         sb.Append($"AcadVersion={selectedAcadVersion?.Value ?? "2000"}");
 
-        if (EnableSplineReplacementCheckBox.IsChecked == true)
+        if (EnableSplineReplacement)
         {
             var splineTolerance = SplineToleranceTextBox.Text;
 
@@ -722,11 +931,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             sb.Append("&SimplifySplines=False");
         }
 
-        if (MergeProfilesIntoPolylineCheckBox.IsChecked == true) sb.Append("&MergeProfilesIntoPolyline=True");
+        if (MergeProfilesIntoPolyline) sb.Append("&MergeProfilesIntoPolyline=True");
 
-        if (RebaseGeometryCheckBox.IsChecked == true) sb.Append("&RebaseGeometry=True");
+        if (RebaseGeometry) sb.Append("&RebaseGeometry=True");
 
-        if (TrimCenterlinesCheckBox.IsChecked == true) // Проверяем новое поле TrimCenterlinesAtContour
+        if (TrimCenterlines) // Проверяем новое поле TrimCenterlinesAtContour
             sb.Append("&TrimCenterlinesAtContour=True");
 
         options = sb.ToString();
@@ -844,10 +1053,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             var asmDoc = (AssemblyDocument)doc;
             var sheetMetalParts = new Dictionary<string, int>();
-            if (TraverseRadioButton.IsChecked == true)
+            if (SelectedProcessingMethod == ProcessingMethod.Traverse)
                 await Task.Run(() =>
                     ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, scanProgress));
-            else if (BomRadioButton.IsChecked == true)
+            else if (SelectedProcessingMethod == ProcessingMethod.BOM)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, scanProgress));
             (partNumber, description) = GetDocumentProperties((Document)asmDoc);
             modelStateInfo = asmDoc.ComponentDefinition.BOM.BOMViews[1].ModelStateMemberName;
@@ -968,20 +1177,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         conflictWindow.ShowDialog(); // Ожидаем закрытия окна
     }
 
-    private void UpdateSubfolderOptions()
+
+    private void UpdateSubfolderOptionsFromProperty()
     {
-        // Опция "В папку с деталью" - чекбокс и текстовое поле должны быть отключены
-        if (PartFolderRadioButton.IsChecked == true)
+        // Опция "Рядом с деталью" - чекбокс должен быть отключен
+        if (SelectedExportFolder == ExportFolderType.PartFolder)
         {
-            EnableSubfolderCheckBox.IsEnabled = false;
-            EnableSubfolderCheckBox.IsChecked = false;
-            SubfolderNameTextBox.IsEnabled = false;
+            EnableSubfolder = false;
         }
-        else
+        
+        // Особая логика для ProjectFolder
+        if (SelectedExportFolder == ExportFolderType.ProjectFolder)
         {
-            // Для всех остальных опций чекбокс активен
-            EnableSubfolderCheckBox.IsEnabled = true;
-            SubfolderNameTextBox.IsEnabled = EnableSubfolderCheckBox.IsChecked == true;
+            SetProjectFolderInfo(); // Устанавливаем информацию о проекте при выборе
         }
     }
 
@@ -1049,43 +1257,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             new() { DisplayName = "Линии", Index = 0 },
             new() { DisplayName = "Дуги", Index = 1 }
         };
-    }
-
-    // Обновленный метод для обработки нажатия радиокнопки
-    private void ProjectFolderRadioButton_Checked(object sender, RoutedEventArgs e)
-    {
-        SetProjectFolderInfo(); // Устанавливаем информацию о проекте при выборе радиокнопки
-        UpdateSubfolderOptions();
-    }
-    private void PartFolderRadioButton_Checked(object sender, RoutedEventArgs e)
-    {
-        UpdateSubfolderOptions();
-    }
-
-    private void ComponentFolderRadioButton_Checked(object sender, RoutedEventArgs e)
-    {
-        UpdateSubfolderOptions();
-    }
-
-    private void ChooseFolderRadioButton_Checked(object sender, RoutedEventArgs e)
-    {
-        UpdateSubfolderOptions();
-    }
-
-    private void FixedFolderRadioButton_Checked(object sender, RoutedEventArgs e)
-    {
-        UpdateSubfolderOptions();
-    }
-
-    private void EnableSubfolderCheckBox_Checked(object sender, RoutedEventArgs e)
-    {
-        SubfolderNameTextBox.IsEnabled = true;
-    }
-
-    private void EnableSubfolderCheckBox_Unchecked(object sender, RoutedEventArgs e)
-    {
-        SubfolderNameTextBox.IsEnabled = false;
-        SubfolderNameTextBox.Text = string.Empty;
     }
 
     private (string partNumber, string description) GetDocumentProperties(Document document)
@@ -1402,6 +1573,41 @@ public class ScanProgress
     public int TotalItems { get; set; }
     public string CurrentOperation { get; set; } = string.Empty;
     public string CurrentItem { get; set; } = string.Empty;
+}
+
+
+// Конвертер для работы с enum в RadioButton
+public class EnumToBooleanConverter : IValueConverter
+{
+    public static readonly EnumToBooleanConverter Instance = new();
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value == null || parameter == null)
+            return false;
+
+        // Универсальный подход для любых enum
+        var valueType = value.GetType();
+        if (valueType.IsEnum && Enum.TryParse(valueType, parameter.ToString(), out var parameterValue))
+        {
+            return value.Equals(parameterValue);
+        }
+
+        return false;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool boolValue && boolValue && parameter != null && targetType.IsEnum)
+        {
+            if (Enum.TryParse(targetType, parameter.ToString(), out var result))
+            {
+                return result;
+            }
+        }
+
+        return Binding.DoNothing;
+    }
 }
 
 // Структура для детальной информации о конфликтах обозначений
