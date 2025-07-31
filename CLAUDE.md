@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**Важно:** Указывай только основные сведения о проекте без описаний того, что добавлено, удалено или улучшено.
+
 ## Структура репозитория
 
 Это C# WPF приложение, которое является дополнением для Autodesk Inventor:
@@ -86,9 +88,32 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Автоматическое заполнение данных из "Inventor User Defined Properties"
 - Поддержка фонового режима обработки
 
+### Архитектура UI - Система привязки данных
+Проект использует декларативную архитектуру WPF/MVVM:
+
+**Enum-based система для RadioButton групп:**
+- `ExportFolderType` - управление выбором папки экспорта (5 опций)
+- `ProcessingMethod` - выбор метода обработки (Перебор/Спецификация)
+
+**Универсальные конвертеры:**
+- `EnumToBooleanConverter` - универсальный конвертер для привязки enum к RadioButton
+- Поддерживает любые enum через рефлексию и `Enum.TryParse`
+
+**Система свойств с INotifyPropertyChanged:**
+- CheckBox используют двустороннюю привязку данных (`TwoWay` binding)
+- Публичные свойства: `ExcludeReferenceParts`, `OrganizeByMaterial`, `EnableSplineReplacement` и др.
+- Вычисляемые свойства: `IsSubfolderCheckBoxEnabled` для зависимых состояний
+
+**Декларативные XAML привязки:**
+- `ElementName` binding для связи между элементами
+- Отсутствие обработчиков событий `Checked`/`Unchecked`
+- Отсутствие прямых обращений к UI элементам из code-behind
+
 ## Заметки по разработке
 
 - Приложение требует установки Autodesk Inventor для функциональности COM interop
 - Использует встроенную отладочную информацию для развертывания
 - Включает пользовательские иконки и изображения ресурсов
 - Поддерживает работу с различными форматами файлов через Inventor API
+- Архитектура UI соответствует принципам WPF Data Binding
+- Для новых RadioButton групп используется enum + `EnumToBooleanConverter`
