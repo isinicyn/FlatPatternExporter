@@ -96,66 +96,47 @@
                 </Style>
             </Button.Style>
         </Button>
-        <GroupBox Header="Поиск" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="5,0,5,0" Height="120" Width="200" Margin="0,5,90,0"
-                  Grid.Row="0" Grid.RowSpan="2">
-            <StackPanel VerticalAlignment="Center">
-                <StackPanel x:Name="StackPanel">
-                    <Grid Margin="0,0,0,10" VerticalAlignment="Center" Width="{Binding Width, ElementName=StackPanel}">
-                        <TextBox x:Name="SearchTextBox" 
-                         VerticalContentAlignment="Center"
+        <GroupBox Header="Поиск" 
+                  HorizontalAlignment="Right" 
+                  VerticalAlignment="Top" 
+                  Width="200" 
+                  Margin="0,5,90,0"
+                  Padding="10"
+                  Grid.Row="0">
+            <Grid>
+                <TextBox x:Name="SearchTextBox" 
+                         Height="25"
                          Padding="5,0,30,0"
-                         TextChanged="SearchTextBox_TextChanged"
-                         VerticalAlignment="Center" Height="20">
-                            <TextBox.Style>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="TextBox">
-                                                <Border Background="{TemplateBinding Background}"
-                                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                                        BorderThickness="{TemplateBinding BorderThickness}">
-                                                    <Grid>
-                                                        <ScrollViewer x:Name="PART_ContentHost" 
-                                                                      VerticalAlignment="Center" 
-                                                                      Margin="{TemplateBinding Padding}"/>
-                                                        <TextBlock Text="Поиск..." 
-                                                                   Foreground="Gray" 
-                                                                   VerticalAlignment="Center" 
-                                                                   Margin="{TemplateBinding Padding}"
-                                                                   IsHitTestVisible="False">
-                                                            <TextBlock.Style>
-                                                                <Style TargetType="TextBlock">
-                                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" Value="">
-                                                                            <Setter Property="Visibility" Value="Visible"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-                                                    </Grid>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </TextBox.Style>
-                        </TextBox>
-                        <Button x:Name="ClearSearchButton" 
+                         VerticalContentAlignment="Center"
+                         TextChanged="SearchTextBox_TextChanged"/>
+                <TextBlock Text="Поиск..." 
+                           Foreground="Gray" 
+                           VerticalAlignment="Center" 
+                           Margin="5,0,30,0"
+                           IsHitTestVisible="False">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <Button x:Name="ClearSearchButton" 
                         Content="✖"
                         Width="20"
                         Height="20"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center" 
-                        Click="ClearSearchButton_Click" FontSize="8" Background="{x:Null}" Visibility="Collapsed">
-                            <Button.BorderBrush>
-                                <SolidColorBrush Color="#FF707070" Opacity="0"/>
-                            </Button.BorderBrush>
-                        </Button>
-                    </Grid>
-                </StackPanel>
-            </StackPanel>
+                        Click="ClearSearchButton_Click" 
+                        FontSize="8" 
+                        Background="Transparent" 
+                        BorderBrush="Transparent"
+                        Visibility="Collapsed"/>
+            </Grid>
         </GroupBox>
         <DataGrid x:Name="PartsDataGrid"
               AutoGenerateColumns="False"
