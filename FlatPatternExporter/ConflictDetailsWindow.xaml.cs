@@ -48,20 +48,16 @@ public partial class ConflictDetailsWindow
 
     private void ExecuteOpenFile(ConflictFileInfo? fileInfo)
     {
-        if (fileInfo?.FilePath == null || !File.Exists(fileInfo.FilePath))
+        if (fileInfo?.FilePath == null)
             return;
 
-        try
+        // Получаем ссылку на главное окно для использования централизованного метода
+        var mainWindow = Owner as FlatPatternExporterMainWindow;
+        if (mainWindow != null)
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = fileInfo.FilePath,
-                UseShellExecute = true
-            });
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            // Используем централизованный метод открытия с состоянием модели
+            // Обработка ошибок уже есть внутри OpenInventorDocument()
+            mainWindow.OpenInventorDocument(fileInfo.FilePath, fileInfo.ModelState);
         }
     }
 

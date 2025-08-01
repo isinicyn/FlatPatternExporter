@@ -1280,6 +1280,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         {
             var partNumber = item.PartNumber;
             var fullPath = GetPartDocumentFullPath(partNumber);
+            var targetModelState = item.ModelState;
 
             // Проверка на null перед использованием fullPath
             if (string.IsNullOrEmpty(fullPath))
@@ -1289,21 +1290,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 continue;
             }
 
-            // Проверка существования файла
-            if (File.Exists(fullPath))
-                try
-                {
-                    // Открытие документа в Inventor
-                    _thisApplication?.Documents?.Open(fullPath);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при открытии файла по пути {fullPath}: {ex.Message}", "Ошибка",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            else
-                MessageBox.Show($"Файл по пути {fullPath}, связанный с номером детали {partNumber}, не найден.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            // Открываем файл с указанием состояния модели
+            OpenInventorDocument(fullPath, targetModelState);
         }
     }
 
@@ -1325,6 +1313,41 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         MessageBox.Show($"Документ с номером детали {partNumber} не найден среди открытых.", "Ошибка",
             MessageBoxButton.OK, MessageBoxImage.Error);
         return null; // Возвращаем null, если документ не найден
+    }
+
+    /// <summary>
+    /// Централизованный метод для открытия файла в Inventor с указанием состояния модели
+    /// </summary>
+    /// <param name="filePath">Полный путь к файлу</param>
+    /// <param name="modelState">Имя состояния модели (может быть null или пустая строка)</param>
+    public void OpenInventorDocument(string filePath, string? modelState = null)
+    {
+        if (!File.Exists(filePath))
+        {
+            MessageBox.Show($"Файл по пути {filePath} не найден.", "Ошибка", 
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        try
+        {
+            if (!string.IsNullOrEmpty(modelState))
+            {
+                // Используем синтаксис с угловыми скобками для указания состояния модели
+                var pathWithModelState = $"{filePath}<{modelState}>";
+                _thisApplication?.Documents?.Open(pathWithModelState);
+            }
+            else
+            {
+                // Открываем обычным способом, если состояние модели не указано
+                _thisApplication?.Documents?.Open(filePath);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка при открытии файла по пути {filePath}: {ex.Message}", "Ошибка",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void partsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
