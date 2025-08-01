@@ -121,6 +121,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     
     // Модель состояния
     private bool _isPrimaryModelState = true;
+    
+    // Словарь колонок с шаблонами (все типы)
+    private static readonly Dictionary<string, string> ColumnTemplates = new()
+    {
+        { "Изобр. детали", "PartImageTemplate" },
+        { "Изобр. развертки", "DxfImageTemplate" },
+        { "Обозначение", "PartNumberWithIndicatorTemplate" }
+    };
 
     public FlatPatternExporterMainWindow()
     {
@@ -673,38 +681,24 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         DataGridColumn column;
 
-        // Проверка, если это колонка с изображением детали или развертки
-        if (iProperty.InternalName == "Изобр. детали" || iProperty.InternalName == "Изобр. развертки")
+        // Проверка колонок с шаблонами
+        if (ColumnTemplates.TryGetValue(iProperty.InternalName, out var templateName))
         {
-            var templateColumn = new DataGridTemplateColumn
+            column = new DataGridTemplateColumn
             {
-                Header = iProperty.InternalName
+                Header = iProperty.InternalName,
+                CellTemplate = FindResource(templateName) as DataTemplate
             };
-
-            if (iProperty.InternalName == "Изобр. детали")
-            {
-                templateColumn.CellTemplate = FindResource("PartImageTemplate") as DataTemplate;
-            }
-            else if (iProperty.InternalName == "Изобр. развертки")
-            {
-                templateColumn.CellTemplate = FindResource("DxfImageTemplate") as DataTemplate;
-            }
-
-            column = templateColumn;
         }
         else
         {
-            // Создаем текстовую колонку
-            var textColumn = new DataGridTextColumn
+            // Создаем обычную текстовую колонку
+            column = new DataGridTextColumn
             {
                 Header = iProperty.InternalName,
-                Binding = new Binding(iProperty.InventorPropertyName)
+                Binding = new Binding(iProperty.InventorPropertyName),
+                ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style
             };
-
-            // Применяем стиль CenteredCellStyle
-            textColumn.ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style;
-
-            column = textColumn;
         }
 
         // Если указан индекс вставки, вставляем колонку в нужное место
