@@ -31,12 +31,12 @@ public partial class FlatPatternExporterMainWindow : Window
         partData.Thickness = mgr.GetThickness();
         partData.HasFlatPattern = mgr.HasFlatPattern();
 
-        // КАТЕГОРИЯ 3: Основные iProperty (всегда читаются)
+        // Всегда обязательные свойства (независимо от наличия колонок)
         partData.PartNumber = mgr.GetMappedProperty("PartNumber");
+        partData.Description = mgr.GetMappedProperty("Description");
         partData.Material = mgr.GetMappedProperty("Material");
 
         // КАТЕГОРИЯ 4: Расширенные iProperty (условно по наличию колонок)
-        if (IsColumnPresent("Наименование")) partData.Description = mgr.GetMappedProperty("Description");
         if (IsColumnPresent("Автор")) partData.Author = mgr.GetMappedProperty("Author");
         if (IsColumnPresent("Ревизия")) partData.Revision = mgr.GetMappedProperty("Revision");
         if (IsColumnPresent("Название")) partData.Title = mgr.GetMappedProperty("Title");

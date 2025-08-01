@@ -180,11 +180,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     new() { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState", Category = "Документ" },
     new() { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness", Category = "Документ" },
     new() { InternalName = "Изобр. детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview", Category = "Документ" },
+    new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber", Category = "Документ" },
     
-    // КАТЕГОРИЯ 3: Основные iProperty
-    new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber", Category = "Основные iProperty" },
-    new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description", Category = "Основные iProperty" },
-    new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material", Category = "Основные iProperty" },
     
     // КАТЕГОРИЯ 4: Расширенные iProperty - Summary Information
     new() { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author", Category = "Summary Information" },
@@ -193,6 +190,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     new() { InternalName = "Тема", DisplayName = "Тема", InventorPropertyName = "Subject", Category = "Summary Information" },
     new() { InternalName = "Ключевые слова", DisplayName = "Ключевые слова", InventorPropertyName = "Keywords", Category = "Summary Information" },
     new() { InternalName = "Примечание", DisplayName = "Примечание", InventorPropertyName = "Comments", Category = "Summary Information" },
+    new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description", Category = "Summary Information" },
     
     // КАТЕГОРИЯ 4: Расширенные iProperty - Document Summary Information
     new() { InternalName = "Категория", DisplayName = "Категория", InventorPropertyName = "Category", Category = "Document Summary Information" },
@@ -222,6 +220,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     new() { InternalName = "Длинна развертки", DisplayName = "Длинна развертки", InventorPropertyName = "FlatPatternLength", Category = "Design Tracking Properties" },
     new() { InternalName = "Площадь развертки", DisplayName = "Площадь развертки", InventorPropertyName = "FlatPatternArea", Category = "Design Tracking Properties" },
     new() { InternalName = "Отделка", DisplayName = "Отделка", InventorPropertyName = "Appearance", Category = "Design Tracking Properties" },
+    new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material", Category = "Design Tracking Properties" },
     
     // КАТЕГОРИЯ 6: Свойства количества и состояния
     new() { InternalName = "Кол.", DisplayName = "Количество", InventorPropertyName = "Quantity", Category = "Количество" },
@@ -1359,11 +1358,6 @@ public class PartData : INotifyPropertyChanged
     public BitmapImage? Preview { get; set; } // apprenticeDoc.Thumbnail
     public bool HasFlatPattern { get; set; } = false; // smCompDef.HasFlatPattern
 
-    // === КАТЕГОРИЯ 3: ОСНОВНЫЕ IPROPERTIES ===
-    // Ключевые iProperty из "Design Tracking Properties", всегда необходимые
-    private string partNumber = string.Empty;
-    private string description = string.Empty;
-    private string material = string.Empty;
 
     // === КАТЕГОРИЯ 4: РАСШИРЕННЫЕ IPROPERTIES ===
     // Опциональные iProperty из различных наборов свойств
@@ -1439,7 +1433,11 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    // КАТЕГОРИЯ 3: Основные iProperty с уведомлениями
+    // КАТЕГОРИЯ 2/4: Основные обязательные свойства с уведомлениями
+    private string partNumber = string.Empty;
+    private string description = string.Empty;
+    private string material = string.Empty;
+
     public string PartNumber
     {
         get => partNumber;
@@ -1452,6 +1450,7 @@ public class PartData : INotifyPropertyChanged
             }
         }
     }
+
 
     public string Description
     {
