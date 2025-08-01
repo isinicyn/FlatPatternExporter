@@ -10,7 +10,7 @@
         FontFamily="Segoe UI" SizeToContent="WidthAndHeight" Opacity="0.95">
 
     <!-- Главное оформление с закругленными углами и фоновым цветом -->
-    <Border CornerRadius="5" Background="#F3F3F3" Padding="5" BorderBrush="#E0E0E0" BorderThickness="1">
+    <Border Background="#F3F3F3" Padding="5" BorderBrush="#E0E0E0" BorderThickness="1">
         <Grid Margin="16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

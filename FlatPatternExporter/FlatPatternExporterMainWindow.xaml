@@ -11,10 +11,10 @@
         <!-- Кисти для чередования строк -->
         <SolidColorBrush x:Key="EvenRowBrush" Color="White"/>
         <SolidColorBrush x:Key="OddRowBrush" Color="#F5F5F5"/>
-        
+
         <!-- Конвертер для определения четности строки по ID -->
         <local:ItemIndexToBackgroundConverter x:Key="ItemIndexToBackgroundConverter"/>
-        
+
         <!-- Стиль для фантомного заголовка колонки при перетаскивании -->
         <Style x:Key="PhantomColumnHeaderStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>
@@ -29,14 +29,14 @@
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="FontWeight" Value="Normal"/>
         </Style>
-        
+
         <!-- Стиль для фантомного заголовка в режиме удаления -->
         <Style x:Key="PhantomColumnHeaderDeleteStyle" TargetType="TextBlock" BasedOn="{StaticResource PhantomColumnHeaderStyle}">
             <Setter Property="Background" Value="Red"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
-        
+
         <!-- Стили для блока информации о документе -->
         <Style x:Key="DocumentInfoLabelStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="11"/>
@@ -44,14 +44,14 @@
             <Setter Property="Margin" Value="0,0,3,1"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-        
+
         <Style x:Key="DocumentInfoValueStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="Margin" Value="0,0,0,1"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-        
+
         <Style x:Key="ModelStateValueStyle" TargetType="TextBlock" BasedOn="{StaticResource DocumentInfoValueStyle}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsPrimaryModelState}" Value="False">
@@ -96,7 +96,7 @@
                 </Style>
             </Button.Style>
         </Button>
-        <GroupBox Header="Список данных деталей" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="5,0,5,0" Height="120" Margin="0,5,90,0"
+        <GroupBox Header="Поиск" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="1,1,1,1" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="5,0,5,0" Height="120" Width="200" Margin="0,5,90,0"
                   Grid.Row="0" Grid.RowSpan="2">
             <StackPanel VerticalAlignment="Center">
                 <StackPanel x:Name="StackPanel">
@@ -312,6 +312,7 @@
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="Foreground" Value="#333333"/>
                 </Style>
+
             </DataGrid.Resources>
 
             <DataGrid.Columns>
@@ -461,7 +462,7 @@
             <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования"/>
         </StackPanel>
         <Border Grid.Row="0" Margin="500,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="75"
-                BorderBrush="#D0D0D0" BorderThickness="1" CornerRadius="5" Background="#F8F8F8" Padding="5">
+                BorderBrush="#D0D0D0" BorderThickness="1" Background="#F8F8F8" Padding="5">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -471,21 +472,21 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Тип документа:" Style="{StaticResource DocumentInfoLabelStyle}"/>
-                <TextBlock x:Name="DocumentTypeLabel" Grid.Row="0" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}"/>
-                
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Обозначение:" Style="{StaticResource DocumentInfoLabelStyle}"/>
-                <TextBlock x:Name="PartNumberLabel" Grid.Row="1" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}"/>
-                
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание:" Style="{StaticResource DocumentInfoLabelStyle}"/>
-                <TextBlock x:Name="DescriptionLabel" Grid.Row="2" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}"/>
-                
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Состояние модели:" Style="{StaticResource DocumentInfoLabelStyle}"/>
+
+                <TextBlock Grid.Column="0" Text="Тип документа:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="16" Margin="0,0,3,0"/>
+                <TextBlock x:Name="DocumentTypeLabel" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="15" Margin="5,0,0,1"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Обозначение:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="14" Margin="0,0,3,0"/>
+                <TextBlock x:Name="PartNumberLabel" Grid.Row="1" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="14" Margin="5,0,0,1"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="14" Margin="0,0,3,0"/>
+                <TextBlock x:Name="DescriptionLabel" Grid.Row="2" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="15" Margin="5,0,0,1"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Состояние модели:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="14" Margin="0,0,3,0"/>
                 <TextBlock x:Name="ModelStateLabel" Grid.Row="3" Grid.Column="1" Text="" 
-                           Style="{StaticResource ModelStateValueStyle}"/>
+                           Style="{StaticResource ModelStateValueStyle}" Height="15" Margin="5,0,0,1"/>
             </Grid>
         </Border>
         <Border Grid.Row="4" Background="LightGray" Height="25" VerticalAlignment="Center">
