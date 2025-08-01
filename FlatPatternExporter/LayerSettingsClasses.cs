@@ -5,10 +5,50 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace FlatPatternExporter
 {
+    public class TextValidationConverter : IValueConverter
+    {
+        private static readonly char[] InvalidCharacters = new[] { '<', '>', '/', '\\', '"', ':', ';', '?', '*', '|', ',', '=' };
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string text)
+            {
+                string cleanedText = RemoveInvalidCharacters(text);
+                
+                if (cleanedText != text)
+                {
+                    System.Windows.MessageBox.Show(
+                        "Недопустимые символы в имени слоя.\nВ именах слоев не допускается употребление следующих символов:\n<>/\\\"\":;?*|,=",
+                        "Ошибка ввода",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+                
+                return cleanedText;
+            }
+            return value;
+        }
+
+        private string RemoveInvalidCharacters(string input)
+        {
+            foreach (var c in InvalidCharacters)
+            {
+                input = input.Replace(c.ToString(), string.Empty);
+            }
+            return input;
+        }
+    }
+
     public class ColorToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -60,6 +100,34 @@ namespace FlatPatternExporter
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object?> _execute;
+        private readonly Func<object?, bool>? _canExecute;
+
+        public RelayCommand(Action<object?> execute, Func<object?, bool>? canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            return _canExecute?.Invoke(parameter) ?? true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
         }
     }
 
@@ -122,6 +190,8 @@ namespace FlatPatternExporter
 
         public string OriginalName { get; set; } // Оригинальное имя слоя, например, IV_BEND
 
+        public ICommand ResetCommand { get; }
+
         public LayerSetting(string displayName, string layerName, bool hasVisibilityOption = true)
         {
             DisplayName = displayName;
@@ -132,6 +202,16 @@ namespace FlatPatternExporter
             CustomName = string.Empty;
             SelectedColor = "White"; // Цвет по умолчанию
             SelectedLineType = "Default"; // Тип линии по умолчанию
+            
+            ResetCommand = new RelayCommand(_ => ResetSettings());
+        }
+
+        private void ResetSettings()
+        {
+            IsVisible = true;
+            CustomName = string.Empty;
+            SelectedColor = "White";
+            SelectedLineType = "Default";
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
