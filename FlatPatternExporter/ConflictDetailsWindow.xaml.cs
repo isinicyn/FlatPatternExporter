@@ -2,11 +2,11 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter;
+
+
 
 public class ConflictPartNumberGroup
 {
@@ -24,7 +24,6 @@ public class ConflictFileInfo
 
 public partial class ConflictDetailsWindow
 {
-    private string? _selectedFilePath;
     public List<ConflictPartNumberGroup> ConflictGroups { get; set; } = new();
 
     public ConflictDetailsWindow(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
@@ -48,57 +47,31 @@ public partial class ConflictDetailsWindow
         }).ToList();
     }
 
-    private void ConflictTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    private void ExecuteOpenFile(ConflictFileInfo? fileInfo)
     {
-        var treeViewItem = FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+        if (fileInfo?.FilePath == null || !File.Exists(fileInfo.FilePath))
+            return;
 
-        if (treeViewItem?.DataContext is ConflictFileInfo fileInfo)
+        try
         {
-            treeViewItem.Focus();
-            _selectedFilePath = fileInfo.FilePath;
-
-            var contextMenu = new ContextMenu();
-            var openFileMenuItem = new MenuItem { Header = "Открыть файл" };
-            openFileMenuItem.Click += OpenFileMenuItem_Click;
-            contextMenu.Items.Add(openFileMenuItem);
-            contextMenu.IsOpen = true;
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = fileInfo.FilePath,
+                UseShellExecute = true
+            });
         }
-
-        e.Handled = true;
-    }
-
-    // Поиск TreeViewItem для элемента
-    private static T? FindAncestor<T>(DependencyObject current) where T : DependencyObject
-    {
-        do
+        catch (Exception ex)
         {
-            if (current is T) return (T)current;
-            current = VisualTreeHelper.GetParent(current);
-        } while (current != null);
-
-        return null;
+            MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
-    // Обработчик для пункта "Открыть файл"
     private void OpenFileMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        if (!string.IsNullOrEmpty(_selectedFilePath) && File.Exists(_selectedFilePath))
-            try
-            {
-                // Открываем файл
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = _selectedFilePath,
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Не удалось открыть файл: {ex.Message}", "Ошибка", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-        else
-            MessageBox.Show("Файл не найден.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        if (sender is MenuItem menuItem && menuItem.DataContext is ConflictFileInfo fileInfo)
+        {
+            ExecuteOpenFile(fileInfo);
+        }
     }
 
     // Обработчик кнопки "ОК"

@@ -1,6 +1,7 @@
 ﻿<Window x:Class="FlatPatternExporter.ConflictDetailsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:FlatPatternExporter"
         Title="Детали конфликта обозначений" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FAFAFA" SizeToContent="WidthAndHeight">
     <Grid Margin="10,10,10,10" VerticalAlignment="Center" HorizontalAlignment="Center">
         <Grid.RowDefinitions>
@@ -15,11 +16,15 @@
         <!-- Иерархическое отображение конфликтов (TreeView) -->
         <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,10">
             <TreeView x:Name="ConflictTreeView" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="1" Padding="0,10,10,10"
-                      ItemsSource="{Binding ConflictGroups}"
-                      PreviewMouseRightButtonDown="ConflictTreeView_PreviewMouseRightButtonDown">
+                      ItemsSource="{Binding ConflictGroups}">
                 <TreeView.Resources>
+                    <ContextMenu x:Key="FileContextMenu">
+                        <MenuItem Header="Открыть файл" Click="OpenFileMenuItem_Click"/>
+                    </ContextMenu>
+                    
                     <Style TargetType="TreeViewItem">
                         <Setter Property="IsExpanded" Value="True"/>
+                        <Setter Property="ContextMenu" Value="{StaticResource FileContextMenu}"/>
                     </Style>
                 </TreeView.Resources>
                 <TreeView.ItemTemplate>
