@@ -22,7 +22,6 @@ using Inventor;
 using Application = Inventor.Application;
 using Binding = System.Windows.Data.Binding;
 using DragEventArgs = System.Windows.DragEventArgs;
-using Image = System.Windows.Controls.Image;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
@@ -106,6 +105,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     
     // Настройки экспорта DXF
     private bool _enableSplineReplacement = false;
+    private int _selectedSplineReplacementIndex = 0;
+    private int _selectedAcadVersionIndex = 5; // 2000 по умолчанию
     private bool _mergeProfilesIntoPolyline = true;
     private bool _rebaseGeometry = true;
     private bool _trimCenterlines = false;
@@ -350,8 +351,32 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _enableSplineReplacement = value;
                 OnPropertyChanged();
-                if (value && SplineReplacementComboBox.SelectedItem == null)
-                    SplineReplacementComboBox.SelectedIndex = 0;
+            }
+        }
+    }
+
+    public int SelectedSplineReplacementIndex
+    {
+        get => _selectedSplineReplacementIndex;
+        set
+        {
+            if (_selectedSplineReplacementIndex != value)
+            {
+                _selectedSplineReplacementIndex = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public int SelectedAcadVersionIndex
+    {
+        get => _selectedAcadVersionIndex;
+        set
+        {
+            if (_selectedAcadVersionIndex != value)
+            {
+                _selectedAcadVersionIndex = value;
+                OnPropertyChanged();
             }
         }
     }

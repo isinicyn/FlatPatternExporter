@@ -361,7 +361,7 @@
                                           ItemsSource="{Binding AcadVersions}"
                                           DisplayMemberPath="DisplayName"
                                           SelectedValuePath="Value"
-                                          SelectedIndex="5"/>
+                                          SelectedIndex="{Binding SelectedAcadVersionIndex, Mode=TwoWay}"/>
                             </StackPanel>
                             <CheckBox x:Name="MergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5" IsChecked="{Binding MergeProfilesIntoPolyline, Mode=TwoWay}"/>
                             <CheckBox x:Name="RebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5" IsChecked="{Binding RebaseGeometry, Mode=TwoWay}"/>
@@ -409,7 +409,8 @@
                                           Margin="2,0,0,0"
                                           ItemsSource="{Binding SplineReplacementTypes}"
                                           DisplayMemberPath="DisplayName"
-                                          SelectedValuePath="Index"/>
+                                          SelectedValuePath="Index"
+                                          SelectedIndex="{Binding SelectedSplineReplacementIndex, Mode=TwoWay}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="0,5,5,5"/>
