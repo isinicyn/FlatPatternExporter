@@ -19,5 +19,28 @@ namespace FlatPatternExporter
             InitializeComponent();
         }
 
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (((System.Windows.Controls.Button)sender).CommandParameter is LayerSetting layerSetting)
+            {
+                layerSetting.ResetSettings();
+            }
+        }
+
+        private void CustomTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = (System.Windows.Controls.TextBox)sender;
+            if (textBox.DataContext is not LayerSetting) return;
+
+            var originalText = textBox.Text;
+            var cleanedText = LayerNameValidator.CleanAndValidate(originalText);
+
+            if (cleanedText != originalText)
+            {
+                var caretIndex = textBox.CaretIndex;
+                textBox.Text = cleanedText;
+                textBox.CaretIndex = Math.Min(caretIndex, cleanedText.Length);
+            }
+        }
     }
 }

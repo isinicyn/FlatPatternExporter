@@ -5,7 +5,6 @@
     <UserControl.Resources>
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
-        <local:TextValidationConverter x:Key="TextValidationConverter"/>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" Margin="0,5">
         <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
@@ -14,10 +13,11 @@
           IsEnabled="{Binding IsCheckBoxEnabled}" FontSize="10"/>
         <Grid Width="95" Margin="0,0,5,0">
             <TextBox x:Name="CustomTextBox"
-                     Text="{Binding CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TextValidationConverter}}"
+                     Text="{Binding CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      IsEnabled="{Binding IsCustomNameEnabled}"
                      FontSize="10" VerticalContentAlignment="Center"
-                     Foreground="Black" Background="White"/>
+                     Foreground="Black" Background="White"
+                     TextChanged="CustomTextBox_TextChanged"/>
             <TextBlock Text="{Binding OriginalName}"
                        Foreground="#808E8E8E"
                        FontSize="10"
@@ -79,7 +79,8 @@
                 Width="22"
                 Height="22"
                 VerticalAlignment="Center"
-                Command="{Binding ResetCommand}"
+                Click="ResetButton_Click"
+                CommandParameter="{Binding}"
                 Margin="5,0,0,0"/>
     </StackPanel>
 </UserControl>
