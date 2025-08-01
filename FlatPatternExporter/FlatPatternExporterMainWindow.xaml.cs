@@ -65,41 +65,62 @@ public class SplineReplacementItem
 
 public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
+    // Inventor API
+    public Application? _thisApplication;
+    private Document? _lastScannedDocument;
+    
+    // Данные и коллекции
+    private readonly ObservableCollection<PartData> _partsData = new();
+    private readonly CollectionViewSource _partsDataView;
+    public readonly List<string> _customPropertiesList = new();
+    private List<PartData> _conflictingParts = new();
+    private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = new();
+    private readonly ConcurrentDictionary<string, List<PartConflictInfo>> _partNumberTracker = new();
+    
+    // Состояние процессов
+    private bool _isScanning;
+    private bool _isCancelled;
     private bool _hasMissingReferences = false;
+    private int _itemCounter = 1;
+    
+    // UI состояние
+    private bool _isCtrlPressed;
+    private string _actualSearchText = string.Empty;
+    private readonly DispatcherTimer _searchDelayTimer;
+    
+    // DataGrid управление колонками
     private AdornerLayer? _adornerLayer;
     private HeaderAdorner? _headerAdorner;
     private bool _isColumnDraggedOutside;
     private DataGridColumn? _reorderingColumn;
-    private string _actualSearchText = string.Empty; // Поле для хранения фактического текста поиска
-
-    public readonly List<string> _customPropertiesList = new();
-    private string _fixedFolderPath = string.Empty;
-    private bool _isCancelled;
-    private bool _isCtrlPressed;
-    private bool _isScanning;
+    
+    // Настройки фильтрации деталей
     private bool _excludeReferenceParts = true;
     private bool _excludePurchasedParts = true;
     private bool _includeLibraryComponents = false;
+    
+    // Настройки организации файлов
     private bool _organizeByMaterial = false;
     private bool _organizeByThickness = false;
     private bool _includeQuantityInFileName = false;
+    
+    // Настройки экспорта DXF
     private bool _enableSplineReplacement = false;
-    private ProcessingMethod _selectedProcessingMethod = ProcessingMethod.BOM; // Спецификация выбрана по умолчанию
     private bool _mergeProfilesIntoPolyline = true;
     private bool _rebaseGeometry = true;
     private bool _trimCenterlines = false;
+    
+    // Настройки папок и путей
     private ExportFolderType _selectedExportFolder = ExportFolderType.ChooseFolder;
     private bool _enableSubfolder = false;
+    private string _fixedFolderPath = string.Empty;
     private List<string> _libraryPaths = new List<string>();
-    private int _itemCounter = 1; // Инициализация счетчика пунктов
-    private Document? _lastScannedDocument;
-    private readonly ObservableCollection<PartData> _partsData = new();
-    private readonly CollectionViewSource _partsDataView;
-    private readonly DispatcherTimer _searchDelayTimer;
-    public Application? _thisApplication;
-    private List<PartData> _conflictingParts = new(); // Список конфликтующих файлов
-    private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = new();
-    private readonly ConcurrentDictionary<string, List<PartConflictInfo>> _partNumberTracker = new(); // Для отслеживания конфликтов во время сканирования
+    
+    // Метод обработки
+    private ProcessingMethod _selectedProcessingMethod = ProcessingMethod.BOM;
+    
+    // Модель состояния
+    private bool _isPrimaryModelState = true;
 
     public FlatPatternExporterMainWindow()
     {
@@ -421,8 +442,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
-    // Свойство для привязки состояния модели к UI (устанавливается однократно при сканировании)
-    private bool _isPrimaryModelState = true;
     public bool IsPrimaryModelState
     {
         get => _isPrimaryModelState;
