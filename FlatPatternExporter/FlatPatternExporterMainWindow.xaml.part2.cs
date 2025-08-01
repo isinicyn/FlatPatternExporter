@@ -790,8 +790,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 item.Quantity = dialog.NewQuantity.Value;
                 item.IsOverridden = true;
             }
-
-            PartsDataGrid.Items.Refresh();
         }
     }
 
@@ -971,7 +969,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 {
                     partData.ProcessingStatus = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Error;
                     partData.DxfPreview = dxfPreview!;
-                    PartsDataGrid.Items.Refresh();
                 });
 
                 if (exportSuccess)
@@ -1401,7 +1398,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 }
             }
 
-            PartsDataGrid.Items.Refresh();
             await Task.Delay(50);
         }
     }
@@ -1417,8 +1413,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 partData.RemoveCustomProperty(propertyName);
 
         // Обновляем список доступных свойств
-        _customPropertiesList.Remove(propertyName); // Не забудьте удалить свойство из списка доступных свойств
-        PartsDataGrid.Items.Refresh();
+        _customPropertiesList.Remove(propertyName);
     }
 
     public void AddCustomIPropertyColumn(string propertyName)

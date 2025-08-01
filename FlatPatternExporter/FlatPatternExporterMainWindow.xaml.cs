@@ -969,8 +969,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             partData.Quantity = partData.OriginalQuantity * multiplier;
             partData.IsMultiplied = multiplier > 1; // Устанавливаем флаг множителя
         }
-
-        PartsDataGrid.Items.Refresh();
     }
 
     private async void ScanButton_Click(object sender, RoutedEventArgs e)
@@ -1047,7 +1045,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             partData.Item = _itemCounter;
             _partsData.Add(partData);
-            PartsDataGrid.Items.Refresh();
             _itemCounter++;
         });
 
