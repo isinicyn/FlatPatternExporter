@@ -18,7 +18,6 @@ public class ConflictFileInfo
 {
     public string FileName { get; set; } = string.Empty;
     public string ModelState { get; set; } = string.Empty;
-    public string DisplayText => $"Файл: {FileName} | Состояние: {ModelState}";
     public string FilePath { get; set; } = string.Empty;
 }
 
@@ -37,7 +36,7 @@ public partial class ConflictDetailsWindow
     {
         ConflictGroups = conflictFileDetails.Select(entry => new ConflictPartNumberGroup
         {
-            PartNumber = $"Обозначение: {entry.Key}",
+            PartNumber = entry.Key,
             Files = entry.Value.Select(conflictInfo => new ConflictFileInfo
             {
                 FileName = conflictInfo.FileName,

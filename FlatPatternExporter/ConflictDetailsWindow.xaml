@@ -29,10 +29,18 @@
                 </TreeView.Resources>
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Files}">
-                        <TextBlock Text="{Binding PartNumber}" FontWeight="Bold"/>
+                        <TextBlock FontWeight="Bold">
+                            <Run Text="Обозначение: "/>
+                            <Run Text="{Binding PartNumber}"/>
+                        </TextBlock>
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding DisplayText}"/>
+                                <TextBlock>
+                                    <Run Text="Файл: "/>
+                                    <Run Text="{Binding FileName}"/>
+                                    <Run Text=" | Состояние: "/>
+                                    <Run Text="{Binding ModelState}"/>
+                                </TextBlock>
                             </DataTemplate>
                         </HierarchicalDataTemplate.ItemTemplate>
                     </HierarchicalDataTemplate>
