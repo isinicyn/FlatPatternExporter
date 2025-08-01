@@ -1402,8 +1402,28 @@ public class PartData : INotifyPropertyChanged
     // Свойства для управления количеством и состоянием обработки
     private int quantity;
     public int OriginalQuantity { get; set; }
-    public bool IsOverridden { get; set; }
-    public bool IsMultiplied { get; set; }
+    
+    private bool isOverridden;
+    public bool IsOverridden 
+    { 
+        get => isOverridden; 
+        set 
+        { 
+            isOverridden = value; 
+            OnPropertyChanged(); 
+        } 
+    }
+    
+    private bool isMultiplied;
+    public bool IsMultiplied 
+    { 
+        get => isMultiplied; 
+        set 
+        { 
+            isMultiplied = value; 
+            OnPropertyChanged(); 
+        } 
+    }
 
     // === КАТЕГОРИЯ 7: СВОЙСТВА СОСТОЯНИЯ ОБРАБОТКИ ===
     // Свойства, устанавливаемые во время экспорта и обработки
