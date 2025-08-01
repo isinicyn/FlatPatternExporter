@@ -1068,23 +1068,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     }
 
 
-    private double GetThicknessForPart(PartDocument partDoc)
-    {
-        try
-        {
-            var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
-            var thicknessParam = smCompDef.Thickness;
-            return
-                Math.Round((double)thicknessParam.Value * 10,
-                    1); // Извлекаем значение толщины и переводим в мм, округляем до одной десятой
-        }
-        catch (Exception)
-        {
-            // Обработка ошибок получения толщины
-        }
-
-        return 0;
-    }
 
     private bool IsValidPath(string path)
     {
