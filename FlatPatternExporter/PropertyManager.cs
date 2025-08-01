@@ -11,7 +11,7 @@ namespace FlatPatternExporter
     public class PropertyManager
     {
         private readonly Document _document;
-        private static readonly string SheetMetalSubType = "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}";
+        public static readonly string SheetMetalSubType = "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}";
 
         /// <summary>
         /// Маппинг внутренних имен свойств на соответствующие наборы и имена в Inventor

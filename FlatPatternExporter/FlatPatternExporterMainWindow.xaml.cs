@@ -1114,7 +1114,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
             var partDoc = (PartDocument)doc;
-            if (partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
+            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
             {
                 partCount = 1;
                 (partNumber, description) = GetDocumentProperties((Document)partDoc);

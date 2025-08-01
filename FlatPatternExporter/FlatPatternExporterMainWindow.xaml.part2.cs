@@ -242,7 +242,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
                 {
                     var partDoc = occ.Definition.Document as PartDocument;
-                    if (partDoc != null && partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
+                    if (partDoc != null && partDoc.SubType == PropertyManager.SheetMetalSubType)
                     {
                         var mgr = new PropertyManager((Document)partDoc);
                         var partNumber = mgr.GetMappedProperty("PartNumber");
@@ -374,7 +374,7 @@ public partial class FlatPatternExporterMainWindow : Window
         if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
             var partDoc = document as PartDocument;
-            if (partDoc != null && partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
+            if (partDoc != null && partDoc.SubType == PropertyManager.SheetMetalSubType)
             {
                 var mgr = new PropertyManager((Document)partDoc);
                 var partNumber = mgr.GetMappedProperty("PartNumber");
@@ -605,7 +605,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
             var partDoc = (PartDocument)doc;
-            if (partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
+            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
             {
                 var mgr = new PropertyManager((Document)partDoc);
                 var partNumber = mgr.GetMappedProperty("PartNumber");
@@ -698,7 +698,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
             var partDoc = (PartDocument)doc;
-            if (partDoc.SubType == "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}")
+            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
                 await ExportSinglePartDXF(partDoc, targetDir, multiplier, stopwatch);
             else
                 MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK,
