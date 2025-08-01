@@ -113,22 +113,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
         PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
         PartsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
-        // ChooseFolderRadioButton.IsChecked = true; // Заменено на свойство
-        
-        // Инициализация значений свойств
-        ExcludeReferenceParts = true;
-        ExcludePurchasedParts = true;
-        IncludeLibraryComponents = false;
-        OrganizeByMaterial = false;
-        OrganizeByThickness = false;
-        IncludeQuantityInFileName = false;
-        EnableSplineReplacement = false;
-        SelectedProcessingMethod = ProcessingMethod.BOM;
-        MergeProfilesIntoPolyline = true;
-        RebaseGeometry = true;
-        TrimCenterlines = false;
-        SelectedExportFolder = ExportFolderType.ChooseFolder;
-        EnableSubfolder = false;
         
         // Инициализация путей библиотек
         InitializeLibraryPaths();

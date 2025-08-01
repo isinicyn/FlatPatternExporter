@@ -117,3 +117,4 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Поддерживает работу с различными форматами файлов через Inventor API
 - Архитектура UI соответствует принципам WPF Data Binding
 - Для новых RadioButton групп используется enum + `EnumToBooleanConverter`
+- **НЕ добавлять комментарии об изменениях в код** - использовать только чистый код без комментариев о внесенных правках
