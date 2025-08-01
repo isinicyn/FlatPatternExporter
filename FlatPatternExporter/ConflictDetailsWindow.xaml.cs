@@ -8,54 +8,54 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter;
 
+public class ConflictPartNumberGroup
+{
+    public string PartNumber { get; set; } = string.Empty;
+    public List<ConflictFileInfo> Files { get; set; } = new();
+}
+
+public class ConflictFileInfo
+{
+    public string FileName { get; set; } = string.Empty;
+    public string ModelState { get; set; } = string.Empty;
+    public string DisplayText => $"Файл: {FileName} | Состояние: {ModelState}";
+    public string FilePath { get; set; } = string.Empty;
+}
+
 public partial class ConflictDetailsWindow
 {
     private string? _selectedFilePath;
+    public List<ConflictPartNumberGroup> ConflictGroups { get; set; } = new();
 
-    // Конструктор принимает данные о конфликтах и заполняет TreeView
     public ConflictDetailsWindow(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
     {
         InitializeComponent();
-        PopulateTreeView(conflictFileDetails);
+        PrepareConflictData(conflictFileDetails);
+        DataContext = this;
     }
 
-    // Заполняем TreeView данными о конфликтах
-    private void PopulateTreeView(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
+    private void PrepareConflictData(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
     {
-        foreach (var entry in conflictFileDetails)
+        ConflictGroups = conflictFileDetails.Select(entry => new ConflictPartNumberGroup
         {
-            // Узел для обозначения детали
-            var partNumberItem = new TreeViewItem
+            PartNumber = $"Обозначение: {entry.Key}",
+            Files = entry.Value.Select(conflictInfo => new ConflictFileInfo
             {
-                Header = $"Обозначение: {entry.Key}",
-                IsExpanded = true,
-                Tag = null // На уровне обозначений не указываем файл
-            };
-
-            // Файлы и состояния модели как дочерние элементы
-            foreach (var conflictInfo in entry.Value)
-            {
-                var fileItem = new TreeViewItem
-                {
-                    Header = $"Файл: {conflictInfo.FileName} | Состояние: {conflictInfo.ModelState}",
-                    Tag = conflictInfo.FileName // Сохраняем путь к файлу в Tag для дальнейшего использования
-                };
-                partNumberItem.Items.Add(fileItem);
-            }
-
-            ConflictTreeView.Items.Add(partNumberItem);
-        }
+                FileName = conflictInfo.FileName,
+                ModelState = conflictInfo.ModelState,
+                FilePath = conflictInfo.FileName
+            }).ToList()
+        }).ToList();
     }
 
-    // Обработчик для правого клика мыши
     private void ConflictTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
         var treeViewItem = FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
 
-        if (treeViewItem != null && treeViewItem.Tag != null) // Только для файлов
+        if (treeViewItem?.DataContext is ConflictFileInfo fileInfo)
         {
-            treeViewItem.Focus(); // Фокусируемся на нужном элементе
-            _selectedFilePath = treeViewItem.Tag?.ToString();
+            treeViewItem.Focus();
+            _selectedFilePath = fileInfo.FilePath;
 
             var contextMenu = new ContextMenu();
             var openFileMenuItem = new MenuItem { Header = "Открыть файл" };
@@ -64,7 +64,7 @@ public partial class ConflictDetailsWindow
             contextMenu.IsOpen = true;
         }
 
-        e.Handled = true; // Прерываем дальнейшую обработку события
+        e.Handled = true;
     }
 
     // Поиск TreeViewItem для элемента

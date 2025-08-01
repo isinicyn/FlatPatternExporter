@@ -15,13 +15,19 @@
         <!-- Иерархическое отображение конфликтов (TreeView) -->
         <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,10">
             <TreeView x:Name="ConflictTreeView" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="1" Padding="0,10,10,10"
+                      ItemsSource="{Binding ConflictGroups}"
                       PreviewMouseRightButtonDown="ConflictTreeView_PreviewMouseRightButtonDown">
+                <TreeView.Resources>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="True"/>
+                    </Style>
+                </TreeView.Resources>
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding FileNames}">
-                        <TextBlock Text="{Binding PartNumber}" />
+                    <HierarchicalDataTemplate ItemsSource="{Binding Files}">
+                        <TextBlock Text="{Binding PartNumber}" FontWeight="Bold"/>
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding}" Tag="{Binding}" />
+                                <TextBlock Text="{Binding DisplayText}"/>
                             </DataTemplate>
                         </HierarchicalDataTemplate.ItemTemplate>
                     </HierarchicalDataTemplate>
