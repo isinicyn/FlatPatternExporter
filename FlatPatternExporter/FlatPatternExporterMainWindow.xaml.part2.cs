@@ -1453,12 +1453,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 // Сохраняем изменения и закрываем документ
                 partDoc.Save2();
 
-                // Обновляем свойства детали в таблице
+                // Обновляем свойства детали в таблице (INotifyPropertyChanged автоматически обновит UI)
                 selectedItem.PartNumber = editDialog.PartNumber;
                 selectedItem.Description = editDialog.Description;
-
-                // Обновляем данные в таблице
-                PartsDataGrid.Items.Refresh();
             }
             else
             {

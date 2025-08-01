@@ -1354,10 +1354,14 @@ public class PartData : INotifyPropertyChanged
     public string FileName { get; set; } = string.Empty; // Path.GetFileNameWithoutExtension()
     public string FullFileName { get; set; } = string.Empty; // partDoc.FullFileName
     public string ModelState { get; set; } = string.Empty; // partDoc.ModelStateName
-    private double thickness = 0.0; // SheetMetalComponentDefinition.Thickness
     public BitmapImage? Preview { get; set; } // apprenticeDoc.Thumbnail
     public bool HasFlatPattern { get; set; } = false; // smCompDef.HasFlatPattern
 
+
+    // === КАТЕГОРИЯ 2/4: ОБЯЗАТЕЛЬНЫЕ СВОЙСТВА БЕЗ УВЕДОМЛЕНИЙ ===
+    // Свойства, которые устанавливаются только при создании объекта
+    public string Material { get; set; } = string.Empty;
+    public double Thickness { get; set; } = 0.0;
 
     // === КАТЕГОРИЯ 4: РАСШИРЕННЫЕ IPROPERTIES ===
     // Опциональные iProperty из различных наборов свойств
@@ -1433,10 +1437,9 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    // КАТЕГОРИЯ 2/4: Основные обязательные свойства с уведомлениями
+    // КАТЕГОРИЯ 2/4: Обязательные свойства с уведомлениями (изменяются программно)
     private string partNumber = string.Empty;
     private string description = string.Empty;
-    private string material = string.Empty;
 
     public string PartNumber
     {
@@ -1465,25 +1468,7 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    public string Material
-    {
-        get => material;
-        set
-        {
-            material = value;
-            OnPropertyChanged();
-        }
-    }
 
-    public double Thickness
-    {
-        get => thickness;
-        set
-        {
-            thickness = value;
-            OnPropertyChanged();
-        }
-    }
 
     // КАТЕГОРИЯ 6: Свойства количества и состояния с уведомлениями
     public int Quantity
