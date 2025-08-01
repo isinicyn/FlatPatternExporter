@@ -676,17 +676,21 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Проверка, если это колонка с изображением детали или развертки
         if (iProperty.InternalName == "Изобр. детали" || iProperty.InternalName == "Изобр. развертки")
         {
-            column = new DataGridTemplateColumn
+            var templateColumn = new DataGridTemplateColumn
             {
-                Header = iProperty.InternalName,
-                CellTemplate = new DataTemplate
-                {
-                    VisualTree = new FrameworkElementFactory(typeof(Image))
-                }
+                Header = iProperty.InternalName
             };
-            // Устанавливаем привязку данных для колонки изображения
-            (column as DataGridTemplateColumn)?.CellTemplate?.VisualTree?.SetBinding(Image.SourceProperty,
-                new Binding(iProperty.InventorPropertyName));
+
+            if (iProperty.InternalName == "Изобр. детали")
+            {
+                templateColumn.CellTemplate = FindResource("PartImageTemplate") as DataTemplate;
+            }
+            else if (iProperty.InternalName == "Изобр. развертки")
+            {
+                templateColumn.CellTemplate = FindResource("DxfImageTemplate") as DataTemplate;
+            }
+
+            column = templateColumn;
         }
         else
         {
@@ -697,7 +701,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 Binding = new Binding(iProperty.InventorPropertyName)
             };
 
-            // Стили теперь назначаются автоматически через неявный стиль DataGridCell в XAML
+            // Применяем стиль CenteredCellStyle
+            textColumn.ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style;
 
             column = textColumn;
         }

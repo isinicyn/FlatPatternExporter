@@ -59,6 +59,36 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Шаблон для колонки "Изобр. детали" -->
+        <DataTemplate x:Key="PartImageTemplate">
+            <Image Source="{Binding Preview}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </DataTemplate>
+
+        <!-- Шаблон для колонки "Изобр. развертки" -->
+        <DataTemplate x:Key="DxfImageTemplate">
+            <Grid Width="50" Height="50">
+                <Image Source="{Binding DxfPreview}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="Нет миниатюры" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center" 
+                           FontSize="8" 
+                           Foreground="Gray"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DxfPreview}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -386,42 +416,10 @@
                 </DataGridTextColumn>
 
                 <!-- Колонка с изображением детали -->
-                <DataGridTemplateColumn Header="Изобр. детали" Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Image Source="{Binding Preview}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Изобр. детали" Width="Auto" CellTemplate="{StaticResource PartImageTemplate}"/>
 
                 <!-- Колонка с изображением развертки -->
-                <DataGridTemplateColumn Header="Изобр. развертки" Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Grid Width="50" Height="50">
-                                <Image Source="{Binding DxfPreview}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock Text="Нет миниатюры" 
-                                           HorizontalAlignment="Center" 
-                                           VerticalAlignment="Center" 
-                                           FontSize="8" 
-                                           Foreground="Gray"
-                                           TextWrapping="Wrap"
-                                           TextAlignment="Center">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding DxfPreview}" Value="{x:Null}">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Изобр. развертки" Width="Auto" CellTemplate="{StaticResource DxfImageTemplate}"/>
 
                 <!-- Колонка с индикатором обработки -->
                 <DataGridTemplateColumn Header="Обр." Width="Auto" IsReadOnly="False" CanUserSort="False" CanUserReorder="False">
