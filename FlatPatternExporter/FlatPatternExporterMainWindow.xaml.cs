@@ -1483,7 +1483,7 @@ public class PartData : INotifyPropertyChanged
     // Реализация интерфейса INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected void OnPropertyChanged([CallerMemberName] string? name = null)
+    public void OnPropertyChanged([CallerMemberName] string? name = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
@@ -1500,11 +1500,7 @@ public class PartData : INotifyPropertyChanged
     }
     public void RemoveCustomProperty(string propertyName)
     {
-        if (customProperties.ContainsKey(propertyName))
-        {
-            customProperties.Remove(propertyName);
-            OnPropertyChanged(nameof(CustomProperties));
-        }
+        customProperties.Remove(propertyName);
     }
 
 }

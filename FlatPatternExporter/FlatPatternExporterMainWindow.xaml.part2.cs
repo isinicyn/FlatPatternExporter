@@ -1373,6 +1373,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 if (isDedicatedProperty)
                 {
                     propInfo!.SetValue(partData, value);
+                    // Принудительно уведомляем UI об изменении свойства
+                    partData.OnPropertyChanged(propertyName);
                 }
                 else
                 {
