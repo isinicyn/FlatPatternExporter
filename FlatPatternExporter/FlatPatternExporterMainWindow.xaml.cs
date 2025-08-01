@@ -187,9 +187,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     new() { InternalName = "Полное имя файла", DisplayName = "Полное имя файла", InventorPropertyName = "FullFileName", Category = "Документ" },
     new() { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState", Category = "Документ" },
     new() { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness", Category = "Документ" },
-    new() { InternalName = "Изобр. детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview", Category = "Документ" },
-    new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber", Category = "Документ" },
-    
+    new() { InternalName = "Изобр. детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview", Category = "Документ" },    
     
     // КАТЕГОРИЯ 4: Расширенные iProperty - Summary Information
     new() { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author", Category = "Summary Information" },
@@ -229,6 +227,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     new() { InternalName = "Площадь развертки", DisplayName = "Площадь развертки", InventorPropertyName = "FlatPatternArea", Category = "Design Tracking Properties" },
     new() { InternalName = "Отделка", DisplayName = "Отделка", InventorPropertyName = "Appearance", Category = "Design Tracking Properties" },
     new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material", Category = "Design Tracking Properties" },
+    new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber", Category = "Design Tracking Properties" },
     
     // КАТЕГОРИЯ 6: Свойства количества и состояния
     new() { InternalName = "Кол.", DisplayName = "Количество", InventorPropertyName = "Quantity", Category = "Количество" },
