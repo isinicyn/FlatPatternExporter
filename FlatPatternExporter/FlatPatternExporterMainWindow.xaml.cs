@@ -1432,8 +1432,33 @@ public class PartData : INotifyPropertyChanged
 
     // === КАТЕГОРИЯ 7: СВОЙСТВА СОСТОЯНИЯ ОБРАБОТКИ ===
     // Свойства, устанавливаемые во время экспорта и обработки
-    public BitmapImage? DxfPreview { get; set; } // Миниатюра развертки (генерируется)
-    public ProcessingStatus ProcessingStatus { get; set; } = ProcessingStatus.NotProcessed; // Индикатор состояния экспорта
+    private BitmapImage? dxfPreview;
+    public BitmapImage? DxfPreview 
+    { 
+        get => dxfPreview; 
+        set 
+        { 
+            if (dxfPreview != value)
+            {
+                dxfPreview = value; 
+                OnPropertyChanged(); 
+            }
+        } 
+    }
+    
+    private ProcessingStatus processingStatus = ProcessingStatus.NotProcessed;
+    public ProcessingStatus ProcessingStatus 
+    { 
+        get => processingStatus; 
+        set 
+        { 
+            if (processingStatus != value)
+            {
+                processingStatus = value; 
+                OnPropertyChanged(); 
+            }
+        } 
+    }
 
     // === СВОЙСТВА С УВЕДОМЛЕНИЯМИ ===
 
