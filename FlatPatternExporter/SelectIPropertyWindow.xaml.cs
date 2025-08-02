@@ -31,7 +31,7 @@ namespace FlatPatternExporter
             // Инициализируем AvailableProperties, исключая уже присутствующие колонки
             AvailableProperties =
                 new ObservableCollection<PresetIProperty>(_presetIProperties.Where(p =>
-                    !_mainWindow.IsColumnPresent(p.InternalName)));
+                    !_mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == p.InternalName)));
             DataContext = this;
             SelectedProperties = new List<PresetIProperty>();
 
@@ -75,7 +75,7 @@ namespace FlatPatternExporter
 
                 foreach (var property in _presetIProperties)
                 {
-                    if (!_mainWindow.IsColumnPresent(property.InternalName))
+                    if (!_mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.InternalName))
                     {
                         AvailableProperties.Add(property);
                     }
@@ -120,7 +120,7 @@ namespace FlatPatternExporter
             if (e.Data.GetDataPresent(typeof(PresetIProperty)) && _isMouseOverDataGrid)
             {
                 var droppedProperty = e.Data.GetData(typeof(PresetIProperty)) as PresetIProperty;
-                if (droppedProperty != null && !_mainWindow.IsColumnPresent(droppedProperty.InternalName))
+                if (droppedProperty != null && !_mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == droppedProperty.InternalName))
                 {
                     // Обновляем список доступных свойств
                     AvailableProperties.Remove(droppedProperty);

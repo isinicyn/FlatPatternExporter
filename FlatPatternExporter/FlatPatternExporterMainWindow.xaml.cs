@@ -72,6 +72,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly ObservableCollection<PartData> _partsData = new();
     private readonly CollectionViewSource _partsDataView;
     public readonly List<string> _customPropertiesList = new();
+    public List<string> CustomPropertiesList => _customPropertiesList;
     private List<PartData> _conflictingParts = new();
     private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = new();
     private readonly ConcurrentDictionary<string, List<PartConflictInfo>> _partNumberTracker = new();
@@ -115,6 +116,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private ExportFolderType _selectedExportFolder = ExportFolderType.ChooseFolder;
     private bool _enableSubfolder = false;
     private string _fixedFolderPath = string.Empty;
+    public string FixedFolderPath 
+    { 
+        get => _fixedFolderPath; 
+        set => _fixedFolderPath = value; 
+    }
     private List<string> _libraryPaths = new List<string>();
     
     // Метод обработки
@@ -241,15 +247,51 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Устанавливаем DataContext для текущего окна
         DataContext = this;
 
-        // Инициализация DataGrid с предустановленными колонками
-        InitializePresetColumns();
-
         // Добавляем обработчики для отслеживания нажатия и отпускания клавиши Ctrl
         KeyDown += MainWindow_KeyDown;
         KeyUp += MainWindow_KeyUp;
 
         VersionTextBlock.Text = "Версия программы: " + GetVersion();
         ProgressLabel.Text = "Статус: Документ не выбран";
+        
+        // Загружаем настройки при запуске
+        LoadSettings();
+    }
+
+    private void LoadSettings()
+    {
+        try
+        {
+            var settings = SettingsManager.LoadSettings();
+            SettingsManager.ApplySettingsToMainWindow(settings, this);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка при загрузке настроек: {ex.Message}", "Ошибка", 
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void SaveSettings()
+    {
+        try
+        {
+            var settings = SettingsManager.CreateSettingsFromMainWindow(this);
+            SettingsManager.SaveSettings(settings);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Ошибка при сохранении настроек: {ex.Message}", "Ошибка", 
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    public void UpdateFixedFolderPathDisplay(string path)
+    {
+        if (path.Length > 40)
+            FixedFolderPathTextBlock.Text = "..." + path.Substring(path.Length - 40);
+        else
+            FixedFolderPathTextBlock.Text = path;
     }
 
     public ObservableCollection<LayerSetting> LayerSettings { get; set; }
@@ -518,29 +560,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             _thisApplication.UserInterfaceManager.UserInteractionDisabled = disableInteraction;
         }
     }
-    public bool IsColumnPresent(string columnName)
-    {
-        var result = false;
 
-        // Используем Dispatcher для доступа к UI-элементам
-        Dispatcher.Invoke(() => { result = PartsDataGrid.Columns.Any(c => c.Header.ToString() == columnName); });
-
-        return result;
-    }
-
-    private void InitializePresetColumns()
-    {
-        if (PresetIProperties == null) throw new InvalidOperationException("PresetIProperties is not initialized.");
-
-        foreach (var property in PresetIProperties)
-        {
-            // Если колонка уже есть в таблице, ничего не делаем
-            if (IsColumnPresent(property.InternalName)) continue;
-
-            // Если колонка не добавлена в XAML, пропускаем её добавление
-            if (property.ShouldBeAddedOnInit) AddIPropertyColumn(property);
-        }
-    }
 
 
     private void PartsDataGrid_DragOver(object sender, DragEventArgs e)
@@ -561,6 +581,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     protected override void OnClosed(EventArgs e)
     {
+        // Сохраняем настройки при закрытии
+        SaveSettings();
+        
         base.OnClosed(e);
 
         // Закрытие всех дочерних окон
@@ -673,7 +696,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (e.Data.GetDataPresent(typeof(PresetIProperty)))
         {
             var droppedData = e.Data.GetData(typeof(PresetIProperty)) as PresetIProperty;
-            if (droppedData != null && !IsColumnPresent(droppedData.InternalName))
+            if (droppedData != null && !PartsDataGrid.Columns.Any(c => c.Header.ToString() == droppedData.InternalName))
             {
                 // Определяем позицию мыши
                 var position = e.GetPosition(PartsDataGrid);
@@ -701,7 +724,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public void AddIPropertyColumn(PresetIProperty iProperty, int? insertIndex = null)
     {
         // Проверяем, существует ли уже колонка с таким заголовком
-        if (IsColumnPresent(iProperty.InternalName))
+        if (PartsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.InternalName))
             return;
 
         DataGridColumn column;
@@ -1612,7 +1635,6 @@ public class PresetIProperty
     public string DisplayName { get; set; } = string.Empty; // Псевдоним для отображения в списке выбора (например, "#Нумерация")
     public string InventorPropertyName { get; set; } = string.Empty; // Соответствующее имя свойства iProperty в Inventor
     public string Category { get; set; } = string.Empty; // Категория свойства для группировки
-    public bool ShouldBeAddedOnInit { get; set; } = false; // Новый флаг для определения необходимости добавления при старте
 }
 
 // Структура для отслеживания прогресса сканирования

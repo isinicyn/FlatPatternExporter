@@ -36,38 +36,38 @@ public partial class FlatPatternExporterMainWindow : Window
         partData.Description = mgr.GetMappedProperty("Description");
         partData.Material = mgr.GetMappedProperty("Material");
 
-        // КАТЕГОРИЯ 4: Расширенные iProperty (условно по наличию колонок)
-        if (IsColumnPresent("Автор")) partData.Author = mgr.GetMappedProperty("Author");
-        if (IsColumnPresent("Ревизия")) partData.Revision = mgr.GetMappedProperty("Revision");
-        if (IsColumnPresent("Название")) partData.Title = mgr.GetMappedProperty("Title");
-        if (IsColumnPresent("Тема")) partData.Subject = mgr.GetMappedProperty("Subject");
-        if (IsColumnPresent("Ключевые слова")) partData.Keywords = mgr.GetMappedProperty("Keywords");
-        if (IsColumnPresent("Примечание")) partData.Comments = mgr.GetMappedProperty("Comments");
-        if (IsColumnPresent("Категория")) partData.Category = mgr.GetMappedProperty("Category");
-        if (IsColumnPresent("Менеджер")) partData.Manager = mgr.GetMappedProperty("Manager");
-        if (IsColumnPresent("Компания")) partData.Company = mgr.GetMappedProperty("Company");
-        if (IsColumnPresent("Проект")) partData.Project = mgr.GetMappedProperty("Project");
-        if (IsColumnPresent("Инвентарный номер")) partData.StockNumber = mgr.GetMappedProperty("StockNumber");
-        if (IsColumnPresent("Время создания")) partData.CreationTime = mgr.GetMappedProperty("CreationTime");
-        if (IsColumnPresent("Сметчик")) partData.CostCenter = mgr.GetMappedProperty("CostCenter");
-        if (IsColumnPresent("Проверил")) partData.CheckedBy = mgr.GetMappedProperty("CheckedBy");
-        if (IsColumnPresent("Нормоконтроль")) partData.EngApprovedBy = mgr.GetMappedProperty("EngApprovedBy");
-        if (IsColumnPresent("Статус")) partData.UserStatus = mgr.GetMappedProperty("UserStatus");
-        if (IsColumnPresent("Веб-ссылка")) partData.CatalogWebLink = mgr.GetMappedProperty("CatalogWebLink");
-        if (IsColumnPresent("Поставщик")) partData.Vendor = mgr.GetMappedProperty("Vendor");
-        if (IsColumnPresent("Утвердил")) partData.MfgApprovedBy = mgr.GetMappedProperty("MfgApprovedBy");
-        if (IsColumnPresent("Статус разработки")) partData.DesignStatus = mgr.GetMappedProperty("DesignStatus");
-        if (IsColumnPresent("Проектировщик")) partData.Designer = mgr.GetMappedProperty("Designer");
-        if (IsColumnPresent("Инженер")) partData.Engineer = mgr.GetMappedProperty("Engineer");
-        if (IsColumnPresent("Нач. отдела")) partData.Authority = mgr.GetMappedProperty("Authority");
-        if (IsColumnPresent("Масса")) partData.Mass = mgr.GetMappedProperty("Mass");
-        if (IsColumnPresent("Площадь поверхности")) partData.SurfaceArea = mgr.GetMappedProperty("SurfaceArea");
-        if (IsColumnPresent("Объем")) partData.Volume = mgr.GetMappedProperty("Volume");
-        if (IsColumnPresent("Правило ЛМ")) partData.SheetMetalRule = mgr.GetMappedProperty("SheetMetalRule");
-        if (IsColumnPresent("Ширина развертки")) partData.FlatPatternWidth = mgr.GetMappedProperty("FlatPatternWidth");
-        if (IsColumnPresent("Длинна развертки")) partData.FlatPatternLength = mgr.GetMappedProperty("FlatPatternLength");
-        if (IsColumnPresent("Площадь развертки")) partData.FlatPatternArea = mgr.GetMappedProperty("FlatPatternArea");
-        if (IsColumnPresent("Отделка")) partData.Appearance = mgr.GetMappedProperty("Appearance");
+        // КАТЕГОРИЯ 4: Расширенные iProperty (загружаем все)
+        partData.Author = mgr.GetMappedProperty("Author");
+        partData.Revision = mgr.GetMappedProperty("Revision");
+        partData.Title = mgr.GetMappedProperty("Title");
+        partData.Subject = mgr.GetMappedProperty("Subject");
+        partData.Keywords = mgr.GetMappedProperty("Keywords");
+        partData.Comments = mgr.GetMappedProperty("Comments");
+        partData.Category = mgr.GetMappedProperty("Category");
+        partData.Manager = mgr.GetMappedProperty("Manager");
+        partData.Company = mgr.GetMappedProperty("Company");
+        partData.Project = mgr.GetMappedProperty("Project");
+        partData.StockNumber = mgr.GetMappedProperty("StockNumber");
+        partData.CreationTime = mgr.GetMappedProperty("CreationTime");
+        partData.CostCenter = mgr.GetMappedProperty("CostCenter");
+        partData.CheckedBy = mgr.GetMappedProperty("CheckedBy");
+        partData.EngApprovedBy = mgr.GetMappedProperty("EngApprovedBy");
+        partData.UserStatus = mgr.GetMappedProperty("UserStatus");
+        partData.CatalogWebLink = mgr.GetMappedProperty("CatalogWebLink");
+        partData.Vendor = mgr.GetMappedProperty("Vendor");
+        partData.MfgApprovedBy = mgr.GetMappedProperty("MfgApprovedBy");
+        partData.DesignStatus = mgr.GetMappedProperty("DesignStatus");
+        partData.Designer = mgr.GetMappedProperty("Designer");
+        partData.Engineer = mgr.GetMappedProperty("Engineer");
+        partData.Authority = mgr.GetMappedProperty("Authority");
+        partData.Mass = mgr.GetMappedProperty("Mass");
+        partData.SurfaceArea = mgr.GetMappedProperty("SurfaceArea");
+        partData.Volume = mgr.GetMappedProperty("Volume");
+        partData.SheetMetalRule = mgr.GetMappedProperty("SheetMetalRule");
+        partData.FlatPatternWidth = mgr.GetMappedProperty("FlatPatternWidth");
+        partData.FlatPatternLength = mgr.GetMappedProperty("FlatPatternLength");
+        partData.FlatPatternArea = mgr.GetMappedProperty("FlatPatternArea");
+        partData.Appearance = mgr.GetMappedProperty("Appearance");
     }
     
 
