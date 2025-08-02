@@ -128,7 +128,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         { "Изобр. детали", "PartImageTemplate" },
         { "Изобр. развертки", "DxfImageTemplate" },
-        { "Обозначение", "PartNumberWithIndicatorTemplate" }
+        { "Обозначение", "PartNumberWithIndicatorTemplate" },
+        { "Кол.", "QuantityTemplate" }
     };
 
     public FlatPatternExporterMainWindow()

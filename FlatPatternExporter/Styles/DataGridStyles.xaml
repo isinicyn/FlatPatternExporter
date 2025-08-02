@@ -22,24 +22,6 @@
     <!-- Стандартный стиль для обычных колонок -->
     <Style x:Key="CenteredCellStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseCellStyle}"/>
 
-    <!-- Специализированные стили -->
-    
-    <!-- Стиль для колонки количества с цветовой индикацией -->
-    <Style x:Key="QuantityCellStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseCellStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsOverridden}" Value="True">
-                <Setter Property="Foreground" Value="Red"/>
-            </DataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding IsOverridden}" Value="False"/>
-                    <Condition Binding="{Binding IsMultiplied}" Value="True"/>
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Foreground" Value="Blue"/>
-            </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
-
     <!-- Шаблоны данных -->
     
     <!-- Шаблон для колонки "Изобр. детали" -->
@@ -107,6 +89,28 @@
                        Style="{StaticResource CenteredCellStyle}" 
                        TextTrimming="CharacterEllipsis"/>
         </Grid>
+    </DataTemplate>
+
+    <!-- Шаблон для колонки "Количество" с цветовой индикацией -->
+    <DataTemplate x:Key="QuantityTemplate">
+        <TextBlock Text="{Binding Quantity}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOverridden}" Value="True">
+                            <Setter Property="Foreground" Value="Red"/>
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsOverridden}" Value="False"/>
+                                <Condition Binding="{Binding IsMultiplied}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Foreground" Value="Blue"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
     </DataTemplate>
 
     <!-- Шаблон для колонки статуса обработки -->

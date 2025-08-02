@@ -220,11 +220,7 @@
                 </DataGridTextColumn>
 
                 <!-- Колонка с количеством деталей -->
-                <DataGridTextColumn Header="Кол." Binding="{Binding Quantity}" Width="Auto">
-                    <DataGridTextColumn.ElementStyle>
-                        <StaticResource ResourceKey="QuantityCellStyle"/>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                <DataGridTemplateColumn Header="Кол." Width="Auto" CellTemplate="{StaticResource QuantityTemplate}"/>
 
                 <!-- Колонка с изображением детали -->
                 <DataGridTemplateColumn Header="Изобр. детали" Width="Auto" CellTemplate="{StaticResource PartImageTemplate}"/>
