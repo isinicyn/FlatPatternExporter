@@ -436,13 +436,7 @@ public partial class FlatPatternExporterMainWindow : Window
         var dialog = new FolderBrowserDialog();
         if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
         {
-            _fixedFolderPath = dialog.SelectedPath;
-
-            if (_fixedFolderPath.Length > 40)
-                // Гарантируем, что показываем именно последние 40 символов
-                FixedFolderPathTextBlock.Text = "..." + _fixedFolderPath.Substring(_fixedFolderPath.Length - 40);
-            else
-                FixedFolderPathTextBlock.Text = _fixedFolderPath;
+            FixedFolderPath = dialog.SelectedPath;
         }
     }
 

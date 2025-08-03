@@ -119,7 +119,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public string FixedFolderPath 
     { 
         get => _fixedFolderPath; 
-        set => _fixedFolderPath = value; 
+        set 
+        {
+            _fixedFolderPath = value;
+            UpdateFixedFolderPathDisplay(value);
+        }
     }
     private List<string> _libraryPaths = new List<string>();
     

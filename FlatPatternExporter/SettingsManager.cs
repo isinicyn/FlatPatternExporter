@@ -157,12 +157,6 @@ public static class SettingsManager
                 window.AddCustomIPropertyColumn(columnName);
             }
         }
-
-        // Обновляем отображение фиксированной папки
-        if (!string.IsNullOrEmpty(settings.FixedFolderPath))
-        {
-            window.UpdateFixedFolderPathDisplay(settings.FixedFolderPath);
-        }
     }
 
     private static bool IsDefaultColumn(string columnName)
