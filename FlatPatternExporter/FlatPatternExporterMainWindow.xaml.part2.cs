@@ -756,7 +756,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 true); // true - с генерацией миниатюр
         });
 
-        UpdateFileCountLabel(selectedItems.Count);
 
         ClearButton.IsEnabled = true; // Активируем кнопку "Очистить" после завершения экспорта
         ScanButton.IsEnabled = true; // Активируем кнопку "Сканировать" после завершения экспорта
@@ -1016,7 +1015,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             () => ExportDXF(partsDataList, targetDir, multiplier, ref processedCount, ref skippedCount,
                 true)); // true - с генерацией миниатюр
 
-        UpdateFileCountLabel(partsDataList.Count);
         FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
     }
 
@@ -1035,7 +1033,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             await Task.Run(() =>
                 ExportDXF(partsDataList, targetDir, multiplier, ref processedCount, ref skippedCount,
                     true)); // true - с генерацией миниатюр
-            UpdateFileCountLabel(1);
         }
 
         FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
@@ -1107,10 +1104,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ClearMultiplierButton.Visibility = Visibility.Collapsed;
     }
 
-    private void UpdateFileCountLabel(int count)
-    {
-        FileCountLabelBottom.Text = $"Найдено листовых деталей: {count}";
-    }
 
 
     private void ResetProgressBar()
@@ -1120,8 +1113,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ProgressBar.Maximum = 100;
         ProgressBar.Value = 0;
         ProgressLabel.Text = "Статус: ";
-        UpdateFileCountLabel(0); // Использование метода для сброса счетчика
-        BottomPanel.Opacity = 0.75;
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -1133,11 +1124,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         {
             // If not scanning, reset the UI
             ResetProgressBar();
-            BottomPanel.Opacity = 0.75;
-            ExportButton.IsEnabled = false;
+                ExportButton.IsEnabled = false;
             ClearButton.IsEnabled = _partsData.Count > 0; // Обновляем состояние кнопки "Очистить"
             _lastScannedDocument = null;
-            UpdateFileCountLabel(0);
         }
     }
 
@@ -1151,9 +1140,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             DescriptionLabel.Text = "";
             ModelStateLabel.Text = "";
             IsPrimaryModelState = true; // Сбрасываем состояние модели по умолчанию
-            BottomPanel.Opacity = 0.75;
-            UpdateFileCountLabel(0); // Использование метода для сброса счетчика
-            return;
+                    return;
         }
 
         var modelStateInfo = GetModelStateName(doc);
@@ -1169,8 +1156,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         // Устанавливаем свойство для триггера стиля
         IsPrimaryModelState = isPrimaryModelState;
 
-        UpdateFileCountLabel(_partsData.Count); // Использование метода для обновления счетчика
-        BottomPanel.Opacity = 1.0;
     }
 
     private void ClearList_Click(object sender, RoutedEventArgs e)
@@ -1179,13 +1164,11 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         _partsData.Clear();
         ProgressBar.Value = 0;
         ProgressLabel.Text = "Статус: ";
-        BottomPanel.Opacity = 0.5;
         ExportButton.IsEnabled = false;
         ClearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки
 
         // Обнуляем информацию о документе
         UpdateDocumentInfo(string.Empty, string.Empty, string.Empty, null!);
-        UpdateFileCountLabel(0); // Сброс счетчика файлов
 
         // Отключаем кнопку "Анализ обозначений" и очищаем список конфликтов
         ConflictFilesButton.IsEnabled = false;

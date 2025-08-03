@@ -149,7 +149,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         InitializeInventor();
         InitializeProjectFolder(); // Инициализация папки проекта при запуске
         PartsDataGrid.ItemsSource = _partsData;
-        UpdateFileCountLabel(0);
         ClearButton.IsEnabled = false;
         PartsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
@@ -1189,10 +1188,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _isScanning = false;
         ProgressBar.IsIndeterminate = false;
         ProgressBar.Value = 0;
-        ProgressLabel.Text = _isCancelled ? $"Статус: Прервано ({elapsedTime})" : $"Статус: Готово ({elapsedTime})";
-        BottomPanel.Opacity = 1.0;
+        ProgressLabel.Text = _isCancelled ? $"Статус: Прервано ({elapsedTime})" : $"Найдено листовых деталей: {partCount} ({elapsedTime})";
         UpdateDocumentInfo(documentType, partNumber, description, doc);
-        UpdateFileCountLabel(_isCancelled ? 0 : partCount);
 
         ScanButton.IsEnabled = true;
         CancelButton.IsEnabled = false;
@@ -1273,7 +1270,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var activeProject = _thisApplication.DesignProjectManager.ActiveDesignProject;
             var projectName = activeProject.Name;
             var projectWorkspacePath = activeProject.WorkspacePath;
-            ProjectName.Text = $"Проект: {projectName}";
+            ProjectNameTop.Text = projectName;
         }
         catch (Exception ex)
         {

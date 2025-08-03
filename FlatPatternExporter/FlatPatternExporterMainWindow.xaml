@@ -185,9 +185,6 @@
         <StackPanel Margin="10,10,10,0" Grid.Row="3" VerticalAlignment="Top">
             <ProgressBar x:Name="ProgressBar" Height="20" Margin="0,0,0,10"/>
         </StackPanel>
-        <TextBlock x:Name="ProgressLabel" Grid.Row="3" Text="Статус: " 
-                   Margin="10,40,10,10" HorizontalAlignment="Left" VerticalAlignment="Top" 
-                   TextWrapping="Wrap" Height="Auto" MaxWidth="800"/>
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="75" Width="245">
             <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="0,0,10,0" Height="75" Width="75" BorderThickness="1,1,1,1" RenderTransformOrigin="0,0"/>
             <StackPanel Width="75" Margin="0,0,10,0">
@@ -196,6 +193,21 @@
             </StackPanel>
             <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования"/>
         </StackPanel>
+        <Border Grid.Row="0" Margin="260,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="230" Height="75"
+                BorderBrush="#D0D0D0" BorderThickness="1" Background="#F8F8F8" Padding="5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Проект:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="16" Margin="0,0,3,0"/>
+                <TextBlock x:Name="ProjectNameTop" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="15" Margin="5,0,0,1"/>
+            </Grid>
+        </Border>
         <Border Grid.Row="0" Margin="500,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="75"
                 BorderBrush="#D0D0D0" BorderThickness="1" Background="#F8F8F8" Padding="5">
             <Grid>
@@ -225,18 +237,9 @@
             </Grid>
         </Border>
         <Border Grid.Row="4" Background="LightGray" Height="25" VerticalAlignment="Center">
-            <StackPanel x:Name="BottomPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Opacity="0.75">
-                <TextBlock x:Name="ProjectName" Text="Проект: " Foreground="Black" Margin="10,0"/>
-                <Separator Width="16" Margin="10,0,10,0" Background="#FFADADAD" UseLayoutRounding="False" Cursor="" VerticalContentAlignment="Center" ScrollViewer.VerticalScrollBarVisibility="Disabled" RenderTransformOrigin="0.5,0.5">
-                    <Separator.RenderTransform>
-                        <TransformGroup>
-                            <RotateTransform Angle="-90"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Separator.RenderTransform>
-                </Separator>
-                <TextBlock x:Name="FileCountLabelBottom" Text="Найдено файлов для экспорта: " Foreground="Black" Margin="10,0"/>
-            </StackPanel>
+            <TextBlock x:Name="ProgressLabel" Text="Статус: " 
+                       Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                       TextWrapping="Wrap" Height="Auto" MaxWidth="800" Foreground="Black"/>
         </Border>
         <TabControl Margin="10,10,10,10" Grid.Row="1">
             <TabItem Header="Основные">
