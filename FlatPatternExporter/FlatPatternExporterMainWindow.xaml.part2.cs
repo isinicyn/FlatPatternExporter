@@ -506,10 +506,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         return false;
     }
 
-    CancelButton.IsEnabled = true;
     _isCancelled = false;
 
-    ScanProgressValue = 0;
+    ExportProgressValue = 0;
     ProgressLabel.Text = "Статус: Экспорт данных...";
 
     stopwatch = Stopwatch.StartNew();
@@ -522,9 +521,12 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         stopwatch.Stop();
         var elapsedTime = GetElapsedTime(stopwatch.Elapsed);
 
-        CancelButton.IsEnabled = false;
-        ScanButton.IsEnabled = true; // Активируем кнопку "Сканировать" после завершения экспорта
-        ClearButton.IsEnabled = _partsData.Count > 0; // Активируем кнопку "Очистить" после завершения экспорта
+        _isExporting = false;
+        ExportProgressValue = 0;
+        ExportButton.Content = "Экспорт";
+        ExportButton.IsEnabled = true;
+        ScanButton.IsEnabled = true;
+        ClearButton.IsEnabled = _partsData.Count > 0;
 
         if (isCancelled)
         {
@@ -565,6 +567,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         ClearButton.IsEnabled = false;
         ScanButton.IsEnabled = false;
+        ExportButton.Content = "Прервать";
+        _isExporting = true;
 
         var processedCount = 0;
         var skippedCount = 0;
@@ -622,9 +626,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             }
         }
 
-        ClearButton.IsEnabled = true;
-        ScanButton.IsEnabled = true;
-
         // Здесь мы НЕ обновляем fileCountLabelBottom
         FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
 
@@ -635,6 +636,14 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private async void ExportButton_Click(object sender, RoutedEventArgs e)
     {
+        // Если экспорт уже идет, выполняем прерывание
+        if (_isExporting)
+        {
+            _isCancelled = true;
+            ExportButton.Content = "Прерывание...";
+            ExportButton.IsEnabled = false;
+            return;
+        }
 
         if (_isCtrlPressed)
         {
@@ -675,6 +684,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         ClearButton.IsEnabled = false;
         ScanButton.IsEnabled = false;
+        ExportButton.Content = "Прервать";
+        _isExporting = true;
 
         if (doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
         {
@@ -698,12 +709,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                     MessageBoxImage.Warning);
         }
 
-        ClearButton.IsEnabled = true;
-        ScanButton.IsEnabled = true;
-
         SetInventorUserInterfaceState(false);
-
-        ExportButton.IsEnabled = true;
     }
 
     private string GetElapsedTime(TimeSpan timeSpan)
@@ -801,7 +807,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         Dispatcher.Invoke(() =>
         {
-            ScanProgressValue = 0; // Сбрасываем прогресс перед началом
+            ExportProgressValue = 0; // Сбрасываем прогресс перед началом
         });
 
         var localProcessedCount = processedCount;
@@ -969,7 +975,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                 Dispatcher.Invoke(() => 
                 { 
-                    ScanProgressValue = totalParts > 0 ? (double)localProcessedCount / totalParts * 100 : 0;
+                    ExportProgressValue = totalParts > 0 ? (double)localProcessedCount / totalParts * 100 : 0;
                 });
             }
             catch (Exception ex)
@@ -984,7 +990,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         Dispatcher.Invoke(() =>
         {
-            ScanProgressValue = 100; // Установка значения 100% по завершению
+            ExportProgressValue = 100; // Установка значения 100% по завершению
         });
     }
 
@@ -1113,20 +1119,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ProgressLabel.Text = "Статус: ";
     }
 
-    private void CancelButton_Click(object sender, RoutedEventArgs e)
-    {
-        _isCancelled = true;
-        CancelButton.IsEnabled = false;
-
-        if (!_isScanning)
-        {
-            // If not scanning, reset the UI
-            ResetProgressBar();
-                ExportButton.IsEnabled = false;
-            ClearButton.IsEnabled = _partsData.Count > 0; // Обновляем состояние кнопки "Очистить"
-            _lastScannedDocument = null;
-        }
-    }
 
     private void UpdateDocumentInfo(string documentType, string partNumber, string description, Document doc)
     {

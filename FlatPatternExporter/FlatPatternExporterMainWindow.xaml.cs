@@ -79,6 +79,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     
     // Состояние процессов
     private bool _isScanning;
+    private bool _isExporting;
     private bool _isCancelled;
     private bool _hasMissingReferences = false;
     private int _itemCounter = 1;
@@ -93,6 +94,20 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (Math.Abs(_scanProgressValue - value) > 0.01)
             {
                 _scanProgressValue = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    private double _exportProgressValue;
+    public double ExportProgressValue
+    {
+        get => _exportProgressValue;
+        set
+        {
+            if (Math.Abs(_exportProgressValue - value) > 0.01)
+            {
+                _exportProgressValue = value;
                 OnPropertyChanged();
             }
         }
@@ -1036,6 +1051,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private async void ScanButton_Click(object sender, RoutedEventArgs e)
     {
+        // Если сканирование уже идет, выполняем прерывание
+        if (_isScanning)
+        {
+            _isCancelled = true;
+            ScanButton.Content = "Прерывание...";
+            ScanButton.IsEnabled = false;
+            return;
+        }
 
         if (_thisApplication == null)
         {
@@ -1071,8 +1094,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         ResetProgressBar();
         ScanProgressValue = 0;
         ProgressLabel.Text = "Статус: Подготовка к сканированию...";
-        ScanButton.IsEnabled = false;
-        CancelButton.IsEnabled = true;
+        ScanButton.Content = "Прервать";
         ExportButton.IsEnabled = false;
         ClearButton.IsEnabled = false;
         _isScanning = true;
@@ -1200,8 +1222,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         ProgressLabel.Text = _isCancelled ? $"Статус: Прервано ({elapsedTime})" : $"Найдено листовых деталей: {partCount} ({elapsedTime})";
         UpdateDocumentInfo(documentType, partNumber, description, doc);
 
+        ScanButton.Content = "Сканировать";
         ScanButton.IsEnabled = true;
-        CancelButton.IsEnabled = false;
         ExportButton.IsEnabled = partCount > 0 && !_isCancelled;
         ClearButton.IsEnabled = _partsData.Count > 0;
         _lastScannedDocument = _isCancelled ? null : doc;
