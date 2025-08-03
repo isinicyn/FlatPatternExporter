@@ -509,8 +509,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     CancelButton.IsEnabled = true;
     _isCancelled = false;
 
-    ProgressBar.IsIndeterminate = false;
-    ProgressBar.Value = 0;
+    ScanProgressValue = 0;
     ProgressLabel.Text = "Статус: Экспорт данных...";
 
     stopwatch = Stopwatch.StartNew();
@@ -802,8 +801,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         Dispatcher.Invoke(() =>
         {
-            ProgressBar.Maximum = totalParts;
-            ProgressBar.Value = 0;
+            ScanProgressValue = 0; // Сбрасываем прогресс перед началом
         });
 
         var localProcessedCount = processedCount;
@@ -969,7 +967,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 else
                     localSkippedCount++;
 
-                Dispatcher.Invoke(() => { ProgressBar.Value = Math.Min(localProcessedCount, ProgressBar.Maximum); });
+                Dispatcher.Invoke(() => 
+                { 
+                    ScanProgressValue = totalParts > 0 ? (double)localProcessedCount / totalParts * 100 : 0;
+                });
             }
             catch (Exception ex)
             {
@@ -983,7 +984,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         Dispatcher.Invoke(() =>
         {
-            ProgressBar.Value = ProgressBar.Maximum; // Установка значения 100% по завершению
+            ScanProgressValue = 100; // Установка значения 100% по завершению
         });
     }
 
@@ -1108,10 +1109,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private void ResetProgressBar()
     {
-        ProgressBar.IsIndeterminate = false;
-        ProgressBar.Minimum = 0;
-        ProgressBar.Maximum = 100;
-        ProgressBar.Value = 0;
+        ScanProgressValue = 0;
         ProgressLabel.Text = "Статус: ";
     }
 
@@ -1162,7 +1160,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         // Очищаем данные в таблице или любом другом источнике данных
         _partsData.Clear();
-        ProgressBar.Value = 0;
+        ScanProgressValue = 0;
         ProgressLabel.Text = "Статус: ";
         ExportButton.IsEnabled = false;
         ClearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки

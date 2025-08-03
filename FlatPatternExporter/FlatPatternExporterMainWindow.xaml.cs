@@ -84,6 +84,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private int _itemCounter = 1;
     
     // UI состояние
+    private double _scanProgressValue;
+    public double ScanProgressValue
+    {
+        get => _scanProgressValue;
+        set
+        {
+            if (Math.Abs(_scanProgressValue - value) > 0.01)
+            {
+                _scanProgressValue = value;
+                OnPropertyChanged();
+            }
+        }
+    }
     private bool _isCtrlPressed;
     private string _actualSearchText = string.Empty;
     private readonly DispatcherTimer _searchDelayTimer;
@@ -1056,10 +1069,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
 
         ResetProgressBar();
-        ProgressBar.IsIndeterminate = false;
-        ProgressBar.Minimum = 0;
-        ProgressBar.Maximum = 100;
-        ProgressBar.Value = 0;
+        ScanProgressValue = 0;
         ProgressLabel.Text = "Статус: Подготовка к сканированию...";
         ScanButton.IsEnabled = false;
         CancelButton.IsEnabled = true;
@@ -1086,7 +1096,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Прогресс для сканирования структуры сборки
         var scanProgress = new Progress<ScanProgress>(progress =>
         {
-            ProgressBar.Value = progress.TotalItems > 0 ? (double)progress.ProcessedItems / progress.TotalItems * 100 : 0;
+            ScanProgressValue = progress.TotalItems > 0 ? (double)progress.ProcessedItems / progress.TotalItems * 100 : 0;
             ProgressLabel.Text = $"Статус: {progress.CurrentOperation} - {progress.CurrentItem}";
         });
 
@@ -1125,7 +1135,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Переключаем прогресс на обработку деталей
             await Dispatcher.InvokeAsync(() =>
             {
-                ProgressBar.Value = 0;
+                ScanProgressValue = 0;
                 ProgressLabel.Text = "Статус: Обработка деталей...";
             });
 
@@ -1150,7 +1160,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     processedParts++;
                     await Dispatcher.InvokeAsync(() =>
                     {
-                        ProgressBar.Value = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
+                        ScanProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
                         ProgressLabel.Text = $"Статус: Обработка деталей - {processedParts} из {totalParts}";
                     });
                     
@@ -1171,7 +1181,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 if (partData != null)
                 {
                     ((IProgress<PartData>)partProgress).Report(partData);
-                    ProgressBar.Value = 100;
+                    ScanProgressValue = 100;
                     await Task.Delay(10);
                 }
             }
@@ -1186,8 +1196,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             UpdateQuantitiesWithMultiplier(multiplier);
 
         _isScanning = false;
-        ProgressBar.IsIndeterminate = false;
-        ProgressBar.Value = 0;
+        ScanProgressValue = 0;
         ProgressLabel.Text = _isCancelled ? $"Статус: Прервано ({elapsedTime})" : $"Найдено листовых деталей: {partCount} ({elapsedTime})";
         UpdateDocumentInfo(documentType, partNumber, description, doc);
 
@@ -1709,34 +1718,5 @@ public enum ProcessingStatus
     NotProcessed,   // Не обработан (прозрачный)
     Success,        // Успешно экспортирован (зеленый)
     Error          // Ошибка экспорта (красный)
-}
-
-// Конвертер для определения четности строки по позиции в отсортированной коллекции
-public class ItemIndexToBackgroundConverter : IMultiValueConverter
-{
-    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (values.Length >= 3 && values[0] is PartData currentItem && values[1] is System.Collections.IEnumerable itemsSource && values[2] is FrameworkElement element)
-        {
-            // Получаем текущий порядок элементов в коллекции (учитывая сортировку и фильтрацию)
-            var items = itemsSource.Cast<PartData>().ToList();
-            var index = items.IndexOf(currentItem);
-            
-            if (index >= 0)
-            {
-                // Четные позиции (0, 2, 4...) получают четную кисть, нечетные (1, 3, 5...) - нечетную
-                var resourceKey = index % 2 == 0 ? "EvenRowBrush" : "OddRowBrush";
-                return element.FindResource(resourceKey);
-            }
-        }
-        
-        // Возвращаем белый цвет по умолчанию, если что-то пошло не так
-        return System.Windows.Media.Brushes.White;
-    }
-
-    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
 }
 

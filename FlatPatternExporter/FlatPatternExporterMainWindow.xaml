@@ -58,6 +58,58 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Стиль для кнопки с прогресс-баром -->
+        <Style x:Key="ProgressButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="Border" 
+                                    Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="0">
+                                <Grid>
+                                    <!-- Прогресс-бар как фон -->
+                                    <ProgressBar x:Name="PART_ProgressBar" 
+                                               Background="Transparent"
+                                               Foreground="#FFE1E1E1"
+                                               BorderThickness="0"
+                                               Minimum="0" 
+                                               Maximum="100" 
+                                               Value="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                    
+                                    <!-- Контент кнопки поверх прогресса -->
+                                    <ContentPresenter x:Name="ContentPresenter"
+                                                    HorizontalAlignment="Center" 
+                                                    VerticalAlignment="Center"
+                                                    Content="{TemplateBinding Content}"
+                                                    TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFE0E0E0"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
+                                <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="#FF888888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -153,6 +205,7 @@
               HorizontalGridLinesBrush="#EAEAEA"
               VerticalGridLinesBrush="#EAEAEA"
               SelectionMode="Extended"
+              AlternationCount="2"
               SelectionChanged="partsDataGrid_SelectionChanged"
               Drop="partsDataGrid_Drop" 
               AllowDrop="True"
@@ -182,11 +235,8 @@
             <DataGrid.Columns>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Margin="10,10,10,0" Grid.Row="3" VerticalAlignment="Top">
-            <ProgressBar x:Name="ProgressBar" Height="20" Margin="0,0,0,10"/>
-        </StackPanel>
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="75" Width="245">
-            <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="0,0,10,0" Height="75" Width="75" BorderThickness="1,1,1,1" RenderTransformOrigin="0,0"/>
+            <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="0,0,10,0" Height="75" Width="75" Style="{StaticResource ProgressButtonStyle}" RenderTransformOrigin="0,0"/>
             <StackPanel Width="75" Margin="0,0,10,0">
                 <Button x:Name="CancelButton" Content="Прервать" Click="CancelButton_Click" IsEnabled="False" Width="75" Height="32.5" VerticalAlignment="Top" Margin="0,0,0,10"/>
                 <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Width="75" Height="32.5" VerticalAlignment="Bottom"/>

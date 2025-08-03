@@ -2,9 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:FlatPatternExporter">
 
-    <!-- Конвертеры -->
-    <local:ItemIndexToBackgroundConverter x:Key="ItemIndexToBackgroundConverter"/>
-
     <!-- Кисти для чередования строк -->
     <SolidColorBrush x:Key="EvenRowBrush" Color="White"/>
     <SolidColorBrush x:Key="OddRowBrush" Color="#F5F5F5"/>
@@ -145,15 +142,14 @@
             <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="LightBlue"/>
             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
         </Style.Resources>
-        <Setter Property="Background">
-            <Setter.Value>
-                <MultiBinding Converter="{StaticResource ItemIndexToBackgroundConverter}">
-                    <Binding/>
-                    <Binding RelativeSource="{RelativeSource AncestorType=DataGrid}" Path="ItemsSource"/>
-                    <Binding RelativeSource="{RelativeSource Self}"/>
-                </MultiBinding>
-            </Setter.Value>
-        </Setter>
+        <Style.Triggers>
+            <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                <Setter Property="Background" Value="{StaticResource EvenRowBrush}"/>
+            </Trigger>
+            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                <Setter Property="Background" Value="{StaticResource OddRowBrush}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Стиль для заголовков столбцов -->
