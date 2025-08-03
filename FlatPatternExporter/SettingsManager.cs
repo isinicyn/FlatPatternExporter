@@ -5,6 +5,19 @@ using System.Xml.Serialization;
 namespace FlatPatternExporter;
 
 [Serializable]
+public class LayerSettingData
+{
+    public string DisplayName { get; set; } = string.Empty;
+    public string LayerName { get; set; } = string.Empty;
+    public bool HasVisibilityOption { get; set; } = true;
+    public bool IsVisible { get; set; } = true;
+    public string CustomName { get; set; } = string.Empty;
+    public string SelectedColor { get; set; } = "White";
+    public string SelectedLineType { get; set; } = "Default";
+    public string OriginalName { get; set; } = string.Empty;
+}
+
+[Serializable]
 public class ApplicationSettings
 {
     public ObservableCollection<string> ActiveColumns { get; set; } = new();
@@ -32,6 +45,7 @@ public class ApplicationSettings
     
     public ProcessingMethod SelectedProcessingMethod { get; set; } = ProcessingMethod.BOM;
     
+    public ObservableCollection<LayerSettingData> LayerSettings { get; set; } = new();
 }
 
 public static class SettingsManager
@@ -116,6 +130,21 @@ public static class SettingsManager
             settings.CustomProperties.Add(customProperty);
         }
 
+        foreach (var layerSetting in window.LayerSettings)
+        {
+            settings.LayerSettings.Add(new LayerSettingData
+            {
+                DisplayName = layerSetting.DisplayName,
+                LayerName = layerSetting.LayerName,
+                HasVisibilityOption = layerSetting.HasVisibilityOption,
+                IsVisible = layerSetting.IsVisible,
+                CustomName = layerSetting.CustomName,
+                SelectedColor = layerSetting.SelectedColor,
+                SelectedLineType = layerSetting.SelectedLineType,
+                OriginalName = layerSetting.OriginalName
+            });
+        }
+
         return settings;
     }
 
@@ -156,6 +185,23 @@ public static class SettingsManager
             else
             {
                 window.AddCustomIPropertyColumn(columnName);
+            }
+        }
+
+        if (settings.LayerSettings.Count > 0)
+        {
+            for (int i = 0; i < Math.Min(settings.LayerSettings.Count, window.LayerSettings.Count); i++)
+            {
+                var settingData = settings.LayerSettings[i];
+                var layerSetting = window.LayerSettings[i];
+                
+                layerSetting.DisplayName = settingData.DisplayName;
+                layerSetting.LayerName = settingData.LayerName;
+                layerSetting.IsVisible = settingData.IsVisible;
+                layerSetting.CustomName = settingData.CustomName;
+                layerSetting.SelectedColor = settingData.SelectedColor;
+                layerSetting.SelectedLineType = settingData.SelectedLineType;
+                layerSetting.OriginalName = settingData.OriginalName;
             }
         }
     }
