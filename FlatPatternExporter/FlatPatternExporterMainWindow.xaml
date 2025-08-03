@@ -206,6 +206,7 @@
               VerticalGridLinesBrush="#EAEAEA"
               SelectionMode="Extended"
               AlternationCount="2"
+              EnableRowVirtualization="False"
               SelectionChanged="partsDataGrid_SelectionChanged"
               Drop="partsDataGrid_Drop" 
               AllowDrop="True"
