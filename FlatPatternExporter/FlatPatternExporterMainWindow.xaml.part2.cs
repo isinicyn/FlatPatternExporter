@@ -710,8 +710,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private string GetElapsedTime(TimeSpan timeSpan)
     {
         if (timeSpan.TotalMinutes >= 1)
-            return $"{(int)timeSpan.TotalMinutes} мин. {timeSpan.Seconds} сек.";
-        return $"{timeSpan.Seconds} сек.";
+            return $"{(int)timeSpan.TotalMinutes} мин. {timeSpan.Seconds}.{timeSpan.Milliseconds:D3} сек.";
+        return $"{timeSpan.Seconds}.{timeSpan.Milliseconds:D3} сек.";
     }
 
     private async void ExportSelectedDXF_Click(object sender, RoutedEventArgs e)
