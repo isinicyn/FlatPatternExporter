@@ -119,7 +119,7 @@ public static class SettingsManager
 
         foreach (var column in window.PartsDataGrid.Columns)
         {
-            if (column.Header is string headerName && !IsDefaultColumn(headerName))
+            if (column.Header is string headerName)
             {
                 settings.ActiveColumns.Add(headerName);
             }
@@ -206,9 +206,4 @@ public static class SettingsManager
         }
     }
 
-    private static bool IsDefaultColumn(string columnName)
-    {
-        var defaultColumns = new string[] { };
-        return defaultColumns.Contains(columnName);
-    }
 }
