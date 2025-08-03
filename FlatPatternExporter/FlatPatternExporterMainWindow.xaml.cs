@@ -506,8 +506,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _enableSubfolder = value;
                 OnPropertyChanged();
-                if (!value && SubfolderNameTextBox != null)
-                    SubfolderNameTextBox.Text = string.Empty;
             }
         }
     }
