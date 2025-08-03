@@ -27,11 +27,11 @@ public class ApplicationSettings
     
     public ExportFolderType SelectedExportFolder { get; set; } = ExportFolderType.ChooseFolder;
     public bool EnableSubfolder { get; set; } = false;
+    public string SubfolderName { get; set; } = string.Empty;
     public string FixedFolderPath { get; set; } = string.Empty;
     
     public ProcessingMethod SelectedProcessingMethod { get; set; } = ProcessingMethod.BOM;
     
-    public bool IsPrimaryModelState { get; set; } = true;
 }
 
 public static class SettingsManager
@@ -98,8 +98,8 @@ public static class SettingsManager
             TrimCenterlines = window.TrimCenterlines,
             SelectedExportFolder = window.SelectedExportFolder,
             EnableSubfolder = window.EnableSubfolder,
+            SubfolderName = window.SubfolderNameTextBox?.Text ?? string.Empty,
             SelectedProcessingMethod = window.SelectedProcessingMethod,
-            IsPrimaryModelState = window.IsPrimaryModelState,
             FixedFolderPath = window.FixedFolderPath
         };
 
@@ -135,8 +135,9 @@ public static class SettingsManager
         window.TrimCenterlines = settings.TrimCenterlines;
         window.SelectedExportFolder = settings.SelectedExportFolder;
         window.EnableSubfolder = settings.EnableSubfolder;
+        if (window.SubfolderNameTextBox != null)
+            window.SubfolderNameTextBox.Text = settings.SubfolderName;
         window.SelectedProcessingMethod = settings.SelectedProcessingMethod;
-        window.IsPrimaryModelState = settings.IsPrimaryModelState;
         window.FixedFolderPath = settings.FixedFolderPath;
 
         window.CustomPropertiesList.Clear();
