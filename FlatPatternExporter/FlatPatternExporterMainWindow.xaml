@@ -180,54 +180,6 @@
 
 
             <DataGrid.Columns>
-
-                <!-- Колонка с номером пункта -->
-                <DataGridTextColumn Header="ID" Binding="{Binding Item, Mode=OneWay}" Width="Auto" SortMemberPath="Item" SortDirection="Ascending">
-                    <DataGridTextColumn.ElementStyle>
-                        <StaticResource ResourceKey="CenteredCellStyle"/>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!-- Колонка с обозначением детали и индикатором развертки -->
-                <DataGridTemplateColumn Header="Обозначение" Width="Auto" SortMemberPath="PartNumber" 
-                                      CellTemplate="{StaticResource PartNumberWithIndicatorTemplate}"/>
-
-                <!-- Колонка с наименованием детали -->
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Description}" Width="Auto" SortMemberPath="Description">
-                    <DataGridTextColumn.ElementStyle>
-                        <StaticResource ResourceKey="CenteredCellStyle"/>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Колонка с состоянием модели -->
-                <DataGridTextColumn Header="Состояние модели" Binding="{Binding ModelState}" Width="Auto">
-                    <DataGridTextColumn.ElementStyle>
-                        <StaticResource ResourceKey="CenteredCellStyle"/>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Колонка с материалом детали -->
-                <DataGridTextColumn Header="Материал" Binding="{Binding Material}" Width="Auto">
-                    <DataGridTextColumn.ElementStyle>
-                        <StaticResource ResourceKey="CenteredCellStyle"/>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Колонка с толщиной материала -->
-                <DataGridTextColumn Header="Толщина" Binding="{Binding Thickness, StringFormat=F1}" Width="Auto">
-                    <DataGridTextColumn.ElementStyle>
-                        <StaticResource ResourceKey="CenteredCellStyle"/>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-
-                <!-- Колонка с количеством деталей -->
-                <DataGridTemplateColumn Header="Кол." Width="Auto" CellTemplate="{StaticResource QuantityTemplate}"/>
-
-                <!-- Колонка с изображением детали -->
-                <DataGridTemplateColumn Header="Изобр. детали" Width="Auto" CellTemplate="{StaticResource PartImageTemplate}"/>
-
-                <!-- Колонка с изображением развертки -->
-                <DataGridTemplateColumn Header="Изобр. развертки" Width="Auto" CellTemplate="{StaticResource DxfImageTemplate}"/>
-
                 <!-- Колонка с индикатором обработки -->
                 <DataGridTemplateColumn Header="Обр." Width="Auto" IsReadOnly="False" CanUserSort="False" CanUserReorder="False"
                                       CellTemplate="{StaticResource ProcessingStatusTemplate}"/>

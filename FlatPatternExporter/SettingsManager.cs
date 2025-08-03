@@ -167,12 +167,7 @@ public static class SettingsManager
 
     private static bool IsDefaultColumn(string columnName)
     {
-        var defaultColumns = new[]
-        {
-            "ID", "Обозначение", "Наименование", "Состояние модели", 
-            "Материал", "Толщина", "Кол.", "Изобр. детали", 
-            "Изобр. развертки", "Обр."
-        };
+        var defaultColumns = new[] { "Обр." };
         return defaultColumns.Contains(columnName);
     }
 }
