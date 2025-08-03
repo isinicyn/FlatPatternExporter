@@ -180,9 +180,6 @@
 
 
             <DataGrid.Columns>
-                <!-- Колонка с индикатором обработки -->
-                <DataGridTemplateColumn Header="Обр." Width="Auto" IsReadOnly="False" CanUserSort="False" CanUserReorder="False"
-                                      CellTemplate="{StaticResource ProcessingStatusTemplate}"/>
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Margin="10,10,10,0" Grid.Row="3" VerticalAlignment="Top">

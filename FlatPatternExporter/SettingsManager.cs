@@ -208,7 +208,7 @@ public static class SettingsManager
 
     private static bool IsDefaultColumn(string columnName)
     {
-        var defaultColumns = new[] { "Обр." };
+        var defaultColumns = new string[] { };
         return defaultColumns.Contains(columnName);
     }
 }

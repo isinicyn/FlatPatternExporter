@@ -136,6 +136,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Словарь колонок с шаблонами (все типы)
     private static readonly Dictionary<string, string> ColumnTemplates = new()
     {
+        { "Обр.", "ProcessingStatusTemplate" },
         { "Изобр. детали", "PartImageTemplate" },
         { "Изобр. развертки", "DxfImageTemplate" },
         { "Обозначение", "PartNumberWithIndicatorTemplate" },
@@ -192,6 +193,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         PresetIProperties = new ObservableCollection<PresetIProperty>
 {
     // КАТЕГОРИЯ 1: Системные свойства приложения
+    new() { InternalName = "Обр.", DisplayName = "Статус обработки", InventorPropertyName = "ProcessingStatus", Category = "Системные" },
     new() { InternalName = "ID", DisplayName = "Нумерация", InventorPropertyName = "Item", Category = "Системные" },
     
     // КАТЕГОРИЯ 2: Свойства документа (не iProperty)
