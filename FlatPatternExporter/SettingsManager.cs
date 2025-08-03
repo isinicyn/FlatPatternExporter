@@ -20,7 +20,7 @@ public class LayerSettingData
 [Serializable]
 public class ApplicationSettings
 {
-    public ObservableCollection<string> ActiveColumns { get; set; } = new();
+    public ObservableCollection<string> ColumnOrder { get; set; } = new();
     public ObservableCollection<string> CustomProperties { get; set; } = new();
     
     public bool ExcludeReferenceParts { get; set; } = true;
@@ -117,12 +117,16 @@ public static class SettingsManager
             FixedFolderPath = window.FixedFolderPath
         };
 
-        foreach (var column in window.PartsDataGrid.Columns)
+        var columnsInDisplayOrder = window.PartsDataGrid.Columns
+            .Where(c => c.Header is string)
+            .OrderBy(c => c.DisplayIndex)
+            .Select(c => c.Header as string)
+            .Where(name => !string.IsNullOrEmpty(name))
+            .ToList();
+            
+        foreach (var columnName in columnsInDisplayOrder)
         {
-            if (column.Header is string headerName)
-            {
-                settings.ActiveColumns.Add(headerName);
-            }
+            settings.ColumnOrder.Add(columnName!);
         }
 
         foreach (var customProperty in window.CustomPropertiesList)
@@ -175,7 +179,7 @@ public static class SettingsManager
             window.CustomPropertiesList.Add(customProperty);
         }
 
-        foreach (var columnName in settings.ActiveColumns)
+        foreach (var columnName in settings.ColumnOrder)
         {
             var presetProperty = window.PresetIProperties.FirstOrDefault(p => p.InternalName == columnName);
             if (presetProperty != null)
