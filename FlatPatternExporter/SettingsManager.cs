@@ -33,6 +33,7 @@ public class ApplicationSettings
     
     public bool EnableSplineReplacement { get; set; } = false;
     public int SelectedSplineReplacementIndex { get; set; } = 0;
+    public string SplineTolerance { get; set; } = "0.01";
     public int SelectedAcadVersionIndex { get; set; } = 5;
     public bool MergeProfilesIntoPolyline { get; set; } = true;
     public bool RebaseGeometry { get; set; } = true;
@@ -106,6 +107,7 @@ public static class SettingsManager
             IncludeQuantityInFileName = window.IncludeQuantityInFileName,
             EnableSplineReplacement = window.EnableSplineReplacement,
             SelectedSplineReplacementIndex = window.SelectedSplineReplacementIndex,
+            SplineTolerance = window.SplineToleranceTextBox?.Text ?? "0.01",
             SelectedAcadVersionIndex = window.SelectedAcadVersionIndex,
             MergeProfilesIntoPolyline = window.MergeProfilesIntoPolyline,
             RebaseGeometry = window.RebaseGeometry,
@@ -162,6 +164,8 @@ public static class SettingsManager
         window.IncludeQuantityInFileName = settings.IncludeQuantityInFileName;
         window.EnableSplineReplacement = settings.EnableSplineReplacement;
         window.SelectedSplineReplacementIndex = settings.SelectedSplineReplacementIndex;
+        if (window.SplineToleranceTextBox != null)
+            window.SplineToleranceTextBox.Text = settings.SplineTolerance;
         window.SelectedAcadVersionIndex = settings.SelectedAcadVersionIndex;
         window.MergeProfilesIntoPolyline = settings.MergeProfilesIntoPolyline;
         window.RebaseGeometry = settings.RebaseGeometry;
