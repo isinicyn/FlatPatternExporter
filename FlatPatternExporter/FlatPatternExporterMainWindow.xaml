@@ -241,7 +241,7 @@
             <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Width="75" Height="75" Margin="0,0,10,0"/>
             <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования"/>
         </StackPanel>
-        <Border Grid.Row="0" Margin="260,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="230" Height="75"
+        <Border Grid.Row="0" Margin="805,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="170" Height="75"
                 BorderBrush="#D0D0D0" BorderThickness="1" Background="#F8F8F8" Padding="5">
             <Grid>
                 <Grid.RowDefinitions>
