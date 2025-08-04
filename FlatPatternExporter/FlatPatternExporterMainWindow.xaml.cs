@@ -183,6 +183,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
         PartsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
         
+        // Обновляем видимость оверлея при изменении коллекции колонок
+        ((System.Collections.Specialized.INotifyCollectionChanged)PartsDataGrid.Columns).CollectionChanged += (s, e) => UpdateNoColumnsOverlayVisibility();
+        
         // Инициализация путей библиотек
         InitializeLibraryPaths();
 
@@ -289,6 +292,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         
         // Загружаем настройки при запуске
         LoadSettings();
+        
+        // Инициализируем видимость оверлея
+        UpdateNoColumnsOverlayVisibility();
     }
 
     private void LoadSettings()

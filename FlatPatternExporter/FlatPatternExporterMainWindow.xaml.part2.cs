@@ -1442,4 +1442,12 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         var aboutWindow = new AboutWindow(this); // Передаем текущий экземпляр MainWindow
         aboutWindow.ShowDialog(); // Отображаем окно как диалоговое
     }
+
+    private void UpdateNoColumnsOverlayVisibility()
+    {
+        if (NoColumnsOverlay != null)
+        {
+            NoColumnsOverlay.Visibility = PartsDataGrid.Columns.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
 }
