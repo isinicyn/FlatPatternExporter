@@ -798,8 +798,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
         selectIPropertyWindow?.UpdateAvailableProperties();
 
-        // Дозаполняем данные для новой колонки (асинхронно)
-        _ = FillPropertyDataAsync(iProperty.InventorPropertyName);
+        // Дозаполняем данные для новой колонки
+        FillPropertyData(iProperty.InventorPropertyName);
     }
 
     private void PartsDataGrid_ColumnReordering(object? sender, DataGridColumnReorderingEventArgs e)
@@ -1115,8 +1115,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         var stopwatch = Stopwatch.StartNew();
 
-        await Task.Delay(100);
-
         var partCount = 0;
         var documentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" : "Деталь";
         var partNumber = string.Empty;
@@ -1197,8 +1195,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                         ScanProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
                         ProgressLabel.Text = $"Статус: Обработка деталей - {processedParts} из {totalParts}";
                     });
-                    
-                    await Task.Delay(10);
                 }
             });
         }
@@ -1216,7 +1212,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 {
                     ((IProgress<PartData>)partProgress).Report(partData);
                     ScanProgressValue = 100;
-                    await Task.Delay(10);
                 }
             }
         }

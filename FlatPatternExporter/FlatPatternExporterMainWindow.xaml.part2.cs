@@ -1304,7 +1304,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         EditIPropertyMenuItem.IsEnabled = PartsDataGrid.SelectedItems.Count == 1;
     }
 
-    public async Task FillPropertyDataAsync(string propertyName)
+    public void FillPropertyData(string propertyName)
     {
         // Блеклист свойств, которые НЕ должны обновляться через этот метод
         // (они заполняются при первичном сканировании или имеют специальную логику)
@@ -1350,8 +1350,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                     partData.AddCustomProperty(propertyName, value);
                 }
             }
-
-            await Task.Delay(50);
         }
     }
     private void RemoveCustomIPropertyColumn(string propertyName)
@@ -1395,8 +1393,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         PartsDataGrid.Columns.Add(column);
 
-        // Дозаполняем данные для новой колонки (асинхронно)
-        _ = FillPropertyDataAsync(propertyName);
+        // Дозаполняем данные для новой колонки
+        FillPropertyData(propertyName);
     }
 
     private void EditIProperty_Click(object sender, RoutedEventArgs e)
