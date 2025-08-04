@@ -568,6 +568,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ClearButton.IsEnabled = false;
         ScanButton.IsEnabled = false;
         ExportButton.Content = "Прервать";
+        ExportButton.IsEnabled = true; // Принудительно активируем для режима Ctrl
         _isExporting = true;
 
         var processedCount = 0;

@@ -968,7 +968,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
         {
             _isCtrlPressed = true;
-            ExportButton.IsEnabled = true;
+            if (!_isExporting && !_isScanning)
+            {
+                ExportButton.IsEnabled = true;
+            }
         }
     }
 
@@ -977,7 +980,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
         {
             _isCtrlPressed = false;
-            ExportButton.IsEnabled = _partsData.Count > 0; // Восстанавливаем исходное состояние кнопки
+            if (!_isExporting && !_isScanning)
+            {
+                ExportButton.IsEnabled = _partsData.Count > 0;
+            }
         }
     }
 
