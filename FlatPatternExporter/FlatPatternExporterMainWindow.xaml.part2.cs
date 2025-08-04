@@ -105,9 +105,7 @@ public partial class FlatPatternExporterMainWindow : Window
         }
 
         // КАТЕГОРИЯ 2: Дополнительные свойства документа (изображения)
-        partData.Preview = await GetThumbnailAsync(partDoc);
-        
-        // HasFlatPattern уже установлено в ReadAllPropertiesFromPart
+        partData.Preview = await GetThumbnailAsync(partDoc);        
 
         return partData;
     }
@@ -1304,32 +1302,24 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         EditIPropertyMenuItem.IsEnabled = PartsDataGrid.SelectedItems.Count == 1;
     }
 
-    public void FillPropertyData(string propertyName)
+    public async Task FillPropertyDataAsync(string propertyName)
     {
-        // Блеклист свойств, которые НЕ должны обновляться через этот метод
-        // (они заполняются при первичном сканировании или имеют специальную логику)
-        var blacklistedProperties = new HashSet<string>
-        {
-            "Item",         // Системная нумерация
-            "FileName",     // Имя файла (заполняется при сканировании)
-            "FullFileName", // Полный путь (заполняется при сканировании)  
-            "ModelState",   // Состояние модели (заполняется при сканировании)
-            "Thickness",    // Толщина (заполняется при сканировании, тип double)
-            "Preview",      // Изображение детали (тип BitmapImage)
-            "DxfPreview",   // Изображение развертки (тип BitmapImage)
-            "Quantity"      // Количество (системное свойство, тип int)
-        };
+        // Проверяем, является ли это стандартным свойством (уже загружено в ReadAllPropertiesFromPart)
+        var propInfo = typeof(PartData).GetProperty(propertyName);
+        var isStandardProperty = propInfo != null && propInfo.PropertyType == typeof(string);
 
-        // Если свойство в блеклисте - не обрабатываем
-        if (blacklistedProperties.Contains(propertyName))
+        // Если это стандартное свойство, то оно уже загружено - просто уведомляем UI
+        if (isStandardProperty)
         {
+            foreach (var partData in _partsData)
+            {
+                partData.OnPropertyChanged(propertyName);
+                await Task.Delay(10);
+            }
             return;
         }
 
-        // Проверяем тип свойства один раз перед циклом
-        var propInfo = typeof(PartData).GetProperty(propertyName);
-        var isDedicatedProperty = propInfo != null && propInfo.PropertyType == typeof(string);
-
+        // Для кастомных свойств загружаем данные из файлов
         foreach (var partData in _partsData)
         {
             var partDoc = OpenPartDocument(partData.PartNumber);
@@ -1337,19 +1327,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             {
                 var mgr = new PropertyManager((Document)partDoc);
                 var value = mgr.GetMappedProperty(propertyName) ?? string.Empty;
-
-                if (isDedicatedProperty)
-                {
-                    propInfo!.SetValue(partData, value);
-                    // Принудительно уведомляем UI об изменении свойства
-                    partData.OnPropertyChanged(propertyName);
-                }
-                else
-                {
-                    // Добавляем как пользовательское свойство
-                    partData.AddCustomProperty(propertyName, value);
-                }
+                partData.AddCustomProperty(propertyName, value);
             }
+
+            await Task.Delay(10);
         }
     }
     private void RemoveCustomIPropertyColumn(string propertyName)
@@ -1393,8 +1374,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         PartsDataGrid.Columns.Add(column);
 
-        // Дозаполняем данные для новой колонки
-        FillPropertyData(propertyName);
+        // Дозаполняем данные для новой колонки (асинхронно)
+        _ = FillPropertyDataAsync(propertyName);
     }
 
     private void EditIProperty_Click(object sender, RoutedEventArgs e)

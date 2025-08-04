@@ -799,7 +799,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         selectIPropertyWindow?.UpdateAvailableProperties();
 
         // Дозаполняем данные для новой колонки
-        FillPropertyData(iProperty.InventorPropertyName);
+        _ = FillPropertyDataAsync(iProperty.InventorPropertyName);
     }
 
     private void PartsDataGrid_ColumnReordering(object? sender, DataGridColumnReorderingEventArgs e)
