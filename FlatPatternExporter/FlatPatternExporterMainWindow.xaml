@@ -370,7 +370,7 @@
                                      Style="{StaticResource TokenListBoxStyle}"
                                      PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
                                      MouseMove="AvailableTokensListBox_MouseMove"
-                                     MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32"/>
+                                     MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center"/>
                         </StackPanel>
 
                         <!-- Правая колонка: Шаблон имени файла -->
@@ -380,8 +380,7 @@
                             <local:TokenizedTextBox x:Name="FileNameTemplateTokenBox"
                                                    Template="{Binding FileNameTemplate, Mode=TwoWay}"
                                                    AvailableTokens="{Binding AvailableTokens}"
-                                                   Height="32"
-                                                   Margin="0,0,0,0"/>
+                                                   Margin="0,0,0,0" HorizontalAlignment="Left"/>
                         </StackPanel>
 
                     </Grid>
