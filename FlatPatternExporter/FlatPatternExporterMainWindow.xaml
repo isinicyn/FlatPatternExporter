@@ -27,158 +27,172 @@
         </Grid.RowDefinitions>
 
         <!-- Row 0: Top Panel -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,20,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="75" Width="245">
-            <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="0,0,10,0" Height="75" Width="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" RenderTransformOrigin="0,0"/>
-            <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Width="75" Height="75" Margin="0,0,10,0"/>
-            <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования"/>
-        </StackPanel>
-        <Button x:Name="AddPresetIPropertyButton" Grid.Row="0" Click="AddPresetIPropertyButton_Click" Height="32.5" Margin="265,0,10,48" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1">
-            <StackPanel Orientation="Horizontal">
-                <Path Style="{StaticResource AddIconStyle}"
-                      Width="12" 
-                      Height="12" 
-                      Margin="0,0,4,0"/>
-                <TextBlock Text="Property" 
-                           VerticalAlignment="Center" 
-                           Foreground="#333333"/>
-            </StackPanel>
-        </Button>
-        <Button Grid.Row="0" Name="ConflictFilesButton" 
-                IsEnabled="False" 
-                Click="ConflictFilesButton_Click" 
-                Width="100" 
-                Height="75" 
-                VerticalAlignment="Bottom" 
-                HorizontalAlignment="Left" 
-                Margin="390,0,0,5"
-                Style="{StaticResource WarningButtonStyle}">
-            <Button.Content>
-                <TextBlock Text="Анализ обозначений" 
-                           TextWrapping="Wrap" 
-                           TextAlignment="Center"/>
-            </Button.Content>
-        </Button>
-        <Border Grid.Row="0" Margin="500,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="75"
-                BorderBrush="#D0D0D0" BorderThickness="1" Background="#F8F8F8" Padding="5">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0" Margin="10,10,10,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="Тип документа:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="16" Margin="0,0,3,0"/>
-                <TextBlock x:Name="DocumentTypeLabel" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="15" Margin="5,0,0,1"/>
+            <!-- Left-aligned controls -->
+            <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
+                <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="0,0,10,10" Height="75" Width="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" RenderTransformOrigin="0,0"/>
+                <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Width="75" Height="75" Margin="0,0,10,10"/>
+                <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования" Margin="0,0,10,10"/>
+                
+                <StackPanel Orientation="Vertical" Margin="0,0,10,10">
+                    <Button x:Name="AddPresetIPropertyButton" Click="AddPresetIPropertyButton_Click" Height="32.5" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1" Margin="0,0,0,5">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Style="{StaticResource AddIconStyle}"
+                                  Width="12" 
+                                  Height="12" 
+                                  Margin="0,0,4,0"/>
+                            <TextBlock Text="Property" 
+                                       VerticalAlignment="Center" 
+                                       Foreground="#333333"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Name="ConflictFilesButton" 
+                            IsEnabled="False" 
+                            Click="ConflictFilesButton_Click" 
+                            Width="115" 
+                            Height="37.5" 
+                            Style="{StaticResource WarningButtonStyle}">
+                        <Button.Content>
+                            <TextBlock Text="Анализ обозначений" 
+                                       TextWrapping="Wrap" 
+                                       TextAlignment="Center"/>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Обозначение:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="14" Margin="0,0,3,0"/>
-                <TextBlock x:Name="PartNumberLabel" Grid.Row="1" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="14" Margin="5,0,0,1"/>
+                <Border Margin="0,0,10,10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="75"
+                        BorderBrush="#D0D0D0" BorderThickness="1" Background="#F8F8F8" Padding="5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="14" Margin="0,0,3,0"/>
-                <TextBlock x:Name="DescriptionLabel" Grid.Row="2" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="15" Margin="5,0,0,1"/>
+                        <TextBlock Grid.Column="0" Text="Тип документа:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="16" Margin="0,0,3,0"/>
+                        <TextBlock x:Name="DocumentTypeLabel" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="15" Margin="5,0,0,1"/>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Состояние модели:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="14" Margin="0,0,3,0"/>
-                <TextBlock x:Name="ModelStateLabel" Grid.Row="3" Grid.Column="1" Text="" 
-                           Style="{StaticResource ModelStateValueStyle}" Height="15" Margin="5,0,0,1"/>
-            </Grid>
-        </Border>
-        <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,85,0" Height="75">
-            <!-- Search Box -->
-            <Grid>
-                <TextBox x:Name="SearchTextBox" 
-                         Width="200"
-                         Height="25"
-                         Padding="5,0,30,0"
-                         VerticalContentAlignment="Center"
-                         TextChanged="SearchTextBox_TextChanged"/>
-                <TextBlock Text="Поиск..." 
-                           Foreground="Gray" 
-                           VerticalAlignment="Center" 
-                           Margin="5,0,30,0"
-                           IsHitTestVisible="False">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Обозначение:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="14" Margin="0,0,3,0"/>
+                        <TextBlock x:Name="PartNumberLabel" Grid.Row="1" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="14" Margin="5,0,0,1"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Описание:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="14" Margin="0,0,3,0"/>
+                        <TextBlock x:Name="DescriptionLabel" Grid.Row="2" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="15" Margin="5,0,0,1"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Состояние модели:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="14" Margin="0,0,3,0"/>
+                        <TextBlock x:Name="ModelStateLabel" Grid.Row="3" Grid.Column="1" Text="" 
+                                   Style="{StaticResource ModelStateValueStyle}" Height="15" Margin="5,0,0,1"/>
+                    </Grid>
+                </Border>
+            </WrapPanel>
+
+            <!-- Right-aligned controls -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="0,0,10,0">
+                    <!-- Search Box -->
+                    <Grid>
+                        <TextBox x:Name="SearchTextBox" 
+                                 Width="200"
+                                 Height="25"
+                                 Padding="5,0,30,0"
+                                 VerticalContentAlignment="Center"
+                                 TextChanged="SearchTextBox_TextChanged"/>
+                        <TextBlock Text="Поиск..." 
+                                   Foreground="Gray" 
+                                   VerticalAlignment="Center" 
+                                   Margin="5,0,30,0"
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <Button x:Name="ClearSearchButton" 
+                                Click="ClearSearchButton_Click" 
+                                Style="{StaticResource ClearInputButtonStyle}"/>
+                    </Grid>
+
+                    <!-- Multiplier -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                        <Label Content="Множитель" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                        <Grid Width="50">
+                            <TextBox x:Name="MultiplierTextBox" Width="50" Text="1" Height="22" VerticalAlignment="Center" 
+                                     PreviewTextInput="MultiplierTextBox_PreviewTextInput" 
+                                     VerticalContentAlignment="Center" 
+                                     TextChanged="MultiplierTextBox_TextChanged"/>
+                            <Button x:Name="ClearMultiplierButton" 
+                                    Click="ClearMultiplierButton_Click" 
+                                    Style="{StaticResource ClearInputButtonStyle}" 
+                                    ToolTip="Сбросить множитель на 1"/>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+                
+                <Button Content="About" Click="AboutButton_Click" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="70" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" FontWeight="Bold" Height="75" VerticalAlignment="Top">
+                    <Button.Background>
+                        <ImageBrush ImageSource="/Resources/Pic/Beta1.png" TileMode="None" Stretch="Uniform" Opacity="1">
+                            <ImageBrush.RelativeTransform>
+                                <TransformGroup>
+                                    <ScaleTransform CenterY="0.75" CenterX="0.5" ScaleY="0.75" ScaleX="0.75"/>
+                                    <SkewTransform CenterX="0.5" CenterY="0.75"/>
+                                    <RotateTransform CenterX="0.5" CenterY="0.75"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </ImageBrush.RelativeTransform>
+                        </ImageBrush>
+                    </Button.Background>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <!-- Убираем стандартный фон при наведении -->
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderBrush" Value="#FFACACAC"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                        BorderBrush="{TemplateBinding BorderBrush}" 
+                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,5,0,0"/>
+                                            <!-- Прижимаем текст к верху -->
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+
+                            <!-- Триггер для изменения границы при наведении -->
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}" Value="">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="BorderBrush" Value="#0078D4"/>
+                                    <!-- Цвет границы при наведении -->
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <!-- Увеличиваем толщину границы -->
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="BorderBrush" Value="#003778"/>
+                                    <!-- Цвет границы при нажатии -->
+                                </Trigger>
                             </Style.Triggers>
                         </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <Button x:Name="ClearSearchButton" 
-                        Click="ClearSearchButton_Click" 
-                        Style="{StaticResource ClearInputButtonStyle}"/>
-            </Grid>
-
-            <!-- Multiplier -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-                <Label Content="Множитель" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                <Grid Width="50">
-                    <TextBox x:Name="MultiplierTextBox" Width="50" Text="1" Height="22" VerticalAlignment="Center" 
-                             PreviewTextInput="MultiplierTextBox_PreviewTextInput" 
-                             VerticalContentAlignment="Center" 
-                             TextChanged="MultiplierTextBox_TextChanged"/>
-                    <Button x:Name="ClearMultiplierButton" 
-                            Click="ClearMultiplierButton_Click" 
-                            Style="{StaticResource ClearInputButtonStyle}" 
-                            ToolTip="Сбросить множитель на 1"/>
-                </Grid>
+                    </Button.Style>
+                </Button>
             </StackPanel>
-        </StackPanel>
-        <Button Grid.Row="0" Content="About" Click="AboutButton_Click" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="70" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" FontWeight="Bold" Height="75" Margin="0,20,10,0" VerticalAlignment="Top">
-            <Button.Background>
-                <ImageBrush ImageSource="/Resources/Pic/Beta1.png" TileMode="None" Stretch="Uniform" Opacity="1">
-                    <ImageBrush.RelativeTransform>
-                        <TransformGroup>
-                            <ScaleTransform CenterY="0.75" CenterX="0.5" ScaleY="0.75" ScaleX="0.75"/>
-                            <SkewTransform CenterX="0.5" CenterY="0.75"/>
-                            <RotateTransform CenterX="0.5" CenterY="0.75"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </ImageBrush.RelativeTransform>
-                </ImageBrush>
-            </Button.Background>
-            <Button.Style>
-                <Style TargetType="Button">
-                    <!-- Убираем стандартный фон при наведении -->
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="BorderBrush" Value="#FFACACAC"/>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="Button">
-                                <Border Background="{TemplateBinding Background}" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,5,0,0"/>
-                                    <!-- Прижимаем текст к верху -->
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-
-                    <!-- Триггер для изменения границы при наведении -->
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" Value="#0078D4"/>
-                            <!-- Цвет границы при наведении -->
-                            <Setter Property="BorderThickness" Value="1"/>
-                            <!-- Увеличиваем толщину границы -->
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="BorderBrush" Value="#003778"/>
-                            <!-- Цвет границы при нажатии -->
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
+        </Grid>
 
         <!-- Row 1: Settings Tabs -->
         <TabControl Grid.Row="1" Margin="10,10,10,10">
