@@ -1361,18 +1361,18 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         AvailableTokens = new ObservableCollection<string>
         {
-            "{PartNumber}",
-            "{Quantity}",
-            "{Material}",
-            "{Thickness}",
-            "{Description}",
-            "{Author}",
-            "{Revision}",
-            "{Project}",
-            "{Mass}",
-            "{FlatPatternWidth}",
-            "{FlatPatternLength}",
-            "{FlatPatternArea}"
+            "PartNumber",
+            "Quantity",
+            "Material",
+            "Thickness",
+            "Description",
+            "Author",
+            "Revision",
+            "Project",
+            "Mass",
+            "FlatPatternWidth",
+            "FlatPatternLength",
+            "FlatPatternArea"
         };
     }
 
@@ -1455,48 +1455,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    private void FileNameTemplateTextBox_DragOver(object sender, DragEventArgs e)
-    {
-        if (e.Data.GetDataPresent(typeof(string)))
-        {
-            e.Effects = System.Windows.DragDropEffects.Copy;
-        }
-        else
-        {
-            e.Effects = System.Windows.DragDropEffects.None;
-        }
-        e.Handled = true;
-    }
-
-    private void FileNameTemplateTextBox_Drop(object sender, DragEventArgs e)
-    {
-        if (e.Data.GetDataPresent(typeof(string)))
-        {
-            var droppedText = (string)e.Data.GetData(typeof(string));
-            var textBox = sender as System.Windows.Controls.TextBox;
-            if (textBox != null)
-            {
-                // Получаем позицию мыши для определения места вставки
-                var position = e.GetPosition(textBox);
-                var charIndex = textBox.GetCharacterIndexFromPoint(position, true);
-                
-                if (charIndex >= 0)
-                {
-                    textBox.Text = textBox.Text.Insert(charIndex, droppedText);
-                    textBox.CaretIndex = charIndex + droppedText.Length;
-                }
-                else
-                {
-                    // Если не удалось определить позицию, добавляем в конец
-                    textBox.Text += droppedText;
-                    textBox.CaretIndex = textBox.Text.Length;
-                }
-                
-                textBox.Focus();
-            }
-        }
-        e.Handled = true;
-    }
 
     private System.Windows.Point _startPoint;
     private bool _isDragging = false;
@@ -1519,7 +1477,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 if (listBox?.SelectedItem is string selectedToken)
                 {
                     _isDragging = true;
-                    System.Windows.DragDrop.DoDragDrop(listBox, selectedToken, System.Windows.DragDropEffects.Copy);
+                    System.Windows.DragDrop.DoDragDrop(listBox, $"{{{selectedToken}}}", System.Windows.DragDropEffects.Copy);
                     _isDragging = false;
                 }
             }
@@ -1531,8 +1489,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var listBox = sender as System.Windows.Controls.ListBox;
         if (listBox?.SelectedItem is string selectedToken)
         {
-            var currentTemplate = FileNameTemplate;
-            FileNameTemplate = currentTemplate + selectedToken;
+            FileNameTemplateTokenBox.AddToken($"{{{selectedToken}}}");
         }
     }
 
@@ -1557,7 +1514,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         };
     }
 
+    private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
 
+    }
 }
 
 public class PartData : INotifyPropertyChanged
