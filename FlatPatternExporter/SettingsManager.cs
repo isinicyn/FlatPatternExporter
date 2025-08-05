@@ -29,7 +29,6 @@ public class ApplicationSettings
     
     public bool OrganizeByMaterial { get; set; } = false;
     public bool OrganizeByThickness { get; set; } = false;
-    public bool IncludeQuantityInFileName { get; set; } = false;
     
     public bool EnableSplineReplacement { get; set; } = false;
     public int SelectedSplineReplacementIndex { get; set; } = 0;
@@ -45,6 +44,9 @@ public class ApplicationSettings
     public string FixedFolderPath { get; set; } = string.Empty;
     
     public ProcessingMethod SelectedProcessingMethod { get; set; } = ProcessingMethod.BOM;
+    
+    public bool EnableFileNameConstructor { get; set; } = false;
+    public string FileNameTemplate { get; set; } = "{PartNumber}";
     
     public ObservableCollection<LayerSettingData> LayerSettings { get; set; } = new();
 }
@@ -104,7 +106,6 @@ public static class SettingsManager
             IncludeLibraryComponents = window.IncludeLibraryComponents,
             OrganizeByMaterial = window.OrganizeByMaterial,
             OrganizeByThickness = window.OrganizeByThickness,
-            IncludeQuantityInFileName = window.IncludeQuantityInFileName,
             EnableSplineReplacement = window.EnableSplineReplacement,
             SelectedSplineReplacementIndex = window.SelectedSplineReplacementIndex,
             SplineTolerance = window.SplineToleranceTextBox?.Text ?? "0.01",
@@ -116,7 +117,9 @@ public static class SettingsManager
             EnableSubfolder = window.EnableSubfolder,
             SubfolderName = window.SubfolderNameTextBox?.Text ?? string.Empty,
             SelectedProcessingMethod = window.SelectedProcessingMethod,
-            FixedFolderPath = window.FixedFolderPath
+            FixedFolderPath = window.FixedFolderPath,
+            EnableFileNameConstructor = window.EnableFileNameConstructor,
+            FileNameTemplate = window.FileNameTemplate
         };
 
         var columnsInDisplayOrder = window.PartsDataGrid.Columns
@@ -161,7 +164,6 @@ public static class SettingsManager
         window.IncludeLibraryComponents = settings.IncludeLibraryComponents;
         window.OrganizeByMaterial = settings.OrganizeByMaterial;
         window.OrganizeByThickness = settings.OrganizeByThickness;
-        window.IncludeQuantityInFileName = settings.IncludeQuantityInFileName;
         window.EnableSplineReplacement = settings.EnableSplineReplacement;
         window.SelectedSplineReplacementIndex = settings.SelectedSplineReplacementIndex;
         if (window.SplineToleranceTextBox != null)
@@ -176,6 +178,8 @@ public static class SettingsManager
             window.SubfolderNameTextBox.Text = settings.SubfolderName;
         window.SelectedProcessingMethod = settings.SelectedProcessingMethod;
         window.FixedFolderPath = settings.FixedFolderPath;
+        window.EnableFileNameConstructor = settings.EnableFileNameConstructor;
+        window.FileNameTemplate = settings.FileNameTemplate;
 
         window.CustomPropertiesList.Clear();
         foreach (var customProperty in settings.CustomProperties)

@@ -3,6 +3,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -498,7 +499,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
     }
 
-    if (IncludeQuantityInFileName && !int.TryParse(MultiplierTextBox.Text, out multiplier))
+    if (!int.TryParse(MultiplierTextBox.Text, out multiplier))
     {
         MessageBox.Show("Введите допустимое целое число для множителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         return false;
@@ -795,12 +796,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         var organizeByMaterial = false;
         var organizeByThickness = false;
-        var includeQuantityInFileName = false;
 
         // Используем свойства вместо прямого обращения к элементам управления
         organizeByMaterial = OrganizeByMaterial;
         organizeByThickness = OrganizeByThickness;
-        includeQuantityInFileName = IncludeQuantityInFileName;
 
         var totalParts = partsDataList.Count();
 
@@ -851,8 +850,29 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                     : materialDir;
                 if (!Directory.Exists(thicknessDir)) Directory.CreateDirectory(thicknessDir);
 
-                var filePath = Path.Combine(thicknessDir,
-                    partNumber + (includeQuantityInFileName ? " - " + qty : "") + ".dxf");
+                // Генерируем имя файла на основе конструктора
+                string fileName;
+                if (EnableFileNameConstructor && !string.IsNullOrEmpty(FileNameTemplate))
+                {
+                    fileName = Regex.Replace(FileNameTemplate, @"\{(\w+)\}", match =>
+                    {
+                        var propertyName = match.Groups[1].Value;
+                        return GetPropertyValue(partData, propertyName);
+                    });
+                    
+                    // Удаляем недопустимые символы из имени файла
+                    var invalidChars = Path.GetInvalidFileNameChars();
+                    foreach (var invalidChar in invalidChars)
+                    {
+                        fileName = fileName.Replace(invalidChar, '_');
+                    }
+                }
+                else
+                {
+                    fileName = partNumber;
+                }
+
+                var filePath = Path.Combine(thicknessDir, fileName + ".dxf");
 
                 if (!IsValidPath(filePath)) continue;
 

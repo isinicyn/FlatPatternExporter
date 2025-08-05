@@ -130,7 +130,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Настройки организации файлов
     private bool _organizeByMaterial = false;
     private bool _organizeByThickness = false;
-    private bool _includeQuantityInFileName = false;
+    
+    // Настройки конструктора имени файла
+    private bool _enableFileNameConstructor = false;
+    private string _fileNameTemplate = "{PartNumber}";
     
     // Настройки экспорта DXF
     private bool _enableSplineReplacement = false;
@@ -217,6 +220,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Инициализируем коллекции для ComboBox
         InitializeAcadVersions();
         InitializeSplineReplacementTypes();
+        InitializeAvailableTokens();
 
 
         // Инициализация предустановленных колонок с указанием категорий
@@ -339,6 +343,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
     public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = new();
     public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = new();
+    public ObservableCollection<string> AvailableTokens { get; set; } = new();
 
     // Публичные свойства для привязки данных CheckBox
     public bool ExcludeReferenceParts
@@ -406,23 +411,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    public bool IncludeQuantityInFileName
-    {
-        get => _includeQuantityInFileName;
-        set
-        {
-            if (_includeQuantityInFileName != value)
-            {
-                _includeQuantityInFileName = value;
-                OnPropertyChanged();
-                if (!value)
-                {
-                    MultiplierTextBox.Text = "1";
-                    UpdateQuantitiesWithMultiplier(1);
-                }
-            }
-        }
-    }
 
     public bool EnableSplineReplacement
     {
@@ -545,6 +533,32 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     // Вычисляемое свойство для IsEnabled чекбокса подпапки
     public bool IsSubfolderCheckBoxEnabled => SelectedExportFolder != ExportFolderType.PartFolder;
+    
+    public bool EnableFileNameConstructor
+    {
+        get => _enableFileNameConstructor;
+        set
+        {
+            if (_enableFileNameConstructor != value)
+            {
+                _enableFileNameConstructor = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string FileNameTemplate
+    {
+        get => _fileNameTemplate;
+        set
+        {
+            if (_fileNameTemplate != value)
+            {
+                _fileNameTemplate = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -1344,6 +1358,25 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         };
     }
 
+    private void InitializeAvailableTokens()
+    {
+        AvailableTokens = new ObservableCollection<string>
+        {
+            "{PartNumber}",
+            "{Quantity}",
+            "{Material}",
+            "{Thickness}",
+            "{Description}",
+            "{Author}",
+            "{Revision}",
+            "{Project}",
+            "{Mass}",
+            "{FlatPatternWidth}",
+            "{FlatPatternLength}",
+            "{FlatPatternArea}"
+        };
+    }
+
     private (string partNumber, string description) GetDocumentProperties(Document document)
     {
         var mgr = new PropertyManager((Document)document);
@@ -1421,6 +1454,108 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 ConflictFilesButton.IsEnabled = false; // Отключаем кнопку, если нет конфликтов
             });
         }
+    }
+
+    private void FileNameTemplateTextBox_DragOver(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(typeof(string)))
+        {
+            e.Effects = System.Windows.DragDropEffects.Copy;
+        }
+        else
+        {
+            e.Effects = System.Windows.DragDropEffects.None;
+        }
+        e.Handled = true;
+    }
+
+    private void FileNameTemplateTextBox_Drop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(typeof(string)))
+        {
+            var droppedText = (string)e.Data.GetData(typeof(string));
+            var textBox = sender as System.Windows.Controls.TextBox;
+            if (textBox != null)
+            {
+                // Получаем позицию мыши для определения места вставки
+                var position = e.GetPosition(textBox);
+                var charIndex = textBox.GetCharacterIndexFromPoint(position, true);
+                
+                if (charIndex >= 0)
+                {
+                    textBox.Text = textBox.Text.Insert(charIndex, droppedText);
+                    textBox.CaretIndex = charIndex + droppedText.Length;
+                }
+                else
+                {
+                    // Если не удалось определить позицию, добавляем в конец
+                    textBox.Text += droppedText;
+                    textBox.CaretIndex = textBox.Text.Length;
+                }
+                
+                textBox.Focus();
+            }
+        }
+        e.Handled = true;
+    }
+
+    private System.Windows.Point _startPoint;
+    private bool _isDragging = false;
+
+    private void AvailableTokensListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _startPoint = e.GetPosition(null);
+        _isDragging = false;
+    }
+
+    private void AvailableTokensListBox_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton == MouseButtonState.Pressed && !_isDragging)
+        {
+            var currentPosition = e.GetPosition(null);
+            if ((Math.Abs(currentPosition.X - _startPoint.X) > SystemParameters.MinimumHorizontalDragDistance) ||
+                (Math.Abs(currentPosition.Y - _startPoint.Y) > SystemParameters.MinimumVerticalDragDistance))
+            {
+                var listBox = sender as System.Windows.Controls.ListBox;
+                if (listBox?.SelectedItem is string selectedToken)
+                {
+                    _isDragging = true;
+                    System.Windows.DragDrop.DoDragDrop(listBox, selectedToken, System.Windows.DragDropEffects.Copy);
+                    _isDragging = false;
+                }
+            }
+        }
+    }
+
+    private void AvailableTokensListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        var listBox = sender as System.Windows.Controls.ListBox;
+        if (listBox?.SelectedItem is string selectedToken)
+        {
+            var currentTemplate = FileNameTemplate;
+            FileNameTemplate = currentTemplate + selectedToken;
+        }
+    }
+
+
+    private string GetPropertyValue(PartData partData, string propertyName)
+    {
+        return propertyName switch
+        {
+            "PartNumber" => partData.PartNumber ?? string.Empty,
+            "Quantity" => partData.Quantity.ToString(),
+            "Material" => partData.Material ?? string.Empty,
+            "Thickness" => partData.Thickness.ToString("F1"),
+            "Description" => partData.Description ?? string.Empty,
+            "Author" => partData.Author ?? string.Empty,
+            "Revision" => partData.Revision ?? string.Empty,
+            "Project" => partData.Project ?? string.Empty,
+            "Mass" => partData.Mass ?? string.Empty,
+            "FlatPatternWidth" => partData.FlatPatternWidth ?? string.Empty,
+            "FlatPatternLength" => partData.FlatPatternLength ?? string.Empty,
+            "FlatPatternArea" => partData.FlatPatternArea ?? string.Empty,
+            _ => string.Empty
+        };
     }
 
 

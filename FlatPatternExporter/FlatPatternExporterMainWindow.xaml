@@ -14,133 +14,133 @@
                 <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-        <!-- Стиль для фантомного заголовка колонки при перетаскивании -->
-        <Style x:Key="PhantomColumnHeaderStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="Opacity" Value="0.7"/>
-            <Setter Property="TextAlignment" Value="Center"/>
-            <Setter Property="Height" Value="30"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="IsHitTestVisible" Value="False"/>
-            <Setter Property="Background" Value="LightGray"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="FontWeight" Value="Normal"/>
-        </Style>
+            <!-- Стиль для фантомного заголовка колонки при перетаскивании -->
+            <Style x:Key="PhantomColumnHeaderStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="Opacity" Value="0.7"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="IsHitTestVisible" Value="False"/>
+                <Setter Property="Background" Value="LightGray"/>
+                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="FontWeight" Value="Normal"/>
+            </Style>
 
-        <!-- Стиль для фантомного заголовка в режиме удаления -->
-        <Style x:Key="PhantomColumnHeaderDeleteStyle" TargetType="TextBlock" BasedOn="{StaticResource PhantomColumnHeaderStyle}">
-            <Setter Property="Background" Value="Red"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-        </Style>
+            <!-- Стиль для фантомного заголовка в режиме удаления -->
+            <Style x:Key="PhantomColumnHeaderDeleteStyle" TargetType="TextBlock" BasedOn="{StaticResource PhantomColumnHeaderStyle}">
+                <Setter Property="Background" Value="Red"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+            </Style>
 
-        <!-- SVG иконка добавления - простой плюс -->
-        <Geometry x:Key="AddIconGeometry">M12,2 L12,22 M2,12 L22,12</Geometry>
-        
-        <!-- Централизованный стиль для иконки добавления -->
-        <Style x:Key="AddIconStyle" TargetType="Path">
-            <Setter Property="Data" Value="{StaticResource AddIconGeometry}"/>
-            <Setter Property="Stroke" Value="#333333"/>
-            <Setter Property="StrokeThickness" Value="2"/>
-            <Setter Property="Stretch" Value="Uniform"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+            <!-- SVG иконка добавления - простой плюс -->
+            <Geometry x:Key="AddIconGeometry">M12,2 L12,22 M2,12 L22,12</Geometry>
 
-        <!-- SVG иконка таблицы для оверлея -->
-        <Geometry x:Key="TableIconGeometry">M3 9v6.8c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874c.427.218.987.218 2.105.218h11.606c1.118 0 1.677 0 2.104-.218.377-.192.683-.498.875-.874.218-.428.218-.986.218-2.104V11M3 9v-.8c0-1.12 0-1.68.218-2.108.192-.377.497-.682.874-.874C4.52 5 5.08 5 6.2 5h6.3M3 9h9.5M6 15h4m5.5-7.5h5M18 5v5</Geometry>
-        
-        <!-- Стиль для иконки таблицы -->
-        <Style x:Key="TableIconStyle" TargetType="Path">
-            <Setter Property="Data" Value="{StaticResource TableIconGeometry}"/>
-            <Setter Property="Stroke" Value="#333333"/>
-            <Setter Property="StrokeThickness" Value="1.5"/>
-            <Setter Property="Stretch" Value="Uniform"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+            <!-- Централизованный стиль для иконки добавления -->
+            <Style x:Key="AddIconStyle" TargetType="Path">
+                <Setter Property="Data" Value="{StaticResource AddIconGeometry}"/>
+                <Setter Property="Stroke" Value="#333333"/>
+                <Setter Property="StrokeThickness" Value="2"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
 
-        <!-- Стили для блока информации о документе -->
-        <Style x:Key="DocumentInfoLabelStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="11"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="0,0,3,1"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+            <!-- SVG иконка таблицы для оверлея -->
+            <Geometry x:Key="TableIconGeometry">M3 9v6.8c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874c.427.218.987.218 2.105.218h11.606c1.118 0 1.677 0 2.104-.218.377-.192.683-.498.875-.874.218-.428.218-.986.218-2.104V11M3 9v-.8c0-1.12 0-1.68.218-2.108.192-.377.497-.682.874-.874C4.52 5 5.08 5 6.2 5h6.3M3 9h9.5M6 15h4m5.5-7.5h5M18 5v5</Geometry>
 
-        <Style x:Key="DocumentInfoValueStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="11"/>
-            <Setter Property="Margin" Value="0,0,0,1"/>
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+            <!-- Стиль для иконки таблицы -->
+            <Style x:Key="TableIconStyle" TargetType="Path">
+                <Setter Property="Data" Value="{StaticResource TableIconGeometry}"/>
+                <Setter Property="Stroke" Value="#333333"/>
+                <Setter Property="StrokeThickness" Value="1.5"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
 
-        <Style x:Key="ModelStateValueStyle" TargetType="TextBlock" BasedOn="{StaticResource DocumentInfoValueStyle}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsPrimaryModelState}" Value="False">
-                    <Setter Property="Foreground" Value="Red"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
+            <!-- Стили для блока информации о документе -->
+            <Style x:Key="DocumentInfoLabelStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Margin" Value="0,0,3,1"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
 
-        <!-- Базовый стиль для кнопки с прогресс-баром -->
-        <Style x:Key="BaseProgressButtonStyle" TargetType="Button">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Border x:Name="Border" 
+            <Style x:Key="DocumentInfoValueStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="Margin" Value="0,0,0,1"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="ModelStateValueStyle" TargetType="TextBlock" BasedOn="{StaticResource DocumentInfoValueStyle}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsPrimaryModelState}" Value="False">
+                        <Setter Property="Foreground" Value="Red"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Базовый стиль для кнопки с прогресс-баром -->
+            <Style x:Key="BaseProgressButtonStyle" TargetType="Button">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Border x:Name="Border" 
                                     Background="{TemplateBinding Background}" 
                                     BorderBrush="{TemplateBinding BorderBrush}" 
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     CornerRadius="0">
-                                <Grid>
-                                    <!-- Прогресс-бар как фон -->
-                                    <ProgressBar x:Name="PART_ProgressBar" 
+                                    <Grid>
+                                        <!-- Прогресс-бар как фон -->
+                                        <ProgressBar x:Name="PART_ProgressBar" 
                                                Background="Transparent"
                                                Foreground="#FFE1E1E1"
                                                BorderThickness="0"
                                                Minimum="0" 
                                                Maximum="100" 
                                                Value="{TemplateBinding Tag}"/>
-                                    
-                                    <!-- Контент кнопки поверх прогресса -->
-                                    <ContentPresenter x:Name="ContentPresenter"
+
+                                        <!-- Контент кнопки поверх прогресса -->
+                                        <ContentPresenter x:Name="ContentPresenter"
                                                     HorizontalAlignment="Center" 
                                                     VerticalAlignment="Center"
                                                     Content="{TemplateBinding Content}"
                                                     TextBlock.Foreground="{TemplateBinding Foreground}"/>
-                                </Grid>
-                            </Border>
-                        </Grid>
-                        
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#FFE0E0E0"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
-                                <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="#FF888888"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="Gray"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="Black"/>
-        </Style>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="#FFE0E0E0"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
+                                    <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="#FF888888"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Background" Value="White"/>
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Foreground" Value="Black"/>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
-            <RowDefinition Height="210"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="25" />
@@ -268,7 +268,7 @@
                 <DataGrid.Columns>
                 </DataGrid.Columns>
             </DataGrid>
-            
+
             <!-- Оверлей для случая отсутствия колонок -->
             <Border x:Name="NoColumnsOverlay" 
                     Background="White" 
@@ -451,7 +451,6 @@
                                 <RadioButton x:Name="TraverseRadioButton" Content="Перебор" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,10,0"/>
                                 <RadioButton x:Name="BomRadioButton" Content="Спецификация" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}"/>
                             </StackPanel>
-                            <CheckBox x:Name="IncludeQuantityInFileNameCheckBox" Content="Записать количество в имя файла" IsChecked="{Binding IncludeQuantityInFileName, Mode=TwoWay}" Margin="0,0,0,5"/>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Header="Настройки экспорта DXF" Margin="254,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="140">
@@ -477,7 +476,7 @@
                         <Label Content="Множитель" Margin="0,0,10,0" VerticalAlignment="Center"/>
                         <Grid Width="50">
                             <!-- Размер поля ввода вернулся к 50 -->
-                            <TextBox x:Name="MultiplierTextBox" Width="50" IsEnabled="{Binding IsChecked, ElementName=IncludeQuantityInFileNameCheckBox}" Text="1" Height="22" VerticalAlignment="Center" 
+                            <TextBox x:Name="MultiplierTextBox" Width="50" Text="1" Height="22" VerticalAlignment="Center" 
                  PreviewTextInput="MultiplierTextBox_PreviewTextInput" 
                  VerticalContentAlignment="Center" 
                  TextChanged="MultiplierTextBox_TextChanged"/>
@@ -582,10 +581,57 @@
                     </Separator>
                 </Grid>
             </TabItem>
-            <TabItem Header="Имя выгружаемого файла"/>
+            <TabItem Header="Имя выгружаемого файла">
+                <Grid Background="White">
+                    <GroupBox Header="Конструктор имени файла" Margin="10,10,10,10" VerticalAlignment="Top">
+                        <StackPanel Margin="10,5,10,5">
+                            <CheckBox x:Name="EnableFileNameConstructorCheckBox" 
+                                      Content="Включить конфигуратор имени файла" 
+                                      IsChecked="{Binding EnableFileNameConstructor, Mode=TwoWay}" 
+                                      Margin="0,0,0,10"/>
+
+                            <StackPanel IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
+                                <TextBlock Text="Шаблон имени файла:" Margin="0,0,0,5"/>
+                                <TextBox x:Name="FileNameTemplateTextBox" 
+                                         Text="{Binding FileNameTemplate, Mode=TwoWay}" 
+                                         Height="25" 
+                                         Margin="0,0,0,10"
+                                         VerticalContentAlignment="Center"
+                                         AllowDrop="True"
+                                         Drop="FileNameTemplateTextBox_Drop"
+                                         DragOver="FileNameTemplateTextBox_DragOver"/>
+
+                                <TextBlock Text="Доступные токены:" Margin="0,0,0,5"/>
+                                <ListBox x:Name="AvailableTokensListBox" 
+                                         ItemsSource="{Binding AvailableTokens}" 
+                                         Height="120" 
+                                         Margin="0,0,0,10"
+                                         PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
+                                         MouseMove="AvailableTokensListBox_MouseMove"
+                                         MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick"/>
+
+
+                                <TextBlock FontStyle="Italic" 
+                                           Foreground="Gray" 
+                                           TextWrapping="Wrap">
+                                    <Run Text="Инструкция: "/>
+                                    <LineBreak/>
+                                    <Run Text="• Дважды кликните по токену для добавления в конец шаблона"/>
+                                    <LineBreak/>
+                                    <Run Text="• Перетащите токен в нужную позицию в шаблоне"/>
+                                    <LineBreak/>
+                                    <Run Text="• Редактируйте шаблон напрямую для добавления разделителей"/>
+                                    <LineBreak/>
+                                    <Run Text="Пример: {PartNumber} - {Quantity} x {Thickness}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
         </TabControl>
         <TextBlock Name="VersionTextBlock" VerticalAlignment="Center" Margin="0,0,25,0" HorizontalAlignment="Right" Text="Версия программы: x.x.x.x + xxxxxxx" Grid.Row="4"/>
-        <Button Content="About" Click="AboutButton_Click" Margin="0,14,10,186" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="73" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" Grid.RowSpan="2" FontWeight="Bold">
+        <Button Content="About" Click="AboutButton_Click" Margin="0,14,10,5" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="73" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" FontWeight="Bold">
             <Button.Background>
                 <ImageBrush ImageSource="/Resources/Pic/Beta1.png" TileMode="None" Stretch="Uniform" Opacity="1">
                     <ImageBrush.RelativeTransform>
