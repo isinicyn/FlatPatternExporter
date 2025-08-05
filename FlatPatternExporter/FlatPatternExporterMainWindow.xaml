@@ -12,176 +12,8 @@
             <!-- Подключение внешнего файла стилей -->
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
+                <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
-            <!-- Стиль для фантомного заголовка колонки при перетаскивании -->
-            <Style x:Key="PhantomColumnHeaderStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="Padding" Value="5"/>
-                <Setter Property="Opacity" Value="0.7"/>
-                <Setter Property="TextAlignment" Value="Center"/>
-                <Setter Property="Height" Value="30"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="HorizontalAlignment" Value="Center"/>
-                <Setter Property="IsHitTestVisible" Value="False"/>
-                <Setter Property="Background" Value="LightGray"/>
-                <Setter Property="Foreground" Value="Black"/>
-                <Setter Property="FontWeight" Value="Normal"/>
-            </Style>
-
-            <!-- Стиль для фантомного заголовка в режиме удаления -->
-            <Style x:Key="PhantomColumnHeaderDeleteStyle" TargetType="TextBlock" BasedOn="{StaticResource PhantomColumnHeaderStyle}">
-                <Setter Property="Background" Value="Red"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter Property="FontWeight" Value="Bold"/>
-            </Style>
-
-            <!-- SVG иконка добавления - простой плюс -->
-            <Geometry x:Key="AddIconGeometry">M12,2 L12,22 M2,12 L22,12</Geometry>
-
-            <!-- Централизованный стиль для иконки добавления -->
-            <Style x:Key="AddIconStyle" TargetType="Path">
-                <Setter Property="Data" Value="{StaticResource AddIconGeometry}"/>
-                <Setter Property="Stroke" Value="#333333"/>
-                <Setter Property="StrokeThickness" Value="2"/>
-                <Setter Property="Stretch" Value="Uniform"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-
-            <!-- SVG иконка таблицы для оверлея -->
-            <Geometry x:Key="TableIconGeometry">M3 9v6.8c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874c.427.218.987.218 2.105.218h11.606c1.118 0 1.677 0 2.104-.218.377-.192.683-.498.875-.874.218-.428.218-.986.218-2.104V11M3 9v-.8c0-1.12 0-1.68.218-2.108.192-.377.497-.682.874-.874C4.52 5 5.08 5 6.2 5h6.3M3 9h9.5M6 15h4m5.5-7.5h5M18 5v5</Geometry>
-
-            <!-- Стиль для иконки таблицы -->
-            <Style x:Key="TableIconStyle" TargetType="Path">
-                <Setter Property="Data" Value="{StaticResource TableIconGeometry}"/>
-                <Setter Property="Stroke" Value="#333333"/>
-                <Setter Property="StrokeThickness" Value="1.5"/>
-                <Setter Property="Stretch" Value="Uniform"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-
-            <!-- Стили для блока информации о документе -->
-            <Style x:Key="DocumentInfoLabelStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="11"/>
-                <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="Margin" Value="0,0,3,1"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-
-            <Style x:Key="DocumentInfoValueStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="11"/>
-                <Setter Property="Margin" Value="0,0,0,1"/>
-                <Setter Property="TextWrapping" Value="Wrap"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-
-            <Style x:Key="ModelStateValueStyle" TargetType="TextBlock" BasedOn="{StaticResource DocumentInfoValueStyle}">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsPrimaryModelState}" Value="False">
-                        <Setter Property="Foreground" Value="Red"/>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-
-            <!-- Базовый стиль для кнопки с прогресс-баром -->
-            <Style x:Key="BaseProgressButtonStyle" TargetType="Button">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Grid>
-                                <Border x:Name="Border" 
-                                    Background="{TemplateBinding Background}" 
-                                    BorderBrush="{TemplateBinding BorderBrush}" 
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="0">
-                                    <Grid>
-                                        <!-- Прогресс-бар как фон -->
-                                        <ProgressBar x:Name="PART_ProgressBar" 
-                                               Background="Transparent"
-                                               Foreground="#FFE1E1E1"
-                                               BorderThickness="0"
-                                               Minimum="0" 
-                                               Maximum="100" 
-                                               Value="{TemplateBinding Tag}"/>
-
-                                        <!-- Контент кнопки поверх прогресса -->
-                                        <ContentPresenter x:Name="ContentPresenter"
-                                                    HorizontalAlignment="Center" 
-                                                    VerticalAlignment="Center"
-                                                    Content="{TemplateBinding Content}"
-                                                    TextBlock.Foreground="{TemplateBinding Foreground}"/>
-                                    </Grid>
-                                </Border>
-                            </Grid>
-
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="Border" Property="Background" Value="#FFE0E0E0"/>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
-                                    <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="#FF888888"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="Background" Value="White"/>
-                <Setter Property="BorderBrush" Value="Gray"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Foreground" Value="Black"/>
-            </Style>
-
-            <!-- Стиль для токенов в виде блоков -->
-            <Style x:Key="TokenItemStyle" TargetType="ListBoxItem">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ListBoxItem">
-                            <Border x:Name="TokenBorder"
-                                    Background="#F8F8F8"
-                                    BorderBrush="Gray"
-                                    BorderThickness="1"
-                                    Padding="6,3"
-                                    Margin="2"
-                                    Cursor="Hand">
-                                <TextBlock Text="{Binding}"
-                                           FontSize="11"
-                                           Foreground="Black"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="TokenBorder" Property="Background" Value="#F0F0F0"/>
-                                </Trigger>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="TokenBorder" Property="Background" Value="#E0E0E0"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <!-- Стиль для ListBox с токенами -->
-            <Style x:Key="TokenListBoxStyle" TargetType="ListBox">
-                <Setter Property="Background" Value="White"/>
-                <Setter Property="BorderBrush" Value="Gray"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-                <Setter Property="ItemContainerStyle" Value="{StaticResource TokenItemStyle}"/>
-                <Setter Property="ItemsPanel">
-                    <Setter.Value>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -218,24 +50,13 @@
                 Height="75" 
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Left" 
-                Margin="390,0,0,5">
+                Margin="390,0,0,5"
+                Style="{StaticResource WarningButtonStyle}">
             <Button.Content>
                 <TextBlock Text="Анализ обозначений" 
                            TextWrapping="Wrap" 
                            TextAlignment="Center"/>
             </Button.Content>
-            <Button.Style>
-                <Style TargetType="Button">
-                    <Setter Property="BorderBrush" Value="Gray"/>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsEnabled" Value="True">
-                            <Setter Property="BorderBrush" Value="#FFFF2929"/>
-                            <Setter Property="BorderThickness" Value="1"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
         </Button>
         <Border Grid.Row="0" Margin="500,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="75"
                 BorderBrush="#D0D0D0" BorderThickness="1" Background="#F8F8F8" Padding="5">
@@ -291,16 +112,8 @@
                     </TextBlock.Style>
                 </TextBlock>
                 <Button x:Name="ClearSearchButton" 
-                        Content="✖"
-                        Width="20"
-                        Height="20"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center" 
                         Click="ClearSearchButton_Click" 
-                        FontSize="8" 
-                        Background="Transparent" 
-                        BorderBrush="Transparent"
-                        Visibility="Collapsed"/>
+                        Style="{StaticResource ClearInputButtonStyle}"/>
             </Grid>
 
             <!-- Multiplier -->
@@ -312,20 +125,9 @@
                              VerticalContentAlignment="Center" 
                              TextChanged="MultiplierTextBox_TextChanged"/>
                     <Button x:Name="ClearMultiplierButton" 
-                            Content="✖" 
-                            Width="20" 
-                            Height="20" 
-                            HorizontalAlignment="Right" 
-                            VerticalAlignment="Center" 
                             Click="ClearMultiplierButton_Click" 
-                            FontSize="8" 
-                            Background="{x:Null}" 
-                            Visibility="Collapsed" 
-                            ToolTip="Сбросить множитель на 1">
-                        <Button.BorderBrush>
-                            <SolidColorBrush Color="#FF707070" Opacity="0"/>
-                        </Button.BorderBrush>
-                    </Button>
+                            Style="{StaticResource ClearInputButtonStyle}" 
+                            ToolTip="Сбросить множитель на 1"/>
                 </Grid>
             </StackPanel>
         </StackPanel>
@@ -516,28 +318,8 @@
                         <local:LayerSettingControl x:Name="AltRepFrontLayerControl" DataContext="{Binding LayerSettings[9]}" Pseudonym="AltRepFront"/>
                         <local:LayerSettingControl x:Name="AltRepBackLayerControl" DataContext="{Binding LayerSettings[10]}" Pseudonym="AltRepBack"/>
                     </StackPanel>
-                    <Separator Background="#FF969595" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Width="185"
-                               Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Margin="0,5,0,20">
-                        <Separator.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform/>
-                                <SkewTransform/>
-                                <RotateTransform Angle="90"/>
-                                <TranslateTransform/>
-                            </TransformGroup>
-                        </Separator.RenderTransform>
-                    </Separator>
-                    <Separator Background="#FF969595" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Width="185"
-                               Grid.Row="0" Grid.ColumnSpan="2" Margin="0,5,0,20" Grid.Column="1">
-                        <Separator.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform/>
-                                <SkewTransform/>
-                                <RotateTransform Angle="90"/>
-                                <TranslateTransform/>
-                            </TransformGroup>
-                        </Separator.RenderTransform>
-                    </Separator>
+                    <Separator Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Style="{StaticResource VerticalSeparatorStyle}"/>
+                    <Separator Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Имя выгружаемого файла">
@@ -670,40 +452,7 @@
                                MaxWidth="400"
                                Margin="0,0,0,20"/>
                     <Button Click="AddPresetIPropertyButton_Click"
-                            Padding="12,6"
-                            FontSize="12"
-                            Background="#F2F2F2"
-                            Foreground="#333333"
-                            BorderBrush="#D0D0D0"
-                            BorderThickness="1"
-                            Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"
-                                                                  Margin="{TemplateBinding Padding}"/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#E8E8E8"/>
-                                                    <Setter Property="BorderBrush" Value="#C0C0C0"/>
-                                                </Trigger>
-                                                <Trigger Property="IsPressed" Value="True">
-                                                    <Setter Property="Background" Value="#D8D8D8"/>
-                                                    <Setter Property="BorderBrush" Value="#B0B0B0"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
+                            Style="{StaticResource OverlayButtonStyle}">
                         <StackPanel Orientation="Horizontal">
                             <Path Style="{StaticResource AddIconStyle}"
                                   Width="14" 
