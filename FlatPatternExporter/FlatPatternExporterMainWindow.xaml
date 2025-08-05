@@ -230,15 +230,11 @@
                 </Style>
             </Button.Style>
         </Button>
-        <GroupBox Header="Поиск" 
-                  HorizontalAlignment="Right" 
-                  VerticalAlignment="Top" 
-                  Width="200" 
-                  Margin="0,5,90,0"
-                  Padding="10"
-                  Grid.Row="0">
+        <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,85,0" Height="75">
+            <!-- Search Box -->
             <Grid>
                 <TextBox x:Name="SearchTextBox" 
+                         Width="200"
                          Height="25"
                          Padding="5,0,30,0"
                          VerticalContentAlignment="Center"
@@ -271,7 +267,33 @@
                         BorderBrush="Transparent"
                         Visibility="Collapsed"/>
             </Grid>
-        </GroupBox>
+            
+            <!-- Multiplier -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                <Label Content="Множитель" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                <Grid Width="50">
+                    <TextBox x:Name="MultiplierTextBox" Width="50" Text="1" Height="22" VerticalAlignment="Center" 
+                             PreviewTextInput="MultiplierTextBox_PreviewTextInput" 
+                             VerticalContentAlignment="Center" 
+                             TextChanged="MultiplierTextBox_TextChanged"/>
+                    <Button x:Name="ClearMultiplierButton" 
+                            Content="✖" 
+                            Width="20" 
+                            Height="20" 
+                            HorizontalAlignment="Right" 
+                            VerticalAlignment="Center" 
+                            Click="ClearMultiplierButton_Click" 
+                            FontSize="8" 
+                            Background="{x:Null}" 
+                            Visibility="Collapsed" 
+                            ToolTip="Сбросить множитель на 1">
+                        <Button.BorderBrush>
+                            <SolidColorBrush Color="#FF707070" Opacity="0"/>
+                        </Button.BorderBrush>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </StackPanel>
         <Grid Grid.Row="2" Margin="10,0,10,10">
             <DataGrid x:Name="PartsDataGrid"
                       AutoGenerateColumns="False"
@@ -538,30 +560,6 @@
                             </StackPanel>
                         </GroupBox>
                         
-                        <StackPanel Orientation="Horizontal" Height="25" Margin="0,0,0,10">
-                            <Label Content="Множитель" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <Grid Width="50">
-                                <TextBox x:Name="MultiplierTextBox" Width="50" Text="1" Height="22" VerticalAlignment="Center" 
-                         PreviewTextInput="MultiplierTextBox_PreviewTextInput" 
-                         VerticalContentAlignment="Center" 
-                         TextChanged="MultiplierTextBox_TextChanged"/>
-                                <Button x:Name="ClearMultiplierButton" 
-                        Content="✖" 
-                        Width="20" 
-                        Height="20" 
-                        HorizontalAlignment="Right" 
-                        VerticalAlignment="Center" 
-                        Click="ClearMultiplierButton_Click" 
-                        FontSize="8" 
-                        Background="{x:Null}" 
-                        Visibility="Collapsed" 
-                        ToolTip="Сбросить множитель на 1">
-                                    <Button.BorderBrush>
-                                        <SolidColorBrush Color="#FF707070" Opacity="0"/>
-                                    </Button.BorderBrush>
-                                </Button>
-                            </Grid>
-                        </StackPanel>
                     </WrapPanel>
                 </ScrollViewer>
             </TabItem>
@@ -676,7 +674,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button Content="About" Click="AboutButton_Click" Margin="0,14,10,5" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="73" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" FontWeight="Bold">
+        <Button Content="About" Click="AboutButton_Click" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="70" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" FontWeight="Bold" Height="75" Margin="0,20,10,0" VerticalAlignment="Top">
             <Button.Background>
                 <ImageBrush ImageSource="/Resources/Pic/Beta1.png" TileMode="None" Stretch="Uniform" Opacity="1">
                     <ImageBrush.RelativeTransform>
