@@ -20,7 +20,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="220"/>
             <RowDefinition />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="25" />
@@ -325,17 +325,29 @@
             </TabItem>
             <TabItem Header="Имя выгружаемого файла">
                 <GroupBox Header="Конструктор имени файла" Margin="10,10,10,10" VerticalAlignment="Top">
-                    <StackPanel Margin="10,5,10,5">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Grid Margin="10,5,10,5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" MinWidth="400"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="1*" MinWidth="300"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Заголовок с чекбоксом и подсказкой -->
+                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" 
+                                    Orientation="Horizontal" Margin="0,0,0,15">
                             <CheckBox x:Name="EnableFileNameConstructorCheckBox" 
-                                          Content="Включить конфигуратор имени файла" 
-                                          IsChecked="{Binding EnableFileNameConstructor, Mode=TwoWay}" 
-                                          Margin="0,0,5,0"/>
+                                      Content="Включить конфигуратор имени файла" 
+                                      IsChecked="{Binding EnableFileNameConstructor, Mode=TwoWay}" 
+                                      Margin="0,0,8,0"/>
                             <TextBlock Text="ⓘ" 
-                                           FontSize="14" 
-                                           Foreground="Gray" 
-                                           VerticalAlignment="Center"
-                                           Cursor="Help">
+                                       FontSize="14" 
+                                       Foreground="Gray" 
+                                       VerticalAlignment="Center"
+                                       Cursor="Help">
                                 <TextBlock.ToolTip>
                                     <ToolTip>
                                         <StackPanel>
@@ -347,31 +359,37 @@
                                         </StackPanel>
                                     </ToolTip>
                                 </TextBlock.ToolTip>
-                                </TextBlock>
+                            </TextBlock>
                         </StackPanel>
 
-                        <StackPanel IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
-                            <TextBlock Text="Шаблон имени файла:" Margin="0,0,0,5"/>
-                            <TextBox x:Name="FileNameTemplateTextBox" 
-                                         Text="{Binding FileNameTemplate, Mode=TwoWay}" 
-                                         Height="25" 
-                                         Margin="0,0,0,10"
-                                         VerticalContentAlignment="Center"
-                                         AllowDrop="True"
-                                         Drop="FileNameTemplateTextBox_Drop"
-                                         DragOver="FileNameTemplateTextBox_DragOver"/>
-
-                            <TextBlock Text="Доступные токены:" Margin="0,0,0,5"/>
+                        <!-- Левая колонка: Доступные токены -->
+                        <StackPanel Grid.Row="1" Grid.Column="0" 
+                                    IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
+                            <TextBlock Text="Доступные токены:" Margin="0,0,0,5" FontWeight="SemiBold"/>
                             <ListBox x:Name="AvailableTokensListBox" 
-                                         ItemsSource="{Binding AvailableTokens}" 
-                                         Margin="0,0,0,10"
-                                         Style="{StaticResource TokenListBoxStyle}"
-                                         PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
-                                         MouseMove="AvailableTokensListBox_MouseMove"
-                                         MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="25"/>
-
+                                     ItemsSource="{Binding AvailableTokens}" 
+                                     Style="{StaticResource TokenListBoxStyle}"
+                                     PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
+                                     MouseMove="AvailableTokensListBox_MouseMove"
+                                     MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32"/>
                         </StackPanel>
-                    </StackPanel>
+
+                        <!-- Правая колонка: Шаблон имени файла -->
+                        <StackPanel Grid.Row="1" Grid.Column="2" 
+                                    IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
+                            <TextBlock Text="Шаблон имени файла:" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <TextBox x:Name="FileNameTemplateTextBox" 
+                                     Text="{Binding FileNameTemplate, Mode=TwoWay}" 
+                                     Height="32" 
+                                     Margin="0,0,0,0"
+                                     VerticalContentAlignment="Center"
+                                     AllowDrop="True"
+                                     Drop="FileNameTemplateTextBox_Drop"
+                                     DragOver="FileNameTemplateTextBox_DragOver"
+                                     Padding="8,4"/>
+                        </StackPanel>
+
+                    </Grid>
                 </GroupBox>
             </TabItem>
         </TabControl>
