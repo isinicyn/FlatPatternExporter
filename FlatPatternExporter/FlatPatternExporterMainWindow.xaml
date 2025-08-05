@@ -147,12 +147,7 @@
                     <Button.Background>
                         <ImageBrush ImageSource="/Resources/Pic/Beta1.png" TileMode="None" Stretch="Uniform" Opacity="1">
                             <ImageBrush.RelativeTransform>
-                                <TransformGroup>
-                                    <ScaleTransform CenterY="0.75" CenterX="0.5" ScaleY="0.75" ScaleX="0.75"/>
-                                    <SkewTransform CenterX="0.5" CenterY="0.75"/>
-                                    <RotateTransform CenterX="0.5" CenterY="0.75"/>
-                                    <TranslateTransform/>
-                                </TransformGroup>
+                                <ScaleTransform CenterY="0.75" CenterX="0.5" ScaleY="0.75" ScaleX="0.75"/>
                             </ImageBrush.RelativeTransform>
                         </ImageBrush>
                     </Button.Background>
@@ -200,11 +195,9 @@
                 <ScrollViewer Background="White" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                     <WrapPanel Orientation="Horizontal" Margin="10">
                         <GroupBox Header="Базовые настройки" Height="140" Margin="0,0,10,10">
-                            <StackPanel Margin="10,5,10,5" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <StackPanel Margin="0,0,0,10">
-                                    <RadioButton x:Name="TraverseRadioButton" Content="Перебор" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,10,0"/>
-                                    <RadioButton x:Name="BomRadioButton" Content="Спецификация" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,5,0,0"/>
-                                </StackPanel>
+                            <StackPanel Margin="10,15,10,5" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                <RadioButton x:Name="TraverseRadioButton" Content="Перебор" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,10,0"/>
+                                <RadioButton x:Name="BomRadioButton" Content="Спецификация" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,5,0,0"/>
                             </StackPanel>
                         </GroupBox>
 
@@ -332,8 +325,8 @@
                         <local:LayerSettingControl x:Name="AltRepFrontLayerControl" DataContext="{Binding LayerSettings[9]}" Pseudonym="AltRepFront"/>
                         <local:LayerSettingControl x:Name="AltRepBackLayerControl" DataContext="{Binding LayerSettings[10]}" Pseudonym="AltRepBack"/>
                     </StackPanel>
-                    <Separator Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Style="{StaticResource VerticalSeparatorStyle}"/>
-                    <Separator Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}"/>
+                    <Separator Grid.Row="0" Grid.Column="0" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right"/>
+                    <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Имя выгружаемого файла">
