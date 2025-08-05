@@ -6,7 +6,7 @@
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
     </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" Margin="0,5">
+    <StackPanel Orientation="Horizontal" Margin="0,3,0,3">
         <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
           IsChecked="{Binding IsVisible, Mode=TwoWay}"
           Width="200" VerticalContentAlignment="Center"
