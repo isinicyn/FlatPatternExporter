@@ -134,6 +134,54 @@
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Foreground" Value="Black"/>
             </Style>
+
+            <!-- Стиль для токенов в виде блоков -->
+            <Style x:Key="TokenItemStyle" TargetType="ListBoxItem">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border x:Name="TokenBorder"
+                                    Background="#F8F8F8"
+                                    BorderBrush="Gray"
+                                    BorderThickness="1"
+                                    Padding="6,3"
+                                    Margin="2"
+                                    Cursor="Hand">
+                                <TextBlock Text="{Binding}"
+                                           FontSize="11"
+                                           Foreground="Black"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="TokenBorder" Property="Background" Value="#F0F0F0"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="TokenBorder" Property="Background" Value="#E0E0E0"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Стиль для ListBox с токенами -->
+            <Style x:Key="TokenListBoxStyle" TargetType="ListBox">
+                <Setter Property="Background" Value="White"/>
+                <Setter Property="BorderBrush" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                <Setter Property="ItemContainerStyle" Value="{StaticResource TokenItemStyle}"/>
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -585,10 +633,29 @@
                 <Grid Background="White">
                     <GroupBox Header="Конструктор имени файла" Margin="10,10,10,10" VerticalAlignment="Top">
                         <StackPanel Margin="10,5,10,5">
-                            <CheckBox x:Name="EnableFileNameConstructorCheckBox" 
-                                      Content="Включить конфигуратор имени файла" 
-                                      IsChecked="{Binding EnableFileNameConstructor, Mode=TwoWay}" 
-                                      Margin="0,0,0,10"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <CheckBox x:Name="EnableFileNameConstructorCheckBox" 
+                                          Content="Включить конфигуратор имени файла" 
+                                          IsChecked="{Binding EnableFileNameConstructor, Mode=TwoWay}" 
+                                          Margin="0,0,5,0"/>
+                                <TextBlock Text="ⓘ" 
+                                           FontSize="14" 
+                                           Foreground="Gray" 
+                                           VerticalAlignment="Center"
+                                           Cursor="Help">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip>
+                                            <StackPanel>
+                                                <TextBlock Text="Инструкция по использованию:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                                <TextBlock Text="• Дважды кликните по токену для добавления в конец шаблона"/>
+                                                <TextBlock Text="• Перетащите токен в нужную позицию в шаблоне"/>
+                                                <TextBlock Text="• Редактируйте шаблон напрямую для добавления разделителей"/>
+                                                <TextBlock Text="• Пример: {PartNumber} - {Quantity} x {Thickness}" FontStyle="Italic" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                            </StackPanel>
 
                             <StackPanel IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
                                 <TextBlock Text="Шаблон имени файла:" Margin="0,0,0,5"/>
@@ -604,26 +671,12 @@
                                 <TextBlock Text="Доступные токены:" Margin="0,0,0,5"/>
                                 <ListBox x:Name="AvailableTokensListBox" 
                                          ItemsSource="{Binding AvailableTokens}" 
-                                         Height="120" 
                                          Margin="0,0,0,10"
+                                         Style="{StaticResource TokenListBoxStyle}"
                                          PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
                                          MouseMove="AvailableTokensListBox_MouseMove"
-                                         MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick"/>
+                                         MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="25"/>
 
-
-                                <TextBlock FontStyle="Italic" 
-                                           Foreground="Gray" 
-                                           TextWrapping="Wrap">
-                                    <Run Text="Инструкция: "/>
-                                    <LineBreak/>
-                                    <Run Text="• Дважды кликните по токену для добавления в конец шаблона"/>
-                                    <LineBreak/>
-                                    <Run Text="• Перетащите токен в нужную позицию в шаблоне"/>
-                                    <LineBreak/>
-                                    <Run Text="• Редактируйте шаблон напрямую для добавления разделителей"/>
-                                    <LineBreak/>
-                                    <Run Text="Пример: {PartNumber} - {Quantity} x {Thickness}"/>
-                                </TextBlock>
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
