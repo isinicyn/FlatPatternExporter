@@ -40,13 +40,13 @@
                 <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования" Margin="0,0,10,10"/>
 
                 <StackPanel Orientation="Vertical" Margin="0,0,10,10">
-                    <Button x:Name="AddPresetIPropertyButton" Click="AddPresetIPropertyButton_Click" Height="32.5" Width="115" HorizontalContentAlignment="Left" Padding="5,1,1,1" Margin="0,0,0,5">
+                    <Button x:Name="AddPresetIPropertyButton" Click="AddPresetIPropertyButton_Click" Height="35" Width="115" HorizontalContentAlignment="Center" Padding="5,1,1,1" Margin="0,0,0,5">
                         <StackPanel Orientation="Horizontal">
                             <Path Style="{StaticResource AddIconStyle}"
                                   Width="12" 
                                   Height="12" 
                                   Margin="0,0,4,0"/>
-                            <TextBlock Text="Property" 
+                            <TextBlock Text="Свойство" 
                                        VerticalAlignment="Center" 
                                        Foreground="#333333"/>
                         </StackPanel>
@@ -55,7 +55,7 @@
                             IsEnabled="False" 
                             Click="ConflictFilesButton_Click" 
                             Width="115" 
-                            Height="37.5" 
+                            Height="35" 
                             Style="{StaticResource WarningButtonStyle}">
                         <Button.Content>
                             <TextBlock Text="Анализ обозначений" 
@@ -342,11 +342,10 @@
                             <CheckBox x:Name="EnableFileNameConstructorCheckBox" 
                                       Content="Включить конфигуратор имени файла" 
                                       IsChecked="{Binding EnableFileNameConstructor, Mode=TwoWay}" 
-                                      Margin="0,0,8,0"/>
-                            <TextBlock Text="ⓘ" 
+                                      Margin="0,0,8,0" VerticalContentAlignment="Center" Padding="4,0,0,0"/>
+                            <TextBlock Text="ℹ" 
                                        FontSize="14" 
-                                       Foreground="Gray" 
-                                       VerticalAlignment="Center"
+                                       Foreground="Gray"
                                        Cursor="Help">
                                 <TextBlock.ToolTip>
                                     <ToolTip>
