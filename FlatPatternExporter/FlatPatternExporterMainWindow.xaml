@@ -398,21 +398,6 @@
             <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Width="75" Height="75" Margin="0,0,10,0"/>
             <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования"/>
         </StackPanel>
-        <Border Grid.Row="0" Margin="805,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="170" Height="75"
-                BorderBrush="#D0D0D0" BorderThickness="1" Background="#F8F8F8" Padding="5">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0" Text="Проект:" Style="{StaticResource DocumentInfoLabelStyle}" FontWeight="Normal" Height="16" Margin="0,0,3,0"/>
-                <TextBlock x:Name="ProjectNameTop" Grid.Column="1" Text="" Style="{StaticResource DocumentInfoValueStyle}" Height="15" Margin="5,0,0,1"/>
-            </Grid>
-        </Border>
         <Border Grid.Row="0" Margin="500,20,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="75"
                 BorderBrush="#D0D0D0" BorderThickness="1" Background="#F8F8F8" Padding="5">
             <Grid>
@@ -442,9 +427,15 @@
             </Grid>
         </Border>
         <Border Grid.Row="4" Background="LightGray" Height="25" VerticalAlignment="Center">
-            <TextBlock x:Name="ProgressLabel" Text="Статус: " 
-                       Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                       TextWrapping="Wrap" Height="Auto" MaxWidth="800" Foreground="Black"/>
+            <Grid>
+                <TextBlock x:Name="ProgressLabel" Text="Статус: " 
+                           Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                           TextWrapping="Wrap" Height="Auto" MaxWidth="800" Foreground="Black"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0">
+                    <TextBlock Text="Проект: " FontWeight="Bold" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock x:Name="ProjectNameTop" Text="" VerticalAlignment="Center" Foreground="Black"/>
+                </StackPanel>
+            </Grid>
         </Border>
         <TabControl Margin="10,10,10,10" Grid.Row="1">
             <TabItem Header="Основные">
@@ -683,7 +674,6 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <TextBlock Name="VersionTextBlock" VerticalAlignment="Center" Margin="0,0,25,0" HorizontalAlignment="Right" Text="Версия программы: x.x.x.x + xxxxxxx" Grid.Row="4"/>
         <Button Content="About" Click="AboutButton_Click" Margin="0,14,10,5" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="73" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" FontWeight="Bold">
             <Button.Background>
                 <ImageBrush ImageSource="/Resources/Pic/Beta1.png" TileMode="None" Stretch="Uniform" Opacity="1">

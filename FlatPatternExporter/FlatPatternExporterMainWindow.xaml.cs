@@ -291,7 +291,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         KeyDown += MainWindow_KeyDown;
         KeyUp += MainWindow_KeyUp;
 
-        VersionTextBlock.Text = "Версия программы: " + GetVersion();
         ProgressLabel.Text = "Статус: Документ не выбран";
         
         // Загружаем настройки при запуске
