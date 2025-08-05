@@ -370,7 +370,7 @@
                                      Style="{StaticResource TokenListBoxStyle}"
                                      PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
                                      MouseMove="AvailableTokensListBox_MouseMove"
-                                     MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center"/>
+                                     MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
                         </StackPanel>
 
                         <!-- Правая колонка: Шаблон имени файла -->

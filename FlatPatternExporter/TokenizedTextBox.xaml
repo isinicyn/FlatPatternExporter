@@ -12,7 +12,8 @@
     
     <Border Background="White" 
             BorderBrush="#D6D6D6" 
-            BorderThickness="1" Width="400" MinHeight="32">
+            BorderThickness="1" Width="400" MinHeight="32"
+            Padding="2">
         <WrapPanel x:Name="TokenContainer" 
                    Orientation="Horizontal" 
                    VerticalAlignment="Center"
