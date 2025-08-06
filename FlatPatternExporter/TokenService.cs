@@ -113,6 +113,11 @@ public class TokenService : INotifyPropertyChanged
             return ("❌ " + preview, false);
         }
         
+        if (preview.Length > 255)
+        {
+            return ($"❌ Имя файла слишком длинное ({preview.Length} символов, максимум 255)", false);
+        }
+        
         return ("✓ " + preview, true);
     }
 
@@ -155,7 +160,7 @@ public class TokenService : INotifyPropertyChanged
             result = result.Replace(invalidChar, '_');
         }
 
-        return result.Length > 255 ? result[..255] : result;
+        return result;
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
