@@ -324,99 +324,102 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Имя выгружаемого файла">
-                <GroupBox Header="Конструктор имени файла" Margin="10,10,10,10" VerticalAlignment="Top">
-                    <Grid Margin="10,5,10,5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Заголовок с чекбоксом и подсказкой -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                        <CheckBox x:Name="EnableFileNameConstructorCheckBox" 
+                                  Content="Включить конфигуратор имени файла" 
+                                  IsChecked="{Binding EnableFileNameConstructor, Mode=TwoWay}" 
+                                  Margin="0,0,8,0" VerticalContentAlignment="Center" Padding="4,0,0,0"/>
+                        <TextBlock Text="ℹ" 
+                                   FontSize="14" 
+                                   Foreground="Gray"
+                                   Cursor="Help">
+                            <TextBlock.ToolTip>
+                                <ToolTip>
+                                    <StackPanel>
+                                        <TextBlock Text="Инструкция по использованию:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                        <TextBlock Text="• Дважды кликните по токену для добавления в конец шаблона"/>
+                                        <TextBlock Text="• Перетащите токен в нужную позицию в шаблоне"/>
+                                        <TextBlock Text="• Редактируйте шаблон напрямую для добавления разделителей"/>
+                                        <TextBlock Text="• Пример: {PartNumber} - {Quantity} x {Thickness}" FontStyle="Italic" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </ToolTip>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+                    </StackPanel>
+                    
+                    <Grid Grid.Row="1" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" MinWidth="350"/>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="2*" MinWidth="400"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="1*" MinWidth="300"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Заголовок с чекбоксом и подсказкой -->
-                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" 
-                                    Orientation="Horizontal" Margin="0,0,0,15">
-                            <CheckBox x:Name="EnableFileNameConstructorCheckBox" 
-                                      Content="Включить конфигуратор имени файла" 
-                                      IsChecked="{Binding EnableFileNameConstructor, Mode=TwoWay}" 
-                                      Margin="0,0,8,0" VerticalContentAlignment="Center" Padding="4,0,0,0"/>
-                            <TextBlock Text="ℹ" 
-                                       FontSize="14" 
-                                       Foreground="Gray"
-                                       Cursor="Help">
-                                <TextBlock.ToolTip>
-                                    <ToolTip>
-                                        <StackPanel>
-                                            <TextBlock Text="Инструкция по использованию:" FontWeight="Bold" Margin="0,0,0,5"/>
-                                            <TextBlock Text="• Дважды кликните по токену для добавления в конец шаблона"/>
-                                            <TextBlock Text="• Перетащите токен в нужную позицию в шаблоне"/>
-                                            <TextBlock Text="• Редактируйте шаблон напрямую для добавления разделителей"/>
-                                            <TextBlock Text="• Пример: {PartNumber} - {Quantity} x {Thickness}" FontStyle="Italic" Margin="0,5,0,0"/>
-                                        </StackPanel>
-                                    </ToolTip>
-                                </TextBlock.ToolTip>
-                            </TextBlock>
-                        </StackPanel>
-
-                        <!-- Левая колонка: Доступные токены -->
-                        <StackPanel Grid.Row="1" Grid.Column="0" 
-                                    IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
-                            <TextBlock Text="Доступные токены:" Margin="0,0,0,5" FontWeight="SemiBold"/>
-                            <ListBox x:Name="AvailableTokensListBox" 
-                                     ItemsSource="{Binding AvailableTokens}" 
-                                     Style="{StaticResource TokenListBoxStyle}"
-                                     PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
-                                     MouseMove="AvailableTokensListBox_MouseMove"
-                                     MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
-                            
-                            <!-- Поле для ввода произвольного текста -->
-                            <TextBlock Text="Произвольный текст:" Margin="0,10,0,5" FontWeight="SemiBold"/>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBox x:Name="CustomTextBox" 
-                                         Width="200" 
-                                         MinHeight="32"
-                                         Background="White"
-                                         BorderBrush="#D6D6D6"
-                                         BorderThickness="1"
-                                         Padding="2,6"
-                                         VerticalContentAlignment="Center"
-                                         KeyDown="CustomTextBox_KeyDown"
-                                         ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
-                                <Button x:Name="AddCustomTextButton"
-                                        Content="Добавить"
-                                        Width="70"
-                                        MinHeight="32"
-                                        Margin="5,0,0,0"
-                                        Click="AddCustomTextButton_Click"
-                                        ToolTip="Добавить введенный текст как кастомный токен"/>
+                        <!-- Левая колонка: Источники данных -->
+                        <GroupBox Grid.Column="0" Header="Источники данных" Margin="0,0,5,0">
+                            <StackPanel Margin="10,5,10,5">
+                                <TextBlock Text="Доступные свойства:" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                <ListBox x:Name="AvailableTokensListBox" 
+                                         ItemsSource="{Binding AvailableTokens}" 
+                                         Style="{StaticResource TokenListBoxStyle}"
+                                         PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
+                                         MouseMove="AvailableTokensListBox_MouseMove"
+                                         MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
+                                
+                                <!-- Поле для ввода произвольного текста -->
+                                <TextBlock Text="Произвольный текст:" Margin="0,10,0,5" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox x:Name="CustomTextBox" 
+                                             Width="200" 
+                                             MinHeight="32"
+                                             Background="White"
+                                             BorderBrush="#D6D6D6"
+                                             BorderThickness="1"
+                                             Padding="2,6"
+                                             VerticalContentAlignment="Center"
+                                             KeyDown="CustomTextBox_KeyDown"
+                                             ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
+                                    <Button x:Name="AddCustomTextButton"
+                                            Content="Добавить"
+                                            Width="70"
+                                            MinHeight="32"
+                                            Margin="5,0,0,0"
+                                            Click="AddCustomTextButton_Click"
+                                            ToolTip="Добавить введенный текст как кастомный токен"/>
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
+                        </GroupBox>
 
-                        <!-- Правая колонка: Шаблон имени файла -->
-                        <StackPanel Grid.Row="1" Grid.Column="2" 
-                                    IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
-                            <TextBlock Text="Шаблон имени файла:" Margin="0,0,0,5" FontWeight="SemiBold"/>
-                            <local:TokenizedTextBox x:Name="FileNameTemplateTokenBox"
-                                                   Template="{Binding TokenService.FileNameTemplate, Mode=TwoWay}"
-                                                   AvailableTokens="{Binding AvailableTokens}"
-                                                   TokenService="{Binding TokenService}"
-                                                   Margin="0,0,0,0" HorizontalAlignment="Left"/>
-                            
-                            <!-- Предпросмотр результата -->
-                            <TextBlock Text="Предпросмотр:" Margin="0,10,0,5" FontWeight="SemiBold"/>
-                            <Border Style="{StaticResource FileNamePreviewBorderStyle}">
-                                <TextBlock x:Name="FileNamePreviewTextBlock" 
-                                          Text="{Binding TokenService.FileNamePreview}" 
-                                          Style="{StaticResource FileNamePreviewTextStyle}"
-                                          ToolTip="{Binding TokenService.FileNamePreview}"/>
-                            </Border>
-                        </StackPanel>
+                        <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="LightGray" Margin="0,12,0,5"/>
 
+                        <!-- Правая колонка: Шаблон и предпросмотр -->
+                        <GroupBox Grid.Column="2" Header="Шаблон и предпросмотр" Margin="5,0,0,0">
+                            <StackPanel Margin="10,5,10,5">
+                                <TextBlock Text="Шаблон имени файла:" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                <local:TokenizedTextBox x:Name="FileNameTemplateTokenBox"
+                                                       Template="{Binding TokenService.FileNameTemplate, Mode=TwoWay}"
+                                                       AvailableTokens="{Binding AvailableTokens}"
+                                                       TokenService="{Binding TokenService}"
+                                                       Margin="0,0,0,0"/>
+                                
+                                <!-- Предпросмотр результата -->
+                                <TextBlock Text="Предпросмотр:" Margin="0,10,0,5" FontWeight="SemiBold"/>
+                                <Border Style="{StaticResource FileNamePreviewBorderStyle}">
+                                    <TextBlock x:Name="FileNamePreviewTextBlock" 
+                                              Text="{Binding TokenService.FileNamePreview}" 
+                                              Style="{StaticResource FileNamePreviewTextStyle}"
+                                              ToolTip="{Binding TokenService.FileNamePreview}"/>
+                                </Border>
+                            </StackPanel>
+                        </GroupBox>
                     </Grid>
-                </GroupBox>
+                </Grid>
             </TabItem>
         </TabControl>
 
