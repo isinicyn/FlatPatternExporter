@@ -508,7 +508,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     _isCancelled = false;
 
     ExportProgressValue = 0;
-    ProgressLabel.Text = "Статус: Экспорт данных...";
+    ProgressLabel.Text = "Экспорт данных...";
 
     stopwatch = Stopwatch.StartNew();
 
@@ -529,13 +529,13 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         if (isCancelled)
         {
-            ProgressLabel.Text = $"Статус: Прервано ({elapsedTime})";
+            ProgressLabel.Text = $"Прервано ({elapsedTime})";
             MessageBox.Show("Процесс экспорта был прерван.", "Информация", MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
         else
         {
-            ProgressLabel.Text = $"Статус: Завершено ({elapsedTime})";
+            ProgressLabel.Text = $"Завершено ({elapsedTime})";
             MessageBox.Show(
                 $"Экспорт DXF завершен.\nВсего файлов обработано: {processedCount + skippedCount}\nПропущено (без разверток): {skippedCount}\nВсего экспортировано: {processedCount}\nВремя выполнения: {elapsedTime}",
                 "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -1113,7 +1113,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private void ResetProgressBar()
     {
         ScanProgressValue = 0;
-        ProgressLabel.Text = "Статус: ";
+        ProgressLabel.Text = "";
     }
 
 
@@ -1121,7 +1121,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         if (string.IsNullOrEmpty(documentType) && string.IsNullOrEmpty(partNumber) && string.IsNullOrEmpty(description))
         {
-            ProgressLabel.Text = "Статус: Информация о документе не доступна";
+            ProgressLabel.Text = "Информация о документе не доступна";
             DocumentTypeLabel.Text = "";
             PartNumberLabel.Text = "";
             DescriptionLabel.Text = "";
@@ -1150,7 +1150,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         // Очищаем данные в таблице или любом другом источнике данных
         _partsData.Clear();
         ScanProgressValue = 0;
-        ProgressLabel.Text = "Статус: ";
+        ProgressLabel.Text = "";
         ExportButton.IsEnabled = false;
         ClearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки
 
@@ -1184,7 +1184,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             }
             else
             {
-                ProgressLabel.Text = $"Статус: Удалено {selectedItems.Count} строк(и)";
+                ProgressLabel.Text = $"Удалено {selectedItems.Count} строк(и)";
             }
         }
     }

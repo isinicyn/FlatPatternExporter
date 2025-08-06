@@ -527,9 +527,11 @@
         <!-- Row 4: Status Bar -->
         <Border Grid.Row="4" Background="LightGray" Height="25" VerticalAlignment="Center">
             <Grid>
-                <TextBlock x:Name="ProgressLabel" Text="Статус: " 
-                           Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center"
-                           TextWrapping="Wrap" Height="Auto" MaxWidth="800" Foreground="Black"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,10,0">
+                    <TextBlock Text="Статус: " Foreground="Black"/>
+                    <TextBlock x:Name="ProgressLabel" Text="" 
+                               TextWrapping="Wrap" Height="Auto" MaxWidth="800" Foreground="Black"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0">
                     <TextBlock Text="Проект: " FontWeight="Bold" VerticalAlignment="Center" Foreground="Black"/>
                     <TextBlock x:Name="ProjectNameTop" Text="" VerticalAlignment="Center" Foreground="Black"/>

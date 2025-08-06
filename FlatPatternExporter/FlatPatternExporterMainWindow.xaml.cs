@@ -293,7 +293,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         KeyDown += MainWindow_KeyDown;
         KeyUp += MainWindow_KeyUp;
 
-        ProgressLabel.Text = "Статус: Документ не выбран";
+        ProgressLabel.Text = "Документ не выбран";
         
         // Загружаем настройки при запуске
         LoadSettings();
@@ -1134,7 +1134,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         ResetProgressBar();
         ScanProgressValue = 0;
-        ProgressLabel.Text = "Статус: Подготовка к сканированию...";
+        ProgressLabel.Text = "Подготовка к сканированию...";
         ScanButton.Content = "Прервать";
         ExportButton.IsEnabled = false;
         ClearButton.IsEnabled = false;
@@ -1158,7 +1158,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var scanProgress = new Progress<ScanProgress>(progress =>
         {
             ScanProgressValue = progress.TotalItems > 0 ? (double)progress.ProcessedItems / progress.TotalItems * 100 : 0;
-            ProgressLabel.Text = $"Статус: {progress.CurrentOperation} - {progress.CurrentItem}";
+            ProgressLabel.Text = $"{progress.CurrentOperation} - {progress.CurrentItem}";
         });
 
         // Прогресс для добавления готовых деталей в таблицу
@@ -1184,7 +1184,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Анализируем конфликты и удаляем конфликтующие детали ДО обработки
             await Dispatcher.InvokeAsync(() =>
             {
-                ProgressLabel.Text = "Статус: Анализ конфликтов обозначений...";
+                ProgressLabel.Text = "Анализ конфликтов обозначений...";
             });
             
             await AnalyzePartNumberConflictsAsync(stopwatch);
@@ -1197,7 +1197,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             await Dispatcher.InvokeAsync(() =>
             {
                 ScanProgressValue = 0;
-                ProgressLabel.Text = "Статус: Обработка деталей...";
+                ProgressLabel.Text = "Обработка деталей...";
             });
 
             var itemCounter = 1;
@@ -1222,7 +1222,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     await Dispatcher.InvokeAsync(() =>
                     {
                         ScanProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
-                        ProgressLabel.Text = $"Статус: Обработка деталей - {processedParts} из {totalParts}";
+                        ProgressLabel.Text = $"Обработка деталей - {processedParts} из {totalParts}";
                     });
                 }
             });
@@ -1230,12 +1230,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
             var partDoc = (PartDocument)doc;
+            (partNumber, description) = GetDocumentProperties((Document)partDoc);
+            
             if (partDoc.SubType == PropertyManager.SheetMetalSubType)
             {
                 partCount = 1;
-                (partNumber, description) = GetDocumentProperties((Document)partDoc);
 
-                ProgressLabel.Text = "Статус: Обработка детали...";
+                ProgressLabel.Text = "Обработка детали...";
                 var partData = await GetPartDataAsync(partNumber, 1, null, 1, partDoc);
                 if (partData != null)
                 {
@@ -1255,7 +1256,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         _isScanning = false;
         ScanProgressValue = 0;
-        ProgressLabel.Text = _isCancelled ? $"Статус: Прервано ({elapsedTime})" : $"Найдено листовых деталей: {partCount} ({elapsedTime})";
+        ProgressLabel.Text = _isCancelled ? $"Прервано ({elapsedTime})" : $"Найдено листовых деталей: {partCount} ({elapsedTime})";
         UpdateDocumentInfo(documentType, partNumber, description, doc);
 
         ScanButton.Content = "Сканировать";
