@@ -696,7 +696,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void AddCustomTextButton_Click(object sender, RoutedEventArgs e)
     {
-        var customText = CustomTextBox.Text.Trim();
+        var customText = CustomTextBox.Text;
         if (string.IsNullOrEmpty(customText)) return;
         
         // Добавляем текст через TokenizedTextBox
