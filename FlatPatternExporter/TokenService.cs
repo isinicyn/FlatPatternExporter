@@ -131,7 +131,7 @@ public class TokenService : INotifyPropertyChanged
             return ($"Имя файла слишком длинное ({preview.Length} символов, максимум 255)", false);
         }
         
-        return (preview, true);
+        return ($"{preview}.dxf", true);
     }
 
     public PartData CreateSamplePartData(IList<PartData> partsData)

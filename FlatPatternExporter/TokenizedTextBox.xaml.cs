@@ -135,7 +135,7 @@ namespace FlatPatternExporter
 
             var textBlock = new TextBlock
             {
-                Text = tokenElement.IsCustomText ? $"'{tokenElement.Name}'" : tokenElement.Name,
+                Text = tokenElement.IsCustomText ? $"{tokenElement.Name}" : tokenElement.Name,
                 Style = FindResource("TokenTextStyle") as Style
             };
 
