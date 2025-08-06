@@ -458,6 +458,7 @@
                         <Separator/>
                         <MenuItem Header="Редактировать iProperty" Click="EditIProperty_Click" x:Name="EditIPropertyMenuItem"/>
                         <Separator/>
+                        <MenuItem Header="Удалить выбранные строки" Click="RemoveSelectedRows_Click"/>
                         <MenuItem Header="Очистить список" Click="ClearList_Click"/>
                     </ContextMenu>
                 </DataGrid.ContextMenu>

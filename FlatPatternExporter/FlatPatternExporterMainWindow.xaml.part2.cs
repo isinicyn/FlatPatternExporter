@@ -1175,6 +1175,36 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     }
 
+    private void RemoveSelectedRows_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
+        if (selectedItems.Count == 0)
+        {
+            MessageBox.Show("Выберите строки для удаления.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var result = MessageBox.Show($"Вы действительно хотите удалить {selectedItems.Count} строк(и)?", 
+            "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        
+        if (result == MessageBoxResult.Yes)
+        {
+            foreach (var item in selectedItems)
+            {
+                _partsData.Remove(item);
+            }
+            
+            if (_partsData.Count == 0)
+            {
+                ClearList_Click(sender, e);
+            }
+            else
+            {
+                ProgressLabel.Text = $"Статус: Удалено {selectedItems.Count} строк(и)";
+            }
+        }
+    }
+
     private void partsDataGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         if (_partsData.Count == 0) e.Handled = true; // Предотвращаем открытие контекстного меню, если таблица пуста
