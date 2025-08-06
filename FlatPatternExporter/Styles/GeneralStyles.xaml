@@ -235,4 +235,32 @@
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
     </Style>
+
+    <!-- Стиль для предпросмотра имени файла -->
+    <Style x:Key="FileNamePreviewBorderStyle" TargetType="Border">
+        <Setter Property="MinHeight" Value="25"/>
+        <Setter Property="Padding" Value="8,5"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="#F8F8F8"/>
+        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsFileNameTemplateValid}" Value="True">
+                <Setter Property="Background" Value="#F0F8FF"/>
+                <Setter Property="BorderBrush" Value="#0078D4"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsFileNameTemplateValid}" Value="False">
+                <Setter Property="Background" Value="#FFEEEE"/>
+                <Setter Property="BorderBrush" Value="#FFFF2929"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Стиль для текста предпросмотра имени файла -->
+    <Style x:Key="FileNamePreviewTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
 </ResourceDictionary>

@@ -854,18 +854,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 string fileName;
                 if (EnableFileNameConstructor && !string.IsNullOrEmpty(FileNameTemplate))
                 {
-                    fileName = Regex.Replace(FileNameTemplate, @"\{(\w+)\}", match =>
-                    {
-                        var propertyName = match.Groups[1].Value;
-                        return GetPropertyValue(partData, propertyName);
-                    });
-                    
-                    // Удаляем недопустимые символы из имени файла
-                    var invalidChars = Path.GetInvalidFileNameChars();
-                    foreach (var invalidChar in invalidChars)
-                    {
-                        fileName = fileName.Replace(invalidChar, '_');
-                    }
+                    fileName = _tokenService.ResolveTemplate(FileNameTemplate, partData);
                 }
                 else
                 {
@@ -1440,6 +1429,63 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         var aboutWindow = new AboutWindow(this); // Передаем текущий экземпляр MainWindow
         aboutWindow.ShowDialog(); // Отображаем окно как диалоговое
+    }
+
+    private void UpdateFileNamePreview()
+    {
+        if (string.IsNullOrEmpty(FileNameTemplate))
+        {
+            FileNamePreview = "Не задан шаблон";
+            IsFileNameTemplateValid = true;
+            return;
+        }
+
+        IsFileNameTemplateValid = _tokenService.ValidateTemplate(FileNameTemplate);
+        
+        if (!IsFileNameTemplateValid)
+        {
+            FileNamePreview = "❌ Ошибка в шаблоне - неизвестные токены";
+            return;
+        }
+
+        var sampleData = CreateSamplePartData();
+        var preview = _tokenService.PreviewTemplate(FileNameTemplate, sampleData);
+        
+        if (preview == "Ошибка в шаблоне")
+        {
+            FileNamePreview = "❌ " + preview;
+            IsFileNameTemplateValid = false;
+        }
+        else
+        {
+            FileNamePreview = "✓ " + preview;
+        }
+    }
+
+    private PartData CreateSamplePartData()
+    {
+        // Используем данные первой детали из списка, если есть
+        if (_partsData.Count > 0)
+        {
+            return _partsData[0];
+        }
+
+        // Иначе возвращаем placeholder данные
+        return new PartData
+        {
+            PartNumber = "{PartNumber}",
+            Quantity = 0,
+            Material = "{Material}",
+            Thickness = 0.0,
+            Description = "{Description}",
+            Author = "{Author}",
+            Revision = "{Revision}",
+            Project = "{Project}",
+            Mass = "{Mass}",
+            FlatPatternWidth = "{FlatPatternWidth}",
+            FlatPatternLength = "{FlatPatternLength}",
+            FlatPatternArea = "{FlatPatternArea}"
+        };
     }
 
     private void UpdateNoColumnsOverlayVisibility()

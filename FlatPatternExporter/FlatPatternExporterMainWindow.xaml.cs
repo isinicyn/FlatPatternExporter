@@ -68,6 +68,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public Application? _thisApplication;
     private Document? _lastScannedDocument;
     
+    // Сервисы
+    private readonly TokenService _tokenService = new();
+    
     // Данные и коллекции
     private readonly ObservableCollection<PartData> _partsData = new();
     private readonly CollectionViewSource _partsDataView;
@@ -298,6 +301,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         
         // Инициализируем видимость оверлея
         UpdateNoColumnsOverlayVisibility();
+        
+        // Инициализируем предпросмотр имени файла
+        UpdateFileNamePreview();
     }
 
     private void LoadSettings()
@@ -555,9 +561,40 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _fileNameTemplate = value;
                 OnPropertyChanged();
+                UpdateFileNamePreview();
             }
         }
     }
+
+    private string _fileNamePreview = "Пример: Деталь_1_2.5mm";
+    public string FileNamePreview
+    {
+        get => _fileNamePreview;
+        private set
+        {
+            if (_fileNamePreview != value)
+            {
+                _fileNamePreview = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _isFileNameTemplateValid = true;
+    public bool IsFileNameTemplateValid
+    {
+        get => _isFileNameTemplateValid;
+        private set
+        {
+            if (_isFileNameTemplateValid != value)
+            {
+                _isFileNameTemplateValid = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public TokenService TokenService => _tokenService;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -1494,25 +1531,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
 
-    private string GetPropertyValue(PartData partData, string propertyName)
-    {
-        return propertyName switch
-        {
-            "PartNumber" => partData.PartNumber ?? string.Empty,
-            "Quantity" => partData.Quantity.ToString(),
-            "Material" => partData.Material ?? string.Empty,
-            "Thickness" => partData.Thickness.ToString("F1"),
-            "Description" => partData.Description ?? string.Empty,
-            "Author" => partData.Author ?? string.Empty,
-            "Revision" => partData.Revision ?? string.Empty,
-            "Project" => partData.Project ?? string.Empty,
-            "Mass" => partData.Mass ?? string.Empty,
-            "FlatPatternWidth" => partData.FlatPatternWidth ?? string.Empty,
-            "FlatPatternLength" => partData.FlatPatternLength ?? string.Empty,
-            "FlatPatternArea" => partData.FlatPatternArea ?? string.Empty,
-            _ => string.Empty
-        };
-    }
 
     private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {

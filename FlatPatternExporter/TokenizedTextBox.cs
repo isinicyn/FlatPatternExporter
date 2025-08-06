@@ -22,7 +22,11 @@ namespace FlatPatternExporter
                 typeof(TokenizedTextBox),
                 new PropertyMetadata(new ObservableCollection<string>(), OnAvailableTokensChanged));
 
-        private string _template = string.Empty;
+        public static readonly DependencyProperty TokenServiceProperty =
+            DependencyProperty.Register(nameof(TokenService), typeof(TokenService), typeof(TokenizedTextBox),
+                new PropertyMetadata(null, OnTokenServiceChanged));
+
+        private static readonly Regex TokenRegex = new(@"\{(\w+)\}", RegexOptions.Compiled);
 
         public TokenizedTextBox()
         {
@@ -39,6 +43,12 @@ namespace FlatPatternExporter
         {
             get => (ObservableCollection<string>)GetValue(AvailableTokensProperty);
             set => SetValue(AvailableTokensProperty, value);
+        }
+
+        public TokenService? TokenService
+        {
+            get => (TokenService?)GetValue(TokenServiceProperty);
+            set => SetValue(TokenServiceProperty, value);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -58,6 +68,11 @@ namespace FlatPatternExporter
             if (d is TokenizedTextBox control) control.UpdateContent();
         }
 
+        private static void OnTokenServiceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TokenizedTextBox control) control.UpdateContent();
+        }
+
         private void UpdateContent()
         {
             if (TokenContainer == null) return;
@@ -66,8 +81,7 @@ namespace FlatPatternExporter
 
             if (string.IsNullOrEmpty(Template)) return;
 
-            var pattern = @"\{(\w+)\}";
-            var matches = Regex.Matches(Template, pattern);
+            var matches = TokenRegex.Matches(Template);
             
             foreach (Match match in matches)
             {
