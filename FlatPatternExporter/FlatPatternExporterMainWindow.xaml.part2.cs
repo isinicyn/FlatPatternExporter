@@ -722,13 +722,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private async void ExportSelectedDXF_Click(object sender, RoutedEventArgs e)
     {
         var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
-        if (selectedItems.Count == 0)
-        {
-            MessageBox.Show("Выберите строки для экспорта.", "Информация", MessageBoxButton.OK,
-                MessageBoxImage.Information);
-            return;
-        }
-
+        
         var itemsWithoutFlatPattern = selectedItems.Where(p => !p.HasFlatPattern).ToList();
         if (itemsWithoutFlatPattern.Count == selectedItems.Count)
         {
@@ -770,13 +764,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private void OverrideQuantity_Click(object sender, RoutedEventArgs e)
     {
         var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
-        if (selectedItems.Count == 0)
-        {
-            MessageBox.Show("Выберите строки для переопределения количества.", "Информация", MessageBoxButton.OK,
-                MessageBoxImage.Information);
-            return;
-        }
-
+        
         var dialog = new OverrideQuantityDialog();
         dialog.Owner = this;
         dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -1178,12 +1166,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private void RemoveSelectedRows_Click(object sender, RoutedEventArgs e)
     {
         var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
-        if (selectedItems.Count == 0)
-        {
-            MessageBox.Show("Выберите строки для удаления.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-            return;
-        }
-
+        
         var result = MessageBox.Show($"Вы действительно хотите удалить {selectedItems.Count} строк(и)?", 
             "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Question);
         
@@ -1207,18 +1190,27 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private void partsDataGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        if (_partsData.Count == 0) e.Handled = true; // Предотвращаем открытие контекстного меню, если таблица пуста
+        if (_partsData.Count == 0) 
+        {
+            e.Handled = true; // Предотвращаем открытие контекстного меню, если таблица пуста
+            return;
+        }
+        
+        // Управляем доступностью пунктов меню в зависимости от выделения
+        var hasSelection = PartsDataGrid.SelectedItems.Count > 0;
+        var hasSingleSelection = PartsDataGrid.SelectedItems.Count == 1;
+        
+        ExportSelectedDXFMenuItem.IsEnabled = hasSelection;
+        OverrideQuantityMenuItem.IsEnabled = hasSelection;
+        OpenFileLocationMenuItem.IsEnabled = hasSelection;
+        OpenSelectedModelsMenuItem.IsEnabled = hasSelection;
+        EditIPropertyMenuItem.IsEnabled = hasSingleSelection;
+        RemoveSelectedRowsMenuItem.IsEnabled = hasSelection;
     }
 
     private void OpenFileLocation_Click(object sender, RoutedEventArgs e)
     {
         var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
-        if (selectedItems.Count == 0)
-        {
-            MessageBox.Show("Выберите строки для открытия расположения файла.", "Информация", MessageBoxButton.OK,
-                MessageBoxImage.Information);
-            return;
-        }
 
         foreach (var item in selectedItems)
         {
@@ -1254,13 +1246,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private void OpenSelectedModels_Click(object sender, RoutedEventArgs e)
     {
         var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
-        if (selectedItems.Count == 0)
-        {
-            MessageBox.Show("Выберите строки для открытия моделей.", "Информация", MessageBoxButton.OK,
-                MessageBoxImage.Information);
-            return;
-        }
-
+        
         foreach (var item in selectedItems)
         {
             var partNumber = item.PartNumber;
@@ -1420,13 +1406,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private void EditIProperty_Click(object sender, RoutedEventArgs e)
     {
         var selectedItem = PartsDataGrid.SelectedItem as PartData;
-        if (selectedItem == null || PartsDataGrid.SelectedItems.Count != 1)
-        {
-            MessageBox.Show("Выберите одну строку для редактирования iProperty.", "Информация", MessageBoxButton.OK,
-                MessageBoxImage.Information);
-            return;
-        }
-
+        
         var editDialog = new EditIPropertyDialog(selectedItem.PartNumber, selectedItem.Description);
         if (editDialog.ShowDialog() == true)
         {

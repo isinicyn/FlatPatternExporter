@@ -450,15 +450,15 @@
                 <!-- Контекстное меню -->
                 <DataGrid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Экспортировать выбранные DXF" Click="ExportSelectedDXF_Click"/>
-                        <MenuItem Header="Переопределить количество" Click="OverrideQuantity_Click"/>
+                        <MenuItem Header="Экспортировать выбранные DXF" Click="ExportSelectedDXF_Click" x:Name="ExportSelectedDXFMenuItem"/>
+                        <MenuItem Header="Переопределить количество" Click="OverrideQuantity_Click" x:Name="OverrideQuantityMenuItem"/>
                         <Separator/>
-                        <MenuItem Header="Открыть расположение файла" Click="OpenFileLocation_Click"/>
-                        <MenuItem Header="Открыть выбранные модели" Click="OpenSelectedModels_Click"/>
+                        <MenuItem Header="Открыть расположение файла" Click="OpenFileLocation_Click" x:Name="OpenFileLocationMenuItem"/>
+                        <MenuItem Header="Открыть выбранные модели" Click="OpenSelectedModels_Click" x:Name="OpenSelectedModelsMenuItem"/>
                         <Separator/>
                         <MenuItem Header="Редактировать iProperty" Click="EditIProperty_Click" x:Name="EditIPropertyMenuItem"/>
                         <Separator/>
-                        <MenuItem Header="Удалить выбранные строки" Click="RemoveSelectedRows_Click"/>
+                        <MenuItem Header="Удалить выбранные строки" Click="RemoveSelectedRows_Click" x:Name="RemoveSelectedRowsMenuItem"/>
                         <MenuItem Header="Очистить список" Click="ClearList_Click"/>
                     </ContextMenu>
                 </DataGrid.ContextMenu>
