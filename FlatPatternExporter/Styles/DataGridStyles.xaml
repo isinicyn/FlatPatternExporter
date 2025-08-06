@@ -6,6 +6,9 @@
     <SolidColorBrush x:Key="EvenRowBrush" Color="White"/>
     <SolidColorBrush x:Key="OddRowBrush" Color="#F5F5F5"/>
 
+    <SolidColorBrush x:Key="HighlightBrush" Color="#D1E8FF"/>
+    <SolidColorBrush x:Key="HighlightTextBrush" Color="Black"/>
+
     <!-- Базовые стили для ячеек -->
     
     <!-- Базовый стиль для всех текстовых ячеек -->
@@ -134,21 +137,27 @@
     </DataTemplate>
 
     <!-- Стили DataGrid -->
-    
-    <!-- Стиль для строк DataGrid -->
     <Style x:Key="DataGridRowStyle" TargetType="DataGridRow">
-        <Style.Resources>
-            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
-            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="LightBlue"/>
-            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-        </Style.Resources>
+        <Setter Property="Background" Value="{StaticResource EvenRowBrush}" />
         <Style.Triggers>
-            <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                <Setter Property="Background" Value="{StaticResource EvenRowBrush}"/>
-            </Trigger>
             <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                 <Setter Property="Background" Value="{StaticResource OddRowBrush}"/>
             </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#E0E0E0"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource HighlightBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource HighlightTextBrush}"/>
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True"/>
+                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{StaticResource HighlightBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource HighlightTextBrush}"/>
+            </MultiTrigger>
         </Style.Triggers>
     </Style>
 
@@ -189,17 +198,19 @@
 
     <!-- Стиль для ячеек -->
     <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
-        <Style.Resources>
-            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
-            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="LightBlue"/>
-            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-        </Style.Resources>
         <Setter Property="Padding" Value="10,5"/>
         <Setter Property="BorderBrush" Value="#EAEAEA"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="#333333"/>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{StaticResource HighlightTextBrush}"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Базовый стиль для TextBlock внутри DataGrid -->
