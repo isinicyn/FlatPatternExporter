@@ -105,7 +105,7 @@ public class TokenService : INotifyPropertyChanged
         }
     }
 
-    public (string preview, bool isValid) UpdateFileNamePreview(string fileNameTemplate, IList<PartData> partsData)
+    public (string preview, bool isValid) UpdateFileNamePreview(string fileNameTemplate, IList<PartData> partsData, PartData? selectedData = null)
     {
         if (string.IsNullOrEmpty(fileNameTemplate))
         {
@@ -118,7 +118,7 @@ public class TokenService : INotifyPropertyChanged
             return ("Ошибка в шаблоне - неизвестные токены", false);
         }
 
-        var sampleData = CreateSamplePartData(partsData);
+        var sampleData = CreateSamplePartData(partsData, selectedData);
         var preview = PreviewTemplate(fileNameTemplate, sampleData);
         
         if (preview == "Ошибка в шаблоне")
@@ -134,9 +134,15 @@ public class TokenService : INotifyPropertyChanged
         return ($"{preview}.dxf", true);
     }
 
-    public PartData CreateSamplePartData(IList<PartData> partsData)
+    public PartData CreateSamplePartData(IList<PartData> partsData, PartData? selectedData = null)
     {
-        // Используем данные первой детали из списка, если есть
+        // Используем выбранную деталь, если она передана
+        if (selectedData != null)
+        {
+            return selectedData;
+        }
+        
+        // Иначе используем данные первой детали из списка, если есть
         if (partsData.Count > 0)
         {
             return partsData[0];
@@ -225,6 +231,13 @@ public class TokenService : INotifyPropertyChanged
     {
         _partsData = partsData ?? new List<PartData>();
         UpdatePreview();
+    }
+
+    public void UpdatePreviewWithSelectedData(PartData? selectedData)
+    {
+        var (preview, isValid) = UpdateFileNamePreview(_fileNameTemplate, _partsData, selectedData);
+        FileNamePreview = preview;
+        IsFileNameTemplateValid = isValid;
     }
 
     private void UpdatePreview()

@@ -1325,6 +1325,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         // Активация пункта "Редактировать iProperty" только при выборе одной строки
         EditIPropertyMenuItem.IsEnabled = PartsDataGrid.SelectedItems.Count == 1;
+        
+        // Обновляем предпросмотр с выбранной строкой
+        var selectedPart = PartsDataGrid.SelectedItem as PartData;
+        _tokenService.UpdatePreviewWithSelectedData(selectedPart);
     }
 
     public async Task FillPropertyDataAsync(string propertyName)
