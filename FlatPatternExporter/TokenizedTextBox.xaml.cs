@@ -10,8 +10,18 @@ using System.Windows.Media;
 
 namespace FlatPatternExporter
 {
+    public class TokenElement
+    {
+        public string Name { get; set; } = string.Empty;
+        public int StartIndex { get; set; }
+        public int EndIndex { get; set; }
+        public Border? VisualElement { get; set; }
+    }
+
     public partial class TokenizedTextBox : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {
+        private List<TokenElement> _tokenElements = new List<TokenElement>();
+
         public static readonly DependencyProperty TextTemplateProperty =
             DependencyProperty.Register(nameof(Template), typeof(string), typeof(TokenizedTextBox),
                 new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
@@ -78,20 +88,29 @@ namespace FlatPatternExporter
             if (TokenContainer == null) return;
 
             TokenContainer.Children.Clear();
+            _tokenElements.Clear();
 
             if (string.IsNullOrEmpty(Template)) return;
 
             var matches = TokenRegex.Matches(Template);
             
-            foreach (Match match in matches)
+            for (int i = 0; i < matches.Count; i++)
             {
-                var tokenName = match.Groups[1].Value;
-                AddTokenElement(tokenName);
+                var match = matches[i];
+                var tokenElement = new TokenElement
+                {
+                    Name = match.Groups[1].Value,
+                    StartIndex = match.Index,
+                    EndIndex = match.Index + match.Length - 1
+                };
+                
+                AddTokenElement(tokenElement, i);
+                _tokenElements.Add(tokenElement);
             }
         }
 
 
-        private void AddTokenElement(string tokenName)
+        private void AddTokenElement(TokenElement tokenElement, int index)
         {
             var border = new Border
             {
@@ -100,24 +119,29 @@ namespace FlatPatternExporter
 
             var textBlock = new TextBlock
             {
-                Text = tokenName,
+                Text = tokenElement.Name,
                 Style = FindResource("TokenTextStyle") as Style
             };
 
             border.Child = textBlock;
+            tokenElement.VisualElement = border;
 
             border.MouseDown += (s, e) =>
             {
-                if (e.RightButton == MouseButtonState.Pressed) RemoveToken(tokenName);
+                if (e.RightButton == MouseButtonState.Pressed) RemoveTokenByIndex(index);
             };
 
             TokenContainer.Children.Add(border);
         }
 
-        private void RemoveToken(string tokenName)
+        private void RemoveTokenByIndex(int index)
         {
-            var pattern = @"\{" + Regex.Escape(tokenName) + @"\}";
-            var newTemplate = Regex.Replace(Template, pattern, "", RegexOptions.IgnoreCase);
+            if (index < 0 || index >= _tokenElements.Count) return;
+            
+            var tokenElement = _tokenElements[index];
+            var tokenText = "{" + tokenElement.Name + "}";
+            
+            var newTemplate = Template.Remove(tokenElement.StartIndex, tokenText.Length);
             Template = newTemplate;
         }
 
