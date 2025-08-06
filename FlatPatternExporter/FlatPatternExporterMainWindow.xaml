@@ -371,6 +371,28 @@
                                      PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
                                      MouseMove="AvailableTokensListBox_MouseMove"
                                      MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
+                            
+                            <!-- Поле для ввода произвольного текста -->
+                            <TextBlock Text="Произвольный текст:" Margin="0,10,0,5" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox x:Name="CustomTextBox" 
+                                         Width="200" 
+                                         MinHeight="32"
+                                         Background="White"
+                                         BorderBrush="#D6D6D6"
+                                         BorderThickness="1"
+                                         Padding="2,6"
+                                         VerticalContentAlignment="Center"
+                                         KeyDown="CustomTextBox_KeyDown"
+                                         ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
+                                <Button x:Name="AddCustomTextButton"
+                                        Content="Добавить"
+                                        Width="70"
+                                        MinHeight="32"
+                                        Margin="5,0,0,0"
+                                        Click="AddCustomTextButton_Click"
+                                        ToolTip="Добавить введенный текст как кастомный токен"/>
+                            </StackPanel>
                         </StackPanel>
 
                         <!-- Правая колонка: Шаблон имени файла -->

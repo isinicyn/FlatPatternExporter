@@ -693,6 +693,27 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _searchDelayTimer.Stop();
         _searchDelayTimer.Start();
     }
+
+    private void AddCustomTextButton_Click(object sender, RoutedEventArgs e)
+    {
+        var customText = CustomTextBox.Text.Trim();
+        if (string.IsNullOrEmpty(customText)) return;
+        
+        // Добавляем текст через TokenizedTextBox
+        FileNameTemplateTokenBox.AddCustomText(customText);
+        
+        // Очищаем поле ввода
+        CustomTextBox.Text = string.Empty;
+    }
+
+    private void CustomTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Enter)
+        {
+            AddCustomTextButton_Click(sender, new RoutedEventArgs());
+            e.Handled = true;
+        }
+    }
     private void SearchDelayTimer_Tick(object? sender, EventArgs e)
     {
         _searchDelayTimer.Stop();

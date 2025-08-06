@@ -7,6 +7,7 @@ namespace FlatPatternExporter;
 public class TokenService : INotifyPropertyChanged
 {
     private static readonly Regex TokenRegex = new(@"\{(\w+)\}", RegexOptions.Compiled);
+    private static readonly Regex CustomTextRegex = new(@"\{CUSTOM:([^}]+)\}", RegexOptions.Compiled);
     private readonly Dictionary<string, Func<PartData, string>> _tokenResolvers;
     private IList<PartData> _partsData;
 
@@ -42,8 +43,10 @@ public class TokenService : INotifyPropertyChanged
             return string.Empty;
 
         var tokenCache = new Dictionary<string, string>();
+        var result = template;
 
-        var result = TokenRegex.Replace(template, match =>
+        // Обрабатываем обычные токены
+        result = TokenRegex.Replace(result, match =>
         {
             var token = match.Groups[1].Value;
             
@@ -64,6 +67,12 @@ public class TokenService : INotifyPropertyChanged
             return value;
         });
 
+        // Обрабатываем кастомные токены
+        result = CustomTextRegex.Replace(result, match =>
+        {
+            return match.Groups[1].Value; // Возвращаем текст как есть
+        });
+
         return SanitizeFileName(result);
     }
 
@@ -72,8 +81,12 @@ public class TokenService : INotifyPropertyChanged
         if (string.IsNullOrEmpty(template))
             return false;
 
-        var matches = TokenRegex.Matches(template);
-        return matches.All(match => _tokenResolvers.ContainsKey(match.Groups[1].Value));
+        // Проверяем обычные токены
+        var tokenMatches = TokenRegex.Matches(template);
+        var validTokens = tokenMatches.All(match => _tokenResolvers.ContainsKey(match.Groups[1].Value));
+        
+        // Кастомные токены всегда валидны (не нуждаются в разрешении)
+        return validTokens;
     }
 
 

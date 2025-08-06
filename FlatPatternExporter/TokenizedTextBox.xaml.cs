@@ -16,6 +16,7 @@ namespace FlatPatternExporter
         public int StartIndex { get; set; }
         public int EndIndex { get; set; }
         public Border? VisualElement { get; set; }
+        public bool IsCustomText { get; set; } = false;
     }
 
     public partial class TokenizedTextBox : System.Windows.Controls.UserControl, INotifyPropertyChanged
@@ -37,6 +38,7 @@ namespace FlatPatternExporter
                 new PropertyMetadata(null, OnTokenServiceChanged));
 
         private static readonly Regex TokenRegex = new(@"\{(\w+)\}", RegexOptions.Compiled);
+        private static readonly Regex CustomTextRegex = new(@"\{CUSTOM:([^}]+)\}", RegexOptions.Compiled);
 
         public TokenizedTextBox()
         {
@@ -92,16 +94,29 @@ namespace FlatPatternExporter
 
             if (string.IsNullOrEmpty(Template)) return;
 
-            var matches = TokenRegex.Matches(Template);
+            // Находим все токены и кастомный текст
+            var allMatches = new List<(Match match, bool isCustom)>();
             
-            for (int i = 0; i < matches.Count; i++)
+            // Добавляем обычные токены
+            foreach (Match match in TokenRegex.Matches(Template))
+                allMatches.Add((match, false));
+            
+            // Добавляем кастомные токены
+            foreach (Match match in CustomTextRegex.Matches(Template))
+                allMatches.Add((match, true));
+            
+            // Сортируем по позиции в строке
+            allMatches.Sort((a, b) => a.match.Index.CompareTo(b.match.Index));
+            
+            for (int i = 0; i < allMatches.Count; i++)
             {
-                var match = matches[i];
+                var (match, isCustom) = allMatches[i];
                 var tokenElement = new TokenElement
                 {
                     Name = match.Groups[1].Value,
                     StartIndex = match.Index,
-                    EndIndex = match.Index + match.Length - 1
+                    EndIndex = match.Index + match.Length - 1,
+                    IsCustomText = isCustom
                 };
                 
                 AddTokenElement(tokenElement, i);
@@ -114,12 +129,13 @@ namespace FlatPatternExporter
         {
             var border = new Border
             {
-                Style = FindResource("TokenBlockStyle") as Style
+                Style = FindResource("TokenBlockStyle") as Style,
+                Tag = tokenElement.IsCustomText ? "CustomText" : null
             };
 
             var textBlock = new TextBlock
             {
-                Text = tokenElement.Name,
+                Text = tokenElement.IsCustomText ? $"'{tokenElement.Name}'" : tokenElement.Name,
                 Style = FindResource("TokenTextStyle") as Style
             };
 
@@ -139,7 +155,9 @@ namespace FlatPatternExporter
             if (index < 0 || index >= _tokenElements.Count) return;
             
             var tokenElement = _tokenElements[index];
-            var tokenText = "{" + tokenElement.Name + "}";
+            var tokenText = tokenElement.IsCustomText 
+                ? $"{{CUSTOM:{tokenElement.Name}}}"
+                : $"{{{tokenElement.Name}}}";
             
             var newTemplate = Template.Remove(tokenElement.StartIndex, tokenText.Length);
             Template = newTemplate;
@@ -165,6 +183,15 @@ namespace FlatPatternExporter
         {
             e.Effects = e.Data.GetDataPresent(System.Windows.DataFormats.StringFormat) ? System.Windows.DragDropEffects.Copy : System.Windows.DragDropEffects.None;
             e.Handled = true;
+        }
+
+        public void AddCustomText(string customText)
+        {
+            if (string.IsNullOrEmpty(customText)) return;
+            
+            // Добавляем кастомный текст как специальный токен
+            var customToken = $"{{CUSTOM:{customText}}}";
+            Template += customToken;
         }
     }
 }

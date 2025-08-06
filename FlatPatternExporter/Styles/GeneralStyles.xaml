@@ -101,6 +101,11 @@
                 <Setter Property="Background" Value="#EAEAEA"/>
                 <Setter Property="BorderBrush" Value="#0078D4"/>
             </Trigger>
+            <!-- Стиль для кастомных токенов -->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="CustomText">
+                <Setter Property="Background" Value="#F0F8FF"/>
+                <Setter Property="BorderBrush" Value="#4682B4"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 
@@ -238,10 +243,10 @@
 
     <!-- Стиль для предпросмотра имени файла -->
     <Style x:Key="FileNamePreviewBorderStyle" TargetType="Border">
-        <Setter Property="MinHeight" Value="25"/>
-        <Setter Property="Padding" Value="8,5"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Padding" Value="2,6"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="#F8F8F8"/>
+        <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="#D6D6D6"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding TokenService.IsFileNameTemplateValid}" Value="True">
