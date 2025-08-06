@@ -532,8 +532,9 @@
                     <TextBlock x:Name="ProgressLabel" Text="" 
                                TextWrapping="Wrap" Height="Auto" MaxWidth="800" Foreground="Black"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0">
-                    <TextBlock Text="Проект: " FontWeight="Bold" VerticalAlignment="Center" Foreground="Black"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0"
+                            x:Name="ProjectStackPanel" ToolTip="Путь к проекту">
+                    <TextBlock Text="Проект: " VerticalAlignment="Center" Foreground="Black"/>
                     <TextBlock x:Name="ProjectNameTop" Text="" VerticalAlignment="Center" Foreground="Black"/>
                 </StackPanel>
             </Grid>

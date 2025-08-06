@@ -1342,6 +1342,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var projectName = activeProject.Name;
             var projectWorkspacePath = activeProject.WorkspacePath;
             ProjectNameTop.Text = projectName;
+            ProjectStackPanel.ToolTip = projectWorkspacePath;
         }
         catch (Exception ex)
         {
