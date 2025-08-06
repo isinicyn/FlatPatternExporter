@@ -673,6 +673,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             MessageBox.Show("Активный документ изменился. Пожалуйста, повторите сканирование перед экспортом.",
                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             MultiplierTextBox.Text = "1";
+            SetInventorUserInterfaceState(false);
             return;
         }
 

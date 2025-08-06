@@ -1128,6 +1128,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             MessageBox.Show("Откройте сборку или деталь для сканирования.", "Ошибка", MessageBoxButton.OK,
                 MessageBoxImage.Warning);
+            SetInventorUserInterfaceState(false);
             return;
         }
 
