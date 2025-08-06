@@ -119,7 +119,7 @@ public static class SettingsManager
             SelectedProcessingMethod = window.SelectedProcessingMethod,
             FixedFolderPath = window.FixedFolderPath,
             EnableFileNameConstructor = window.EnableFileNameConstructor,
-            FileNameTemplate = window.FileNameTemplate
+            FileNameTemplate = window.TokenService.FileNameTemplate
         };
 
         var columnsInDisplayOrder = window.PartsDataGrid.Columns
@@ -179,7 +179,7 @@ public static class SettingsManager
         window.SelectedProcessingMethod = settings.SelectedProcessingMethod;
         window.FixedFolderPath = settings.FixedFolderPath;
         window.EnableFileNameConstructor = settings.EnableFileNameConstructor;
-        window.FileNameTemplate = settings.FileNameTemplate;
+        window.TokenService.FileNameTemplate = settings.FileNameTemplate;
 
         window.CustomPropertiesList.Clear();
         foreach (var customProperty in settings.CustomProperties)

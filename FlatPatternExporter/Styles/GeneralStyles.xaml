@@ -244,11 +244,11 @@
         <Setter Property="Background" Value="#F8F8F8"/>
         <Setter Property="BorderBrush" Value="#D6D6D6"/>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsFileNameTemplateValid}" Value="True">
+            <DataTrigger Binding="{Binding TokenService.IsFileNameTemplateValid}" Value="True">
                 <Setter Property="Background" Value="#F0F8FF"/>
                 <Setter Property="BorderBrush" Value="#0078D4"/>
             </DataTrigger>
-            <DataTrigger Binding="{Binding IsFileNameTemplateValid}" Value="False">
+            <DataTrigger Binding="{Binding TokenService.IsFileNameTemplateValid}" Value="False">
                 <Setter Property="Background" Value="#FFEEEE"/>
                 <Setter Property="BorderBrush" Value="#FFFF2929"/>
             </DataTrigger>

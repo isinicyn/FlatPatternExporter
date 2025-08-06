@@ -136,7 +136,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     
     // Настройки конструктора имени файла
     private bool _enableFileNameConstructor = false;
-    private string _fileNameTemplate = "{PartNumber}";
     
     // Настройки экспорта DXF
     private bool _enableSplineReplacement = false;
@@ -302,8 +301,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Инициализируем видимость оверлея
         UpdateNoColumnsOverlayVisibility();
         
-        // Инициализируем предпросмотр имени файла
-        UpdateFileNamePreview();
+        // Инициализируем данные в TokenService
+        _tokenService.UpdatePartsData(_partsData);
     }
 
     private void LoadSettings()
@@ -547,48 +546,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (_enableFileNameConstructor != value)
             {
                 _enableFileNameConstructor = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public string FileNameTemplate
-    {
-        get => _fileNameTemplate;
-        set
-        {
-            if (_fileNameTemplate != value)
-            {
-                _fileNameTemplate = value;
-                OnPropertyChanged();
-                UpdateFileNamePreview();
-            }
-        }
-    }
-
-    private string _fileNamePreview = "Пример: Деталь_1_2.5mm";
-    public string FileNamePreview
-    {
-        get => _fileNamePreview;
-        private set
-        {
-            if (_fileNamePreview != value)
-            {
-                _fileNamePreview = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private bool _isFileNameTemplateValid = true;
-    public bool IsFileNameTemplateValid
-    {
-        get => _isFileNameTemplateValid;
-        private set
-        {
-            if (_isFileNameTemplateValid != value)
-            {
-                _isFileNameTemplateValid = value;
                 OnPropertyChanged();
             }
         }
@@ -1284,6 +1241,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         ExportButton.IsEnabled = partCount > 0 && !_isCancelled;
         ClearButton.IsEnabled = _partsData.Count > 0;
         _lastScannedDocument = _isCancelled ? null : doc;
+
+        // Обновляем данные в TokenService после сканирования
+        _tokenService.UpdatePartsData(_partsData);
 
         SetInventorUserInterfaceState(false);
 

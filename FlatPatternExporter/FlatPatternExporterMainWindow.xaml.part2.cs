@@ -852,9 +852,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                 // Генерируем имя файла на основе конструктора
                 string fileName;
-                if (EnableFileNameConstructor && !string.IsNullOrEmpty(FileNameTemplate))
+                if (EnableFileNameConstructor && !string.IsNullOrEmpty(_tokenService.FileNameTemplate))
                 {
-                    fileName = _tokenService.ResolveTemplate(FileNameTemplate, partData);
+                    fileName = _tokenService.ResolveTemplate(_tokenService.FileNameTemplate, partData);
                 }
                 else
                 {
@@ -1431,62 +1431,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         aboutWindow.ShowDialog(); // Отображаем окно как диалоговое
     }
 
-    private void UpdateFileNamePreview()
-    {
-        if (string.IsNullOrEmpty(FileNameTemplate))
-        {
-            FileNamePreview = "Не задан шаблон";
-            IsFileNameTemplateValid = true;
-            return;
-        }
-
-        IsFileNameTemplateValid = _tokenService.ValidateTemplate(FileNameTemplate);
-        
-        if (!IsFileNameTemplateValid)
-        {
-            FileNamePreview = "❌ Ошибка в шаблоне - неизвестные токены";
-            return;
-        }
-
-        var sampleData = CreateSamplePartData();
-        var preview = _tokenService.PreviewTemplate(FileNameTemplate, sampleData);
-        
-        if (preview == "Ошибка в шаблоне")
-        {
-            FileNamePreview = "❌ " + preview;
-            IsFileNameTemplateValid = false;
-        }
-        else
-        {
-            FileNamePreview = "✓ " + preview;
-        }
-    }
-
-    private PartData CreateSamplePartData()
-    {
-        // Используем данные первой детали из списка, если есть
-        if (_partsData.Count > 0)
-        {
-            return _partsData[0];
-        }
-
-        // Иначе возвращаем placeholder данные
-        return new PartData
-        {
-            PartNumber = "{PartNumber}",
-            Quantity = 0,
-            Material = "{Material}",
-            Thickness = 0.0,
-            Description = "{Description}",
-            Author = "{Author}",
-            Revision = "{Revision}",
-            Project = "{Project}",
-            Mass = "{Mass}",
-            FlatPatternWidth = "{FlatPatternWidth}",
-            FlatPatternLength = "{FlatPatternLength}",
-            FlatPatternArea = "{FlatPatternArea}"
-        };
-    }
 
     private void UpdateNoColumnsOverlayVisibility()
     {

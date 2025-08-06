@@ -1,14 +1,24 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace FlatPatternExporter;
 
-public class TokenService
+public class TokenService : INotifyPropertyChanged
 {
     private static readonly Regex TokenRegex = new(@"\{(\w+)\}", RegexOptions.Compiled);
     private readonly Dictionary<string, Func<PartData, string>> _tokenResolvers;
+    private IList<PartData> _partsData;
+
+    private string _fileNameTemplate = "{PartNumber}";
+    private string _fileNamePreview = string.Empty;
+    private bool _isFileNameTemplateValid = true;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public TokenService()
     {
+        _partsData = new List<PartData>();
         _tokenResolvers = new Dictionary<string, Func<PartData, string>>
         {
             ["PartNumber"] = partData => partData.PartNumber ?? string.Empty,
@@ -82,6 +92,56 @@ public class TokenService
         }
     }
 
+    public (string preview, bool isValid) UpdateFileNamePreview(string fileNameTemplate, IList<PartData> partsData)
+    {
+        if (string.IsNullOrEmpty(fileNameTemplate))
+        {
+            return ("Не задан шаблон", true);
+        }
+
+        var isValid = ValidateTemplate(fileNameTemplate);
+        if (!isValid)
+        {
+            return ("❌ Ошибка в шаблоне - неизвестные токены", false);
+        }
+
+        var sampleData = CreateSamplePartData(partsData);
+        var preview = PreviewTemplate(fileNameTemplate, sampleData);
+        
+        if (preview == "Ошибка в шаблоне")
+        {
+            return ("❌ " + preview, false);
+        }
+        
+        return ("✓ " + preview, true);
+    }
+
+    public PartData CreateSamplePartData(IList<PartData> partsData)
+    {
+        // Используем данные первой детали из списка, если есть
+        if (partsData.Count > 0)
+        {
+            return partsData[0];
+        }
+
+        // Иначе возвращаем placeholder данные
+        return new PartData
+        {
+            PartNumber = "{PartNumber}",
+            Quantity = 0,
+            Material = "{Material}",
+            Thickness = 0.0,
+            Description = "{Description}",
+            Author = "{Author}",
+            Revision = "{Revision}",
+            Project = "{Project}",
+            Mass = "{Mass}",
+            FlatPatternWidth = "{FlatPatternWidth}",
+            FlatPatternLength = "{FlatPatternLength}",
+            FlatPatternArea = "{FlatPatternArea}"
+        };
+    }
+
     private string SanitizeFileName(string fileName)
     {
         if (string.IsNullOrEmpty(fileName))
@@ -96,5 +156,63 @@ public class TokenService
         }
 
         return result.Length > 255 ? result[..255] : result;
+    }
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public string FileNameTemplate
+    {
+        get => _fileNameTemplate;
+        set
+        {
+            if (_fileNameTemplate != value)
+            {
+                _fileNameTemplate = value;
+                OnPropertyChanged();
+                UpdatePreview();
+            }
+        }
+    }
+
+    public string FileNamePreview
+    {
+        get => _fileNamePreview;
+        private set
+        {
+            if (_fileNamePreview != value)
+            {
+                _fileNamePreview = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool IsFileNameTemplateValid
+    {
+        get => _isFileNameTemplateValid;
+        private set
+        {
+            if (_isFileNameTemplateValid != value)
+            {
+                _isFileNameTemplateValid = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public void UpdatePartsData(IList<PartData> partsData)
+    {
+        _partsData = partsData ?? new List<PartData>();
+        UpdatePreview();
+    }
+
+    private void UpdatePreview()
+    {
+        var (preview, isValid) = UpdateFileNamePreview(_fileNameTemplate, _partsData);
+        FileNamePreview = preview;
+        IsFileNameTemplateValid = isValid;
     }
 }
