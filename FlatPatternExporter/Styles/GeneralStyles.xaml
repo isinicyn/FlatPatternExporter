@@ -249,13 +249,35 @@
         <Setter Property="Background" Value="#FFFCF5"/>
         <Setter Property="BorderBrush" Value="#E0E0E0"/>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding TokenService.IsFileNameTemplateValid}" Value="True">
-                <Setter Property="Background" Value="#F5FDF5"/>
-                <Setter Property="BorderBrush" Value="#C8E6C9"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding TokenService.IsFileNameTemplateValid}" Value="False">
+            <!-- Триггеры валидации (работают только когда функция включена и шаблон не пустой) -->
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding EnableFileNameConstructor}" Value="True"/>
+                    <Condition Binding="{Binding TokenService.IsFileNameTemplateValid}" Value="True"/>
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="Background" Value="#F5FDF5"/>
+                    <Setter Property="BorderBrush" Value="#C8E6C9"/>
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding EnableFileNameConstructor}" Value="True"/>
+                    <Condition Binding="{Binding TokenService.IsFileNameTemplateValid}" Value="False"/>
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter Property="Background" Value="#FFFCF5"/>
+                    <Setter Property="BorderBrush" Value="#FFE0B2"/>
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
+            <!-- Приоритетные триггеры: нейтральный вид когда функция отключена или шаблон пустой (ПОСЛЕДНИЕ - высший приоритет) -->
+            <DataTrigger Binding="{Binding EnableFileNameConstructor}" Value="False">
                 <Setter Property="Background" Value="#FFFCF5"/>
-                <Setter Property="BorderBrush" Value="#FFE0B2"/>
+                <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding TokenService.FileNameTemplate}" Value="">
+                <Setter Property="Background" Value="#FFFCF5"/>
+                <Setter Property="BorderBrush" Value="#E0E0E0"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>

@@ -412,9 +412,19 @@
                                 <TextBlock Text="Предпросмотр:" Margin="0,10,0,5" FontWeight="SemiBold"/>
                                 <Border Style="{StaticResource FileNamePreviewBorderStyle}">
                                     <TextBlock x:Name="FileNamePreviewTextBlock" 
-                                              Text="{Binding TokenService.FileNamePreview}" 
-                                              Style="{StaticResource FileNamePreviewTextStyle}"
-                                              ToolTip="{Binding TokenService.FileNamePreview}"/>
+                                              ToolTip="{Binding TokenService.FileNamePreview}" Cursor="">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource FileNamePreviewTextStyle}">
+                                                <Setter Property="Text" Value="{Binding TokenService.FileNamePreview}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding EnableFileNameConstructor}" Value="False">
+                                                        <Setter Property="Text" Value="Функция отключена - при экспорте будет использовано обозначение детали"/>
+                                                        <Setter Property="Foreground" Value="#666666"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </Border>
                             </StackPanel>
                         </GroupBox>
