@@ -11,7 +11,7 @@ public class TokenService : INotifyPropertyChanged
     private readonly Dictionary<string, Func<PartData, string>> _tokenResolvers;
     private IList<PartData> _partsData;
 
-    private string _fileNameTemplate = "{PartNumber}";
+    private string _fileNameTemplate = string.Empty;
     private string _fileNamePreview = string.Empty;
     private bool _isFileNameTemplateValid = true;
 
@@ -109,7 +109,7 @@ public class TokenService : INotifyPropertyChanged
     {
         if (string.IsNullOrEmpty(fileNameTemplate))
         {
-            return ("Не задан шаблон", true);
+            return ("Не задан шаблон - при экспорте будет использовано значение по умолчанию \"Обозначение детали\"", true);
         }
 
         var isValid = ValidateTemplate(fileNameTemplate);
