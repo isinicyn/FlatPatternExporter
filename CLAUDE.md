@@ -6,6 +6,49 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Структура репозитория
 
+```
+FlatPatternExporter/
+├── CLAUDE.md                           # Инструкции для Claude
+├── LICENSE.txt                         # Лицензия
+├── README.md                           # Документация проекта
+├── FlatPatternExporter.sln             # Файл решения Visual Studio
+├── HELP/                               # Документация
+└── FlatPatternExporter/                # Основной проект
+    ├── FlatPatternExporter.csproj      # Файл проекта
+    ├── App.xaml(.cs)                   # Главное приложение
+    ├── AssemblyInfo.cs                 # Информация о сборке
+    ├── FPExport.ico                    # Иконка приложения
+    │
+    ├── FlatPatternExporterMainWindow.xaml(.cs,.part2.cs)  # Главное окно
+    ├── AboutWindow.xaml(.cs)           # Окно "О программе"
+    ├── ConflictDetailsWindow.xaml(.cs) # Окно деталей конфликтов
+    ├── EditIPropertyDialog.xaml(.cs)   # Диалог редактирования свойств
+    ├── SelectIPropertyWindow.xaml(.cs) # Окно выбора свойств
+    ├── OverrideQuantityDialog.xaml(.cs) # Диалог переопределения количества
+    │
+    ├── LayerSettingControl.xaml(.cs)   # Элемент управления слоями
+    ├── TokenizedTextBox.xaml(.cs)      # Токенизированное текстовое поле
+    │
+    ├── Styles/                         # XAML стили
+    │   ├── DataGridStyles.xaml
+    │   └── GeneralStyles.xaml
+    │
+    ├── MarshalCore.cs                  # COM interop
+    ├── DXFThumbnailCreator.cs          # Генерация миниатюр
+    ├── IPictureDispConverter.cs        # Конвертер изображений
+    ├── PropertyManager.cs              # Управление свойствами
+    ├── SettingsManager.cs              # Настройки пользователя
+    ├── LayerSettingsClasses.cs         # Классы настроек слоев
+    │
+    ├── Resources/Pic/                  # Изображения ресурсов
+    │   ├── Beta1.png
+    │   └── copy-icon.png
+    │
+    └── Properties/                     # Свойства проекта
+        ├── launchSettings.json
+        └── PublishProfiles/
+```
+
 Это C# WPF приложение, которое является дополнением для Autodesk Inventor:
 
 - **FlatPatternExporter** - Приложение для экспорта разверток деталей из листового металла с интегрированным функционалом управления слоями
@@ -57,11 +100,17 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `LayerSettingsClasses` - Классы моделей данных, конвертеры и вспомогательные методы
 - `LayerSettingsHelper` - Статические методы для работы с настройками слоев
 
+**Стили и ресурсы**:
+- `DataGridStyles.xaml` - Стили для DataGrid элементов
+- `GeneralStyles.xaml` - Общие стили приложения
+
 **Утилиты**:
 - `MarshalCore` - Основная функциональность COM interop  
 - `DXFThumbnailCreator` - Генерация миниатюр DXF файлов
 - `IPictureDispConverter` - Конвертер изображений
 - `SettingsManager` - Система сохранения и загрузки настроек пользователя в XML
+- `PropertyManager` - Управление пользовательскими свойствами iProperty
+- `TokenizedTextBox` - Пользовательский элемент управления для токенизированного ввода текста
 
 ### Управление версиями
 Проект использует версионирование на основе Git в процессе сборки:
