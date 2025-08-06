@@ -115,7 +115,7 @@ public class TokenService : INotifyPropertyChanged
         var isValid = ValidateTemplate(fileNameTemplate);
         if (!isValid)
         {
-            return ("❌ Ошибка в шаблоне - неизвестные токены", false);
+            return ("Ошибка в шаблоне - неизвестные токены", false);
         }
 
         var sampleData = CreateSamplePartData(partsData);
@@ -123,15 +123,15 @@ public class TokenService : INotifyPropertyChanged
         
         if (preview == "Ошибка в шаблоне")
         {
-            return ("❌ " + preview, false);
+            return (preview, false);
         }
         
         if (preview.Length > 255)
         {
-            return ($"❌ Имя файла слишком длинное ({preview.Length} символов, максимум 255)", false);
+            return ($"Имя файла слишком длинное ({preview.Length} символов, максимум 255)", false);
         }
         
-        return ("✓ " + preview, true);
+        return (preview, true);
     }
 
     public PartData CreateSamplePartData(IList<PartData> partsData)
