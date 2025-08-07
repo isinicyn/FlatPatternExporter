@@ -364,6 +364,7 @@
                                       SelectedItem="{Binding SelectedTemplatePreset, Mode=TwoWay}"
                                       SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
                                       Style="{StaticResource PresetComboBoxStyle}"
+                                      IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}"
                                       ToolTip="Выберите сохраненный пресет шаблона"/>
                             <Button x:Name="DeletePresetButton"
                                     Content="Удалить"
