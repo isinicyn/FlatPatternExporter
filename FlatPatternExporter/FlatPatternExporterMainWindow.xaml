@@ -393,6 +393,23 @@
                                             Click="AddCustomTextButton_Click"
                                             ToolTip="Добавить введенный текст как кастомный токен"/>
                                 </StackPanel>
+                                
+                                <!-- Панель с предустановленными символами -->
+                                <TextBlock Text="Быстрые символы:" Margin="0,10,0,5" FontWeight="SemiBold"/>
+                                <WrapPanel Orientation="Horizontal">
+                                    <Button Content="-" Click="AddSymbolButton_Click" Tag="-" ToolTip="Тире" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="_" Click="AddSymbolButton_Click" Tag="_" ToolTip="Подчеркивание" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="." Click="AddSymbolButton_Click" Tag="." ToolTip="Точка" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="␣" Click="AddSymbolButton_Click" Tag=" " ToolTip="Пробел" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="(" Click="AddSymbolButton_Click" Tag="(" ToolTip="Открывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content=")" Click="AddSymbolButton_Click" Tag=")" ToolTip="Закрывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="[" Click="AddSymbolButton_Click" Tag="[" ToolTip="Открывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="]" Click="AddSymbolButton_Click" Tag="]" ToolTip="Закрывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="+" Click="AddSymbolButton_Click" Tag="+" ToolTip="Плюс" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="=" Click="AddSymbolButton_Click" Tag="=" ToolTip="Знак равенства" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="x" Click="AddSymbolButton_Click" Tag="x" ToolTip="x (для обозначения 'на')" Style="{StaticResource SymbolButtonStyle}"/>
+                                    <Button Content="#" Click="AddSymbolButton_Click" Tag="#" ToolTip="Решетка" Style="{StaticResource SymbolButtonStyle}"/>
+                                </WrapPanel>
                             </StackPanel>
                         </GroupBox>
 

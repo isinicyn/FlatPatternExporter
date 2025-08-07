@@ -706,6 +706,15 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         CustomTextBox.Text = string.Empty;
     }
 
+    private void AddSymbolButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Button button && button.Tag is string symbol)
+        {
+            // Добавляем символ через TokenizedTextBox
+            FileNameTemplateTokenBox.AddCustomText(symbol);
+        }
+    }
+
     private void CustomTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key == System.Windows.Input.Key.Enter)
