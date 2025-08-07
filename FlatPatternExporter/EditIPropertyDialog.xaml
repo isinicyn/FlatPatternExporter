@@ -1,34 +1,71 @@
 ﻿<Window x:Class="FlatPatternExporter.EditIPropertyDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Редактировать iProperty" Width="420" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Background="#FAFAFA" Height="285">
-    <Grid Margin="10,0,10,0" Height="244" VerticalAlignment="Center" Width="380">
+        Title="Редактировать iProperty"
+        WindowStartupLocation="CenterScreen" 
+        ResizeMode="NoResize" 
+        Background="White"
+        FontFamily="Segoe UI" SizeToContent="WidthAndHeight">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <!-- Подключение внешнего файла стилей -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок окна -->
-        <TextBlock Text="Редактирование свойств iProperty" FontWeight="Bold" FontSize="16" Grid.Row="0" Margin="0,0,0,20"/>
+        <!-- Основное содержимое -->
+        <StackPanel Grid.Row="0" Margin="15">
+            <GroupBox Header="Свойства детали" Margin="0,0,0,15">
+                <StackPanel Margin="10,10,10,5">
+                    <!-- Обозначение (Part Number) -->
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="Обозначение (Part Number):" 
+                                   FontSize="11" 
+                                   FontWeight="Bold" 
+                                   Margin="0,0,0,5"/>
+                        <TextBox x:Name="partNumberTextBox" 
+                                 Style="{StaticResource FileNameInputTextBoxStyle}"
+                                 Width="380"
+                                 ToolTip="Введите обозначение детали"/>
+                    </StackPanel>
 
-        <!-- Обозначение (Part Number) -->
-        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,10">
-            <Label Content="Обозначение (Part Number):" FontWeight="Bold"/>
-            <TextBox x:Name="partNumberTextBox" Height="30" Margin="0,5,0,0" Padding="5" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="1"/>
+                    <!-- Наименование (Description) -->
+                    <StackPanel Margin="0,0,0,5">
+                        <TextBlock Text="Наименование (Description):" 
+                                   FontSize="11" 
+                                   FontWeight="Bold" 
+                                   Margin="0,0,0,5"/>
+                        <TextBox x:Name="descriptionTextBox" 
+                                 Style="{StaticResource FileNameInputTextBoxStyle}"
+                                 Width="380"
+                                 ToolTip="Введите наименование детали"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
         </StackPanel>
 
-        <!-- Наименование (Description) -->
-        <StackPanel Orientation="Vertical" Grid.Row="2" Margin="0,0,0,10">
-            <Label Content="Наименование (Description):" FontWeight="Bold"/>
-            <TextBox x:Name="descriptionTextBox" Height="30" Margin="0,5,0,0" Padding="5" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="1"/>
-        </StackPanel>
-
-        <!-- Кнопки "ОК" и "Отмена" -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Отмена" Width="100" Margin="0,0,10,0" Click="CancelButton_Click" Background="#E0E0E0" BorderBrush="#CCCCCC" Padding="5"/>
-            <Button Content="ОК" Width="100" Click="OkButton_Click" Background="#4CAF50" Foreground="White" BorderBrush="#388E3C" Padding="5"/>
-        </StackPanel>
+        <!-- Кнопки -->
+        <Border Grid.Row="1" Background="#F8F8F8" BorderBrush="#D0D0D0" BorderThickness="0,1,0,0" Padding="15,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Отмена" 
+                        Width="120" 
+                        Margin="0,0,5,0"
+                        Style="{StaticResource FileNameActionButtonStyle}"
+                        Click="CancelButton_Click"/>
+                <Button Content="ОК" 
+                        Width="120" 
+                        Style="{StaticResource FileNameActionButtonStyle}"
+                        Click="OkButton_Click"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
