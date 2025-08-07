@@ -339,7 +339,8 @@
                         <TextBlock Text="ℹ" 
                                    FontSize="14" 
                                    Foreground="Gray"
-                                   Cursor="Help">
+                                   Cursor="Help"
+                                   Margin="0,0,15,0">
                             <TextBlock.ToolTip>
                                 <ToolTip>
                                     <StackPanel>
@@ -352,6 +353,27 @@
                                 </ToolTip>
                             </TextBlock.ToolTip>
                         </TextBlock>
+                        
+                        <!-- Управление пресетами -->
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Пресеты:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="SemiBold"/>
+                            <ComboBox x:Name="TemplatePresetsComboBox" 
+                                      Width="120" 
+                                      Height="22"
+                                      ItemsSource="{Binding TemplatePresets}"
+                                      DisplayMemberPath="Name"
+                                      SelectedItem="{Binding SelectedTemplatePreset, Mode=TwoWay}"
+                                      SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
+                                      ToolTip="Выберите сохраненный пресет шаблона"/>
+                            <Button x:Name="DeletePresetButton"
+                                    Content="Удалить"
+                                    Width="60"
+                                    Height="22"
+                                    Margin="3,0,0,0"
+                                    Click="DeletePresetButton_Click"
+                                    IsEnabled="{Binding SelectedTemplatePreset, Converter={x:Static local:ObjectToBooleanConverter.Instance}}"
+                                    ToolTip="Удалить выбранный пресет"/>
+                        </StackPanel>
                     </StackPanel>
                     
                     <Grid Grid.Row="1" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
@@ -424,6 +446,23 @@
                                                        AvailableTokens="{Binding AvailableTokens}"
                                                        TokenService="{Binding TokenService}"
                                                        Margin="0,0,0,0"/>
+                                
+                                <!-- Сохранение пресета -->
+                                <TextBlock Text="Сохранить как пресет:" Margin="0,10,0,5" FontWeight="SemiBold"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox x:Name="PresetNameTextBox" 
+                                             Width="200" 
+                                             Height="22"
+                                             VerticalContentAlignment="Center"
+                                             ToolTip="Введите имя для нового пресета"/>
+                                    <Button x:Name="SavePresetInlineButton"
+                                            Content="Сохранить"
+                                            Width="80"
+                                            Height="22"
+                                            Margin="5,0,0,0"
+                                            Click="SavePresetInlineButton_Click"
+                                            ToolTip="Сохранить текущий шаблон как пресет"/>
+                                </StackPanel>
                                 
                                 <!-- Предпросмотр результата -->
                                 <TextBlock Text="Предпросмотр:" Margin="0,10,0,5" FontWeight="SemiBold"/>

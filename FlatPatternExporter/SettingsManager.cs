@@ -18,6 +18,13 @@ public class LayerSettingData
 }
 
 [Serializable]
+public class TemplatePresetData
+{
+    public string Name { get; set; } = string.Empty;
+    public string Template { get; set; } = string.Empty;
+}
+
+[Serializable]
 public class ApplicationSettings
 {
     public ObservableCollection<string> ColumnOrder { get; set; } = new();
@@ -47,6 +54,9 @@ public class ApplicationSettings
     
     public bool EnableFileNameConstructor { get; set; } = false;
     public string FileNameTemplate { get; set; } = "{PartNumber}";
+    
+    public ObservableCollection<TemplatePresetData> TemplatePresets { get; set; } = new();
+    public string SelectedTemplatePresetName { get; set; } = string.Empty;
     
     public ObservableCollection<LayerSettingData> LayerSettings { get; set; } = new();
 }
@@ -121,6 +131,20 @@ public static class SettingsManager
             EnableFileNameConstructor = window.EnableFileNameConstructor,
             FileNameTemplate = window.TokenService.FileNameTemplate
         };
+        
+        // Сохранение пресетов шаблонов
+        settings.TemplatePresets.Clear();
+        foreach (var preset in window.TemplatePresets)
+        {
+            settings.TemplatePresets.Add(new TemplatePresetData
+            {
+                Name = preset.Name,
+                Template = preset.Template
+            });
+        }
+        
+        // Сохранение выбранного пресета
+        settings.SelectedTemplatePresetName = window.SelectedTemplatePreset?.Name ?? string.Empty;
 
         var columnsInDisplayOrder = window.PartsDataGrid.Columns
             .Where(c => c.Header is string)
@@ -180,6 +204,24 @@ public static class SettingsManager
         window.FixedFolderPath = settings.FixedFolderPath;
         window.EnableFileNameConstructor = settings.EnableFileNameConstructor;
         window.TokenService.FileNameTemplate = settings.FileNameTemplate;
+        
+        // Загрузка пресетов шаблонов
+        window.TemplatePresets.Clear();
+        foreach (var presetData in settings.TemplatePresets)
+        {
+            window.TemplatePresets.Add(new TemplatePreset
+            {
+                Name = presetData.Name,
+                Template = presetData.Template
+            });
+        }
+        
+        // Восстановление выбранного пресета
+        if (!string.IsNullOrEmpty(settings.SelectedTemplatePresetName))
+        {
+            window.SelectedTemplatePreset = window.TemplatePresets
+                .FirstOrDefault(p => p.Name == settings.SelectedTemplatePresetName);
+        }
 
         window.CustomPropertiesList.Clear();
         foreach (var customProperty in settings.CustomProperties)

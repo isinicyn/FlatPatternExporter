@@ -348,6 +348,18 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = new();
     public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = new();
     public ObservableCollection<string> AvailableTokens { get; set; } = new();
+    public ObservableCollection<TemplatePreset> TemplatePresets { get; set; } = new();
+
+    private TemplatePreset? _selectedTemplatePreset;
+    public TemplatePreset? SelectedTemplatePreset
+    {
+        get => _selectedTemplatePreset;
+        set
+        {
+            _selectedTemplatePreset = value;
+            OnPropertyChanged();
+        }
+    }
 
     // Публичные свойства для привязки данных CheckBox
     public bool ExcludeReferenceParts
@@ -712,6 +724,77 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             // Добавляем символ через TokenizedTextBox
             FileNameTemplateTokenBox.AddCustomText(symbol);
+        }
+    }
+
+    private void TemplatePresetsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (SelectedTemplatePreset != null && !string.IsNullOrEmpty(SelectedTemplatePreset.Template))
+        {
+            TokenService.FileNameTemplate = SelectedTemplatePreset.Template;
+        }
+    }
+
+    private void SavePresetInlineButton_Click(object sender, RoutedEventArgs e)
+    {
+        var currentTemplate = TokenService.FileNameTemplate;
+        if (string.IsNullOrEmpty(currentTemplate))
+        {
+            MessageBox.Show("Шаблон не может быть пустым.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var presetName = PresetNameTextBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(presetName))
+        {
+            MessageBox.Show("Введите имя пресета.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        // Проверяем, не существует ли уже пресет с таким именем
+        var existingPreset = TemplatePresets.FirstOrDefault(p => p.Name == presetName);
+        if (existingPreset != null)
+        {
+            var result = MessageBox.Show(
+                $"Пресет с именем '{presetName}' уже существует. Заменить?", 
+                "Подтверждение", 
+                MessageBoxButton.YesNo, 
+                MessageBoxImage.Question);
+            
+            if (result == MessageBoxResult.Yes)
+            {
+                existingPreset.Template = currentTemplate;
+                PresetNameTextBox.Text = "";
+            }
+        }
+        else
+        {
+            var newPreset = new TemplatePreset
+            {
+                Name = presetName,
+                Template = currentTemplate
+            };
+            TemplatePresets.Add(newPreset);
+            SelectedTemplatePreset = newPreset;
+            PresetNameTextBox.Text = "";
+        }
+    }
+
+    private void DeletePresetButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (SelectedTemplatePreset == null)
+            return;
+
+        var result = MessageBox.Show(
+            $"Удалить пресет '{SelectedTemplatePreset.Name}'?", 
+            "Подтверждение удаления", 
+            MessageBoxButton.YesNo, 
+            MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            TemplatePresets.Remove(SelectedTemplatePreset);
+            SelectedTemplatePreset = null;
         }
     }
 
@@ -1823,6 +1906,29 @@ public class EnumToBooleanConverter : IValueConverter
 
         return Binding.DoNothing;
     }
+}
+
+public class ObjectToBooleanConverter : IValueConverter
+{
+    public static readonly ObjectToBooleanConverter Instance = new();
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value != null;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return Binding.DoNothing;
+    }
+}
+
+public class TemplatePreset
+{
+    public string Name { get; set; } = string.Empty;
+    public string Template { get; set; } = string.Empty;
+    
+    public override string ToString() => Name;
 }
 
 // Структура для детальной информации о конфликтах обозначений
