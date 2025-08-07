@@ -362,4 +362,46 @@
         </Setter>
     </Style>
 
+    <!-- Простой стиль для TreeView -->
+    <Style x:Key="ConflictTreeViewStyle" TargetType="TreeView">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="10"/>
+    </Style>
+
+    <!-- Простой стиль для TreeViewItem -->
+    <Style x:Key="ConflictTreeViewItemStyle" TargetType="TreeViewItem">
+        <Setter Property="IsExpanded" Value="True"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Margin" Value="0,1"/>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#0078D4"/>
+                <Setter Property="Foreground" Value="White"/>
+            </Trigger>
+        </Style.Triggers>
+        <Style.Resources>
+            <!-- Стиль для TextBlock внутри TreeViewItem -->
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#333333"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True">
+                        <Setter Property="Foreground" Value="White"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            
+            <!-- Стиль для TextBlock дочерних элементов (файлов) -->
+            <Style TargetType="TextBlock" x:Key="FileTextBlockStyle" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="Foreground" Value="#666666"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True">
+                        <Setter Property="Foreground" Value="White"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Style.Resources>
+    </Style>
+
 </ResourceDictionary>
