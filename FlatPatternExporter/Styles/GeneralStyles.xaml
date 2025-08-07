@@ -298,4 +298,68 @@
         <Setter Property="Margin" Value="0,0,3,3"/>
     </Style>
 
+    <!-- Стили для элементов конструктора имени файла -->
+    <Style x:Key="FileNameInputTextBoxStyle" TargetType="TextBox">
+        <Setter Property="Width" Value="200"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="2,6"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="FileNameActionButtonStyle" TargetType="Button">
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Margin" Value="5,0,0,0"/>
+        <Setter Property="Padding" Value="8,4"/>
+    </Style>
+
+    <Style x:Key="PresetComboBoxStyle" TargetType="ComboBox">
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="6,4"/>
+    </Style>
+
+    <Style x:Key="PresetDeleteButtonStyle" TargetType="Button">
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="Margin" Value="5,0,0,0"/>
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="MinWidth" Value="60"/>
+        <Setter Property="Background" Value="#F8F8F8"/>
+        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#FFE6E6"/>
+                            <Setter Property="BorderBrush" Value="#FF9999"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#FFCCCC"/>
+                            <Setter Property="BorderBrush" Value="#FF6666"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#F0F0F0"/>
+                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                            <Setter Property="Foreground" Value="#999999"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

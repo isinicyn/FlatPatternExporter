@@ -358,20 +358,18 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Пресеты:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="SemiBold"/>
                             <ComboBox x:Name="TemplatePresetsComboBox" 
-                                      Width="120" 
-                                      Height="22"
+                                      Width="150"
                                       ItemsSource="{Binding TemplatePresets}"
                                       DisplayMemberPath="Name"
                                       SelectedItem="{Binding SelectedTemplatePreset, Mode=TwoWay}"
                                       SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
+                                      Style="{StaticResource PresetComboBoxStyle}"
                                       ToolTip="Выберите сохраненный пресет шаблона"/>
                             <Button x:Name="DeletePresetButton"
                                     Content="Удалить"
-                                    Width="60"
-                                    Height="22"
-                                    Margin="3,0,0,0"
                                     Click="DeletePresetButton_Click"
                                     IsEnabled="{Binding SelectedTemplatePreset, Converter={x:Static local:ObjectToBooleanConverter.Instance}}"
+                                    Style="{StaticResource PresetDeleteButtonStyle}"
                                     ToolTip="Удалить выбранный пресет"/>
                         </StackPanel>
                     </StackPanel>
@@ -451,16 +449,12 @@
                                 <TextBlock Text="Сохранить как пресет:" Margin="0,10,0,5" FontWeight="SemiBold"/>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBox x:Name="PresetNameTextBox" 
-                                             Width="200" 
-                                             Height="22"
-                                             VerticalContentAlignment="Center"
+                                             Style="{StaticResource FileNameInputTextBoxStyle}"
                                              ToolTip="Введите имя для нового пресета"/>
                                     <Button x:Name="SavePresetInlineButton"
                                             Content="Сохранить"
-                                            Width="80"
-                                            Height="22"
-                                            Margin="5,0,0,0"
                                             Click="SavePresetInlineButton_Click"
+                                            Style="{StaticResource FileNameActionButtonStyle}"
                                             ToolTip="Сохранить текущий шаблон как пресет"/>
                                 </StackPanel>
                                 
