@@ -7,7 +7,7 @@
         Background="White"
         FontFamily="Segoe UI" 
         SizeToContent="WidthAndHeight"
-        MinWidth="400">
+        MinWidth="300">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -37,7 +37,7 @@
                         <TextBox x:Name="quantityTextBox" 
                                  PreviewTextInput="QuantityTextBox_PreviewTextInput"
                                  Style="{StaticResource FileNameInputTextBoxStyle}"
-                                 Width="100"
+                                 Width="50"
                                  FlowDirection="RightToLeft"
                                  ToolTip="Введите количество (только числа)"/>
                     </StackPanel>

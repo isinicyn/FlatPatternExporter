@@ -7,10 +7,15 @@ namespace FlatPatternExporter;
 
 public partial class OverrideQuantityDialog : Window
 {
-    public OverrideQuantityDialog()
+    public OverrideQuantityDialog(int? currentQuantity = null)
     {
         InitializeComponent();
         Loaded += OverrideQuantityDialog_Loaded;
+        
+        if (currentQuantity.HasValue)
+        {
+            quantityTextBox.Text = currentQuantity.Value.ToString();
+        }
     }
 
     public int? NewQuantity { get; private set; }

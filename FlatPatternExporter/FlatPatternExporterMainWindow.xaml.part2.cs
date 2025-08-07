@@ -766,7 +766,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
         
-        var dialog = new OverrideQuantityDialog();
+        // Передаем текущее количество первого выбранного элемента для отображения пользователю
+        var currentQuantity = selectedItems.FirstOrDefault()?.Quantity;
+        var dialog = new OverrideQuantityDialog(currentQuantity);
         dialog.Owner = this;
         dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
