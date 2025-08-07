@@ -355,22 +355,60 @@
                         </TextBlock>
                         
                         <!-- Управление пресетами -->
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
                             <TextBlock Text="Пресеты:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="SemiBold"/>
-                            <ComboBox x:Name="TemplatePresetsComboBox" 
-                                      Width="150"
-                                      ItemsSource="{Binding TemplatePresets}"
-                                      DisplayMemberPath="Name"
-                                      SelectedItem="{Binding SelectedTemplatePreset, Mode=TwoWay}"
-                                      SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
-                                      Style="{StaticResource PresetComboBoxStyle}"
-                                      IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}"
-                                      ToolTip="Выберите сохраненный пресет шаблона"/>
+                            <Grid>
+                                <ComboBox x:Name="TemplatePresetsComboBox" 
+                                          Width="150"
+                                          ItemsSource="{Binding TemplatePresets}"
+                                          DisplayMemberPath="Name"
+                                          SelectedItem="{Binding SelectedTemplatePreset, Mode=TwoWay}"
+                                          SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
+                                          ToolTip="Выберите сохраненный пресет шаблона">
+                                    <ComboBox.Style>
+                                        <Style TargetType="ComboBox" BasedOn="{StaticResource PresetComboBoxStyle}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                                                    <Setter Property="IsEnabled" Value="False" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ComboBox.Style>
+                                </ComboBox>
+                                <TextBlock Text="Нет пресетов" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0" Foreground="Gray">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasItems, ElementName=TemplatePresetsComboBox}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Text="Выберите пресет" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0" Foreground="Gray">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding HasItems, ElementName=TemplatePresetsComboBox}" Value="True"/>
+                                                        <Condition Binding="{Binding SelectedItem, ElementName=TemplatePresetsComboBox}" Value="{x:Null}"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
                             <Button x:Name="DeletePresetButton"
                                     Content="Удалить"
                                     Click="DeletePresetButton_Click"
-                                    IsEnabled="{Binding SelectedTemplatePreset, Converter={x:Static local:ObjectToBooleanConverter.Instance}}"
                                     Style="{StaticResource PresetDeleteButtonStyle}"
+                                    IsEnabled="{Binding SelectedTemplatePreset, Converter={x:Static local:ObjectToBooleanConverter.Instance}}"
                                     ToolTip="Удалить выбранный пресет"/>
                         </StackPanel>
                     </StackPanel>
