@@ -189,9 +189,26 @@ namespace FlatPatternExporter
         {
             if (string.IsNullOrEmpty(customText)) return;
             
-            // Добавляем кастомный текст как специальный токен
-            var customToken = $"{{CUSTOM:{customText}}}";
-            Template += customToken;
+            // Проверяем, заканчивается ли текущий Template на CUSTOM токен
+            var customTextPattern = @"\{CUSTOM:([^}]+)\}$";
+            var match = Regex.Match(Template, customTextPattern);
+            
+            if (match.Success)
+            {
+                // Объединяем с предыдущим CUSTOM токеном
+                var existingCustomText = match.Groups[1].Value;
+                var combinedText = existingCustomText + customText;
+                var combinedToken = $"{{CUSTOM:{combinedText}}}";
+                
+                // Заменяем последний CUSTOM токен на объединенный
+                Template = Template.Substring(0, match.Index) + combinedToken;
+            }
+            else
+            {
+                // Добавляем новый кастомный текст как специальный токен
+                var customToken = $"{{CUSTOM:{customText}}}";
+                Template += customToken;
+            }
         }
     }
 }
