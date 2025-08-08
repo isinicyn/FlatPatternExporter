@@ -553,7 +553,8 @@
                       RowStyle="{StaticResource DataGridRowStyle}"
                       ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
                       RowHeaderStyle="{StaticResource DataGridRowHeaderStyle}"
-                      CellStyle="{StaticResource DataGridCellStyle}">
+                      CellStyle="{StaticResource DataGridCellStyle}"
+                      PreviewKeyDown="PartsDataGrid_PreviewKeyDown">
 
                 <!-- Контекстное меню -->
                 <DataGrid.ContextMenu>

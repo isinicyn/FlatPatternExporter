@@ -1528,4 +1528,13 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             NoColumnsOverlay.Visibility = PartsDataGrid.Columns.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
     }
+
+    private void PartsDataGrid_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Delete && PartsDataGrid.SelectedItems.Count > 0)
+        {
+            RemoveSelectedRows_Click(this, new RoutedEventArgs());
+            e.Handled = true;
+        }
+    }
 }
