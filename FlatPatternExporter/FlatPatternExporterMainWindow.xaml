@@ -103,7 +103,7 @@
                         <Grid>
                             <TextBox x:Name="SearchTextBox" 
                                      Width="200"
-                                     Height="32"
+                                     Height="24"
                                      Padding="5,0,5,0"
                                      VerticalContentAlignment="Center"
                                      TextChanged="SearchTextBox_TextChanged"/>
@@ -124,7 +124,7 @@
                                 </TextBlock.Style>
                             </TextBlock>
                         </Grid>
-                        <Border Width="32" Height="32" Margin="2,0,0,0">
+                        <Border Width="24" Height="24" Margin="2,0,0,0">
                             <Button x:Name="ClearSearchButton" 
                                     Click="ClearSearchButton_Click" 
                                     Style="{StaticResource ClearInputButtonStyle}"/>
@@ -133,14 +133,13 @@
 
                     <!-- Multiplier -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-                        <Label Content="Множитель" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                        <Label Content="Множитель" Margin="0,0,5,0" Padding="5,0,5,0" VerticalContentAlignment="Center"/>
                         <Grid>
-                            <TextBox x:Name="MultiplierTextBox" Text="1" Height="32" VerticalAlignment="Center" 
+                            <TextBox x:Name="MultiplierTextBox" Text="1" Height="24" 
                                      PreviewTextInput="MultiplierTextBox_PreviewTextInput" 
-                                     VerticalContentAlignment="Center" 
-                                     TextChanged="MultiplierTextBox_TextChanged" FontSize="16" Padding="2,0,2,2" Width="50"/>
+                                     TextChanged="MultiplierTextBox_TextChanged" Padding="2,0,2,2" Width="50" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
                         </Grid>
-                        <Border Width="32" Height="32" Margin="2,0,0,0">
+                        <Border Width="24" Height="24" Margin="2,0,0,0">
                             <Button x:Name="ClearMultiplierButton" 
                                     Click="ClearMultiplierButton_Click" 
                                     Style="{StaticResource ClearInputButtonStyle}" 
@@ -212,7 +211,7 @@
                                 <Label Content="Версия AutoCAD:" VerticalAlignment="Center"/>
                                 <ComboBox x:Name="AcadVersionComboBox" 
                                               Width="70" 
-                                              Height="20" 
+                                              Height="24" 
                                               VerticalContentAlignment="Center" 
                                               Padding="5,0,5,0"
                                               ItemsSource="{Binding AcadVersions}"
@@ -237,7 +236,7 @@
                                               Width="65" 
                                               VerticalContentAlignment="Center" 
                                               IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" 
-                                              Height="20" 
+                                              Height="24" 
                                               Padding="5,0,5,0" 
                                               Margin="2,0,0,0"
                                               ItemsSource="{Binding SplineReplacementTypes}"
@@ -247,7 +246,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="0,5,5,5"/>
-                                <TextBox x:Name="SplineToleranceTextBox" Width="65" Text="0.01" VerticalContentAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" Height="20"/>
+                                <TextBox x:Name="SplineToleranceTextBox" Width="65" Text="0.01" VerticalContentAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" Height="24" Padding="2,0,0,0"/>
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
@@ -273,14 +272,14 @@
                             <!-- Правая колонка -->
                             <StackPanel Grid.Row="0" Grid.Column="1">
                                 <CheckBox x:Name="EnableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsChecked="{Binding EnableSubfolder, Mode=TwoWay}" IsEnabled="{Binding IsSubfolderCheckBoxEnabled}" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="10,5,0,0" HorizontalAlignment="Left" />
-                                <TextBox x:Name="SubfolderNameTextBox" Width="118" Height="20" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Left" Margin="10,5,0,0" />
+                                <TextBox x:Name="SubfolderNameTextBox" Width="118" Height="24" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalContentAlignment="Center" Padding="2,0,0,0" />
                                 <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="Сортировать по материалу" IsChecked="{Binding OrganizeByMaterial, Mode=TwoWay}" Margin="10,5,0,0"/>
                                 <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="Сортировать по толщине" IsChecked="{Binding OrganizeByThickness, Mode=TwoWay}" Margin="10,5,0,0"/>
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Left" Grid.ColumnSpan="2" Grid.Column="0">
                                 <RadioButton x:Name="FixedFolderRadioButton" Content="Фиксированная папка" VerticalAlignment="Center" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=FixedFolder, Mode=TwoWay}" />
-                                <Button x:Name="SelectFixedFolderButton" Content="..." Width="30" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Click="SelectFixedFolderButton_Click" />
+                                <Button x:Name="SelectFixedFolderButton" Content="..." Width="30" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Click="SelectFixedFolderButton_Click" />
                                 <TextBlock x:Name="FixedFolderPathTextBlock" Text="Путь не выбран" Margin="10,0,0,0" TextTrimming="CharacterEllipsis" Opacity="0.75" VerticalAlignment="Center" Width="200" />
                             </StackPanel>
                         </Grid>
@@ -347,7 +346,7 @@
                                    FontSize="14" 
                                    Foreground="Gray"
                                    Cursor="Help"
-                                   Margin="0,0,15,0">
+                                   Margin="0,0,15,0" VerticalAlignment="Center">
                             <TextBlock.ToolTip>
                                 <ToolTip>
                                     <StackPanel>
@@ -535,7 +534,7 @@
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
                       CanUserAddRows="False"
-                      RowHeight="50"
+                      RowHeight="45"
                       GridLinesVisibility="None"
                       Background="White"
                       VerticalAlignment="Top"
