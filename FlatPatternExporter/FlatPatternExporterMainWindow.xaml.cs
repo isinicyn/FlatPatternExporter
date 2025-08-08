@@ -1338,18 +1338,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var partDoc = (PartDocument)doc;
             (partNumber, description) = GetDocumentProperties((Document)partDoc);
             
-            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
-            {
-                partCount = 1;
-
-                ProgressLabel.Text = "Обработка детали...";
-                var partData = await GetPartDataAsync(partNumber, 1, null, 1, partDoc);
-                if (partData != null)
-                {
-                    ((IProgress<PartData>)partProgress).Report(partData);
-                    ScanProgressValue = 100;
-                }
-            }
+            partCount = await ProcessSinglePart(partDoc, partNumber, partProgress);
         }
 
         // Останавливаем секундомер, если он еще не остановлен
@@ -1531,6 +1520,22 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 }
                 return existingList;
             });
+    }
+
+    private async Task<int> ProcessSinglePart(PartDocument partDoc, string partNumber, IProgress<PartData> partProgress)
+    {
+        if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+        {
+            ProgressLabel.Text = "Обработка детали...";
+            var partData = await GetPartDataAsync(partNumber, 1, null, 1, partDoc);
+            if (partData != null)
+            {
+                ((IProgress<PartData>)partProgress).Report(partData);
+                ScanProgressValue = 100;
+                return 1; // Успешно обработана 1 деталь
+            }
+        }
+        return 0; // Деталь не обработана (не листовой металл или ошибка)
     }
 
     private void FilterConflictingParts(Dictionary<string, int> sheetMetalParts)
