@@ -183,14 +183,38 @@
     <!-- Стиль для кнопки очистки поля ввода -->
     <Style x:Key="ClearInputButtonStyle" TargetType="Button">
         <Setter Property="Content" Value="✖"/>
-        <Setter Property="Width" Value="20"/>
-        <Setter Property="Height" Value="20"/>
-        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="FontSize" Value="8"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Background" Value="#F8F8F8"/>
+        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Visibility" Value="Collapsed"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center"
+                                          Content="{TemplateBinding Content}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#FFE6E6"/>
+                            <Setter Property="BorderBrush" Value="#FF9999"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#FFCCCC"/>
+                            <Setter Property="BorderBrush" Value="#FF6666"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- Стиль для кнопки на оверлее -->
