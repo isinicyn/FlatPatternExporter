@@ -150,6 +150,19 @@ namespace FlatPatternExporter
         }
 
         public bool IsEnabled => DisplayName != "OuterProfileLayer";
+
+        public bool HasChanges()
+        {
+            var defaultIsChecked = DisplayName == "OuterProfileLayer";
+            const string defaultCustomName = "";
+            const string defaultSelectedColor = "White";
+            const string defaultSelectedLineType = "Default";
+
+            return IsChecked != defaultIsChecked ||
+                   CustomName != defaultCustomName ||
+                   SelectedColor != defaultSelectedColor ||
+                   SelectedLineType != defaultSelectedLineType;
+        }
     }
 
 

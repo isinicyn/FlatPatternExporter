@@ -8,13 +8,10 @@ namespace FlatPatternExporter;
 public class LayerSettingData
 {
     public string DisplayName { get; set; } = string.Empty;
-    public string LayerName { get; set; } = string.Empty;
-    public bool HasVisibilityOption { get; set; } = true;
     public bool IsChecked { get; set; } = false;
     public string CustomName { get; set; } = string.Empty;
     public string SelectedColor { get; set; } = "White";
     public string SelectedLineType { get; set; } = "Default";
-    public string OriginalName { get; set; } = string.Empty;
 }
 
 [Serializable]
@@ -167,17 +164,17 @@ public static class SettingsManager
 
         foreach (var layerSetting in window.LayerSettings)
         {
-            settings.LayerSettings.Add(new LayerSettingData
+            if (layerSetting.HasChanges())
             {
-                DisplayName = layerSetting.DisplayName,
-                LayerName = layerSetting.LayerName,
-                HasVisibilityOption = layerSetting.HasVisibilityOption,
-                IsChecked = layerSetting.IsChecked,
-                CustomName = layerSetting.CustomName,
-                SelectedColor = layerSetting.SelectedColor,
-                SelectedLineType = layerSetting.SelectedLineType,
-                OriginalName = layerSetting.OriginalName
-            });
+                settings.LayerSettings.Add(new LayerSettingData
+                {
+                    DisplayName = layerSetting.DisplayName,
+                    IsChecked = layerSetting.IsChecked,
+                    CustomName = layerSetting.CustomName,
+                    SelectedColor = layerSetting.SelectedColor,
+                    SelectedLineType = layerSetting.SelectedLineType
+                });
+            }
         }
 
         return settings;
@@ -245,20 +242,15 @@ public static class SettingsManager
             }
         }
 
-        if (settings.LayerSettings.Count > 0)
+        foreach (var settingData in settings.LayerSettings)
         {
-            for (int i = 0; i < Math.Min(settings.LayerSettings.Count, window.LayerSettings.Count); i++)
+            var layerSetting = window.LayerSettings.FirstOrDefault(ls => ls.DisplayName == settingData.DisplayName);
+            if (layerSetting != null)
             {
-                var settingData = settings.LayerSettings[i];
-                var layerSetting = window.LayerSettings[i];
-                
-                layerSetting.DisplayName = settingData.DisplayName;
-                layerSetting.LayerName = settingData.LayerName;
                 layerSetting.IsChecked = settingData.IsChecked;
                 layerSetting.CustomName = settingData.CustomName;
                 layerSetting.SelectedColor = settingData.SelectedColor;
                 layerSetting.SelectedLineType = settingData.SelectedLineType;
-                layerSetting.OriginalName = settingData.OriginalName;
             }
         }
     }
