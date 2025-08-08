@@ -1487,30 +1487,58 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         var selectedItem = PartsDataGrid.SelectedItem as PartData;
         if (selectedItem == null) return;
         
-        var editDialog = new EditIPropertyDialog(selectedItem.PartNumber, selectedItem.Description);
+        // Открываем документ детали
+        var partDoc = OpenPartDocument(selectedItem.PartNumber);
+        if (partDoc == null)
+        {
+            MessageBox.Show("Не удалось открыть документ детали для редактирования.", "Ошибка", MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        }
+
+        var mgr = new PropertyManager((Document)partDoc);
+        
+        // Получаем выражения или значения для передачи в диалог
+        var partNumberForEdit = selectedItem.PartNumberIsExpression 
+            ? mgr.GetMappedPropertyExpression("PartNumber") 
+            : selectedItem.PartNumber;
+            
+        var descriptionIsExpression = mgr.IsMappedPropertyExpression("Description");
+        var descriptionForEdit = descriptionIsExpression 
+            ? mgr.GetMappedPropertyExpression("Description") 
+            : selectedItem.Description;
+        
+        var editDialog = new EditIPropertyDialog(partNumberForEdit, descriptionForEdit);
         if (editDialog.ShowDialog() == true)
         {
-            // Открываем документ детали
-            var partDoc = OpenPartDocument(selectedItem.PartNumber);
-            if (partDoc != null)
+            // Обновляем iProperty в файле детали
+            // Если изначально было выражение и новое значение начинается с "=", устанавливаем выражение
+            if (selectedItem.PartNumberIsExpression && editDialog.PartNumber.StartsWith("="))
             {
-                // Обновляем iProperty в файле детали
-                var mgr = new PropertyManager((Document)partDoc);
-                mgr.SetMappedProperty("PartNumber", editDialog.PartNumber);
-                mgr.SetMappedProperty("Description", editDialog.Description);
-
-                // Сохраняем изменения и закрываем документ
-                partDoc.Save2();
-
-                // Обновляем свойства детали в таблице (INotifyPropertyChanged автоматически обновит UI)
-                selectedItem.PartNumber = editDialog.PartNumber;
-                selectedItem.Description = editDialog.Description;
+                mgr.SetMappedPropertyExpression("PartNumber", editDialog.PartNumber);
             }
             else
             {
-                MessageBox.Show("Не удалось открыть документ детали для редактирования.", "Ошибка", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                mgr.SetMappedProperty("PartNumber", editDialog.PartNumber);
             }
+            
+            if (descriptionIsExpression && editDialog.Description.StartsWith("="))
+            {
+                mgr.SetMappedPropertyExpression("Description", editDialog.Description);
+            }
+            else
+            {
+                mgr.SetMappedProperty("Description", editDialog.Description);
+            }
+
+            // Сохраняем изменения
+            partDoc.Save2();
+
+            // Обновляем свойства детали в таблице после сохранения
+            // Получаем актуальные значения (не выражения) для отображения
+            selectedItem.PartNumber = mgr.GetMappedProperty("PartNumber");
+            selectedItem.PartNumberIsExpression = mgr.IsMappedPropertyExpression("PartNumber");
+            selectedItem.Description = mgr.GetMappedProperty("Description");
         }
     }
 

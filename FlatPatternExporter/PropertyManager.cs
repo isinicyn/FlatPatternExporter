@@ -67,9 +67,6 @@ namespace FlatPatternExporter
         /// <summary>
         /// Получает значение свойства из указанного набора свойств
         /// </summary>
-        /// <param name="setName">Имя набора свойств</param>
-        /// <param name="propName">Имя свойства</param>
-        /// <returns>Значение свойства в виде строки или пустая строка при ошибке</returns>
         public string GetProperty(string setName, string propName)
         {
             try
@@ -86,11 +83,26 @@ namespace FlatPatternExporter
         }
 
         /// <summary>
+        /// Получает выражение свойства из указанного набора свойств
+        /// </summary>
+        public string GetPropertyExpression(string setName, string propName)
+        {
+            try
+            {
+                var propSet = _document.PropertySets[setName];
+                var prop = propSet[propName];
+                return prop.Expression ?? string.Empty;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка получения выражения свойства '{propName}' из набора '{setName}': {ex.Message}");
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
         /// Проверяет, является ли значение свойства expression-ом
         /// </summary>
-        /// <param name="setName">Имя набора свойств</param>
-        /// <param name="propName">Имя свойства</param>
-        /// <returns>true если свойство содержит expression</returns>
         public bool IsPropertyExpression(string setName, string propName)
         {
             try
@@ -111,9 +123,6 @@ namespace FlatPatternExporter
         /// <summary>
         /// Устанавливает значение свойства в указанном наборе свойств
         /// </summary>
-        /// <param name="setName">Имя набора свойств</param>
-        /// <param name="propName">Имя свойства</param>
-        /// <param name="value">Новое значение свойства</param>
         public void SetProperty(string setName, string propName, object value)
         {
             try
@@ -130,10 +139,26 @@ namespace FlatPatternExporter
         }
 
         /// <summary>
+        /// Устанавливает выражение свойства в указанном наборе свойств
+        /// </summary>
+        public void SetPropertyExpression(string setName, string propName, string expression)
+        {
+            try
+            {
+                var propSet = _document.PropertySets[setName];
+                var prop = propSet[propName];
+                prop.Expression = expression;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка установки выражения свойства '{propName}' в наборе '{setName}': {ex.Message}");
+                System.Windows.MessageBox.Show($"Не удалось обновить выражение свойства '{propName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
         /// Получает значение свойства по внутреннему имени с использованием маппинга
         /// </summary>
-        /// <param name="ourName">Внутреннее имя свойства</param>
-        /// <returns>Значение свойства в виде строки</returns>
         public string GetMappedProperty(string ourName)
         {
             if (PropertyMapping.TryGetValue(ourName, out var mapping))
@@ -146,10 +171,22 @@ namespace FlatPatternExporter
         }
 
         /// <summary>
+        /// Получает выражение свойства по внутреннему имени с использованием маппинга
+        /// </summary>
+        public string GetMappedPropertyExpression(string ourName)
+        {
+            if (PropertyMapping.TryGetValue(ourName, out var mapping))
+            {
+                return GetPropertyExpression(mapping.SetName, mapping.InventorName);
+            }
+
+            // Для пользовательских свойств проверяем только набор user-defined
+            return GetPropertyExpression("Inventor User Defined Properties", ourName);
+        }
+
+        /// <summary>
         /// Проверяет, является ли свойство expression-ом по внутреннему имени с использованием маппинга
         /// </summary>
-        /// <param name="ourName">Внутреннее имя свойства</param>
-        /// <returns>true если свойство содержит expression</returns>
         public bool IsMappedPropertyExpression(string ourName)
         {
             if (PropertyMapping.TryGetValue(ourName, out var mapping))
@@ -164,8 +201,6 @@ namespace FlatPatternExporter
         /// <summary>
         /// Устанавливает значение свойства по внутреннему имени с использованием маппинга
         /// </summary>
-        /// <param name="ourName">Внутреннее имя свойства</param>
-        /// <param name="value">Новое значение свойства</param>
         public void SetMappedProperty(string ourName, object value)
         {
             if (PropertyMapping.TryGetValue(ourName, out var mapping))
@@ -176,6 +211,21 @@ namespace FlatPatternExporter
 
             // Для пользовательских свойств
             SetProperty("Inventor User Defined Properties", ourName, value);
+        }
+
+        /// <summary>
+        /// Устанавливает выражение свойства по внутреннему имени с использованием маппинга
+        /// </summary>
+        public void SetMappedPropertyExpression(string ourName, string expression)
+        {
+            if (PropertyMapping.TryGetValue(ourName, out var mapping))
+            {
+                SetPropertyExpression(mapping.SetName, mapping.InventorName, expression);
+                return;
+            }
+
+            // Для пользовательских свойств
+            SetPropertyExpression("Inventor User Defined Properties", ourName, expression);
         }
 
         // === Методы для работы с не-iProperty свойствами ===
