@@ -469,6 +469,9 @@ public partial class FlatPatternExporterMainWindow : Window
         if (ExcludePurchasedParts && bomStructure == BOMStructureEnum.kPurchasedBOMStructure)
             return true;
 
+        if (ExcludePhantomParts && bomStructure == BOMStructureEnum.kPhantomBOMStructure)
+            return true;
+
         if (!IncludeLibraryComponents && !string.IsNullOrEmpty(fullFileName) && IsLibraryComponent(fullFileName))
             return true;
 

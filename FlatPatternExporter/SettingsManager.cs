@@ -32,6 +32,7 @@ public class ApplicationSettings
     
     public bool ExcludeReferenceParts { get; set; } = true;
     public bool ExcludePurchasedParts { get; set; } = true;
+    public bool ExcludePhantomParts { get; set; } = true;
     public bool IncludeLibraryComponents { get; set; } = false;
     
     public bool OrganizeByMaterial { get; set; } = false;
@@ -113,6 +114,7 @@ public static class SettingsManager
         {
             ExcludeReferenceParts = window.ExcludeReferenceParts,
             ExcludePurchasedParts = window.ExcludePurchasedParts,
+            ExcludePhantomParts = window.ExcludePhantomParts,
             IncludeLibraryComponents = window.IncludeLibraryComponents,
             OrganizeByMaterial = window.OrganizeByMaterial,
             OrganizeByThickness = window.OrganizeByThickness,
@@ -185,6 +187,7 @@ public static class SettingsManager
     {
         window.ExcludeReferenceParts = settings.ExcludeReferenceParts;
         window.ExcludePurchasedParts = settings.ExcludePurchasedParts;
+        window.ExcludePhantomParts = settings.ExcludePhantomParts;
         window.IncludeLibraryComponents = settings.IncludeLibraryComponents;
         window.OrganizeByMaterial = settings.OrganizeByMaterial;
         window.OrganizeByThickness = settings.OrganizeByThickness;

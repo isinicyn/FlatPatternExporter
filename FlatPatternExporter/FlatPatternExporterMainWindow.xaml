@@ -284,6 +284,7 @@
                         <StackPanel Margin="10,5,10,5">
                             <CheckBox x:Name="ExcludeReferencePartsCheckBox" Content="Исключить ссылочные" IsChecked="{Binding ExcludeReferenceParts, Mode=TwoWay}" Margin="0,0,0,5"/>
                             <CheckBox x:Name="ExcludePurchasedPartsCheckBox" Content="Исключить покупные" IsChecked="{Binding ExcludePurchasedParts, Mode=TwoWay}" Margin="0,0,0,5"/>
+                            <CheckBox x:Name="ExcludePhantomPartsCheckBox" Content="Исключить фантомные" IsChecked="{Binding ExcludePhantomParts, Mode=TwoWay}" Margin="0,0,0,5"/>
                             <CheckBox x:Name="IncludeLibraryComponentsCheckBox" Content="Включить библиотечные компоненты" IsChecked="{Binding IncludeLibraryComponents, Mode=TwoWay}" Margin="0,0,0,5"/>
                         </StackPanel>
                     </GroupBox>

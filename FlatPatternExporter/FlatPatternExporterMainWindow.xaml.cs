@@ -128,6 +128,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Настройки фильтрации деталей
     private bool _excludeReferenceParts = true;
     private bool _excludePurchasedParts = true;
+    private bool _excludePhantomParts = true;
     private bool _includeLibraryComponents = false;
     
     // Настройки организации файлов
@@ -383,6 +384,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (_excludePurchasedParts != value)
             {
                 _excludePurchasedParts = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool ExcludePhantomParts
+    {
+        get => _excludePhantomParts;
+        set
+        {
+            if (_excludePhantomParts != value)
+            {
+                _excludePhantomParts = value;
                 OnPropertyChanged();
             }
         }
