@@ -366,13 +366,18 @@ public partial class FlatPatternExporterMainWindow : Window
                     // Фильтруем подавленные компоненты
                     if (!hideSuppressed && row.ItemQuantity <= 0)
                         continue;
+
+                    // Применяем фильтрацию BOM структуры перед добавлением в список
+                    var componentDefinition = row.ComponentDefinitions[1];
+                    if (componentDefinition?.Document is Document document && 
+                        ShouldExcludeComponent(row.BOMStructure, document.FullFileName))
+                        continue;
                         
                     allRows.Add(row);
                     
                     // Рекурсивно получаем строки из подсборок
                     try
                     {
-                        var componentDefinition = row.ComponentDefinitions[1];
                         if (componentDefinition?.Document is AssemblyDocument asmDoc)
                         {
                             var subRows = GetAllBOMRowsRecursively(asmDoc.ComponentDefinition.BOM);
@@ -408,8 +413,6 @@ public partial class FlatPatternExporterMainWindow : Window
 
             var document = componentDefinition.Document as Document;
             if (document == null) return;
-
-            if (ShouldExcludeComponent(row.BOMStructure, document.FullFileName)) return;
 
             // Обрабатываем только детали из листового металла (не подсборки)
             if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
