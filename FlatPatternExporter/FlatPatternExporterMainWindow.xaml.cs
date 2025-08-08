@@ -1775,6 +1775,7 @@ public class PartData : INotifyPropertyChanged
     // КАТЕГОРИЯ 2/4: Обязательные свойства с уведомлениями (изменяются программно)
     private string partNumber = string.Empty;
     private string description = string.Empty;
+    private bool partNumberIsExpression = false;
 
     public string PartNumber
     {
@@ -1784,6 +1785,19 @@ public class PartData : INotifyPropertyChanged
             if (partNumber != value)
             {
                 partNumber = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool PartNumberIsExpression
+    {
+        get => partNumberIsExpression;
+        set
+        {
+            if (partNumberIsExpression != value)
+            {
+                partNumberIsExpression = value;
                 OnPropertyChanged();
             }
         }

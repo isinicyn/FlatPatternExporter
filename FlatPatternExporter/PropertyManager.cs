@@ -86,6 +86,29 @@ namespace FlatPatternExporter
         }
 
         /// <summary>
+        /// Проверяет, является ли значение свойства expression-ом
+        /// </summary>
+        /// <param name="setName">Имя набора свойств</param>
+        /// <param name="propName">Имя свойства</param>
+        /// <returns>true если свойство содержит expression</returns>
+        public bool IsPropertyExpression(string setName, string propName)
+        {
+            try
+            {
+                var propSet = _document.PropertySets[setName];
+                var prop = propSet[propName];
+                
+                // Expression в Inventor должен начинаться с символа "="
+                return !string.IsNullOrEmpty(prop.Expression) && prop.Expression.StartsWith("=");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка проверки expression свойства '{propName}' из набора '{setName}': {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Устанавливает значение свойства в указанном наборе свойств
         /// </summary>
         /// <param name="setName">Имя набора свойств</param>
@@ -120,6 +143,22 @@ namespace FlatPatternExporter
 
             // Для пользовательских свойств проверяем только набор user-defined
             return GetProperty("Inventor User Defined Properties", ourName);
+        }
+
+        /// <summary>
+        /// Проверяет, является ли свойство expression-ом по внутреннему имени с использованием маппинга
+        /// </summary>
+        /// <param name="ourName">Внутреннее имя свойства</param>
+        /// <returns>true если свойство содержит expression</returns>
+        public bool IsMappedPropertyExpression(string ourName)
+        {
+            if (PropertyMapping.TryGetValue(ourName, out var mapping))
+            {
+                return IsPropertyExpression(mapping.SetName, mapping.InventorName);
+            }
+
+            // Для пользовательских свойств проверяем только набор user-defined
+            return IsPropertyExpression("Inventor User Defined Properties", ourName);
         }
 
         /// <summary>

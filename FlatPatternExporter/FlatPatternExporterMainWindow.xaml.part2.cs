@@ -34,6 +34,7 @@ public partial class FlatPatternExporterMainWindow : Window
 
         // Всегда обязательные свойства (независимо от наличия колонок)
         partData.PartNumber = mgr.GetMappedProperty("PartNumber");
+        partData.PartNumberIsExpression = mgr.IsMappedPropertyExpression("PartNumber");
         partData.Description = mgr.GetMappedProperty("Description");
         partData.Material = mgr.GetMappedProperty("Material");
 
