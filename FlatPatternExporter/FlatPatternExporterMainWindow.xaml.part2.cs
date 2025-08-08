@@ -1457,6 +1457,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private void EditIProperty_Click(object sender, RoutedEventArgs e)
     {
         var selectedItem = PartsDataGrid.SelectedItem as PartData;
+        if (selectedItem == null) return;
         
         var editDialog = new EditIPropertyDialog(selectedItem.PartNumber, selectedItem.Description);
         if (editDialog.ShowDialog() == true)
