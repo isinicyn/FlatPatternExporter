@@ -369,8 +369,11 @@ public partial class FlatPatternExporterMainWindow : Window
             BOMView? bomView = null;
             foreach (BOMView view in bom.BOMViews)
             {
-                bomView = view;
-                break;
+                if (view.ViewType == BOMViewTypeEnum.kModelDataBOMViewType)
+                {
+                    bomView = view;
+                    break;
+                }
             }
 
             if (bomView == null) return allRows;
