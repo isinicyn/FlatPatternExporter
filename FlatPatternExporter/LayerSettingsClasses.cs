@@ -120,13 +120,11 @@ namespace FlatPatternExporter
         }
 
 
-        public string OriginalName { get; set; } // Оригинальное имя слоя, например, IV_BEND
 
         public LayerSetting(string displayName, string layerName, bool hasVisibilityOption = true)
         {
             DisplayName = displayName;
             LayerName = layerName;
-            OriginalName = layerName; // Инициализируем OriginalName
             HasVisibilityOption = hasVisibilityOption;
             IsChecked = DisplayName == "OuterProfileLayer" ? true : false; // OuterProfile всегда включен
             CustomName = string.Empty;

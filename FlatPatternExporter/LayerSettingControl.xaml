@@ -18,7 +18,7 @@
                      FontSize="10" VerticalContentAlignment="Center"
                      Foreground="Black" Background="White"
                      TextChanged="CustomTextBox_TextChanged"/>
-            <TextBlock Text="{Binding OriginalName}"
+            <TextBlock Text="{Binding LayerName}"
                        Foreground="#808E8E8E"
                        FontSize="10"
                        IsHitTestVisible="False"
