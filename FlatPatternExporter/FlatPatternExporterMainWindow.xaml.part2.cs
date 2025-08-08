@@ -294,42 +294,21 @@ public partial class FlatPatternExporterMainWindow : Window
     {
         try
         {
-            BOMView? bomView = null;
-            foreach (BOMView view in bom.BOMViews)
-            {
-                bomView = view;
-                break;
-            }
-
-            if (bomView == null)
-            {
-                MessageBox.Show("Не найдено ни одного представления спецификации.", "Ошибка", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                return;
-            }
-
-            BOMRow[] bomRows;
-            try
-            {
-                bomRows = bomView.BOMRows.Cast<BOMRow>().ToArray();
-            }
-            catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
-            {
-                _hasMissingReferences = true;
-                Debug.WriteLine("Ошибка при доступе к BOMRows. Возможно, в сборке есть потерянные ссылки.");
-                return;
-            }
-
-            var totalRows = bomRows.Length;
+            // Получаем все компоненты из BOM рекурсивно в один плоский список
+            var allBomRows = GetAllBOMRowsRecursively(bom);
+            
+            Debug.WriteLine($"[ProcessBOM] Всего найдено {allBomRows.Count} строк BOM во всей структуре");
+            
             var processedRows = 0;
+            var totalRows = allBomRows.Count;
 
-            foreach (BOMRow row in bomRows)
+            foreach (var row in allBomRows)
             {
                 if (_isCancelled) break;
 
                 try
                 {
-                    ProcessBOMRow(row, sheetMetalParts);
+                    ProcessBOMRowSimple(row, sheetMetalParts);
                     
                     // Обновляем прогресс
                     processedRows++;
@@ -360,42 +339,107 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private void ProcessBOMRow(BOMRow row, Dictionary<string, int> sheetMetalParts)
+    private List<BOMRow> GetAllBOMRowsRecursively(BOM bom)
     {
-        var componentDefinition = row.ComponentDefinitions[1];
-        if (componentDefinition == null) return;
-
-        var document = componentDefinition.Document as Document;
-        if (document == null) return;
-
-        if (ShouldExcludeComponent(row.BOMStructure, document.FullFileName)) return;
-
-        if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
+        var allRows = new List<BOMRow>();
+        
+        try
         {
-            var partDoc = document as PartDocument;
-            if (partDoc != null && partDoc.SubType == PropertyManager.SheetMetalSubType)
+            // Проверяем настройку скрытия подавленных компонентов
+            var hideSuppressed = bom.HideSuppressedComponentsInBOM;
+            
+            BOMView? bomView = null;
+            foreach (BOMView view in bom.BOMViews)
             {
-                var mgr = new PropertyManager((Document)partDoc);
-                var partNumber = mgr.GetMappedProperty("PartNumber");
-                if (!string.IsNullOrEmpty(partNumber))
+                bomView = view;
+                break;
+            }
+
+            if (bomView == null) return allRows;
+
+            try
+            {
+                var bomRows = bomView.BOMRows.Cast<BOMRow>().ToArray();
+                
+                foreach (BOMRow row in bomRows)
                 {
-                    // Добавляем в трекер конфликтов
-                    var modelState = mgr.GetModelState();
-                    AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
+                    // Фильтруем подавленные компоненты
+                    if (!hideSuppressed && row.ItemQuantity <= 0)
+                        continue;
+                        
+                    allRows.Add(row);
                     
-                    if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
-                        sheetMetalParts[partNumber] += row.ItemQuantity;
-                    else
-                        sheetMetalParts.Add(partNumber, row.ItemQuantity);
+                    // Рекурсивно получаем строки из подсборок
+                    try
+                    {
+                        var componentDefinition = row.ComponentDefinitions[1];
+                        if (componentDefinition?.Document is AssemblyDocument asmDoc)
+                        {
+                            var subRows = GetAllBOMRowsRecursively(asmDoc.ComponentDefinition.BOM);
+                            allRows.AddRange(subRows);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Игнорируем ошибки при получении подсборок
+                    }
                 }
             }
+            catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
+            {
+                _hasMissingReferences = true;
+                Debug.WriteLine("Ошибка при доступе к BOMRows. Возможно, в сборке есть потерянные ссылки.");
+            }
         }
-        else if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+        catch (Exception ex)
         {
-            var asmDoc = document as AssemblyDocument;
-            if (asmDoc != null) ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts); // Рекурсивный вызов без прогресса
+            Debug.WriteLine($"Ошибка при рекурсивном получении BOM: {ex.Message}");
+        }
+        
+        return allRows;
+    }
+
+    private void ProcessBOMRowSimple(BOMRow row, Dictionary<string, int> sheetMetalParts)
+    {
+        try
+        {
+            var componentDefinition = row.ComponentDefinitions[1];
+            if (componentDefinition == null) return;
+
+            var document = componentDefinition.Document as Document;
+            if (document == null) return;
+
+            if (ShouldExcludeComponent(row.BOMStructure, document.FullFileName)) return;
+
+            // Обрабатываем только детали из листового металла (не подсборки)
+            if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
+            {
+                var partDoc = document as PartDocument;
+                if (partDoc != null && partDoc.SubType == PropertyManager.SheetMetalSubType)
+                {
+                    var mgr = new PropertyManager((Document)partDoc);
+                    var partNumber = mgr.GetMappedProperty("PartNumber");
+                    if (!string.IsNullOrEmpty(partNumber))
+                    {
+                        // Добавляем в трекер конфликтов
+                        var modelState = mgr.GetModelState();
+                        AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
+                        
+                        if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
+                            sheetMetalParts[partNumber] += row.ItemQuantity;
+                        else
+                            sheetMetalParts.Add(partNumber, row.ItemQuantity);
+                    }
+                }
+            }
+            // Подсборки больше не обрабатываем - они уже развернуты в GetAllBOMRowsRecursively
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Ошибка при простой обработке строки BOM: {ex.Message}");
         }
     }
+
     private void InitializeLibraryPaths()
     {
         if (_thisApplication == null) return;
