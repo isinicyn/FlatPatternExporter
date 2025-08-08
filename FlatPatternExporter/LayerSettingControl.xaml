@@ -8,9 +8,9 @@
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" Margin="0,3,0,3">
         <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
-          IsChecked="{Binding IsVisible, Mode=TwoWay}"
+          IsChecked="{Binding IsChecked, Mode=TwoWay}"
           Width="200" VerticalContentAlignment="Center"
-          IsEnabled="{Binding IsCheckBoxEnabled}" FontSize="10"/>
+          IsEnabled="{Binding IsEnabled}" FontSize="10"/>
         <Grid Width="95" Margin="0,0,5,0">
             <TextBox x:Name="CustomTextBox"
                      Text="{Binding CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

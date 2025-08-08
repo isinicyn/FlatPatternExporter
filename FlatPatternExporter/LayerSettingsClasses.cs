@@ -69,22 +69,22 @@ namespace FlatPatternExporter
         public string LayerName { get; set; } // Стандартное имя слоя, например, IV_BEND
         public bool HasVisibilityOption { get; set; }
 
-        private bool isVisible;
-        public bool IsVisible
+        private bool isChecked;
+        public bool IsChecked
         {
-            get => isVisible;
+            get => isChecked;
             set
             {
-                isVisible = value;
+                isChecked = value;
                 OnPropertyChanged();
-                // Обновление доступности других опций при изменении видимости
+                // Обновление доступности других опций при изменении состояния
                 OnPropertyChanged(nameof(IsCustomNameEnabled));
                 OnPropertyChanged(nameof(IsColorAndLineTypeEnabled));
             }
         }
 
-        public bool IsCustomNameEnabled => IsVisible;
-        public bool IsColorAndLineTypeEnabled => IsVisible;
+        public bool IsCustomNameEnabled => IsChecked;
+        public bool IsColorAndLineTypeEnabled => IsChecked;
 
         private string customName = string.Empty;
         public string CustomName
@@ -128,7 +128,7 @@ namespace FlatPatternExporter
             LayerName = layerName;
             OriginalName = layerName; // Инициализируем OriginalName
             HasVisibilityOption = hasVisibilityOption;
-            IsVisible = true; // Видимость по умолчанию
+            IsChecked = DisplayName == "OuterProfileLayer" ? true : false; // OuterProfile всегда включен
             CustomName = string.Empty;
             SelectedColor = "White"; // Цвет по умолчанию
             SelectedLineType = "Default"; // Тип линии по умолчанию
@@ -136,7 +136,7 @@ namespace FlatPatternExporter
 
         public void ResetSettings()
         {
-            IsVisible = true;
+            IsChecked = DisplayName == "OuterProfileLayer" ? true : false;
             CustomName = string.Empty;
             SelectedColor = "White";
             SelectedLineType = "Default";
@@ -149,7 +149,7 @@ namespace FlatPatternExporter
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public bool IsCheckBoxEnabled => DisplayName != "OuterProfileLayer";
+        public bool IsEnabled => DisplayName != "OuterProfileLayer";
     }
 
 

@@ -10,7 +10,7 @@ public class LayerSettingData
     public string DisplayName { get; set; } = string.Empty;
     public string LayerName { get; set; } = string.Empty;
     public bool HasVisibilityOption { get; set; } = true;
-    public bool IsVisible { get; set; } = true;
+    public bool IsChecked { get; set; } = false;
     public string CustomName { get; set; } = string.Empty;
     public string SelectedColor { get; set; } = "White";
     public string SelectedLineType { get; set; } = "Default";
@@ -172,7 +172,7 @@ public static class SettingsManager
                 DisplayName = layerSetting.DisplayName,
                 LayerName = layerSetting.LayerName,
                 HasVisibilityOption = layerSetting.HasVisibilityOption,
-                IsVisible = layerSetting.IsVisible,
+                IsChecked = layerSetting.IsChecked,
                 CustomName = layerSetting.CustomName,
                 SelectedColor = layerSetting.SelectedColor,
                 SelectedLineType = layerSetting.SelectedLineType,
@@ -254,7 +254,7 @@ public static class SettingsManager
                 
                 layerSetting.DisplayName = settingData.DisplayName;
                 layerSetting.LayerName = settingData.LayerName;
-                layerSetting.IsVisible = settingData.IsVisible;
+                layerSetting.IsChecked = settingData.IsChecked;
                 layerSetting.CustomName = settingData.CustomName;
                 layerSetting.SelectedColor = settingData.SelectedColor;
                 layerSetting.SelectedLineType = settingData.SelectedLineType;
