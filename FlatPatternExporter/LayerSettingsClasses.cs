@@ -217,25 +217,26 @@ namespace FlatPatternExporter
         // Метод для инициализации настроек слоев
         public static ObservableCollection<LayerSetting> InitializeLayerSettings()
         {
-            var layerSettings = new ObservableCollection<LayerSetting>();
-
-            // Добавляем настройки для всех слоев
-            layerSettings.Add(new LayerSetting("BendUpLayer", "IV_BEND"));
-            layerSettings.Add(new LayerSetting("BendDownLayer", "IV_BEND_DOWN"));
-            layerSettings.Add(new LayerSetting("ToolCenterUpLayer", "IV_TOOL_CENTER"));
-            layerSettings.Add(new LayerSetting("ToolCenterDownLayer", "IV_TOOL_CENTER_DOWN"));
-            layerSettings.Add(new LayerSetting("ArcCentersLayer", "IV_ARC_CENTERS"));
-            layerSettings.Add(new LayerSetting("OuterProfileLayer", "IV_OUTER_PROFILE", canBeHidden: false));
-            layerSettings.Add(new LayerSetting("InteriorProfilesLayer", "IV_INTERIOR_PROFILES"));
-            layerSettings.Add(new LayerSetting("FeatureProfilesUpLayer", "IV_FEATURE_PROFILES"));
-            layerSettings.Add(new LayerSetting("FeatureProfilesDownLayer", "IV_FEATURE_PROFILES_DOWN"));
-            layerSettings.Add(new LayerSetting("AltRepFrontLayer", "IV_ALTREP_FRONT"));
-            layerSettings.Add(new LayerSetting("AltRepBackLayer", "IV_ALTREP_BACK"));
-            layerSettings.Add(new LayerSetting("UnconsumedSketchesLayer", "IV_UNCONSUMED_SKETCHES"));
-            layerSettings.Add(new LayerSetting("TangentLayer", "IV_TANGENT"));
-            layerSettings.Add(new LayerSetting("TangentRollLinesLayer", "IV_ROLL_TANGENT"));
-            layerSettings.Add(new LayerSetting("RollLinesLayer", "IV_ROLL"));
-            layerSettings.Add(new LayerSetting("UnconsumedSketchConstructionLayer", "IV_UNCONSUMED_SKETCH_CONSTRUCTION"));
+            var layerSettings = new ObservableCollection<LayerSetting>
+            {
+                // Добавляем настройки для всех слоев
+                new("BendUpLayer", "IV_BEND"),
+                new("BendDownLayer", "IV_BEND_DOWN"),
+                new("ToolCenterUpLayer", "IV_TOOL_CENTER"),
+                new("ToolCenterDownLayer", "IV_TOOL_CENTER_DOWN"),
+                new("ArcCentersLayer", "IV_ARC_CENTERS"),
+                new("OuterProfileLayer", "IV_OUTER_PROFILE", canBeHidden: false),
+                new("InteriorProfilesLayer", "IV_INTERIOR_PROFILES"),
+                new("FeatureProfilesUpLayer", "IV_FEATURE_PROFILES"),
+                new("FeatureProfilesDownLayer", "IV_FEATURE_PROFILES_DOWN"),
+                new("AltRepFrontLayer", "IV_ALTREP_FRONT"),
+                new("AltRepBackLayer", "IV_ALTREP_BACK"),
+                new("UnconsumedSketchesLayer", "IV_UNCONSUMED_SKETCHES"),
+                new("TangentLayer", "IV_TANGENT"),
+                new("TangentRollLinesLayer", "IV_ROLL_TANGENT"),
+                new("RollLinesLayer", "IV_ROLL"),
+                new("UnconsumedSketchConstructionLayer", "IV_UNCONSUMED_SKETCH_CONSTRUCTION")
+            };
 
             return layerSettings;
         }
