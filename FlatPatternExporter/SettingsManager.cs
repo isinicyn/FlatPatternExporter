@@ -7,9 +7,9 @@ namespace FlatPatternExporter;
 [Serializable]
 public class LayerSettingData
 {
-    public string DisplayName { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = "";
     public bool IsChecked { get; set; } = false;
-    public string CustomName { get; set; } = string.Empty;
+    public string CustomName { get; set; } = "";
     public string SelectedColor { get; set; } = "White";
     public string SelectedLineType { get; set; } = "Default";
 }
@@ -17,8 +17,8 @@ public class LayerSettingData
 [Serializable]
 public class TemplatePresetData
 {
-    public string Name { get; set; } = string.Empty;
-    public string Template { get; set; } = string.Empty;
+    public string Name { get; set; } = "";
+    public string Template { get; set; } = "";
 }
 
 [Serializable]
@@ -45,8 +45,8 @@ public class ApplicationSettings
     
     public ExportFolderType SelectedExportFolder { get; set; } = ExportFolderType.ChooseFolder;
     public bool EnableSubfolder { get; set; } = false;
-    public string SubfolderName { get; set; } = string.Empty;
-    public string FixedFolderPath { get; set; } = string.Empty;
+    public string SubfolderName { get; set; } = "";
+    public string FixedFolderPath { get; set; } = "";
     
     public ProcessingMethod SelectedProcessingMethod { get; set; } = ProcessingMethod.BOM;
     
@@ -54,7 +54,7 @@ public class ApplicationSettings
     public string FileNameTemplate { get; set; } = "{PartNumber}";
     
     public ObservableCollection<TemplatePresetData> TemplatePresets { get; set; } = new();
-    public string SelectedTemplatePresetName { get; set; } = string.Empty;
+    public string SelectedTemplatePresetName { get; set; } = "";
     
     public ObservableCollection<LayerSettingData> LayerSettings { get; set; } = new();
 }
@@ -143,7 +143,7 @@ public static class SettingsManager
         }
         
         // Сохранение выбранного пресета
-        settings.SelectedTemplatePresetName = window.SelectedTemplatePreset?.Name ?? string.Empty;
+        settings.SelectedTemplatePresetName = window.SelectedTemplatePreset?.Name ?? "";
 
         var columnsInDisplayOrder = window.PartsDataGrid.Columns
             .Where(c => c.Header is string)

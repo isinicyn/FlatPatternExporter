@@ -127,7 +127,7 @@ namespace FlatPatternExporter
             LayerName = layerName;
             CanBeHidden = canBeHidden;
             IsChecked = DisplayName == "OuterProfileLayer" ? true : false; // OuterProfile всегда включен
-            CustomName = string.Empty;
+            CustomName = "";
             SelectedColor = "White"; // Цвет по умолчанию
             SelectedLineType = "Default"; // Тип линии по умолчанию
         }
@@ -135,7 +135,7 @@ namespace FlatPatternExporter
         public void ResetSettings()
         {
             IsChecked = DisplayName == "OuterProfileLayer" ? true : false;
-            CustomName = string.Empty;
+            CustomName = "";
             SelectedColor = "White";
             SelectedLineType = "Default";
         }
@@ -170,7 +170,7 @@ namespace FlatPatternExporter
         // Метод для конвертации имени цвета в RGB значение
         public static string GetColorValue(string colorName)
         {
-            var colorDictionary = new Dictionary<string, string>
+            Dictionary<string, string> colorDictionary = new()
             {
                 { "White", "255;255;255" },
                 { "Red", "255;0;0" },
@@ -190,7 +190,7 @@ namespace FlatPatternExporter
         // Метод для конвертации имени типа линии в его соответствующее значение
         public static string GetLineTypeValue(string lineTypeName)
         {
-            var lineTypeDictionary = new Dictionary<string, string>
+            Dictionary<string, string> lineTypeDictionary = new()
             {
                 { "Chain", "37644" },
                 { "Continuous", "37633" },
@@ -244,7 +244,7 @@ namespace FlatPatternExporter
         // Доступные цвета
         public static ObservableCollection<string> GetAvailableColors()
         {
-            return new ObservableCollection<string>
+            return new()
             {
                 "White",
                 "Red",
@@ -262,7 +262,7 @@ namespace FlatPatternExporter
         // Доступные типы линий
         public static ObservableCollection<string> GetLineTypes()
         {
-            return new ObservableCollection<string>
+            return new()
             {
                 "Chain",
                 "Continuous",

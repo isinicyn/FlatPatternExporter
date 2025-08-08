@@ -514,7 +514,7 @@ public partial class FlatPatternExporterMainWindow : Window
 private bool PrepareForExport(out string targetDir, out int multiplier, out Stopwatch stopwatch)
 {
     stopwatch = new Stopwatch();
-    targetDir = string.Empty;
+    targetDir = "";
     multiplier = 1; // Присваиваем значение по умолчанию
 
     // Обрабатываем выбор папки экспорта через enum
@@ -531,7 +531,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             
         case ExportFolderType.ComponentFolder:
             // Папка компонента
-            targetDir = Path.GetDirectoryName(_thisApplication?.ActiveDocument?.FullFileName) ?? string.Empty;
+            targetDir = Path.GetDirectoryName(_thisApplication?.ActiveDocument?.FullFileName) ?? "";
             break;
             
         case ExportFolderType.FixedFolder:
@@ -546,7 +546,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         case ExportFolderType.ProjectFolder:
             try
             {
-                targetDir = _thisApplication?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? string.Empty;
+                targetDir = _thisApplication?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? "";
                 if (string.IsNullOrEmpty(targetDir))
                 {
                     MessageBox.Show("Не удалось получить путь проекта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -887,11 +887,11 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 var partPath = GetPartDocumentFullPath(partNumber);
                 if (!string.IsNullOrEmpty(partPath))
                 {
-                    targetDir = Path.GetDirectoryName(partPath) ?? string.Empty;
+                    targetDir = Path.GetDirectoryName(partPath) ?? "";
                 }
                 else
                 {
-                    targetDir = string.Empty;
+                    targetDir = "";
                 }
             }
 
@@ -1229,7 +1229,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ClearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки
 
         // Обнуляем информацию о документе
-        UpdateDocumentInfo(string.Empty, string.Empty, string.Empty, null!);
+        UpdateDocumentInfo("", "", "", null!);
 
         // Отключаем кнопку "Анализ обозначений" и очищаем список конфликтов
         ConflictFilesButton.IsEnabled = false;
@@ -1430,7 +1430,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             if (partDoc != null)
             {
                 var mgr = new PropertyManager((Document)partDoc);
-                var value = mgr.GetMappedProperty(propertyName) ?? string.Empty;
+                var value = mgr.GetMappedProperty(propertyName) ?? "";
                 partData.AddCustomProperty(propertyName, value);
             }
 

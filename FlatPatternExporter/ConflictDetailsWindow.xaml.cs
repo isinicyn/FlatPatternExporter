@@ -10,15 +10,15 @@ namespace FlatPatternExporter;
 
 public class ConflictPartNumberGroup
 {
-    public string PartNumber { get; set; } = string.Empty;
+    public string PartNumber { get; set; } = "";
     public List<ConflictFileInfo> Files { get; set; } = new();
 }
 
 public class ConflictFileInfo
 {
-    public string FileName { get; set; } = string.Empty;
-    public string ModelState { get; set; } = string.Empty;
-    public string FilePath { get; set; } = string.Empty;
+    public string FileName { get; set; } = "";
+    public string ModelState { get; set; } = "";
+    public string FilePath { get; set; } = "";
 }
 
 public partial class ConflictDetailsWindow

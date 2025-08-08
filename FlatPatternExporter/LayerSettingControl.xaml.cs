@@ -6,7 +6,7 @@ namespace FlatPatternExporter
     public partial class LayerSettingControl : System.Windows.Controls.UserControl
     {
         public static readonly DependencyProperty PseudonymProperty =
-            DependencyProperty.Register("Pseudonym", typeof(string), typeof(LayerSettingControl), new PropertyMetadata(string.Empty));
+            DependencyProperty.Register("Pseudonym", typeof(string), typeof(LayerSettingControl), new PropertyMetadata(""));
 
         public string Pseudonym
         {

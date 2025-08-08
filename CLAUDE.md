@@ -184,3 +184,45 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Архитектура UI соответствует принципам WPF Data Binding
 - Для новых RadioButton групп используется enum + `EnumToBooleanConverter`
 - **НЕ добавлять комментарии об изменениях в код** - использовать только чистый код без комментариев о внесенных правках
+
+## Стиль кодирования
+
+При внесении изменений в проект придерживайтесь современного C# 9.0+ стиля:
+
+**Инициализация коллекций:**
+- Используйте target-typed new expressions: `new()` вместо `new Type()`
+- Применяйте collection initializers: `new() { item1, item2 }` вместо множественных `Add()`
+
+**Строки:**
+- Используйте `""` вместо `string.Empty` для пустых строк
+- Применяйте string interpolation `$"text {variable}"` для форматирования
+
+**Объявления переменных:**
+- Предпочитайте явное указание типа для коллекций: `Dictionary<string, string> dict = new()`
+- Используйте `var` только когда тип очевиден из контекста
+
+**Примеры современного стиля:**
+```csharp
+// Коллекции
+Dictionary<string, string> colorMap = new()
+{
+    { "Red", "#FF0000" },
+    { "Blue", "#0000FF" }
+};
+
+var layerSettings = new ObservableCollection<LayerSetting>
+{
+    new("LayerName", "IV_LAYER"),
+    new("AnotherLayer", "IV_OTHER")
+};
+
+// Строки
+public string Name { get; set; } = "";
+targetPath = basePath ?? "";
+
+// Возврат коллекций
+return new()
+{
+    "Item1", "Item2", "Item3"
+};
+```
