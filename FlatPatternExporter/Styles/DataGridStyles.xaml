@@ -27,21 +27,21 @@
     <!-- Шаблон для колонки "Изобр. детали" -->
     <DataTemplate x:Key="PartImageTemplate">
         <Image Source="{Binding Preview}" 
-               Height="40" Width="40" 
+               Margin="0,1,0,1" 
                HorizontalAlignment="Center" 
                VerticalAlignment="Center"/>
     </DataTemplate>
 
     <!-- Шаблон для колонки "Изобр. развертки" -->
     <DataTemplate x:Key="DxfImageTemplate">
-        <Grid Width="40" Height="40">
+        <Grid Margin="0,1,0,1">
             <Image Source="{Binding DxfPreview}" 
                    HorizontalAlignment="Center" 
                    VerticalAlignment="Center"/>
             <TextBlock Text="Нет миниатюры" 
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center" 
-                       FontSize="7" 
+                       FontSize="8" 
                        Foreground="Gray"
                        TextWrapping="Wrap"
                        TextAlignment="Center">
