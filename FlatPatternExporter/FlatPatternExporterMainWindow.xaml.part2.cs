@@ -209,35 +209,53 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
+    private static string GetFullFileName(ComponentOccurrence occ)
+    {
+        string fullFileName = "";
+        if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
+        {
+            var partDoc = occ.Definition.Document as PartDocument;
+            if (partDoc != null)
+                fullFileName = partDoc.FullFileName;
+        }
+        else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+        {
+            var asmDoc = occ.Definition.Document as AssemblyDocument;
+            if (asmDoc != null)
+                fullFileName = asmDoc.FullFileName;
+        }
+        return fullFileName;
+    }
+
     private void ProcessComponentOccurrences(ComponentOccurrences occurrences, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null)
     {
-        var totalOccurrences = occurrences.Count;
+        // Предварительно считаем только компоненты, которые пройдут фильтрацию
+        var filteredOccurrences = new List<ComponentOccurrence>();
+        foreach (ComponentOccurrence occ in occurrences)
+        {
+            if (occ.Suppressed) continue;
+            
+            try
+            {
+                var fullFileName = GetFullFileName(occ);
+                if (!ShouldExcludeComponent(occ.BOMStructure, fullFileName))
+                    filteredOccurrences.Add(occ);
+            }
+            catch
+            {
+                // Игнорируем компоненты с ошибками при фильтрации
+            }
+        }
+        
+        var totalOccurrences = filteredOccurrences.Count;
         var processedOccurrences = 0;
 
-        foreach (ComponentOccurrence occ in occurrences)
+        foreach (ComponentOccurrence occ in filteredOccurrences)
         {
             if (_isCancelled) break;
 
-            if (occ.Suppressed) continue;
-
             try
             {
-                string fullFileName = "";
-                if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
-                {
-                    var partDoc = occ.Definition.Document as PartDocument;
-                    if (partDoc != null)
-                        fullFileName = partDoc.FullFileName;
-                }
-                else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
-                {
-                    var asmDoc = occ.Definition.Document as AssemblyDocument;
-                    if (asmDoc != null)
-                        fullFileName = asmDoc.FullFileName;
-                }
-
-                if (ShouldExcludeComponent(occ.BOMStructure, fullFileName)) continue;
-
                 if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
                 {
                     var partDoc = occ.Definition.Document as PartDocument;
