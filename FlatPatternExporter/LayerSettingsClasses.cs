@@ -67,7 +67,7 @@ namespace FlatPatternExporter
     {
         public string DisplayName { get; set; } // Название настройки, например, BendUpLayer
         public string LayerName { get; set; } // Стандартное имя слоя, например, IV_BEND
-        public bool HasVisibilityOption { get; set; }
+        public bool CanBeHidden { get; set; } // Может ли слой быть скрыт при экспорте
 
         private bool isChecked;
         public bool IsChecked
@@ -121,11 +121,11 @@ namespace FlatPatternExporter
 
 
 
-        public LayerSetting(string displayName, string layerName, bool hasVisibilityOption = true)
+        public LayerSetting(string displayName, string layerName, bool canBeHidden = true)
         {
             DisplayName = displayName;
             LayerName = layerName;
-            HasVisibilityOption = hasVisibilityOption;
+            CanBeHidden = canBeHidden;
             IsChecked = DisplayName == "OuterProfileLayer" ? true : false; // OuterProfile всегда включен
             CustomName = string.Empty;
             SelectedColor = "White"; // Цвет по умолчанию
@@ -225,7 +225,7 @@ namespace FlatPatternExporter
             layerSettings.Add(new LayerSetting("ToolCenterUpLayer", "IV_TOOL_CENTER"));
             layerSettings.Add(new LayerSetting("ToolCenterDownLayer", "IV_TOOL_CENTER_DOWN"));
             layerSettings.Add(new LayerSetting("ArcCentersLayer", "IV_ARC_CENTERS"));
-            layerSettings.Add(new LayerSetting("OuterProfileLayer", "IV_OUTER_PROFILE", hasVisibilityOption: false));
+            layerSettings.Add(new LayerSetting("OuterProfileLayer", "IV_OUTER_PROFILE", canBeHidden: false));
             layerSettings.Add(new LayerSetting("InteriorProfilesLayer", "IV_INTERIOR_PROFILES"));
             layerSettings.Add(new LayerSetting("FeatureProfilesUpLayer", "IV_FEATURE_PROFILES"));
             layerSettings.Add(new LayerSetting("FeatureProfilesDownLayer", "IV_FEATURE_PROFILES_DOWN"));

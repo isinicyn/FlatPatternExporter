@@ -946,7 +946,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                         foreach (var layer in LayerSettings) // Используем настройки слоев
                         {
-                            if (layer.HasVisibilityOption && !layer.IsChecked)
+                            if (layer.CanBeHidden && !layer.IsChecked)
                             {
                                 invisibleLayersBuilder.Append($"{layer.LayerName};");
                                 continue;
