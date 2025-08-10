@@ -59,6 +59,19 @@ namespace FlatPatternExporter
             { "Appearance", ("Design Tracking Properties", "Appearance") }
         };
 
+        /// <summary>
+        /// Свойства, которые требуют округления до двух знаков после запятой
+        /// </summary>
+        private static readonly HashSet<string> NumericPropertiesForRounding = new()
+        {
+            "FlatPatternLength",
+            "FlatPatternWidth", 
+            "FlatPatternArea",
+            "Mass",
+            "Volume",
+            "SurfaceArea"
+        };
+
         public PropertyManager(Document document)
         {
             _document = document ?? throw new ArgumentNullException(nameof(document));
@@ -163,7 +176,18 @@ namespace FlatPatternExporter
         {
             if (PropertyMapping.TryGetValue(ourName, out var mapping))
             {
-                return GetProperty(mapping.SetName, mapping.InventorName);
+                var value = GetProperty(mapping.SetName, mapping.InventorName);
+                
+                // Округляем числовые значения до двух знаков после запятой
+                if (NumericPropertiesForRounding.Contains(ourName))
+                {
+                    if (double.TryParse(value, out var numericValue))
+                    {
+                        return Math.Round(numericValue, 2).ToString("F2");
+                    }
+                }
+                
+                return value;
             }
 
             // Для пользовательских свойств проверяем только набор user-defined
