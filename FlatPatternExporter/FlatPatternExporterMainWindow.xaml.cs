@@ -274,7 +274,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     new() { InternalName = "Объем", DisplayName = "Объем", InventorPropertyName = "Volume", Category = "Design Tracking Properties" },
     new() { InternalName = "Правило ЛМ", DisplayName = "Правило листового металла", InventorPropertyName = "SheetMetalRule", Category = "Design Tracking Properties" },
     new() { InternalName = "Ширина развертки", DisplayName = "Ширина развертки", InventorPropertyName = "FlatPatternWidth", Category = "Design Tracking Properties" },
-    new() { InternalName = "Длинна развертки", DisplayName = "Длинна развертки", InventorPropertyName = "FlatPatternLength", Category = "Design Tracking Properties" },
+    new() { InternalName = "Длина развертки", DisplayName = "Длина развертки", InventorPropertyName = "FlatPatternLength", Category = "Design Tracking Properties" },
     new() { InternalName = "Площадь развертки", DisplayName = "Площадь развертки", InventorPropertyName = "FlatPatternArea", Category = "Design Tracking Properties" },
     new() { InternalName = "Отделка", DisplayName = "Отделка", InventorPropertyName = "Appearance", Category = "Design Tracking Properties" },
     new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material", Category = "Design Tracking Properties" },
