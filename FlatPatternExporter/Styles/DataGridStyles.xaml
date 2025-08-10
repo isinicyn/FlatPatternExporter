@@ -75,9 +75,11 @@
                 <Rectangle.Style>
                     <Style TargetType="Rectangle">
                         <Setter Property="Fill" Value="Red"/>
+                        <Setter Property="ToolTip" Value="Развертка отсутствует"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding HasFlatPattern}" Value="True">
                                 <Setter Property="Fill" Value="Green"/>
+                                <Setter Property="ToolTip" Value="Развертка доступна"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
