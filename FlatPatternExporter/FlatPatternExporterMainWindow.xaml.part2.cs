@@ -1408,6 +1408,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     public async Task FillPropertyDataAsync(string propertyName)
     {
+        // Если нет данных для заполнения, выходим
+        if (_partsData.Count == 0)
+            return;
+
         // Проверяем, является ли это стандартным свойством (уже загружено в ReadAllPropertiesFromPart)
         var propInfo = typeof(PartData).GetProperty(propertyName);
         var isStandardProperty = propInfo != null && propInfo.PropertyType == typeof(string);
