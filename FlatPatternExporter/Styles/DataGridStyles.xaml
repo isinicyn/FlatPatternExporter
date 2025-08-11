@@ -11,6 +11,23 @@
 
     <!-- Базовые стили для ячеек -->
     
+    <!-- Стиль для индикатора выражения fx --><Style x:Key="ExpressionIndicatorStyle" TargetType="TextBlock">
+        <Setter Property="Text" Value="fx"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Margin" Value="0,0,3,0"/>
+        <Setter Property="FontStyle" Value="Italic"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Foreground" Value="#666666"/>
+        <Setter Property="ToolTip" Value="Значение задано выражением (Expression)"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding PartNumberIsExpression}" Value="True">
+                <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <!-- Базовый стиль для всех текстовых ячеек -->
     <Style x:Key="BaseCellStyle" TargetType="TextBlock">
         <Setter Property="Padding" Value="10,5"/>
@@ -92,25 +109,7 @@
                        Style="{StaticResource CenteredCellStyle}" 
                        TextTrimming="CharacterEllipsis"/>
             <TextBlock Grid.Column="2" 
-                       Text="fx" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Right" 
-                       Margin="0,0,3,0"
-                       FontStyle="Italic"
-                       FontSize="10"
-                       Foreground="#666666"
-                       ToolTip="Значение задано выражением (Expression)">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding PartNumberIsExpression}" Value="True">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
+                       Style="{StaticResource ExpressionIndicatorStyle}"/>
         </Grid>
     </DataTemplate>
 
