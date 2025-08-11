@@ -1,6 +1,8 @@
 ﻿using System.Drawing.Drawing2D;
+using System.IO;
 using netDxf;
 using netDxf.Entities;
+using netDxf.Header;
 
 namespace DxfThumbnailGenerator;
 
@@ -12,16 +14,47 @@ public class DxfThumbnailGenerator
     private const float DefaultPenWidth = 1f;
     private static readonly double[] CardinalAngles = { 0, 90, 180, 270 };
     private static readonly Color DefaultEntityColor = Color.Black;
-    public Bitmap GenerateThumbnail(string filePath)
+    public Bitmap GenerateThumbnail(string filePath, bool optimizeDxf = false)
     {
         try
         {
             var dxf = DxfDocument.Load(filePath);
+            if (optimizeDxf)
+            {
+                SaveAsR15(dxf, filePath);
+            }
             return RenderDxfToBitmap(dxf);
         }
         catch (Exception ex)
         {
             throw new Exception($"Error loading DXF file: {ex.Message}", ex);
+        }
+    }
+
+    private void SaveAsR15(DxfDocument dxf, string originalFilePath)
+    {
+        try
+        {
+            var directory = Path.GetDirectoryName(originalFilePath) ?? "";
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFilePath);
+            var extension = Path.GetExtension(originalFilePath);
+            var r15FilePath = Path.Combine(directory, $"{fileNameWithoutExtension}_R15{extension}");
+
+            if (File.Exists(r15FilePath))
+                return;
+
+            var r15Dxf = new DxfDocument();
+            r15Dxf.DrawingVariables.AcadVer = DxfVersion.AutoCad2000;
+            
+            var allEntities = CollectEntities(dxf);
+            foreach (var entity in allEntities)
+                r15Dxf.Entities.Add((EntityObject)entity.Clone());
+
+            r15Dxf.Save(r15FilePath);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Ошибка сохранения R15: {ex.Message}");
         }
     }
 

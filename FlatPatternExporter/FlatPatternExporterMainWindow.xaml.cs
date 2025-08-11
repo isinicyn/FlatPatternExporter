@@ -138,6 +138,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Настройки конструктора имени файла
     private bool _enableFileNameConstructor = false;
     
+    // Настройки оптимизации
+    private bool _optimizeDxf = false;
+    
     // Настройки экспорта DXF
     private bool _enableSplineReplacement = false;
     private int _selectedSplineReplacementIndex = 0;
@@ -383,6 +386,18 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
+    public bool OptimizeDxf
+    {
+        get => _optimizeDxf;
+        set
+        {
+            if (_optimizeDxf != value)
+            {
+                _optimizeDxf = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public bool EnableSplineReplacement
     {

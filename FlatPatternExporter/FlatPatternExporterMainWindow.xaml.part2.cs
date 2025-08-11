@@ -123,7 +123,7 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             var dxfFilePath = dxfFiles[0]; // Берем первый найденный файл, соответствующий шаблону
             var generator = new DxfThumbnailGenerator.DxfThumbnailGenerator();
-            var bitmap = generator.GenerateThumbnail(dxfFilePath);
+            var bitmap = generator.GenerateThumbnail(dxfFilePath, OptimizeDxf);
 
             BitmapImage? bitmapImage = null;
 

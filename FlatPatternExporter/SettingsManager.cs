@@ -50,6 +50,8 @@ public class ApplicationSettings
     
     public ProcessingMethod SelectedProcessingMethod { get; set; } = ProcessingMethod.BOM;
     
+    public bool OptimizeDxf { get; set; } = false;
+    
     public bool EnableFileNameConstructor { get; set; } = false;
     public string FileNameTemplate { get; set; } = "{PartNumber}";
     
@@ -127,6 +129,7 @@ public static class SettingsManager
             SubfolderName = window.SubfolderNameTextBox?.Text ?? string.Empty,
             SelectedProcessingMethod = window.SelectedProcessingMethod,
             FixedFolderPath = window.FixedFolderPath,
+            OptimizeDxf = window.OptimizeDxf,
             EnableFileNameConstructor = window.EnableFileNameConstructor,
             FileNameTemplate = window.TokenService.FileNameTemplate
         };
@@ -202,6 +205,7 @@ public static class SettingsManager
             window.SubfolderNameTextBox.Text = settings.SubfolderName;
         window.SelectedProcessingMethod = settings.SelectedProcessingMethod;
         window.FixedFolderPath = settings.FixedFolderPath;
+        window.OptimizeDxf = settings.OptimizeDxf;
         window.EnableFileNameConstructor = settings.EnableFileNameConstructor;
         window.TokenService.FileNameTemplate = settings.FileNameTemplate;
         
