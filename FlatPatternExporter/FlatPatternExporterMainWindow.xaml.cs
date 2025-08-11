@@ -226,66 +226,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         InitializeAvailableTokens();
 
 
-        // Инициализация предустановленных колонок с указанием категорий
-        PresetIProperties = new ObservableCollection<PresetIProperty>
-{
-    // КАТЕГОРИЯ 1: Системные свойства приложения
-    new() { InternalName = "Обр.", DisplayName = "Статус обработки", InventorPropertyName = "ProcessingStatus", Category = "Системные" },
-    new() { InternalName = "ID", DisplayName = "Нумерация", InventorPropertyName = "Item", Category = "Системные" },
-    
-    // КАТЕГОРИЯ 2: Свойства документа (не iProperty)
-    new() { InternalName = "Имя файла", DisplayName = "Имя файла", InventorPropertyName = "FileName", Category = "Документ" },
-    new() { InternalName = "Полное имя файла", DisplayName = "Полное имя файла", InventorPropertyName = "FullFileName", Category = "Документ" },
-    new() { InternalName = "Состояние модели", DisplayName = "Состояние модели", InventorPropertyName = "ModelState", Category = "Документ" },
-    new() { InternalName = "Толщина", DisplayName = "Толщина", InventorPropertyName = "Thickness", Category = "Документ" },
-    new() { InternalName = "Изобр. детали", DisplayName = "Изображение детали", InventorPropertyName = "Preview", Category = "Документ" },    
-    
-    // КАТЕГОРИЯ 4: Расширенные iProperty - Summary Information
-    new() { InternalName = "Автор", DisplayName = "Автор", InventorPropertyName = "Author", Category = "Summary Information" },
-    new() { InternalName = "Ревизия", DisplayName = "Ревизия", InventorPropertyName = "Revision", Category = "Summary Information" },
-    new() { InternalName = "Название", DisplayName = "Название", InventorPropertyName = "Title", Category = "Summary Information" },
-    new() { InternalName = "Тема", DisplayName = "Тема", InventorPropertyName = "Subject", Category = "Summary Information" },
-    new() { InternalName = "Ключевые слова", DisplayName = "Ключевые слова", InventorPropertyName = "Keywords", Category = "Summary Information" },
-    new() { InternalName = "Примечание", DisplayName = "Примечание", InventorPropertyName = "Comments", Category = "Summary Information" },
-    new() { InternalName = "Наименование", DisplayName = "Наименование", InventorPropertyName = "Description", Category = "Summary Information" },
-    
-    // КАТЕГОРИЯ 4: Расширенные iProperty - Document Summary Information
-    new() { InternalName = "Категория", DisplayName = "Категория", InventorPropertyName = "Category", Category = "Document Summary Information" },
-    new() { InternalName = "Менеджер", DisplayName = "Менеджер", InventorPropertyName = "Manager", Category = "Document Summary Information" },
-    new() { InternalName = "Компания", DisplayName = "Компания", InventorPropertyName = "Company", Category = "Document Summary Information" },
-    
-    // КАТЕГОРИЯ 4: Расширенные iProperty - Design Tracking Properties
-    new() { InternalName = "Проект", DisplayName = "Проект", InventorPropertyName = "Project", Category = "Design Tracking Properties" },
-    new() { InternalName = "Инвентарный номер", DisplayName = "Инвентарный номер", InventorPropertyName = "StockNumber", Category = "Design Tracking Properties" },
-    new() { InternalName = "Время создания", DisplayName = "Время создания", InventorPropertyName = "CreationTime", Category = "Design Tracking Properties" },
-    new() { InternalName = "Сметчик", DisplayName = "Сметчик", InventorPropertyName = "CostCenter", Category = "Design Tracking Properties" },
-    new() { InternalName = "Проверил", DisplayName = "Проверил", InventorPropertyName = "CheckedBy", Category = "Design Tracking Properties" },
-    new() { InternalName = "Нормоконтроль", DisplayName = "Нормоконтроль", InventorPropertyName = "EngApprovedBy", Category = "Design Tracking Properties" },
-    new() { InternalName = "Статус", DisplayName = "Статус", InventorPropertyName = "UserStatus", Category = "Design Tracking Properties" },
-    new() { InternalName = "Веб-ссылка", DisplayName = "Веб-ссылка", InventorPropertyName = "CatalogWebLink", Category = "Design Tracking Properties" },
-    new() { InternalName = "Поставщик", DisplayName = "Поставщик", InventorPropertyName = "Vendor", Category = "Design Tracking Properties" },
-    new() { InternalName = "Утвердил", DisplayName = "Утвердил", InventorPropertyName = "MfgApprovedBy", Category = "Design Tracking Properties" },
-    new() { InternalName = "Статус разработки", DisplayName = "Статус разработки", InventorPropertyName = "DesignStatus", Category = "Design Tracking Properties" },
-    new() { InternalName = "Проектировщик", DisplayName = "Проектировщик", InventorPropertyName = "Designer", Category = "Design Tracking Properties" },
-    new() { InternalName = "Инженер", DisplayName = "Инженер", InventorPropertyName = "Engineer", Category = "Design Tracking Properties" },
-    new() { InternalName = "Нач. отдела", DisplayName = "Нач. отдела", InventorPropertyName = "Authority", Category = "Design Tracking Properties" },
-    new() { InternalName = "Масса", DisplayName = "Масса", InventorPropertyName = "Mass", Category = "Design Tracking Properties" },
-    new() { InternalName = "Площадь поверхности", DisplayName = "Площадь поверхности", InventorPropertyName = "SurfaceArea", Category = "Design Tracking Properties" },
-    new() { InternalName = "Объем", DisplayName = "Объем", InventorPropertyName = "Volume", Category = "Design Tracking Properties" },
-    new() { InternalName = "Правило ЛМ", DisplayName = "Правило листового металла", InventorPropertyName = "SheetMetalRule", Category = "Design Tracking Properties" },
-    new() { InternalName = "Ширина развертки", DisplayName = "Ширина развертки", InventorPropertyName = "FlatPatternWidth", Category = "Design Tracking Properties" },
-    new() { InternalName = "Длина развертки", DisplayName = "Длина развертки", InventorPropertyName = "FlatPatternLength", Category = "Design Tracking Properties" },
-    new() { InternalName = "Площадь развертки", DisplayName = "Площадь развертки", InventorPropertyName = "FlatPatternArea", Category = "Design Tracking Properties" },
-    new() { InternalName = "Отделка", DisplayName = "Отделка", InventorPropertyName = "Appearance", Category = "Design Tracking Properties" },
-    new() { InternalName = "Материал", DisplayName = "Материал", InventorPropertyName = "Material", Category = "Design Tracking Properties" },
-    new() { InternalName = "Обозначение", DisplayName = "Обозначение", InventorPropertyName = "PartNumber", Category = "Design Tracking Properties" },
-    
-    // КАТЕГОРИЯ 6: Свойства количества и состояния
-    new() { InternalName = "Кол.", DisplayName = "Количество", InventorPropertyName = "Quantity", Category = "Количество" },
-    
-    // КАТЕГОРИЯ 7: Свойства состояния обработки
-    new() { InternalName = "Изобр. развертки", DisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", Category = "Обработка" }
-};
+        // Инициализация предустановленных колонок на основе PropertyMapping
+        PresetIProperties = PropertyManager.GetPresetProperties();
 
         // Устанавливаем DataContext для текущего окна
         DataContext = this;
@@ -867,7 +809,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (e.Data.GetDataPresent(typeof(PresetIProperty)))
         {
             var droppedData = e.Data.GetData(typeof(PresetIProperty)) as PresetIProperty;
-            if (droppedData != null && !PartsDataGrid.Columns.Any(c => c.Header.ToString() == droppedData.InternalName))
+            if (droppedData != null && !PartsDataGrid.Columns.Any(c => c.Header.ToString() == droppedData.ColumnHeader))
             {
                 // Определяем позицию мыши
                 var position = e.GetPosition(PartsDataGrid);
@@ -895,17 +837,17 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public void AddIPropertyColumn(PresetIProperty iProperty, int? insertIndex = null)
     {
         // Проверяем, существует ли уже колонка с таким заголовком
-        if (PartsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.InternalName))
+        if (PartsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.ColumnHeader))
             return;
 
         DataGridColumn column;
 
         // Проверка колонок с шаблонами
-        if (ColumnTemplates.TryGetValue(iProperty.InternalName, out var templateName))
+        if (ColumnTemplates.TryGetValue(iProperty.ColumnHeader, out var templateName))
         {
             column = new DataGridTemplateColumn
             {
-                Header = iProperty.InternalName,
+                Header = iProperty.ColumnHeader,
                 CellTemplate = FindResource(templateName) as DataTemplate
             };
         }
@@ -914,7 +856,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Создаем обычную текстовую колонку
             column = new DataGridTextColumn
             {
-                Header = iProperty.InternalName,
+                Header = iProperty.ColumnHeader,
                 Binding = new Binding(iProperty.InventorPropertyName),
                 ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style
             };
@@ -1891,9 +1833,9 @@ public class HeaderAdorner : Adorner
 
 public class PresetIProperty
 {
-    public string InternalName { get; set; } = string.Empty; // Внутреннее имя колонки (например, "#")
-    public string DisplayName { get; set; } = string.Empty; // Псевдоним для отображения в списке выбора (например, "#Нумерация")
-    public string InventorPropertyName { get; set; } = string.Empty; // Соответствующее имя свойства iProperty в Inventor
+    public string ColumnHeader { get; set; } = string.Empty; // Заголовок колонки в DataGrid (например, "Обозначение")
+    public string ListDisplayName { get; set; } = string.Empty; // Отображение в списке выбора свойств (например, "Обозначение")
+    public string InventorPropertyName { get; set; } = string.Empty; // Соответствующее имя свойства iProperty в Inventor (например, "PartNumber")
     public string Category { get; set; } = string.Empty; // Категория свойства для группировки
 }
 

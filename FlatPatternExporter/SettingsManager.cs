@@ -231,7 +231,7 @@ public static class SettingsManager
 
         foreach (var columnName in settings.ColumnOrder)
         {
-            var presetProperty = window.PresetIProperties.FirstOrDefault(p => p.InternalName == columnName);
+            var presetProperty = window.PresetIProperties.FirstOrDefault(p => p.ColumnHeader == columnName);
             if (presetProperty != null)
             {
                 window.AddIPropertyColumn(presetProperty);

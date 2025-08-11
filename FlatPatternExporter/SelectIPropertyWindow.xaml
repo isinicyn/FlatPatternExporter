@@ -19,7 +19,7 @@
             <CollectionViewSource.SortDescriptions>
                 <!-- Сначала сортируем по категории, затем по DisplayName -->
                 <scm:SortDescription PropertyName="Category" Direction="Ascending" />
-                <scm:SortDescription PropertyName="DisplayName" Direction="Ascending" />
+                <scm:SortDescription PropertyName="ListDisplayName" Direction="Ascending" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
     </Window.Resources>
@@ -95,7 +95,7 @@
                                 BorderThickness="1,1,1,1"
                                 Padding="2,2,2,2"
                                 SnapsToDevicePixels="True" Width="215" Margin="0,0,0,0" Height="22.5">
-                            <TextBlock Text="{Binding DisplayName}" 
+                            <TextBlock Text="{Binding ListDisplayName}" 
                                        FontWeight="Bold" 
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Left" 

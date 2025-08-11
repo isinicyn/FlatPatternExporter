@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using Inventor;
@@ -313,6 +314,100 @@ namespace FlatPatternExporter
                 Debug.WriteLine($"Ошибка проверки типа состояния модели: {ex.Message}");
                 return true; // По умолчанию считаем основным состоянием
             }
+        }
+
+        /// <summary>
+        /// Получает список предустановленных свойств iProperty на основе PropertyMapping
+        /// </summary>
+        public static ObservableCollection<PresetIProperty> GetPresetProperties()
+        {
+            var presetProperties = new ObservableCollection<PresetIProperty>
+            {
+                // Системные свойства приложения
+                new() { ColumnHeader = "Обр.", ListDisplayName = "Статус обработки", InventorPropertyName = "ProcessingStatus", Category = "Системные" },
+                new() { ColumnHeader = "ID", ListDisplayName = "Нумерация", InventorPropertyName = "Item", Category = "Системные" },
+
+                // Свойства документа (не iProperty)
+                new() { ColumnHeader = "Имя файла", ListDisplayName = "Имя файла", InventorPropertyName = "FileName", Category = "Документ" },
+                new() { ColumnHeader = "Полное имя файла", ListDisplayName = "Полное имя файла", InventorPropertyName = "FullFileName", Category = "Документ" },
+                new() { ColumnHeader = "Состояние модели", ListDisplayName = "Состояние модели", InventorPropertyName = "ModelState", Category = "Документ" },
+                new() { ColumnHeader = "Толщина", ListDisplayName = "Толщина", InventorPropertyName = "Thickness", Category = "Документ" },
+                new() { ColumnHeader = "Изобр. детали", ListDisplayName = "Изображение детали", InventorPropertyName = "Preview", Category = "Документ" },
+
+                // Количество и обработка
+                new() { ColumnHeader = "Кол.", ListDisplayName = "Количество", InventorPropertyName = "Quantity", Category = "Количество" },
+                new() { ColumnHeader = "Изобр. развертки", ListDisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", Category = "Обработка" }
+            };
+
+            // Автоматическое добавление свойств из PropertyMapping
+            foreach (var mapping in PropertyMapping)
+            {
+                var category = mapping.Value.SetName switch
+                {
+                    "Summary Information" => "Summary Information",
+                    "Document Summary Information" => "Document Summary Information", 
+                    "Design Tracking Properties" => "Design Tracking Properties",
+                    _ => "Прочие"
+                };
+
+                var columnHeader = GetDisplayNameForProperty(mapping.Key);
+                var listDisplayName = GetDisplayNameForProperty(mapping.Key);
+                
+                presetProperties.Add(new() 
+                { 
+                    ColumnHeader = columnHeader,        // Заголовок колонки в DataGrid
+                    ListDisplayName = listDisplayName, // Отображение в списке выбора
+                    InventorPropertyName = mapping.Key, // Ключ для PropertyMapping
+                    Category = category 
+                });
+            }
+
+            return presetProperties;
+        }
+
+        /// <summary>
+        /// Получает русское отображаемое имя для свойства
+        /// </summary>
+        private static string GetDisplayNameForProperty(string propertyKey)
+        {
+            return propertyKey switch
+            {
+                "PartNumber" => "Обозначение",
+                "Description" => "Наименование", 
+                "Material" => "Материал",
+                "Author" => "Автор",
+                "Revision" => "Ревизия",
+                "Title" => "Название",
+                "Subject" => "Тема",
+                "Keywords" => "Ключевые слова",
+                "Comments" => "Примечание",
+                "Category" => "Категория",
+                "Manager" => "Менеджер",
+                "Company" => "Компания",
+                "Project" => "Проект",
+                "StockNumber" => "Инвентарный номер",
+                "CreationTime" => "Время создания",
+                "CostCenter" => "Сметчик",
+                "CheckedBy" => "Проверил",
+                "EngApprovedBy" => "Нормоконтроль",
+                "UserStatus" => "Статус",
+                "CatalogWebLink" => "Веб-ссылка",
+                "Vendor" => "Поставщик",
+                "MfgApprovedBy" => "Утвердил",
+                "DesignStatus" => "Статус разработки",
+                "Designer" => "Проектировщик",
+                "Engineer" => "Инженер",
+                "Authority" => "Нач. отдела",
+                "Mass" => "Масса",
+                "SurfaceArea" => "Площадь поверхности",
+                "Volume" => "Объем",
+                "SheetMetalRule" => "Правило ЛМ",
+                "FlatPatternWidth" => "Ширина развертки",
+                "FlatPatternLength" => "Длина развертки",
+                "FlatPatternArea" => "Площадь развертки",
+                "Appearance" => "Отделка",
+                _ => propertyKey
+            };
         }
     }
 }
