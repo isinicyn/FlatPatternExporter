@@ -78,120 +78,63 @@ namespace FlatPatternExporter
         }
 
         /// <summary>
-        /// Получает значение свойства из указанного набора свойств
+        /// Получает объект свойства по внутреннему имени с использованием маппинга или из пользовательских свойств.
         /// </summary>
-        public string GetProperty(string setName, string propName)
+        private Inventor.Property? GetPropertyObject(string ourName)
         {
-            try
-            {
-                var propSet = _document.PropertySets[setName];
-                var prop = propSet[propName];
-                return prop.Value?.ToString() ?? string.Empty;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка получения свойства '{propName}' из набора '{setName}': {ex.Message}");
-                return string.Empty;
-            }
-        }
+            string setName;
+            string inventorName;
 
-        /// <summary>
-        /// Получает выражение свойства из указанного набора свойств
-        /// </summary>
-        public string GetPropertyExpression(string setName, string propName)
-        {
-            try
-            {
-                var propSet = _document.PropertySets[setName];
-                var prop = propSet[propName];
-                return prop.Expression ?? string.Empty;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка получения выражения свойства '{propName}' из набора '{setName}': {ex.Message}");
-                return string.Empty;
-            }
-        }
-
-        /// <summary>
-        /// Проверяет, является ли значение свойства expression-ом
-        /// </summary>
-        public bool IsPropertyExpression(string setName, string propName)
-        {
-            try
-            {
-                var propSet = _document.PropertySets[setName];
-                var prop = propSet[propName];
-                
-                // Expression в Inventor должен начинаться с символа "="
-                return !string.IsNullOrEmpty(prop.Expression) && prop.Expression.StartsWith("=");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка проверки expression свойства '{propName}' из набора '{setName}': {ex.Message}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Устанавливает значение свойства в указанном наборе свойств
-        /// </summary>
-        public void SetProperty(string setName, string propName, object value)
-        {
-            try
-            {
-                var propSet = _document.PropertySets[setName];
-                var prop = propSet[propName];
-                prop.Value = value;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка установки свойства '{propName}' в наборе '{setName}': {ex.Message}");
-                System.Windows.MessageBox.Show($"Не удалось обновить свойство '{propName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        /// <summary>
-        /// Устанавливает выражение свойства в указанном наборе свойств
-        /// </summary>
-        public void SetPropertyExpression(string setName, string propName, string expression)
-        {
-            try
-            {
-                var propSet = _document.PropertySets[setName];
-                var prop = propSet[propName];
-                prop.Expression = expression;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Ошибка установки выражения свойства '{propName}' в наборе '{setName}': {ex.Message}");
-                System.Windows.MessageBox.Show($"Не удалось обновить выражение свойства '{propName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        /// <summary>
-        /// Получает значение свойства по внутреннему имени с использованием маппинга
-        /// </summary>
-        public string GetMappedProperty(string ourName)
-        {
             if (PropertyMapping.TryGetValue(ourName, out var mapping))
             {
-                var value = GetProperty(mapping.SetName, mapping.InventorName);
-                
-                // Округляем числовые значения до двух знаков после запятой
-                if (NumericPropertiesForRounding.Contains(ourName))
-                {
-                    if (double.TryParse(value, out var numericValue))
-                    {
-                        return Math.Round(numericValue, 2).ToString("F2");
-                    }
-                }
-                
-                return value;
+                setName = mapping.SetName;
+                inventorName = mapping.InventorName;
+            }
+            else
+            {
+                setName = "Inventor User Defined Properties";
+                inventorName = ourName;
             }
 
-            // Для пользовательских свойств проверяем только набор user-defined
-            return GetProperty("Inventor User Defined Properties", ourName);
+            try
+            {
+                var propSet = _document.PropertySets[setName];
+                return propSet[inventorName];
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка доступа к свойству '{ourName}': {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Получает значение или выражение свойства по внутреннему имени.
+        /// </summary>
+        /// <param name="ourName">Внутреннее имя свойства.</param>
+        /// <param name="getExpression">Если true, возвращает выражение; иначе - значение.</param>
+        public string GetMappedProperty(string ourName, bool getExpression = false)
+        {
+            var prop = GetPropertyObject(ourName);
+            if (prop == null) return string.Empty;
+
+            string result;
+            if (getExpression)
+            {
+                result = prop.Expression ?? string.Empty;
+            }
+            else
+            {
+                result = prop.Value?.ToString() ?? string.Empty;
+
+                // Округляем числовые значения
+                if (NumericPropertiesForRounding.Contains(ourName) && double.TryParse(result, out var numericValue))
+                {
+                    result = Math.Round(numericValue, 2).ToString("F2");
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -199,57 +142,56 @@ namespace FlatPatternExporter
         /// </summary>
         public string GetMappedPropertyExpression(string ourName)
         {
-            if (PropertyMapping.TryGetValue(ourName, out var mapping))
-            {
-                return GetPropertyExpression(mapping.SetName, mapping.InventorName);
-            }
-
-            // Для пользовательских свойств проверяем только набор user-defined
-            return GetPropertyExpression("Inventor User Defined Properties", ourName);
+            return GetMappedProperty(ourName, getExpression: true);
         }
 
         /// <summary>
-        /// Проверяет, является ли свойство expression-ом по внутреннему имени с использованием маппинга
+        /// Проверяет, является ли свойство expression-ом по внутреннему имени.
         /// </summary>
         public bool IsMappedPropertyExpression(string ourName)
         {
-            if (PropertyMapping.TryGetValue(ourName, out var mapping))
-            {
-                return IsPropertyExpression(mapping.SetName, mapping.InventorName);
-            }
+            var prop = GetPropertyObject(ourName);
+            if (prop == null) return false;
 
-            // Для пользовательских свойств проверяем только набор user-defined
-            return IsPropertyExpression("Inventor User Defined Properties", ourName);
+            return !string.IsNullOrEmpty(prop.Expression) && prop.Expression.StartsWith("=");
         }
 
         /// <summary>
-        /// Устанавливает значение свойства по внутреннему имени с использованием маппинга
+        /// Устанавливает значение свойства по внутреннему имени.
         /// </summary>
         public void SetMappedProperty(string ourName, object value)
         {
-            if (PropertyMapping.TryGetValue(ourName, out var mapping))
-            {
-                SetProperty(mapping.SetName, mapping.InventorName, value);
-                return;
-            }
+            var prop = GetPropertyObject(ourName);
+            if (prop == null) return;
 
-            // Для пользовательских свойств
-            SetProperty("Inventor User Defined Properties", ourName, value);
+            try
+            {
+                prop.Value = value;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка установки значения свойства '{ourName}': {ex.Message}");
+                System.Windows.MessageBox.Show($"Не удалось обновить свойство '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
-        /// Устанавливает выражение свойства по внутреннему имени с использованием маппинга
+        /// Устанавливает выражение свойства по внутреннему имени.
         /// </summary>
         public void SetMappedPropertyExpression(string ourName, string expression)
         {
-            if (PropertyMapping.TryGetValue(ourName, out var mapping))
-            {
-                SetPropertyExpression(mapping.SetName, mapping.InventorName, expression);
-                return;
-            }
+            var prop = GetPropertyObject(ourName);
+            if (prop == null) return;
 
-            // Для пользовательских свойств
-            SetPropertyExpression("Inventor User Defined Properties", ourName, expression);
+            try
+            {
+                prop.Expression = expression;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Ошибка установки выражения свойства '{ourName}': {ex.Message}");
+                System.Windows.MessageBox.Show($"Не удалось обновить выражение свойства '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         // === Методы для работы с не-iProperty свойствами ===
