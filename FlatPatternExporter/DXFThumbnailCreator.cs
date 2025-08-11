@@ -14,15 +14,11 @@ public class DxfThumbnailGenerator
     private const float DefaultPenWidth = 1f;
     private static readonly double[] CardinalAngles = { 0, 90, 180, 270 };
     private static readonly Color DefaultEntityColor = Color.Black;
-    public Bitmap GenerateThumbnail(string filePath, bool optimizeDxf = false)
+    public Bitmap GenerateThumbnail(string filePath)
     {
         try
         {
             var dxf = DxfDocument.Load(filePath);
-            if (optimizeDxf)
-            {
-                SaveAsR15(dxf, filePath);
-            }
             return RenderDxfToBitmap(dxf);
         }
         catch (Exception ex)
@@ -31,7 +27,20 @@ public class DxfThumbnailGenerator
         }
     }
 
-    private void SaveAsR15(DxfDocument dxf, string originalFilePath)
+    public static void OptimizeDxfFile(string dxfFilePath)
+    {
+        try
+        {
+            var dxf = DxfDocument.Load(dxfFilePath);
+            SaveAsR15Static(dxf, dxfFilePath);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Ошибка оптимизации DXF: {ex.Message}");
+        }
+    }
+
+    private static void SaveAsR15Static(DxfDocument dxf, string originalFilePath)
     {
         try
         {

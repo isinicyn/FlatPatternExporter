@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
+using DxfThumbnailGenerator;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -123,7 +124,7 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             var dxfFilePath = dxfFiles[0]; // Берем первый найденный файл, соответствующий шаблону
             var generator = new DxfThumbnailGenerator.DxfThumbnailGenerator();
-            var bitmap = generator.GenerateThumbnail(dxfFilePath, OptimizeDxf);
+            var bitmap = generator.GenerateThumbnail(dxfFilePath);
 
             BitmapImage? bitmapImage = null;
 
@@ -1022,6 +1023,12 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                         oDataIO.WriteDataToFile(dxfOptions, filePath);
                         exportSuccess = true;
+
+                        // Оптимизация DXF если включена настройка
+                        if (OptimizeDxf && exportSuccess)
+                        {
+                            DxfThumbnailGenerator.DxfThumbnailGenerator.OptimizeDxfFile(filePath);
+                        }
                     }
                     catch (Exception ex)
                     {
