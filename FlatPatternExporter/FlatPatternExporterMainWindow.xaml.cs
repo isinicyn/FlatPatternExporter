@@ -434,6 +434,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _selectedAcadVersionIndex = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsOptimizeDxfEnabled));
+                
+                // Автоматически отключаем оптимизацию для R12
+                if (AcadVersions.Count > value && AcadVersions[value].Value == "R12")
+                {
+                    OptimizeDxf = false;
+                }
             }
         }
     }
@@ -535,6 +542,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     public TokenService TokenService => _tokenService;
+
+    // Вычисляемое свойство для доступности оптимизации DXF
+    public bool IsOptimizeDxfEnabled => 
+        AcadVersions.Count > SelectedAcadVersionIndex && 
+        AcadVersions[SelectedAcadVersionIndex].Value != "R12";
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

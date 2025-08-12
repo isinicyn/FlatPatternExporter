@@ -202,7 +202,7 @@
                         <StackPanel Margin="10,15,10,5" HorizontalAlignment="Center" VerticalAlignment="Top">
                             <RadioButton x:Name="TraverseRadioButton" Content="Перебор" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,10,0"/>
                             <RadioButton x:Name="BomRadioButton" Content="Спецификация" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,5,0,5"/>
-                            <CheckBox x:Name="OptimizeDxfCheckBox" Content="Оптимизация dxf" IsChecked="{Binding OptimizeDxf, Mode=TwoWay}" Margin="0,0,0,0"/>
+                            <CheckBox x:Name="OptimizeDxfCheckBox" Content="Оптимизация dxf" IsChecked="{Binding OptimizeDxf, Mode=TwoWay}" IsEnabled="{Binding IsOptimizeDxfEnabled}" Margin="0,0,0,0"/>
                         </StackPanel>
                     </GroupBox>
 

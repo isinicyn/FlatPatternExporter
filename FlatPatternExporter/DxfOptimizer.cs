@@ -1,4 +1,3 @@
-using System.IO;
 using netDxf;
 using netDxf.Entities;
 using netDxf.Header;
@@ -17,7 +16,7 @@ public static class DxfOptimizer
         { "2018", DxfVersion.AutoCad2018 }
     };
 
-    public static void OptimizeDxfFile(string dxfFilePath, string acadVersion = "2000")
+    public static void OptimizeDxfFile(string dxfFilePath, string acadVersion)
     {
         try
         {
@@ -36,8 +35,8 @@ public static class DxfOptimizer
         {
             if (!AcadVersionToDxfVersion.TryGetValue(acadVersion, out var dxfVersion))
             {
-                dxfVersion = DxfVersion.AutoCad2000;
-                System.Diagnostics.Debug.WriteLine($"Неизвестная версия AutoCAD: {acadVersion}, используется 2000 по умолчанию");
+                System.Diagnostics.Debug.WriteLine($"Неподдерживаемая версия AutoCAD: {acadVersion}, оптимизация пропущена");
+                return;
             }
 
             var optimizedDxf = new DxfDocument();

@@ -1023,11 +1023,15 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                         oDataIO.WriteDataToFile(dxfOptions, filePath);
                         exportSuccess = true;
 
-                        // Оптимизация DXF если включена настройка
+                        // Оптимизация DXF если включена настройка и версия не R12
                         if (OptimizeDxf && exportSuccess)
                         {
                             var selectedVersion = AcadVersions[SelectedAcadVersionIndex].Value;
-                            DxfOptimizer.OptimizeDxfFile(filePath, selectedVersion);
+                            // Не оптимизируем файлы R12, так как netDxf не поддерживает эту версию
+                            if (selectedVersion != "R12")
+                            {
+                                DxfOptimizer.OptimizeDxfFile(filePath, selectedVersion);
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -1038,7 +1042,20 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 }
 
                 BitmapImage? dxfPreview = null;
-                if (generateThumbnails) dxfPreview = GenerateDxfThumbnail(thicknessDir, partNumber);
+                if (generateThumbnails)
+                {
+                    var selectedVersion = "";
+                    Dispatcher.Invoke(() => 
+                    {
+                        selectedVersion = AcadVersions[SelectedAcadVersionIndex].Value;
+                    });
+                    
+                    // Не создаваем миниатюры для R12, так как netDxf не поддерживает эту версию
+                    if (selectedVersion != "R12")
+                    {
+                        dxfPreview = GenerateDxfThumbnail(thicknessDir, partNumber);
+                    }
+                }
 
                 Dispatcher.Invoke(() =>
                 {
