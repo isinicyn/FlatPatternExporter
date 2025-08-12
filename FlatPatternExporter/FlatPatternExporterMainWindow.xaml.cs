@@ -86,6 +86,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private bool _isCancelled;
     private bool _hasMissingReferences = false;
     private int _itemCounter = 1;
+    private bool _isInitializing = true;
     
     // UI состояние
     private double _scanProgressValue;
@@ -249,6 +250,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         
         // Инициализируем данные в TokenService
         _tokenService.UpdatePartsData(_partsData);
+        
+        // Завершаем инициализацию
+        _isInitializing = false;
     }
 
     private void LoadSettings()
@@ -440,6 +444,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 if (AcadVersions.Count > value && AcadVersions[value].Value == "R12")
                 {
                     OptimizeDxf = false;
+                    // Показываем сообщение только если приложение уже инициализировано
+                    if (!_isInitializing)
+                    {
+                        MessageBox.Show("Для версии R12 отключены оптимизация DXF и генерация миниатюр.\n\nДанная версия не поддерживается используемой библиотекой.", 
+                            "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 }
             }
         }
