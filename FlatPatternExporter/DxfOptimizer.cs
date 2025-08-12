@@ -43,8 +43,7 @@ public static class DxfOptimizer
             var optimizedDxf = new DxfDocument();
             optimizedDxf.DrawingVariables.AcadVer = dxfVersion;
             
-            var allEntities = CollectEntities(dxf);
-            foreach (var entity in allEntities)
+            foreach (var entity in dxf.Entities.All)
                 optimizedDxf.Entities.Add((EntityObject)entity.Clone());
 
             optimizedDxf.Save(originalFilePath);
@@ -55,16 +54,4 @@ public static class DxfOptimizer
         }
     }
 
-    private static List<EntityObject> CollectEntities(DxfDocument dxf)
-    {
-        var entities = new List<EntityObject>();
-        entities.AddRange(dxf.Entities.Lines);
-        entities.AddRange(dxf.Entities.Circles);
-        entities.AddRange(dxf.Entities.Arcs);
-        entities.AddRange(dxf.Entities.Polylines2D);
-        entities.AddRange(dxf.Entities.Polylines3D);
-        entities.AddRange(dxf.Entities.Splines);
-        entities.AddRange(dxf.Entities.Ellipses);
-        return entities;
-    }
 }
