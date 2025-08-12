@@ -313,7 +313,7 @@ public partial class FlatPatternExporterMainWindow : Window
     {
         try
         {
-            // Получаем все компоненты из BOM рекурсивно в один плоский список
+            // Получаем все компоненты из BOM рекурсивно в один плоский список с количествами
             var allBomRows = GetAllBOMRowsRecursively(bom);
             
             Debug.WriteLine($"[ProcessBOM] Всего найдено {allBomRows.Count} строк BOM во всей структуре");
@@ -321,13 +321,13 @@ public partial class FlatPatternExporterMainWindow : Window
             var processedRows = 0;
             var totalRows = allBomRows.Count;
 
-            foreach (var row in allBomRows)
+            foreach (var (row, parentQuantity) in allBomRows)
             {
                 if (_isCancelled) break;
 
                 try
                 {
-                    ProcessBOMRowSimple(row, sheetMetalParts);
+                    ProcessBOMRowSimple(row, sheetMetalParts, parentQuantity);
                     
                     // Обновляем прогресс
                     processedRows++;
@@ -358,9 +358,9 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private List<BOMRow> GetAllBOMRowsRecursively(BOM bom)
+    private List<(BOMRow Row, int ParentQuantity)> GetAllBOMRowsRecursively(BOM bom, int parentQuantity = 1)
     {
-        var allRows = new List<BOMRow>();
+        var allRows = new List<(BOMRow, int)>();
         
         try
         {
@@ -395,14 +395,17 @@ public partial class FlatPatternExporterMainWindow : Window
                         ShouldExcludeComponent(row.BOMStructure, document.FullFileName))
                         continue;
                         
-                    allRows.Add(row);
+                    // Добавляем строку с учетом количества родительского компонента
+                    allRows.Add((row, parentQuantity));
                     
                     // Рекурсивно получаем строки из подсборок
                     try
                     {
                         if (componentDefinition?.Document is AssemblyDocument asmDoc)
                         {
-                            var subRows = GetAllBOMRowsRecursively(asmDoc.ComponentDefinition.BOM);
+                            // Передаем общее количество: parentQuantity * количество данной подсборки
+                            var totalQuantity = parentQuantity * row.ItemQuantity;
+                            var subRows = GetAllBOMRowsRecursively(asmDoc.ComponentDefinition.BOM, totalQuantity);
                             allRows.AddRange(subRows);
                         }
                     }
@@ -426,7 +429,7 @@ public partial class FlatPatternExporterMainWindow : Window
         return allRows;
     }
 
-    private void ProcessBOMRowSimple(BOMRow row, Dictionary<string, int> sheetMetalParts)
+    private void ProcessBOMRowSimple(BOMRow row, Dictionary<string, int> sheetMetalParts, int parentQuantity = 1)
     {
         try
         {
@@ -450,10 +453,13 @@ public partial class FlatPatternExporterMainWindow : Window
                         var modelState = mgr.GetModelState();
                         AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
                         
+                        // Учитываем общее количество: количество детали * количество родительских сборок
+                        var totalQuantity = row.ItemQuantity * parentQuantity;
+                        
                         if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
-                            sheetMetalParts[partNumber] += row.ItemQuantity;
+                            sheetMetalParts[partNumber] += totalQuantity;
                         else
-                            sheetMetalParts.Add(partNumber, row.ItemQuantity);
+                            sheetMetalParts.Add(partNumber, totalQuantity);
                     }
                 }
             }
