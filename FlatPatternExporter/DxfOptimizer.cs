@@ -7,12 +7,22 @@ namespace DxfGenerator;
 
 public static class DxfOptimizer
 {
-    public static void OptimizeDxfFile(string dxfFilePath)
+    private static readonly Dictionary<string, DxfVersion> AcadVersionToDxfVersion = new()
+    {
+        { "2000", DxfVersion.AutoCad2000 },
+        { "2004", DxfVersion.AutoCad2004 },
+        { "2007", DxfVersion.AutoCad2007 },
+        { "2010", DxfVersion.AutoCad2010 },
+        { "2013", DxfVersion.AutoCad2013 },
+        { "2018", DxfVersion.AutoCad2018 }
+    };
+
+    public static void OptimizeDxfFile(string dxfFilePath, string acadVersion = "2000")
     {
         try
         {
             var dxf = DxfDocument.Load(dxfFilePath);
-            SaveAsR15(dxf, dxfFilePath);
+            SaveAsVersion(dxf, dxfFilePath, acadVersion);
         }
         catch (Exception ex)
         {
@@ -20,30 +30,37 @@ public static class DxfOptimizer
         }
     }
 
-    private static void SaveAsR15(DxfDocument dxf, string originalFilePath)
+    private static void SaveAsVersion(DxfDocument dxf, string originalFilePath, string acadVersion)
     {
         try
         {
+            if (!AcadVersionToDxfVersion.TryGetValue(acadVersion, out var dxfVersion))
+            {
+                dxfVersion = DxfVersion.AutoCad2000;
+                System.Diagnostics.Debug.WriteLine($"Неизвестная версия AutoCAD: {acadVersion}, используется 2000 по умолчанию");
+                acadVersion = "2000";
+            }
+            
             var directory = Path.GetDirectoryName(originalFilePath) ?? "";
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFilePath);
             var extension = Path.GetExtension(originalFilePath);
-            var r15FilePath = Path.Combine(directory, $"{fileNameWithoutExtension}_R15{extension}");
+            var versionFilePath = Path.Combine(directory, $"{fileNameWithoutExtension}_{acadVersion}{extension}");
 
-            if (File.Exists(r15FilePath))
+            if (File.Exists(versionFilePath))
                 return;
 
-            var r15Dxf = new DxfDocument();
-            r15Dxf.DrawingVariables.AcadVer = DxfVersion.AutoCad2000;
+            var versionDxf = new DxfDocument();
+            versionDxf.DrawingVariables.AcadVer = dxfVersion;
             
             var allEntities = CollectEntities(dxf);
             foreach (var entity in allEntities)
-                r15Dxf.Entities.Add((EntityObject)entity.Clone());
+                versionDxf.Entities.Add((EntityObject)entity.Clone());
 
-            r15Dxf.Save(r15FilePath);
+            versionDxf.Save(versionFilePath);
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Ошибка сохранения R15: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Ошибка сохранения {acadVersion}: {ex.Message}");
         }
     }
 

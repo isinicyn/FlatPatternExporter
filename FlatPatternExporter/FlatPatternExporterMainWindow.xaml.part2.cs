@@ -1026,7 +1026,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                         // Оптимизация DXF если включена настройка
                         if (OptimizeDxf && exportSuccess)
                         {
-                            DxfOptimizer.OptimizeDxfFile(filePath);
+                            var selectedVersion = AcadVersions[SelectedAcadVersionIndex].Value;
+                            DxfOptimizer.OptimizeDxfFile(filePath, selectedVersion);
                         }
                     }
                     catch (Exception ex)
