@@ -22,7 +22,7 @@ public static class DxfOptimizer
         try
         {
             var dxf = DxfDocument.Load(dxfFilePath);
-            SaveAsVersion(dxf, dxfFilePath, acadVersion);
+            ReplaceWithOptimizedVersion(dxf, dxfFilePath, acadVersion);
         }
         catch (Exception ex)
         {
@@ -30,7 +30,7 @@ public static class DxfOptimizer
         }
     }
 
-    private static void SaveAsVersion(DxfDocument dxf, string originalFilePath, string acadVersion)
+    private static void ReplaceWithOptimizedVersion(DxfDocument dxf, string originalFilePath, string acadVersion)
     {
         try
         {
@@ -38,29 +38,20 @@ public static class DxfOptimizer
             {
                 dxfVersion = DxfVersion.AutoCad2000;
                 System.Diagnostics.Debug.WriteLine($"Неизвестная версия AutoCAD: {acadVersion}, используется 2000 по умолчанию");
-                acadVersion = "2000";
             }
-            
-            var directory = Path.GetDirectoryName(originalFilePath) ?? "";
-            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFilePath);
-            var extension = Path.GetExtension(originalFilePath);
-            var versionFilePath = Path.Combine(directory, $"{fileNameWithoutExtension}_{acadVersion}{extension}");
 
-            if (File.Exists(versionFilePath))
-                return;
-
-            var versionDxf = new DxfDocument();
-            versionDxf.DrawingVariables.AcadVer = dxfVersion;
+            var optimizedDxf = new DxfDocument();
+            optimizedDxf.DrawingVariables.AcadVer = dxfVersion;
             
             var allEntities = CollectEntities(dxf);
             foreach (var entity in allEntities)
-                versionDxf.Entities.Add((EntityObject)entity.Clone());
+                optimizedDxf.Entities.Add((EntityObject)entity.Clone());
 
-            versionDxf.Save(versionFilePath);
+            optimizedDxf.Save(originalFilePath);
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Ошибка сохранения {acadVersion}: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Ошибка оптимизации {acadVersion}: {ex.Message}");
         }
     }
 
