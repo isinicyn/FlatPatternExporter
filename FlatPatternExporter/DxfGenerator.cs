@@ -4,7 +4,7 @@ using netDxf;
 using netDxf.Entities;
 using netDxf.Header;
 
-namespace DxfThumbnailGenerator;
+namespace DxfGenerator;
 
 public class DxfThumbnailGenerator
 {
@@ -27,45 +27,6 @@ public class DxfThumbnailGenerator
         }
     }
 
-    public static void OptimizeDxfFile(string dxfFilePath)
-    {
-        try
-        {
-            var dxf = DxfDocument.Load(dxfFilePath);
-            SaveAsR15Static(dxf, dxfFilePath);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Ошибка оптимизации DXF: {ex.Message}");
-        }
-    }
-
-    private static void SaveAsR15Static(DxfDocument dxf, string originalFilePath)
-    {
-        try
-        {
-            var directory = Path.GetDirectoryName(originalFilePath) ?? "";
-            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFilePath);
-            var extension = Path.GetExtension(originalFilePath);
-            var r15FilePath = Path.Combine(directory, $"{fileNameWithoutExtension}_R15{extension}");
-
-            if (File.Exists(r15FilePath))
-                return;
-
-            var r15Dxf = new DxfDocument();
-            r15Dxf.DrawingVariables.AcadVer = DxfVersion.AutoCad2000;
-            
-            var allEntities = CollectEntities(dxf);
-            foreach (var entity in allEntities)
-                r15Dxf.Entities.Add((EntityObject)entity.Clone());
-
-            r15Dxf.Save(r15FilePath);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Ошибка сохранения R15: {ex.Message}");
-        }
-    }
 
     private Bitmap RenderDxfToBitmap(DxfDocument dxf)
     {
