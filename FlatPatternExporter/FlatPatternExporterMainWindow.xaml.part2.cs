@@ -235,6 +235,9 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             if (occ.Suppressed) continue;
             
+            // Проверяем, является ли компонент виртуальным
+            if (occ.Definition is VirtualComponentDefinition) continue;
+            
             try
             {
                 var fullFileName = GetFullFileName(occ);
@@ -390,6 +393,14 @@ public partial class FlatPatternExporterMainWindow : Window
 
                     // Применяем фильтрацию BOM структуры перед добавлением в список
                     var componentDefinition = row.ComponentDefinitions[1];
+                    
+                    // Проверяем, является ли компонент виртуальным
+                    if (componentDefinition is VirtualComponentDefinition)
+                    {
+                        // Виртуальные компоненты пропускаем
+                        continue;
+                    }
+                    
                     if (componentDefinition?.Document is Document document && 
                         ShouldExcludeComponent(row.BOMStructure, document.FullFileName))
                         continue;
