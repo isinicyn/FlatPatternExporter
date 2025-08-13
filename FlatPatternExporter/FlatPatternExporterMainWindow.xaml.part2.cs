@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Inventor;
@@ -1486,6 +1485,19 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         _customPropertiesList.Remove(propertyName);
     }
 
+    /// <summary>
+    /// Централизованный метод для создания текстовых колонок DataGrid
+    /// </summary>
+    private DataGridTextColumn CreateTextColumn(string header, string bindingPath)
+    {
+        return new DataGridTextColumn
+        {
+            Header = header,
+            Binding = new Binding(bindingPath),
+            ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style
+        };
+    }
+
     public void AddCustomIPropertyColumn(string propertyName)
     {
         // Проверяем, существует ли уже колонка с таким именем или заголовком
@@ -1496,19 +1508,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
-        // Создаем новую колонку
-        var column = new DataGridTextColumn
-        {
-            Header = propertyName,
-            Binding = new Binding($"CustomProperties[{propertyName}]")
-            {
-                Mode = BindingMode.OneWay // Устанавливаем режим привязки
-            },
-            Width = DataGridLength.Auto
-        };
-
-        // Применяем стиль CenteredCellStyle
-        column.ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style;
+        // Создаем текстовую колонку через централизованный метод
+        var column = CreateTextColumn(propertyName, $"CustomProperties[{propertyName}]");
 
         PartsDataGrid.Columns.Add(column);
 

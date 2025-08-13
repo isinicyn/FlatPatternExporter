@@ -19,7 +19,6 @@ using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using DefineEdge;
 using Inventor;
-using Application = Inventor.Application;
 using Binding = System.Windows.Data.Binding;
 using DragEventArgs = System.Windows.DragEventArgs;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -65,7 +64,7 @@ public class SplineReplacementItem
 public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
     // Inventor API
-    public Application? _thisApplication;
+    public Inventor.Application? _thisApplication;
     private Document? _lastScannedDocument;
     
     // Сервисы
@@ -890,13 +889,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
         else
         {
-            // Создаем обычную текстовую колонку
-            column = new DataGridTextColumn
-            {
-                Header = iProperty.ColumnHeader,
-                Binding = new Binding(iProperty.InventorPropertyName),
-                ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style
-            };
+            // Создаем обычную текстовую колонку через централизованный метод
+            column = CreateTextColumn(iProperty.ColumnHeader, iProperty.InventorPropertyName);
         }
 
         // Если указан индекс вставки, вставляем колонку в нужное место
@@ -1049,7 +1043,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         try
         {
-            _thisApplication = (Application)MarshalCore.GetActiveObject("Inventor.Application");
+            _thisApplication = (Inventor.Application)MarshalCore.GetActiveObject("Inventor.Application");
             if (_thisApplication != null)
             {
                 InitializeProjectAndLibraryData();
