@@ -1425,16 +1425,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void InitializeAcadVersions()
     {
-        AcadVersions = new ObservableCollection<AcadVersionItem>
-        {
-            new() { DisplayName = "2018", Value = "2018" },
-            new() { DisplayName = "2013", Value = "2013" },
-            new() { DisplayName = "2010", Value = "2010" },
-            new() { DisplayName = "2007", Value = "2007" },
-            new() { DisplayName = "2004", Value = "2004" },
-            new() { DisplayName = "2000", Value = "2000" },
-            new() { DisplayName = "R12", Value = "R12" }
-        };
+        AcadVersions = new ObservableCollection<AcadVersionItem>(
+            new[] { "2018", "2013", "2010", "2007", "2004", "2000", "R12" }
+            .Select(v => new AcadVersionItem { DisplayName = v, Value = v })
+        );
     }
 
     private void InitializeSplineReplacementTypes()
