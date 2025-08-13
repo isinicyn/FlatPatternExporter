@@ -80,7 +80,7 @@
         <Button Click="ResetButton_Click"
                 CommandParameter="{Binding}"
                 IsEnabled="{Binding CanReset}"
-                Style="{StaticResource LayerResetButtonStyle}"
+                Style="{StaticResource ResetButtonStyle}"
                 Margin="5,0,0,0"/>
     </StackPanel>
 </UserControl>
