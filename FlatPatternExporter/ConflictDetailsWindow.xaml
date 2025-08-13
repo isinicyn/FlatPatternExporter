@@ -10,14 +10,6 @@
         SizeToContent="WidthAndHeight"
         MinWidth="600">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <!-- Подключение внешнего файла стилей -->
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>

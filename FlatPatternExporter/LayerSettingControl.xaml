@@ -3,13 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:FlatPatternExporter" HorizontalAlignment="Left">
     <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-            <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
-            <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
-        </ResourceDictionary>
+        <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+        <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" Margin="0,3,0,3">
         <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"

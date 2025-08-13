@@ -7,15 +7,6 @@
         MinHeight="850" MinWidth="1410"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Height="850">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <!-- Подключение внешнего файла стилей -->
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
-                <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>

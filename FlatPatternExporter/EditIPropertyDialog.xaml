@@ -7,14 +7,6 @@
         Background="White"
         FontFamily="Segoe UI" SizeToContent="WidthAndHeight">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <!-- Подключение внешнего файла стилей -->
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
