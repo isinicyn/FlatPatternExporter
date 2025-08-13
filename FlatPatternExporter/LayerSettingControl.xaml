@@ -3,8 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:FlatPatternExporter" HorizontalAlignment="Left">
     <UserControl.Resources>
-        <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
-        <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+            <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
+        </ResourceDictionary>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" Margin="0,3,0,3">
         <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
@@ -72,16 +77,10 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button Content="✖"
-                Foreground="Red"
-                FontSize="10"
-                FontWeight="Bold"
-                Width="24"
-                Height="24"
-                VerticalAlignment="Center"
-                Click="ResetButton_Click"
+        <Button Click="ResetButton_Click"
                 CommandParameter="{Binding}"
                 IsEnabled="{Binding CanReset}"
+                Style="{StaticResource LayerResetButtonStyle}"
                 Margin="5,0,0,0"/>
     </StackPanel>
 </UserControl>
