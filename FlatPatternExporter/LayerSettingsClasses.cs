@@ -134,7 +134,6 @@ namespace FlatPatternExporter
 
         public void ResetSettings()
         {
-            IsChecked = DisplayName == "OuterProfileLayer" ? true : false;
             CustomName = "";
             SelectedColor = "White";
             SelectedLineType = "Default";
