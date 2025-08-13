@@ -1198,17 +1198,17 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         {
             UpdateQuantitiesWithMultiplier(multiplier);
 
-            // Проверка на null перед изменением видимости кнопки
+            // Проверка на null перед изменением состояния кнопки
             if (ClearMultiplierButton != null)
-                ClearMultiplierButton.Visibility = multiplier > 1 ? Visibility.Visible : Visibility.Collapsed;
+                ClearMultiplierButton.IsEnabled = multiplier > 1;
         }
         else
         {
-            // Если введенное значение некорректное, сбрасываем текст на "1" и скрываем кнопку сброса
+            // Если введенное значение некорректное, сбрасываем текст на "1" и выключаем кнопку сброса
             MultiplierTextBox.Text = "1";
             UpdateQuantitiesWithMultiplier(1);
 
-            if (ClearMultiplierButton != null) ClearMultiplierButton.Visibility = Visibility.Collapsed;
+            if (ClearMultiplierButton != null) ClearMultiplierButton.IsEnabled = false;
         }
     }
 
@@ -1218,8 +1218,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         MultiplierTextBox.Text = "1";
         UpdateQuantitiesWithMultiplier(1);
 
-        // Скрываем кнопку сброса
-        ClearMultiplierButton.Visibility = Visibility.Collapsed;
+        // Выключаем кнопку сброса
+        ClearMultiplierButton.IsEnabled = false;
     }
 
 

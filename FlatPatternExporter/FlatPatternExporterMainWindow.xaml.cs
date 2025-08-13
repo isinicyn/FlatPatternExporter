@@ -681,7 +681,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         // Очищаем текстовое поле
         SearchTextBox.Text = string.Empty;
-        ClearSearchButton.Visibility = Visibility.Collapsed;
+        ClearSearchButton.IsEnabled = false;
         SearchTextBox.Focus(); // Устанавливаем фокус на поле поиска
     }
 
@@ -689,9 +689,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         _actualSearchText = SearchTextBox.Text.Trim().ToLower();
 
-        // Показываем или скрываем кнопку очистки в зависимости от наличия текста
-        ClearSearchButton.Visibility =
-            string.IsNullOrEmpty(_actualSearchText) ? Visibility.Collapsed : Visibility.Visible;
+        // Включаем или выключаем кнопку очистки в зависимости от наличия текста
+        ClearSearchButton.IsEnabled = !string.IsNullOrEmpty(_actualSearchText);
 
         // Перезапуск таймера при изменении текста
         _searchDelayTimer.Stop();
