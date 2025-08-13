@@ -94,6 +94,7 @@ namespace FlatPatternExporter
             {
                 customName = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CanReset));
             }
         }
 
@@ -105,6 +106,7 @@ namespace FlatPatternExporter
             {
                 selectedColor = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CanReset));
             }
         }
 
@@ -116,6 +118,7 @@ namespace FlatPatternExporter
             {
                 selectedLineType = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CanReset));
             }
         }
 
@@ -137,6 +140,7 @@ namespace FlatPatternExporter
             CustomName = "";
             SelectedColor = "White";
             SelectedLineType = "Default";
+            OnPropertyChanged(nameof(CanReset));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -150,16 +154,16 @@ namespace FlatPatternExporter
 
         public bool HasChanges()
         {
-            var defaultIsChecked = DisplayName == "OuterProfileLayer";
             const string defaultCustomName = "";
             const string defaultSelectedColor = "White";
             const string defaultSelectedLineType = "Default";
 
-            return IsChecked != defaultIsChecked ||
-                   CustomName != defaultCustomName ||
+            return CustomName != defaultCustomName ||
                    SelectedColor != defaultSelectedColor ||
                    SelectedLineType != defaultSelectedLineType;
         }
+
+        public bool CanReset => HasChanges();
     }
 
 

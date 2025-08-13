@@ -81,6 +81,7 @@
                 VerticalAlignment="Center"
                 Click="ResetButton_Click"
                 CommandParameter="{Binding}"
+                IsEnabled="{Binding CanReset}"
                 Margin="5,0,0,0"/>
     </StackPanel>
 </UserControl>
