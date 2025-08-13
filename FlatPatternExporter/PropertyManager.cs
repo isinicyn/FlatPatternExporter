@@ -61,6 +61,21 @@ namespace FlatPatternExporter
         };
 
         /// <summary>
+        /// Словарь сопоставлений значений свойств для преобразования внутренних значений в читаемые
+        /// </summary>
+        private static readonly Dictionary<string, Dictionary<string, string>> ValueMappings = new()
+        {
+            {
+                "DesignStatus", new Dictionary<string, string>
+                {
+                    {"1", "Разработка"},
+                    {"2", "Утверждение"},
+                    {"3", "Завершен"}
+                }
+            }
+        };
+
+        /// <summary>
         /// Свойства, которые требуют округления до двух знаков после запятой
         /// </summary>
         private static readonly HashSet<string> NumericPropertiesForRounding = new()
@@ -132,6 +147,12 @@ namespace FlatPatternExporter
                 if (NumericPropertiesForRounding.Contains(ourName) && double.TryParse(result, out var numericValue))
                 {
                     result = Math.Round(numericValue, 2).ToString("F2");
+                }
+
+                // Применяем сопоставления значений
+                if (ValueMappings.TryGetValue(ourName, out var mappings) && mappings.TryGetValue(result, out var mappedValue))
+                {
+                    result = mappedValue;
                 }
             }
 
