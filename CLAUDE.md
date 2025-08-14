@@ -30,6 +30,7 @@ FlatPatternExporter/
     ├── TokenizedTextBox.xaml(.cs)      # Токенизированное текстовое поле
     │
     ├── Styles/                         # XAML стили
+    │   ├── ColorResources.xaml
     │   ├── DataGridStyles.xaml
     │   └── GeneralStyles.xaml
     │
@@ -102,6 +103,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `LayerSettingsHelper` - Статические методы для работы с настройками слоев
 
 **Стили и ресурсы**:
+- `ColorResources.xaml` - Централизованные цветовые ресурсы приложения
 - `DataGridStyles.xaml` - Стили для DataGrid элементов
 - `GeneralStyles.xaml` - Общие стили приложения
 

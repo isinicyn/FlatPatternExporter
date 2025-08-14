@@ -2,23 +2,18 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:FlatPatternExporter">
 
-    <!-- Кисти для чередования строк -->
-    <SolidColorBrush x:Key="EvenRowBrush" Color="White"/>
-    <SolidColorBrush x:Key="OddRowBrush" Color="#F5F5F5"/>
-
-    <SolidColorBrush x:Key="HighlightBrush" Color="#D1E8FF"/>
-    <SolidColorBrush x:Key="HighlightTextBrush" Color="Black"/>
 
     <!-- Базовые стили для ячеек -->
     
-    <!-- Стиль для индикатора выражения fx --><Style x:Key="ExpressionIndicatorStyle" TargetType="TextBlock">
+    <!-- Стиль для индикатора выражения fx -->
+    <Style x:Key="ExpressionIndicatorStyle" TargetType="TextBlock">
         <Setter Property="Text" Value="fx"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Right"/>
         <Setter Property="Margin" Value="0,0,3,0"/>
         <Setter Property="FontStyle" Value="Italic"/>
         <Setter Property="FontSize" Value="10"/>
-        <Setter Property="Foreground" Value="#666666"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
         <Setter Property="ToolTip" Value="Значение задано выражением (Expression)"/>
         <Setter Property="Visibility" Value="Collapsed"/>
         <Style.Triggers>
@@ -33,7 +28,7 @@
         <Setter Property="Padding" Value="10,5"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>
 
     <!-- Стандартный стиль для обычных колонок -->
@@ -59,7 +54,7 @@
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center" 
                        FontSize="8" 
-                       Foreground="Gray"
+                       Foreground="{DynamicResource TextDisabledBrush}"
                        TextWrapping="Wrap"
                        TextAlignment="Center">
                 <TextBlock.Style>
@@ -91,11 +86,11 @@
                        Margin="2,0,0,0">
                 <Rectangle.Style>
                     <Style TargetType="Rectangle">
-                        <Setter Property="Fill" Value="Red"/>
+                        <Setter Property="Fill" Value="{DynamicResource ErrorBrush}"/>
                         <Setter Property="ToolTip" Value="Развертка отсутствует"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding HasFlatPattern}" Value="True">
-                                <Setter Property="Fill" Value="Green"/>
+                                <Setter Property="Fill" Value="{DynamicResource SuccessBrush}"/>
                                 <Setter Property="ToolTip" Value="Развертка доступна"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -120,14 +115,14 @@
                 <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsOverridden}" Value="True">
-                            <Setter Property="Foreground" Value="Red"/>
+                            <Setter Property="Foreground" Value="{DynamicResource QuantityOverriddenBrush}"/>
                         </DataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsOverridden}" Value="False"/>
                                 <Condition Binding="{Binding IsMultiplied}" Value="True"/>
                             </MultiDataTrigger.Conditions>
-                            <Setter Property="Foreground" Value="Blue"/>
+                            <Setter Property="Foreground" Value="{DynamicResource QuantityMultipliedBrush}"/>
                         </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -138,7 +133,7 @@
     <!-- Шаблон для колонки статуса обработки -->
     <DataTemplate x:Key="ProcessingStatusTemplate">
         <Border Width="10" Height="10" 
-                BorderBrush="DarkGray" 
+                BorderBrush="{DynamicResource TextDisabledBrush}" 
                 BorderThickness="1" 
                 HorizontalAlignment="Center" 
                 VerticalAlignment="Center">
@@ -147,10 +142,10 @@
                     <Setter Property="Background" Value="Transparent"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding ProcessingStatus}" Value="Success">
-                            <Setter Property="Background" Value="Green"/>
+                            <Setter Property="Background" Value="{DynamicResource ProcessingStatusSuccessBrush}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding ProcessingStatus}" Value="Error">
-                            <Setter Property="Background" Value="Red"/>
+                            <Setter Property="Background" Value="{DynamicResource ProcessingStatusErrorBrush}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -166,7 +161,7 @@
                 <Setter Property="Background" Value="{StaticResource OddRowBrush}"/>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#E0E0E0"/>
+                <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="Background" Value="{StaticResource HighlightBrush}"/>
@@ -185,8 +180,8 @@
 
     <!-- Стиль для заголовков столбцов -->
     <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
-        <Setter Property="Background" Value="#F2F2F2"/>
-        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Padding" Value="10,5"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -198,7 +193,7 @@
 
     <!-- Стиль для заголовков строк -->
     <Style x:Key="DataGridRowHeaderStyle" TargetType="DataGridRowHeader">
-        <Setter Property="Background" Value="#F2F2F2"/>
+        <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="#FFE0DDDD"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="Width" Value="15"/>
@@ -221,11 +216,11 @@
     <!-- Стиль для ячеек -->
     <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
         <Setter Property="Padding" Value="10,5"/>
-        <Setter Property="BorderBrush" Value="#EAEAEA"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource GridLinesBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="Background" Value="Transparent"/>
@@ -240,7 +235,7 @@
         <Setter Property="Padding" Value="5,2"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>
 
     <!-- Стиль для фантомного заголовка колонки при перетаскивании -->
@@ -253,15 +248,14 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="IsHitTestVisible" Value="False"/>
-        <Setter Property="Background" Value="LightGray"/>
-        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="Background" Value="{DynamicResource StatusBarBackgroundBrush}"/>
         <Setter Property="FontWeight" Value="Normal"/>
     </Style>
 
     <!-- Стиль для фантомного заголовка в режиме удаления -->
     <Style x:Key="PhantomColumnHeaderDeleteStyle" TargetType="TextBlock" BasedOn="{StaticResource PhantomColumnHeaderStyle}">
-        <Setter Property="Background" Value="Red"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{DynamicResource ErrorBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="FontWeight" Value="Bold"/>
     </Style>
     
@@ -271,7 +265,7 @@
     <!-- Стиль для иконки таблицы -->
     <Style x:Key="TableIconStyle" TargetType="Path">
         <Setter Property="Data" Value="{StaticResource TableIconGeometry}"/>
-        <Setter Property="Stroke" Value="#333333"/>
+        <Setter Property="Stroke" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="StrokeThickness" Value="1.5"/>
         <Setter Property="Stretch" Value="Uniform"/>
         <Setter Property="VerticalAlignment" Value="Center"/>

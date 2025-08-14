@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" SnapsToDevicePixels="True">
     
     
-    <Border Background="White" 
-            BorderBrush="#D6D6D6" 
+    <Border Background="{StaticResource BackgroundPrimaryBrush}" 
+            BorderBrush="{StaticResource BorderPrimaryBrush}" 
             BorderThickness="1" MinHeight="32"
             Padding="2">
         <WrapPanel x:Name="TokenContainer" 

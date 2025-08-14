@@ -17,11 +17,11 @@
         </Grid.RowDefinitions>
 
         <!-- Заголовок -->
-        <Border Grid.Row="0" Background="#F8F8F8" BorderBrush="#D0D0D0" BorderThickness="0,0,0,1" Padding="15">
+        <Border Grid.Row="0" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="0,0,0,1" Padding="15">
             <TextBlock Text="FPEx - Flat Pattern Exporter" 
                        FontWeight="SemiBold" 
                        FontSize="16" 
-                       Foreground="#333333" 
+                       Foreground="{StaticResource TextSecondaryBrush}" 
                        VerticalAlignment="Center"/>
         </Border>
 
@@ -66,13 +66,13 @@
 
             <TextBlock Text="Создано при поддержке ChatGPT 4o, Claude 3.5 Sonnet, Claude Sonnet 4, Mistral Large 2" 
                        FontSize="10" 
-                       Foreground="#666666" 
+                       Foreground="{StaticResource TextMutedBrush}" 
                        TextWrapping="Wrap"
                        HorizontalAlignment="Left"/>
         </StackPanel>
 
         <!-- Кнопки -->
-        <Border Grid.Row="2" Background="#F8F8F8" BorderBrush="#D0D0D0" BorderThickness="0,1,0,0" Padding="15,10">
+        <Border Grid.Row="2" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="0,1,0,0" Padding="15,10">
             <Button Content="Закрыть" 
                     HorizontalAlignment="Right" 
                     Width="120" 

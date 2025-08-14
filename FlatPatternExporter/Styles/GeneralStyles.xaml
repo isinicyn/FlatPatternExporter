@@ -7,7 +7,7 @@
     <!-- Централизованный стиль для иконки добавления -->
     <Style x:Key="AddIconStyle" TargetType="Path">
         <Setter Property="Data" Value="{StaticResource AddIconGeometry}"/>
-        <Setter Property="Stroke" Value="#333333"/>
+        <Setter Property="Stroke" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="StrokeThickness" Value="2"/>
         <Setter Property="Stretch" Value="Uniform"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -31,7 +31,7 @@
     <Style x:Key="ModelStateValueStyle" TargetType="TextBlock" BasedOn="{StaticResource DocumentInfoValueStyle}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsPrimaryModelState}" Value="False">
-                <Setter Property="Foreground" Value="Red"/>
+                <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -51,7 +51,7 @@
                                 <!-- Прогресс-бар как фон -->
                                 <ProgressBar x:Name="PART_ProgressBar" 
                                        Background="Transparent"
-                                       Foreground="#FFE1E1E1"
+                                       Foreground="{DynamicResource ProgressBarBrush}"
                                        BorderThickness="0"
                                        Minimum="0" 
                                        Maximum="100" 
@@ -82,29 +82,28 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="BorderBrush" Value="Gray"/>
+        <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TextDisabledBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Foreground" Value="Black"/>
     </Style>
 
     <!-- Универсальный стиль для токенов в виде блоков -->
     <Style x:Key="TokenBlockStyle" TargetType="Border">
-        <Setter Property="Background" Value="#F8F8F8"/>
-        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="6,4"/>
         <Setter Property="Margin" Value="2"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#EAEAEA"/>
-                <Setter Property="BorderBrush" Value="#0078D4"/>
+                <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
             </Trigger>
             <!-- Стиль для кастомных токенов -->
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="CustomText">
-                <Setter Property="Background" Value="#F0F8FF"/>
-                <Setter Property="BorderBrush" Value="#4682B4"/>
+                <Setter Property="Background" Value="{DynamicResource TokenCustomBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource TokenCustomBorderBrush}"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -112,7 +111,7 @@
     <!-- Стиль для текста внутри токенов -->
     <Style x:Key="TokenTextStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="11"/>
-        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
@@ -127,7 +126,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="TokenBorder" Property="Background" Value="#E0E0E0"/>
+                            <Setter TargetName="TokenBorder" Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -137,8 +136,8 @@
 
     <!-- Стиль для ListBox с токенами -->
     <Style x:Key="TokenListBoxStyle" TargetType="ListBox">
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
@@ -170,11 +169,11 @@
 
     <!-- Стиль для кнопки-предупреждения -->
     <Style x:Key="WarningButtonStyle" TargetType="Button">
-        <Setter Property="BorderBrush" Value="Gray"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TextDisabledBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="True">
-                <Setter Property="BorderBrush" Value="#FFFF2929"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource WarningBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
             </Trigger>
         </Style.Triggers>
@@ -184,9 +183,9 @@
     <Style x:Key="OverlayButtonStyle" TargetType="Button">
         <Setter Property="Padding" Value="12,6"/>
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Background" Value="#F2F2F2"/>
-        <Setter Property="Foreground" Value="#333333"/>
-        <Setter Property="BorderBrush" Value="#D0D0D0"/>
+        <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSecondaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
@@ -201,12 +200,12 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#E8E8E8"/>
-                            <Setter Property="BorderBrush" Value="#C0C0C0"/>
+                            <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderTertiaryBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#D8D8D8"/>
-                            <Setter Property="BorderBrush" Value="#B0B0B0"/>
+                            <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderDarkBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -219,7 +218,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Separator">
-                    <Rectangle Fill="#FF969595" Width="1"/>
+                    <Rectangle Fill="{DynamicResource SeparatorBrush}" Width="1"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -233,8 +232,8 @@
         <Setter Property="MinHeight" Value="32"/>
         <Setter Property="Padding" Value="8,6"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="#FFFCF5"/>
-        <Setter Property="BorderBrush" Value="#E0E0E0"/>
+        <Setter Property="Background" Value="{DynamicResource PreviewWarningBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Style.Triggers>
             <!-- Триггеры валидации (работают только когда функция включена и шаблон не пустой) -->
             <MultiDataTrigger>
@@ -243,8 +242,8 @@
                     <Condition Binding="{Binding TokenService.IsFileNameTemplateValid}" Value="True"/>
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.Setters>
-                    <Setter Property="Background" Value="#F5FDF5"/>
-                    <Setter Property="BorderBrush" Value="#C8E6C9"/>
+                    <Setter Property="Background" Value="{DynamicResource PreviewValidBackgroundBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource PreviewValidBorderBrush}"/>
                 </MultiDataTrigger.Setters>
             </MultiDataTrigger>
             <MultiDataTrigger>
@@ -253,18 +252,18 @@
                     <Condition Binding="{Binding TokenService.IsFileNameTemplateValid}" Value="False"/>
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.Setters>
-                    <Setter Property="Background" Value="#FFFCF5"/>
-                    <Setter Property="BorderBrush" Value="#FFE0B2"/>
+                    <Setter Property="Background" Value="{DynamicResource PreviewWarningBackgroundBrush}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource PreviewWarningBorderBrush}"/>
                 </MultiDataTrigger.Setters>
             </MultiDataTrigger>
             <!-- Приоритетные триггеры: нейтральный вид когда функция отключена или шаблон пустой (ПОСЛЕДНИЕ - высший приоритет) -->
             <DataTrigger Binding="{Binding EnableFileNameConstructor}" Value="False">
-                <Setter Property="Background" Value="#FFFCF5"/>
-                <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                <Setter Property="Background" Value="{DynamicResource PreviewWarningBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding TokenService.FileNameTemplate}" Value="">
-                <Setter Property="Background" Value="#FFFCF5"/>
-                <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                <Setter Property="Background" Value="{DynamicResource PreviewWarningBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -273,7 +272,7 @@
     <Style x:Key="FileNamePreviewTextStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="Consolas"/>
         <Setter Property="FontSize" Value="11"/>
-        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     </Style>
@@ -289,8 +288,8 @@
     <Style x:Key="FileNameInputTextBoxStyle" TargetType="TextBox">
         <Setter Property="Width" Value="200"/>
         <Setter Property="MinHeight" Value="32"/>
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="2,6"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -305,8 +304,8 @@
     <Style x:Key="PresetComboBoxStyle" TargetType="ComboBox">
         <Setter Property="Height" Value="32"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="6,4"/>
     </Style>
@@ -316,8 +315,8 @@
         <Setter Property="Margin" Value="5,0,0,0"/>
         <Setter Property="Padding" Value="12,6"/>
         <Setter Property="MinWidth" Value="60"/>
-        <Setter Property="Background" Value="#F8F8F8"/>
-        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -331,16 +330,16 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#FFE6E6"/>
-                            <Setter Property="BorderBrush" Value="#FF9999"/>
+                            <Setter Property="Background" Value="{DynamicResource RedLightBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource RedLightBorderBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#FFCCCC"/>
-                            <Setter Property="BorderBrush" Value="#FF6666"/>
+                            <Setter Property="Background" Value="{DynamicResource RedMediumBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource RedMediumBorderBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" Value="#F0F0F0"/>
-                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                            <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
                             <Setter Property="Foreground" Value="#999999"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -352,14 +351,14 @@
     <!-- Универсальный стиль для кнопок сброса -->
     <Style x:Key="ResetButtonStyle" TargetType="Button">
         <Setter Property="Content" Value="✖"/>
-        <Setter Property="Foreground" Value="Red"/>
+        <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
         <Setter Property="FontSize" Value="10"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Width" Value="24"/>
         <Setter Property="Height" Value="24"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Background" Value="#F8F8F8"/>
-        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
@@ -375,18 +374,18 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#FFE6E6"/>
-                            <Setter Property="BorderBrush" Value="#FF9999"/>
+                            <Setter Property="Background" Value="{DynamicResource RedLightBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource RedLightBorderBrush}"/>
                             <Setter Property="Foreground" Value="#CC0000"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#FFCCCC"/>
-                            <Setter Property="BorderBrush" Value="#FF6666"/>
+                            <Setter Property="Background" Value="{DynamicResource RedMediumBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource RedMediumBorderBrush}"/>
                             <Setter Property="Foreground" Value="#990000"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" Value="#F0F0F0"/>
-                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                            <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
                             <Setter Property="Foreground" Value="#CCCCCC"/>
                             <Setter Property="Cursor" Value="Arrow"/>
                         </Trigger>
@@ -398,8 +397,8 @@
 
     <!-- Простой стиль для TreeView -->
     <Style x:Key="ConflictTreeViewStyle" TargetType="TreeView">
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="BorderBrush" Value="#D6D6D6"/>
+        <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="10"/>
     </Style>
@@ -411,27 +410,27 @@
         <Setter Property="Margin" Value="0,1"/>
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="#0078D4"/>
-                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource BackgroundPrimaryBrush}"/>
             </Trigger>
         </Style.Triggers>
         <Style.Resources>
             <!-- Стиль для TextBlock внутри TreeViewItem -->
             <Style TargetType="TextBlock">
-                <Setter Property="Foreground" Value="#333333"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True">
-                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Foreground" Value="{DynamicResource BackgroundPrimaryBrush}"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
             
             <!-- Стиль для TextBlock дочерних элементов (файлов) -->
             <Style TargetType="TextBlock" x:Key="FileTextBlockStyle" BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="Foreground" Value="#666666"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem}, Path=IsSelected}" Value="True">
-                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="Foreground" Value="{DynamicResource BackgroundPrimaryBrush}"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>

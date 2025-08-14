@@ -19,7 +19,7 @@
                      Foreground="Black" Background="White"
                      TextChanged="CustomTextBox_TextChanged"/>
             <TextBlock Text="{Binding LayerName}"
-                       Foreground="#808E8E8E"
+                       Foreground="{StaticResource TextTransparentMutedBrush}"
                        FontSize="10"
                        IsHitTestVisible="False"
                        VerticalAlignment="Center"

@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     mc:Ignorable="av" x:Class="FlatPatternExporter.SelectIPropertyWindow"
-    Title="Customization" Width="230" Background="#FAFAFA" 
+    Title="Customization" Width="230" Background="{StaticResource BackgroundSecondaryBrush}" 
     WindowStyle="None" ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"
     SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">
@@ -31,12 +31,12 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Border Background="#F5F5F5" Height="30" VerticalAlignment="Center" BorderThickness="0">
+        <Border Background="{StaticResource BackgroundQuaternaryBrush}" Height="30" VerticalAlignment="Center" BorderThickness="0">
             <DockPanel LastChildFill="False" MouseDown="WindowHeader_MouseDown">
                 <TextBlock Text="Выберите Property" FontWeight="Bold" Foreground="#555" FontSize="12" Margin="10,0,0,0" Width="185" VerticalAlignment="Center"/>
                 <Button Content="X" Width="25" Height="25" DockPanel.Dock="Right" 
                         VerticalAlignment="Center" HorizontalAlignment="Right" 
-                        Background="#C80000" Foreground="White" 
+                        Background="{StaticResource ErrorDarkBrush}" Foreground="{StaticResource BackgroundPrimaryBrush}" 
                         BorderBrush="{x:Null}" Click="CloseWindow_Click" />
             </DockPanel>
         </Border>
@@ -72,15 +72,15 @@
                         </GroupStyle.ContainerStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
-                                <Border Background="#E0E0E0" 
-                                        BorderBrush="#B0B0B0" 
+                                <Border Background="{StaticResource BorderLightBrush}" 
+                                        BorderBrush="{StaticResource BorderDarkBrush}" 
                                         BorderThickness="1"
                                         Margin="0,2,0,0"
                                         Padding="5,3">
                                     <TextBlock Text="{Binding Name}" 
                                                FontWeight="Bold" 
                                                FontSize="10" 
-                                               Foreground="#444444"
+                                               Foreground="{StaticResource TextTertiaryBrush}"
                                                VerticalAlignment="Center"/>
                                 </Border>
                             </DataTemplate>
@@ -90,8 +90,8 @@
                 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="#F0F0F0" 
-                                BorderBrush="#C0C0C0" 
+                        <Border Background="{StaticResource SelectionBackgroundBrush}" 
+                                BorderBrush="{StaticResource BorderTertiaryBrush}" 
                                 BorderThickness="1,1,1,1"
                                 Padding="2,2,2,2"
                                 SnapsToDevicePixels="True" Width="215" Margin="0,0,0,0" Height="22.5">
@@ -99,7 +99,7 @@
                                        FontWeight="Bold" 
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Left" 
-                                       Foreground="#333333"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
                                        FontSize="11" Margin="5,0,0,0"/>
                         </Border>
                     </DataTemplate>
@@ -107,7 +107,7 @@
             </ListBox>
             
             <!-- Поле для добавления custom property -->
-            <Border Grid.Row="1" Background="#F5F5F5" BorderThickness="0.5,0,0.5,0.5">
+            <Border Grid.Row="1" Background="{StaticResource BackgroundQuaternaryBrush}" BorderThickness="0.5,0,0.5,0.5">
                 <Border.BorderBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
                 </Border.BorderBrush>
@@ -121,8 +121,8 @@
                              Grid.Column="0"
                              Height="25"
                              VerticalContentAlignment="Center"
-                             Background="White"
-                             BorderBrush="#C0C0C0"
+                             Background="{StaticResource BackgroundPrimaryBrush}"
+                             BorderBrush="{StaticResource BorderTertiaryBrush}"
                              BorderThickness="1"
                              Padding="5,0"
                              TextChanged="CustomPropertyTextBox_TextChanged"/>
@@ -132,9 +132,9 @@
                             Content="+"
                             Width="25"
                             Height="25"
-                            Background="#4CAF50"
-                            Foreground="White"
-                            BorderBrush="#388E3C"
+                            Background="{StaticResource SuccessLightBrush}"
+                            Foreground="{StaticResource BackgroundPrimaryBrush}"
+                            BorderBrush="{StaticResource SuccessDarkBrush}"
                             BorderThickness="1"
                             FontWeight="Bold"
                             FontSize="14"
