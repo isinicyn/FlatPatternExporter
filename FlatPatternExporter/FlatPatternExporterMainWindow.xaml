@@ -13,18 +13,17 @@
             <RowDefinition Height="100" />
             <RowDefinition Height="Auto"/>
             <RowDefinition />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
 
-        <!-- Row 0: Top Panel -->
+        <!-- Строка 0: Верхняя панель -->
         <Grid Grid.Row="0" Margin="10,10,10,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- Left-aligned controls -->
+            <!-- Элементы управления по левому краю -->
             <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
                 <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="0,0,10,10" Height="75" Width="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" RenderTransformOrigin="0,0"/>
                 <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Width="75" Height="75" Margin="0,0,10,10"/>
@@ -86,61 +85,8 @@
                 </Border>
             </WrapPanel>
 
-            <!-- Right-aligned controls -->
+            <!-- Элементы управления по правому краю -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="0,0,10,0">
-                    <!-- Search Box -->
-                    <StackPanel Orientation="Horizontal">
-                        <Grid>
-                            <TextBox x:Name="SearchTextBox" 
-                                     Width="200"
-                                     Height="24"
-                                     Padding="5,0,5,0"
-                                     VerticalContentAlignment="Center"
-                                     TextChanged="SearchTextBox_TextChanged"/>
-                            <TextBlock Text="Поиск..." 
-                                       Foreground="Gray" 
-                                       VerticalAlignment="Center" 
-                                       Margin="5,0,5,0"
-                                       IsHitTestVisible="False">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}" Value="">
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Grid>
-                        <Border Width="24" Height="24" Margin="2,0,0,0">
-                            <Button x:Name="ClearSearchButton" 
-                                    Click="ClearSearchButton_Click" 
-                                    Style="{StaticResource ResetButtonStyle}"
-                                    IsEnabled="False"/>
-                        </Border>
-                    </StackPanel>
-
-                    <!-- Multiplier -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-                        <Label Content="Множитель" Margin="0,0,5,0" Padding="5,0,5,0" VerticalContentAlignment="Center"/>
-                        <Grid>
-                            <TextBox x:Name="MultiplierTextBox" Text="1" Height="24" 
-                                     PreviewTextInput="MultiplierTextBox_PreviewTextInput" 
-                                     TextChanged="MultiplierTextBox_TextChanged" Padding="2,0,2,2" Width="50" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
-                        </Grid>
-                        <Border Width="24" Height="24" Margin="2,0,0,0">
-                            <Button x:Name="ClearMultiplierButton" 
-                                    Click="ClearMultiplierButton_Click" 
-                                    Style="{StaticResource ResetButtonStyle}" 
-                                    ToolTip="Сбросить множитель на 1"
-                                    IsEnabled="False"/>
-                        </Border>
-                    </StackPanel>
-                </StackPanel>
-
                 <Button Content="About" Click="AboutButton_Click" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="70" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" FontWeight="Bold" Height="75" VerticalAlignment="Top">
                     <Button.Background>
                         <ImageBrush ImageSource="/Resources/Pic/Beta1.png" TileMode="None" Stretch="Uniform" Opacity="1">
@@ -187,7 +133,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- Row 1: Settings Tabs -->
+        <!-- Строка 1: Вкладки настроек -->
         <TabControl Grid.Row="1" Margin="10,10,10,10" SelectionChanged="TabControl_SelectionChanged">
             <TabItem Header="Основные">
                 <WrapPanel Orientation="Horizontal" Margin="10">
@@ -521,8 +467,81 @@
             </TabItem>
         </TabControl>
 
-        <!-- Row 2: Data Grid -->
+        <!-- Строка 2: Панель поиска и множителя -->
         <Grid Grid.Row="2" Margin="10,0,10,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Элементы управления поиском и множителем -->
+            <Border Grid.Row="0" Margin="0,0,0,0" 
+                    Background="White" 
+                    BorderBrush="#D6D6D6" 
+                    BorderThickness="1,1,1,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                <!-- Поиск - выравнивание по левому краю -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" 
+                           Margin="10,5,10,5" VerticalAlignment="Center">
+                    <Grid>
+                        <TextBox x:Name="SearchTextBox" 
+                                 Width="200"
+                                 Height="22"
+                                 Padding="5,0,5,0"
+                                 VerticalContentAlignment="Center"
+                                 TextChanged="SearchTextBox_TextChanged"/>
+                        <TextBlock Text="Поиск..." 
+                                   Foreground="Gray" 
+                                   VerticalAlignment="Center" 
+                                   Margin="5,0,5,0"
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    <Border Width="24" Height="24" Margin="2,0,0,0">
+                        <Button x:Name="ClearSearchButton" 
+                                Click="ClearSearchButton_Click" 
+                                Style="{StaticResource ResetButtonStyle}"
+                                IsEnabled="False" Width="22" Height="22"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Множитель - выравнивание по правому краю -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" 
+                           Margin="10,5,10,5" VerticalAlignment="Center">
+                    <Label Content="Множитель" Margin="0,0,5,0" Padding="5,0,5,0" VerticalContentAlignment="Center"/>
+                    <Grid>
+                        <TextBox x:Name="MultiplierTextBox" Text="1" Height="22" 
+                                 PreviewTextInput="MultiplierTextBox_PreviewTextInput" 
+                                 TextChanged="MultiplierTextBox_TextChanged" Padding="2,0,2,2" Width="50" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                    </Grid>
+                    <Border Width="24" Height="24" Margin="2,0,0,0">
+                        <Button x:Name="ClearMultiplierButton" 
+                                Click="ClearMultiplierButton_Click" 
+                                Style="{StaticResource ResetButtonStyle}" 
+                                ToolTip="Сбросить множитель на 1"
+                                IsEnabled="False" Width="22" Height="22"/>
+                    </Border>
+                </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Таблица данных -->
+            <Grid Grid.Row="1">
             <DataGrid x:Name="PartsDataGrid"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
@@ -611,10 +630,11 @@
                     </Button>
                 </StackPanel>
             </Border>
+            </Grid>
         </Grid>
 
-        <!-- Row 4: Status Bar -->
-        <Border Grid.Row="4" Background="LightGray" Height="25" VerticalAlignment="Center">
+        <!-- Строка 3: Строка состояния -->
+        <Border Grid.Row="3" Background="LightGray" Height="25" VerticalAlignment="Center">
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,10,0">
                     <TextBlock Text="Статус: " Foreground="Black"/>
