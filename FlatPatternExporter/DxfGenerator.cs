@@ -272,11 +272,34 @@ public class DxfThumbnailGenerator
         else if (entity is Polyline2D polyline2D)
         {
             foreach (var vertex in polyline2D.Vertexes)
+                UpdateBoundsForPoint(new Vector3(vertex.Position.X, vertex.Position.Y, 0), ref minX, ref minY, ref maxX,
+                    ref maxY);
+
+            var numSegments = polyline2D.IsClosed ? polyline2D.Vertexes.Count : polyline2D.Vertexes.Count - 1;
+            for (var i = 0; i < numSegments; i++)
             {
-                minX = Math.Min(minX, vertex.Position.X);
-                minY = Math.Min(minY, vertex.Position.Y);
-                maxX = Math.Max(maxX, vertex.Position.X);
-                maxY = Math.Max(maxY, vertex.Position.Y);
+                var startVertex = polyline2D.Vertexes[i];
+                if (startVertex.Bulge == 0) continue;
+
+                var endVertex = polyline2D.Vertexes[(i + 1) % polyline2D.Vertexes.Count];
+
+                var arcGeom = GetArcGeomFromBulge(startVertex, endVertex);
+                if (arcGeom == null) continue;
+
+                var (center, radius, startAngle, endAngle) = arcGeom.Value;
+
+                foreach (var angle in CardinalAngles)
+                    if (IsAngleBetween(angle, startAngle, endAngle))
+                    {
+                        var radian = angle * Math.PI / 180;
+                        var x = center.X + radius * Math.Cos(radian);
+                        var y = center.Y + radius * Math.Sin(radian);
+
+                        minX = Math.Min(minX, x);
+                        minY = Math.Min(minY, y);
+                        maxX = Math.Max(maxX, x);
+                        maxY = Math.Max(maxY, y);
+                    }
             }
         }
         else if (entity is Polyline3D polyline3D)
@@ -334,6 +357,41 @@ public class DxfThumbnailGenerator
                 maxY = Math.Max(maxY, vertex.Y);
             }
         }
+    }
+
+    private (Vector2 center, double radius, double startAngle, double endAngle)? GetArcGeomFromBulge(
+        Polyline2DVertex startV, Polyline2DVertex endV)
+    {
+        var bulge = startV.Bulge;
+        if (Math.Abs(bulge) < 1e-9) return null;
+
+        var startPoint = startV.Position;
+        var endPoint = endV.Position;
+
+        var dx = endPoint.X - startPoint.X;
+        var dy = endPoint.Y - startPoint.Y;
+        var chordLength = Math.Sqrt(dx * dx + dy * dy);
+
+        if (Math.Abs(chordLength) < 1e-9) return null;
+
+        var angle = 4 * Math.Atan(Math.Abs(bulge));
+        var radius = chordLength / (2 * Math.Sin(angle / 2));
+
+        var chordAngle = Math.Atan2(endPoint.Y - startPoint.Y, endPoint.X - startPoint.X);
+
+        var angleToCenter = chordAngle + Math.Sign(bulge) * (Math.PI / 2 - angle / 2);
+
+        var centerX = startPoint.X + Math.Cos(angleToCenter) * radius;
+        var centerY = startPoint.Y + Math.Sin(angleToCenter) * radius;
+
+        var center = new Vector2(centerX, centerY);
+
+        var startAngle = Math.Atan2(startPoint.Y - center.Y, startPoint.X - center.X) * 180 / Math.PI;
+        var endAngle = Math.Atan2(endPoint.Y - center.Y, endPoint.X - center.X) * 180 / Math.PI;
+
+        if (bulge < 0) (startAngle, endAngle) = (endAngle, startAngle);
+
+        return (center, radius, startAngle, endAngle);
     }
 
     private bool IsAngleBetween(double angle, double startAngle, double endAngle)
