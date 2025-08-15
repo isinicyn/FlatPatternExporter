@@ -667,11 +667,16 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         if (doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
         {
             var asmDoc = (AssemblyDocument)doc;
+            _partNumberTracker.Clear(); // Очищаем трекер конфликтов
+            
             if (SelectedProcessingMethod == ProcessingMethod.Traverse)
                 await Task.Run(() =>
                     ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
             else if (SelectedProcessingMethod == ProcessingMethod.BOM)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
+
+            // Фильтруем конфликтные детали (данные уже собраны в _partNumberTracker)
+            FilterConflictingParts(sheetMetalParts);
 
             // Создаем временный список PartData для экспорта
             var tempPartsDataList = new List<PartData>();

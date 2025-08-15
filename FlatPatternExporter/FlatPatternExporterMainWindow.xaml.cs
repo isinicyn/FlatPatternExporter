@@ -1266,7 +1266,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 ProgressLabel.Text = "Анализ конфликтов обозначений...";
             });
             
-            await AnalyzePartNumberConflictsAsync(stopwatch);
+            await AnalyzePartNumberConflictsAsync();
             FilterConflictingParts(sheetMetalParts);
             
             // Подсчитываем количество деталей ПОСЛЕ фильтрации конфликтов
@@ -1526,7 +1526,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    private async Task AnalyzePartNumberConflictsAsync(Stopwatch stopwatch)
+    private async Task AnalyzePartNumberConflictsAsync()
     {
         _conflictingParts.Clear(); // Очищаем список конфликтов перед началом проверки
 
