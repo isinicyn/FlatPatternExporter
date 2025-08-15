@@ -218,7 +218,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Separator">
-                    <Rectangle Fill="{DynamicResource SeparatorBrush}" Width="1" Opacity="0.5"/>
+                    <Rectangle Fill="{DynamicResource SeparatorBrush}" Width="1" Opacity="0.25"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -152,7 +152,7 @@
                             </StackPanel>
                             
                             <!-- Вертикальный разделитель -->
-                            <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5"/>
+                            <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5" UseLayoutRounding="True"/>
                             
                             <!-- Фильтрация компонентов -->
                             <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
@@ -193,7 +193,7 @@
                             </StackPanel>
                             
                             <!-- Вертикальный разделитель -->
-                            <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5"/>
+                            <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5" UseLayoutRounding="True"/>
                             
                             <!-- Замена сплайнов -->
                             <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
@@ -222,7 +222,7 @@
                         </Grid>
                     </GroupBox>
 
-                    <GroupBox Header="Папка экспорта" Margin="0,0,10,0">
+                    <GroupBox Header="Размещение экспорта" Margin="0,0,10,0">
                         <Grid Margin="10,5,10,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -244,7 +244,7 @@
                             </StackPanel>
                             
                             <!-- Вертикальный разделитель -->
-                            <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,5"/>
+                            <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,5" UseLayoutRounding="True"/>
                             
                             <!-- Правая колонка -->
                             <StackPanel Grid.Row="0" Grid.Column="2">
@@ -256,8 +256,20 @@
                             
                             <!-- Элементы управления фиксированной папкой - отдельная строка -->
                             <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
-                                <Button x:Name="SelectFixedFolderButton" Content="..." Width="30" Click="SelectFixedFolderButton_Click" Height="20" Padding="1,1,1,1" Margin="2,0,0,0" />
-                                <TextBlock x:Name="FixedFolderPathTextBlock" Text="Путь не выбран" Margin="10,0,0,0" TextTrimming="CharacterEllipsis" Opacity="0.75" VerticalAlignment="Center" Width="360" />
+                                <Button x:Name="SelectFixedFolderButton" Content="..." Width="30" Click="SelectFixedFolderButton_Click" Height="24" Padding="1,1,1,1" Margin="2,0,0,0" />
+                                <Border Background="{StaticResource BackgroundSecondaryBrush}" 
+                                        BorderBrush="{StaticResource BorderPrimaryBrush}" 
+                                        BorderThickness="1" 
+                                        Margin="10,0,0,0" 
+                                        Width="360" 
+                                        Height="24" 
+                                        Padding="5,0">
+                                    <TextBlock x:Name="FixedFolderPathTextBlock" 
+                                               Text="Путь не выбран" 
+                                               TextTrimming="CharacterEllipsis" 
+                                               Opacity="0.75" 
+                                               VerticalAlignment="Center" />
+                                </Border>
                             </StackPanel>
                         </Grid>
                     </GroupBox>
