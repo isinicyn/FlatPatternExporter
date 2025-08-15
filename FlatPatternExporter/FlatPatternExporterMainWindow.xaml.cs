@@ -1231,6 +1231,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _partsData.Clear();
         _itemCounter = 1;
         _partNumberTracker.Clear(); // Очищаем трекер конфликтов
+        ConflictFilesButton.IsEnabled = false; // Отключаем кнопку конфликтов в начале сканирования
 
         // Прогресс для сканирования структуры сборки
         var scanProgress = new Progress<ScanProgress>(progress =>
@@ -1341,6 +1342,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             MessageBox.Show("Процесс сканирования был прерван.", "Информация", MessageBoxButton.OK,
                 MessageBoxImage.Information);
+        }
+        else if (_conflictingParts.Count > 0)
+        {
+            MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для просмотра деталей конфликтов.",
+                "Конфликт обозначений",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         else if (_hasMissingReferences)
         {
@@ -1530,25 +1537,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             _conflictingParts.AddRange(conflictingPartNumbers.SelectMany(entry => entry.Value.Select(v => new PartData { PartNumber = v.PartNumber })));
 
-            // Останавливаем секундомер перед показом MessageBox
-            stopwatch.Stop();
-
-            // Используем Dispatcher для обновления UI
+            // Используем Dispatcher для обновления UI без показа MessageBox
             await Dispatcher.InvokeAsync(() =>
             {
-                MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для просмотра деталей конфликтов.",
-                    "Конфликт обозначений",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-
                 ConflictFilesButton.IsEnabled = true; // Включаем кнопку для просмотра подробностей о конфликтах
                 _conflictFileDetails = conflictingPartNumbers; // Сохраняем подробную информацию о конфликтах для вывода при нажатии кнопки
-            });
-        }
-        else
-        {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                ConflictFilesButton.IsEnabled = false; // Отключаем кнопку, если нет конфликтов
             });
         }
     }
