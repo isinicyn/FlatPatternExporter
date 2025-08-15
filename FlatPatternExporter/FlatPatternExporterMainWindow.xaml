@@ -147,7 +147,6 @@
                             
                             <!-- Метод сканирования -->
                             <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <TextBlock Text="Метод сканирования:" FontWeight="SemiBold" Margin="0,0,0,5" HorizontalAlignment="Center"/>
                                 <RadioButton x:Name="TraverseRadioButton" Content="По структуре сборки" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,0,5"/>
                                 <RadioButton x:Name="BomRadioButton" Content="По спецификации" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,0,0,5"/>
                             </StackPanel>
@@ -157,7 +156,6 @@
                             
                             <!-- Фильтрация компонентов -->
                             <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <TextBlock Text="Фильтрация компонентов:" FontWeight="SemiBold" Margin="0,0,0,5" HorizontalAlignment="Center"/>
                                 <CheckBox x:Name="ExcludeReferencePartsCheckBox" Content="Исключить ссылочные" IsChecked="{Binding ExcludeReferenceParts, Mode=TwoWay}" Margin="0,0,0,5"/>
                                 <CheckBox x:Name="ExcludePurchasedPartsCheckBox" Content="Исключить покупные" IsChecked="{Binding ExcludePurchasedParts, Mode=TwoWay}" Margin="0,0,0,5"/>
                                 <CheckBox x:Name="ExcludePhantomPartsCheckBox" Content="Исключить фантомные" IsChecked="{Binding ExcludePhantomParts, Mode=TwoWay}" Margin="0,0,0,5"/>
@@ -227,33 +225,39 @@
                     <GroupBox Header="Папка экспорта" Margin="0,0,10,0">
                         <Grid Margin="10,5,10,0">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="85*"/>
-                                <RowDefinition Height="27*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
                             <!-- Левая колонка -->
-                            <StackPanel Orientation="Vertical" Grid.Column="0">
+                            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
                                 <RadioButton x:Name="ChooseFolderRadioButton" Content="Указать папку в процессе экспорта" Margin="0,5,0,0" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ChooseFolder, Mode=TwoWay}" />
                                 <RadioButton x:Name="ComponentFolderRadioButton" Content="Папка компонента" Margin="0,5,0,0" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ComponentFolder, Mode=TwoWay}" />
                                 <RadioButton x:Name="PartFolderRadioButton" Content="Рядом с деталью" Margin="0,5,0,0" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=PartFolder, Mode=TwoWay}" />
-                                <RadioButton x:Name="ProjectFolderRadioButton" Content="Папка проекта" VerticalAlignment="Center" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ProjectFolder, Mode=TwoWay}" Margin="0,5,0,0" />
+                                <RadioButton x:Name="ProjectFolderRadioButton" Content="Папка проекта" Margin="0,5,0,0" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ProjectFolder, Mode=TwoWay}" />
+                                <RadioButton x:Name="FixedFolderRadioButton" Content="Фиксированная папка" Margin="0,5,0,5" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=FixedFolder, Mode=TwoWay}" />
                             </StackPanel>
+                            
+                            <!-- Вертикальный разделитель -->
+                            <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,5"/>
+                            
                             <!-- Правая колонка -->
-                            <StackPanel Grid.Row="0" Grid.Column="1">
-                                <CheckBox x:Name="EnableSubfolderCheckBox" Content="Создать подпапку" VerticalAlignment="Center" IsChecked="{Binding EnableSubfolder, Mode=TwoWay}" IsEnabled="{Binding IsSubfolderCheckBoxEnabled}" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="10,5,0,0" HorizontalAlignment="Left" />
-                                <TextBox x:Name="SubfolderNameTextBox" Width="118" Height="24" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalContentAlignment="Center" Padding="2,0,0,0" />
-                                <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="Сортировать по материалу" IsChecked="{Binding OrganizeByMaterial, Mode=TwoWay}" Margin="10,5,0,0"/>
-                                <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="Сортировать по толщине" IsChecked="{Binding OrganizeByThickness, Mode=TwoWay}" Margin="10,5,0,0"/>
+                            <StackPanel Grid.Row="0" Grid.Column="2">
+                                <CheckBox x:Name="EnableSubfolderCheckBox" Content="Создать подпапку" IsChecked="{Binding EnableSubfolder, Mode=TwoWay}" IsEnabled="{Binding IsSubfolderCheckBoxEnabled}" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="0,5,0,0" />
+                                <TextBox x:Name="SubfolderNameTextBox" Width="118" Height="24" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" Margin="0,5,0,0" VerticalContentAlignment="Center" Padding="2,0,0,0" HorizontalAlignment="Left" />
+                                <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="Сортировать по материалу" IsChecked="{Binding OrganizeByMaterial, Mode=TwoWay}" Margin="0,5,0,0"/>
+                                <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="Сортировать по толщине" IsChecked="{Binding OrganizeByThickness, Mode=TwoWay}" Margin="0,5,0,5"/>
                             </StackPanel>
-
-                            <StackPanel Grid.Row="1" VerticalAlignment="Center" Orientation="Horizontal" HorizontalAlignment="Left" Grid.ColumnSpan="2" Grid.Column="0">
-                                <RadioButton x:Name="FixedFolderRadioButton" Content="Фиксированная папка" VerticalAlignment="Center" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=FixedFolder, Mode=TwoWay}" />
-                                <Button x:Name="SelectFixedFolderButton" Content="..." Width="30" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" Click="SelectFixedFolderButton_Click" />
-                                <TextBlock x:Name="FixedFolderPathTextBlock" Text="Путь не выбран" Margin="10,0,0,0" TextTrimming="CharacterEllipsis" Opacity="0.75" VerticalAlignment="Center" Width="200" />
+                            
+                            <!-- Элементы управления фиксированной папкой - отдельная строка -->
+                            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
+                                <Button x:Name="SelectFixedFolderButton" Content="..." Width="30" Click="SelectFixedFolderButton_Click" Height="20" Padding="1,1,1,1" Margin="2,0,0,0" />
+                                <TextBlock x:Name="FixedFolderPathTextBlock" Text="Путь не выбран" Margin="10,0,0,0" TextTrimming="CharacterEllipsis" Opacity="0.75" VerticalAlignment="Center" Width="360" />
                             </StackPanel>
                         </Grid>
                     </GroupBox>
