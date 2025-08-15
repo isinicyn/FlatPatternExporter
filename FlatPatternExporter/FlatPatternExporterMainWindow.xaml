@@ -137,58 +137,69 @@
         <TabControl Grid.Row="1" Margin="10,10,10,10" SelectionChanged="TabControl_SelectionChanged">
             <TabItem Header="Основные">
                 <WrapPanel Orientation="Horizontal" Margin="10">
-                    <GroupBox Header="Базовые настройки" Margin="0,0,10,0">
+                    <GroupBox Header="Метод сканирования" Margin="0,0,10,0">
                         <StackPanel Margin="10,15,10,5" HorizontalAlignment="Center" VerticalAlignment="Top">
-                            <RadioButton x:Name="TraverseRadioButton" Content="Перебор" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,10,0"/>
-                            <RadioButton x:Name="BomRadioButton" Content="Спецификация" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,5,0,5"/>
-                            <CheckBox x:Name="OptimizeDxfCheckBox" Content="Оптимизация dxf" IsChecked="{Binding OptimizeDxf, Mode=TwoWay}" IsEnabled="{Binding IsOptimizeDxfEnabled}" Margin="0,0,0,0"/>
+                            <RadioButton x:Name="TraverseRadioButton" Content="По структуре сборки" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,10,0"/>
+                            <RadioButton x:Name="BomRadioButton" Content="По спецификации" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,5,0,5"/>
                         </StackPanel>
                     </GroupBox>
 
                     <GroupBox Header="Настройки экспорта DXF" Margin="0,0,10,0">
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="10,5,10,0">
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                <Label Content="Версия AutoCAD:" VerticalAlignment="Center"/>
-                                <ComboBox x:Name="AcadVersionComboBox" 
-                                              Width="70" 
-                                              Height="24" 
-                                              VerticalContentAlignment="Center" 
-                                              Padding="5,0,5,0"
-                                              ItemsSource="{Binding AcadVersions}"
-                                              DisplayMemberPath="DisplayName"
-                                              SelectedValuePath="Value"
-                                              SelectedIndex="{Binding SelectedAcadVersionIndex, Mode=TwoWay}"/>
+                        <Grid Margin="10,5,10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Настройки экспорта DXF -->
+                            <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <Label Content="Версия AutoCAD:" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="AcadVersionComboBox" 
+                                                  Width="70" 
+                                                  Height="24" 
+                                                  VerticalContentAlignment="Center" 
+                                                  Padding="5,0,5,0"
+                                                  ItemsSource="{Binding AcadVersions}"
+                                                  DisplayMemberPath="DisplayName"
+                                                  SelectedValuePath="Value"
+                                                  SelectedIndex="{Binding SelectedAcadVersionIndex, Mode=TwoWay}"/>
+                                </StackPanel>
+                                <CheckBox x:Name="MergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5" IsChecked="{Binding MergeProfilesIntoPolyline, Mode=TwoWay}"/>
+                                <CheckBox x:Name="RebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5" IsChecked="{Binding RebaseGeometry, Mode=TwoWay}"/>
+                                <CheckBox x:Name="TrimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" Margin="0,0,0,5" IsChecked="{Binding TrimCenterlines, Mode=TwoWay}"/>
+                                <CheckBox x:Name="OptimizeDxfCheckBox" Content="Оптимизация dxf" IsChecked="{Binding OptimizeDxf, Mode=TwoWay}" IsEnabled="{Binding IsOptimizeDxfEnabled}" Margin="0,0,0,5"/>
                             </StackPanel>
-                            <CheckBox x:Name="MergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5" IsChecked="{Binding MergeProfilesIntoPolyline, Mode=TwoWay}"/>
-                            <CheckBox x:Name="RebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5" IsChecked="{Binding RebaseGeometry, Mode=TwoWay}"/>
-                            <CheckBox x:Name="TrimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" Margin="0,0,0,5" IsChecked="{Binding TrimCenterlines, Mode=TwoWay}"/>
-                        </StackPanel>
-                    </GroupBox>
-
-                    <GroupBox Header="Замена сплайнов" Margin="0,0,10,0">
-                        <StackPanel Orientation="Vertical" Margin="10,5,10,0" VerticalAlignment="Top" HorizontalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                <CheckBox x:Name="EnableSplineReplacementCheckBox" Content="Активация" IsChecked="{Binding EnableSplineReplacement, Mode=TwoWay}" VerticalAlignment="Center"/>
+                            
+                            <!-- Вертикальный разделитель -->
+                            <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5"/>
+                            
+                            <!-- Замена сплайнов -->
+                            <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <CheckBox x:Name="EnableSplineReplacementCheckBox" Content="Замена сплайнов" IsChecked="{Binding EnableSplineReplacement, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <Label Content="Тип замены:" VerticalAlignment="Center" Padding="0,5,5,5"/>
+                                    <ComboBox x:Name="SplineReplacementComboBox" 
+                                                  Width="65" 
+                                                  VerticalContentAlignment="Center" 
+                                                  IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" 
+                                                  Height="24" 
+                                                  Padding="5,0,5,0" 
+                                                  Margin="2,0,0,0"
+                                                  ItemsSource="{Binding SplineReplacementTypes}"
+                                                  DisplayMemberPath="DisplayName"
+                                                  SelectedValuePath="Index"
+                                                  SelectedIndex="{Binding SelectedSplineReplacementIndex, Mode=TwoWay}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="0,5,5,5"/>
+                                    <TextBox x:Name="SplineToleranceTextBox" Width="65" Text="0.01" VerticalContentAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" Height="24" Padding="2,0,0,0"/>
+                                </StackPanel>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                <Label Content="Тип замены:" VerticalAlignment="Center" Padding="0,5,5,5"/>
-                                <ComboBox x:Name="SplineReplacementComboBox" 
-                                              Width="65" 
-                                              VerticalContentAlignment="Center" 
-                                              IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" 
-                                              Height="24" 
-                                              Padding="5,0,5,0" 
-                                              Margin="2,0,0,0"
-                                              ItemsSource="{Binding SplineReplacementTypes}"
-                                              DisplayMemberPath="DisplayName"
-                                              SelectedValuePath="Index"
-                                              SelectedIndex="{Binding SelectedSplineReplacementIndex, Mode=TwoWay}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="0,5,5,5"/>
-                                <TextBox x:Name="SplineToleranceTextBox" Width="65" Text="0.01" VerticalContentAlignment="Center" IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" Height="24" Padding="2,0,0,0"/>
-                            </StackPanel>
-                        </StackPanel>
+                        </Grid>
                     </GroupBox>
 
                     <GroupBox Header="Папка экспорта" Margin="0,0,10,0">
