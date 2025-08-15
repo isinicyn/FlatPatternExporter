@@ -249,7 +249,7 @@
                             <!-- Правая колонка -->
                             <StackPanel Grid.Row="0" Grid.Column="2">
                                 <CheckBox x:Name="EnableSubfolderCheckBox" Content="Создать подпапку" IsChecked="{Binding EnableSubfolder, Mode=TwoWay}" IsEnabled="{Binding IsSubfolderCheckBoxEnabled}" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="0,5,0,0" />
-                                <TextBox x:Name="SubfolderNameTextBox" Width="118" Height="24" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" Margin="0,5,0,0" VerticalContentAlignment="Center" Padding="2,0,0,0" HorizontalAlignment="Left" />
+                                <TextBox x:Name="SubfolderNameTextBox" Width="168" Height="24" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" Margin="0,5,0,0" VerticalContentAlignment="Center" Padding="2,0,0,0" HorizontalAlignment="Left" Background="{StaticResource BackgroundSecondaryBrush}" />
                                 <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="Сортировать по материалу" IsChecked="{Binding OrganizeByMaterial, Mode=TwoWay}" Margin="0,5,0,0"/>
                                 <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="Сортировать по толщине" IsChecked="{Binding OrganizeByThickness, Mode=TwoWay}" Margin="0,5,0,5"/>
                             </StackPanel>
