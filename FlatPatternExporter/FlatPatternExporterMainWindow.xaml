@@ -137,11 +137,33 @@
         <TabControl Grid.Row="1" Margin="10,10,10,10" SelectionChanged="TabControl_SelectionChanged">
             <TabItem Header="Основные">
                 <WrapPanel Orientation="Horizontal" Margin="10">
-                    <GroupBox Header="Метод сканирования" Margin="0,0,10,0">
-                        <StackPanel Margin="10,15,10,5" HorizontalAlignment="Center" VerticalAlignment="Top">
-                            <RadioButton x:Name="TraverseRadioButton" Content="По структуре сборки" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,10,0"/>
-                            <RadioButton x:Name="BomRadioButton" Content="По спецификации" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,5,0,5"/>
-                        </StackPanel>
+                    <GroupBox Header="Обработка компонентов" Margin="0,0,10,0">
+                        <Grid Margin="10,5,10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Метод сканирования -->
+                            <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                <TextBlock Text="Метод сканирования:" FontWeight="SemiBold" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+                                <RadioButton x:Name="TraverseRadioButton" Content="По структуре сборки" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                <RadioButton x:Name="BomRadioButton" Content="По спецификации" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,0,0,5"/>
+                            </StackPanel>
+                            
+                            <!-- Вертикальный разделитель -->
+                            <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5"/>
+                            
+                            <!-- Фильтрация компонентов -->
+                            <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                <TextBlock Text="Фильтрация компонентов:" FontWeight="SemiBold" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+                                <CheckBox x:Name="ExcludeReferencePartsCheckBox" Content="Исключить ссылочные" IsChecked="{Binding ExcludeReferenceParts, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                <CheckBox x:Name="ExcludePurchasedPartsCheckBox" Content="Исключить покупные" IsChecked="{Binding ExcludePurchasedParts, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                <CheckBox x:Name="ExcludePhantomPartsCheckBox" Content="Исключить фантомные" IsChecked="{Binding ExcludePhantomParts, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                <CheckBox x:Name="IncludeLibraryComponentsCheckBox" Content="Включить библиотечные компоненты" IsChecked="{Binding IncludeLibraryComponents, Mode=TwoWay}" Margin="0,0,0,5"/>
+                            </StackPanel>
+                        </Grid>
                     </GroupBox>
 
                     <GroupBox Header="Настройки экспорта DXF" Margin="0,0,10,0">
@@ -236,14 +258,6 @@
                         </Grid>
                     </GroupBox>
 
-                    <GroupBox Header="Фильтрация компонентов" Margin="0,0,10,0">
-                        <StackPanel Margin="10,5,10,5">
-                            <CheckBox x:Name="ExcludeReferencePartsCheckBox" Content="Исключить ссылочные" IsChecked="{Binding ExcludeReferenceParts, Mode=TwoWay}" Margin="0,0,0,5"/>
-                            <CheckBox x:Name="ExcludePurchasedPartsCheckBox" Content="Исключить покупные" IsChecked="{Binding ExcludePurchasedParts, Mode=TwoWay}" Margin="0,0,0,5"/>
-                            <CheckBox x:Name="ExcludePhantomPartsCheckBox" Content="Исключить фантомные" IsChecked="{Binding ExcludePhantomParts, Mode=TwoWay}" Margin="0,0,0,5"/>
-                            <CheckBox x:Name="IncludeLibraryComponentsCheckBox" Content="Включить библиотечные компоненты" IsChecked="{Binding IncludeLibraryComponents, Mode=TwoWay}" Margin="0,0,0,5"/>
-                        </StackPanel>
-                    </GroupBox>
                 </WrapPanel>
             </TabItem>
             <TabItem Header="Настройка слоев">
