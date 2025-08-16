@@ -30,7 +30,7 @@
                 <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования" Margin="0,0,10,10"/>
 
                 <StackPanel Orientation="Vertical" Margin="0,0,10,10">
-                    <Button x:Name="AddPresetIPropertyButton" Click="AddPresetIPropertyButton_Click" Height="35" Width="115" HorizontalContentAlignment="Center" Padding="5,1,1,1" Margin="0,0,0,5">
+                    <Button x:Name="AddPresetIPropertyButton" Click="AddPresetIPropertyButton_Click" Height="35" Width="115" HorizontalContentAlignment="Center" Margin="0,0,0,5">
                         <StackPanel Orientation="Horizontal">
                             <Path Style="{StaticResource AddIconStyle}"
                                   Width="12" 
@@ -49,8 +49,7 @@
                             Style="{StaticResource WarningButtonStyle}">
                         <Button.Content>
                             <TextBlock Text="Анализ обозначений" 
-                                       TextWrapping="Wrap" 
-                                       TextAlignment="Center"/>
+                                       TextAlignment="Center" TextWrapping="Wrap"/>
                         </Button.Content>
                     </Button>
                 </StackPanel>
@@ -382,22 +381,19 @@
                                 <TextBlock Text="Произвольный текст:" Margin="0,10,0,5" FontWeight="SemiBold"/>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBox x:Name="CustomTextBox" 
-                                             Width="200" 
-                                             MinHeight="32"
+                                             Width="200"
                                              Background="{StaticResource BackgroundPrimaryBrush}"
                                              BorderBrush="{StaticResource BorderPrimaryBrush}"
                                              BorderThickness="1"
                                              Padding="2,6"
                                              VerticalContentAlignment="Center"
                                              KeyDown="CustomTextBox_KeyDown"
-                                             ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
+                                             ToolTip="Введите произвольный текст (тире, пробелы, текст)" Height="24"/>
                                     <Button x:Name="AddCustomTextButton"
                                             Content="Добавить"
-                                            Width="70"
-                                            MinHeight="32"
                                             Margin="5,0,0,0"
                                             Click="AddCustomTextButton_Click"
-                                            ToolTip="Добавить введенный текст как кастомный токен"/>
+                                            ToolTip="Добавить введенный текст как кастомный токен" Padding="5,0,5,0"/>
                                 </StackPanel>
                                 
                                 <!-- Панель с предустановленными символами -->

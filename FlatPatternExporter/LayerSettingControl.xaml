@@ -39,7 +39,7 @@
         <ComboBox Width="90"
                   ItemsSource="{Binding DataContext.AvailableColors, RelativeSource={RelativeSource AncestorType=Window}}"
                   SelectedItem="{Binding SelectedColor, Mode=TwoWay}"
-                  IsEnabled="{Binding IsColorAndLineTypeEnabled}">
+                  IsEnabled="{Binding IsColorAndLineTypeEnabled}" VerticalContentAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -55,7 +55,7 @@
                   ItemsSource="{Binding DataContext.LineTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                   SelectedItem="{Binding SelectedLineType, Mode=TwoWay}"
                   IsEnabled="{Binding IsColorAndLineTypeEnabled}"
-                  Margin="5,0,0,0">
+                  Margin="5,0,0,0" VerticalContentAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
