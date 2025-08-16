@@ -11,22 +11,12 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок -->
-        <Border Grid.Row="0" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="0,0,0,1" Padding="15">
-            <TextBlock Text="FPEx - Flat Pattern Exporter" 
-                       FontWeight="SemiBold" 
-                       FontSize="16" 
-                       Foreground="{StaticResource TextSecondaryBrush}" 
-                       VerticalAlignment="Center"/>
-        </Border>
-
         <!-- Основная информация -->
-        <StackPanel Grid.Row="1" Margin="15">
+        <StackPanel Grid.Row="0" Margin="15">
             <GroupBox Header="Информация о программе" Margin="0,0,0,15">
                 <StackPanel Margin="10,10,10,5">
                     <DockPanel Margin="0,0,0,5">
@@ -72,7 +62,7 @@
         </StackPanel>
 
         <!-- Кнопки -->
-        <Border Grid.Row="2" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="0,1,0,0" Padding="15,10">
+        <Border Grid.Row="1" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="0,1,0,0" Padding="15,10">
             <Button Content="Закрыть" 
                     HorizontalAlignment="Right" 
                     Width="120" 
