@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:FlatPatternExporter"
         PreviewMouseLeftButtonDown="MainWindow_PreviewMouseLeftButtonDown"
         Title="FPEx"
-        MinHeight="600" MinWidth="1675"
+        MinHeight="600" MinWidth="1710"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip">
 
 
@@ -236,37 +236,39 @@
                 </WrapPanel>
             </TabItem>
             <TabItem Header="Настройка слоев">
-                <Grid Background="{StaticResource BackgroundPrimaryBrush}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="571*"/>
-                        <ColumnDefinition Width="571*"/>
-                        <ColumnDefinition Width="571*"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Margin="10,0,10,0" Grid.Column="0">
-                        <local:LayerSettingControl x:Name="OuterProfileLayerControl" DataContext="{Binding LayerSettings[5]}" Pseudonym="OuterProfile"/>
-                        <local:LayerSettingControl x:Name="InteriorProfilesLayerControl" DataContext="{Binding LayerSettings[6]}" Pseudonym="InteriorProfiles"/>
-                        <local:LayerSettingControl x:Name="BendUpLayerControl" DataContext="{Binding LayerSettings[0]}" Pseudonym="BendUp"/>
-                        <local:LayerSettingControl x:Name="BendDownLayerControl" DataContext="{Binding LayerSettings[1]}" Pseudonym="BendDown"/>
-                        <local:LayerSettingControl x:Name="ToolCenterUpLayerControl" DataContext="{Binding LayerSettings[2]}" Pseudonym="ToolCenterUp"/>
-                        <local:LayerSettingControl x:Name="ToolCenterDownLayerControl" DataContext="{Binding LayerSettings[3]}" Pseudonym="ToolCenterDown"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,10,0">
-                        <local:LayerSettingControl x:Name="TangentLayerControl" DataContext="{Binding LayerSettings[12]}" Pseudonym="Tangent"/>
-                        <local:LayerSettingControl x:Name="RollLinesLayerControl" DataContext="{Binding LayerSettings[14]}" Pseudonym="RollLines"/>
-                        <local:LayerSettingControl x:Name="TangentRollLinesLayerControl" DataContext="{Binding LayerSettings[13]}" Pseudonym="TangentRollLines"/>
-                        <local:LayerSettingControl x:Name="ArcCentersLayerControl" DataContext="{Binding LayerSettings[4]}" Pseudonym="ArcCenters"/>
-                        <local:LayerSettingControl x:Name="FeatureProfilesUpLayerControl" DataContext="{Binding LayerSettings[7]}" Pseudonym="FeatureProfilesUp"/>
-                        <local:LayerSettingControl x:Name="FeatureProfilesDownLayerControl" DataContext="{Binding LayerSettings[8]}" Pseudonym="FeatureProfilesDown"/>
-                    </StackPanel>
-                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="10,0,10,0">
-                        <local:LayerSettingControl x:Name="UnconsumedSketchConstructionLayerControl" DataContext="{Binding LayerSettings[15]}" Pseudonym="UnconsumedSketchConstruction"/>
-                        <local:LayerSettingControl x:Name="UnconsumedSketchesLayerControl" DataContext="{Binding LayerSettings[11]}" Pseudonym="UnconsumedSketches"/>
-                        <local:LayerSettingControl x:Name="AltRepFrontLayerControl" DataContext="{Binding LayerSettings[9]}" Pseudonym="AltRepFront"/>
-                        <local:LayerSettingControl x:Name="AltRepBackLayerControl" DataContext="{Binding LayerSettings[10]}" Pseudonym="AltRepBack"/>
-                    </StackPanel>
-                    <Separator Grid.Row="0" Grid.Column="0" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right" Margin="0,5,0,5"/>
-                    <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right" Margin="0,5,0,5"/>
-                </Grid>
+                <GroupBox Header="Индивидуальная настройка слоев (Отметьте для включения геометрии, оставьте поле пустым для имени слоя по умолчанию)" Margin="10" Padding="0,5,0,0">
+                    <Grid Background="{StaticResource BackgroundPrimaryBrush}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="571*"/>
+                            <ColumnDefinition Width="571*"/>
+                            <ColumnDefinition Width="571*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="10,0,10,0" Grid.Column="0">
+                            <local:LayerSettingControl x:Name="OuterProfileLayerControl" DataContext="{Binding LayerSettings[5]}" Pseudonym="OuterProfile"/>
+                            <local:LayerSettingControl x:Name="InteriorProfilesLayerControl" DataContext="{Binding LayerSettings[6]}" Pseudonym="InteriorProfiles"/>
+                            <local:LayerSettingControl x:Name="BendUpLayerControl" DataContext="{Binding LayerSettings[0]}" Pseudonym="BendUp"/>
+                            <local:LayerSettingControl x:Name="BendDownLayerControl" DataContext="{Binding LayerSettings[1]}" Pseudonym="BendDown"/>
+                            <local:LayerSettingControl x:Name="ToolCenterUpLayerControl" DataContext="{Binding LayerSettings[2]}" Pseudonym="ToolCenterUp"/>
+                            <local:LayerSettingControl x:Name="ToolCenterDownLayerControl" DataContext="{Binding LayerSettings[3]}" Pseudonym="ToolCenterDown"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,10,0">
+                            <local:LayerSettingControl x:Name="TangentLayerControl" DataContext="{Binding LayerSettings[12]}" Pseudonym="Tangent"/>
+                            <local:LayerSettingControl x:Name="RollLinesLayerControl" DataContext="{Binding LayerSettings[14]}" Pseudonym="RollLines"/>
+                            <local:LayerSettingControl x:Name="TangentRollLinesLayerControl" DataContext="{Binding LayerSettings[13]}" Pseudonym="TangentRollLines"/>
+                            <local:LayerSettingControl x:Name="ArcCentersLayerControl" DataContext="{Binding LayerSettings[4]}" Pseudonym="ArcCenters"/>
+                            <local:LayerSettingControl x:Name="FeatureProfilesUpLayerControl" DataContext="{Binding LayerSettings[7]}" Pseudonym="FeatureProfilesUp"/>
+                            <local:LayerSettingControl x:Name="FeatureProfilesDownLayerControl" DataContext="{Binding LayerSettings[8]}" Pseudonym="FeatureProfilesDown"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="2" Margin="10,0,10,0">
+                            <local:LayerSettingControl x:Name="UnconsumedSketchConstructionLayerControl" DataContext="{Binding LayerSettings[15]}" Pseudonym="UnconsumedSketchConstruction"/>
+                            <local:LayerSettingControl x:Name="UnconsumedSketchesLayerControl" DataContext="{Binding LayerSettings[11]}" Pseudonym="UnconsumedSketches"/>
+                            <local:LayerSettingControl x:Name="AltRepFrontLayerControl" DataContext="{Binding LayerSettings[9]}" Pseudonym="AltRepFront"/>
+                            <local:LayerSettingControl x:Name="AltRepBackLayerControl" DataContext="{Binding LayerSettings[10]}" Pseudonym="AltRepBack"/>
+                        </StackPanel>
+                        <Separator Grid.Row="0" Grid.Column="0" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right" Margin="0,5,0,5"/>
+                        <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right" Margin="0,5,0,5"/>
+                    </Grid>
+                </GroupBox>
             </TabItem>
             <TabItem Header="Имя выгружаемого файла">
                 <Grid Margin="10">
