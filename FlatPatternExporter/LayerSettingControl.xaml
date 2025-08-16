@@ -1,26 +1,25 @@
 ﻿<UserControl x:Class="FlatPatternExporter.LayerSettingControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FlatPatternExporter" HorizontalAlignment="Left">
+             xmlns:local="clr-namespace:FlatPatternExporter" HorizontalAlignment="Left" FontSize="11">
     <UserControl.Resources>
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
     </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" Margin="0,3,0,3">
+    <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
         <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
           IsChecked="{Binding IsChecked, Mode=TwoWay}"
           Width="180" VerticalContentAlignment="Center"
-          IsEnabled="{Binding IsEnabled}" FontSize="10"/>
+          IsEnabled="{Binding IsEnabled}"/>
         <Grid Width="95" Margin="0,0,5,0">
             <TextBox x:Name="CustomTextBox"
                      Text="{Binding CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      IsEnabled="{Binding IsCustomNameEnabled}"
-                     FontSize="10" VerticalContentAlignment="Center"
+                     VerticalContentAlignment="Center"
                      Foreground="Black" Background="White"
                      TextChanged="CustomTextBox_TextChanged"/>
             <TextBlock Text="{Binding LayerName}"
                        Foreground="{StaticResource TextTransparentMutedBrush}"
-                       FontSize="10"
                        IsHitTestVisible="False"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
@@ -40,14 +39,14 @@
         <ComboBox Width="90"
                   ItemsSource="{Binding DataContext.AvailableColors, RelativeSource={RelativeSource AncestorType=Window}}"
                   SelectedItem="{Binding SelectedColor, Mode=TwoWay}"
-                  IsEnabled="{Binding IsColorAndLineTypeEnabled}" FontSize="10">
+                  IsEnabled="{Binding IsColorAndLineTypeEnabled}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="16" Height="16"
                                  Fill="{Binding Converter={StaticResource ColorToBrushConverter}}"
                                  Margin="0,0,4,0"/>
-                        <TextBlock Text="{Binding}" VerticalAlignment="Center" FontSize="10"/>
+                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
@@ -56,7 +55,7 @@
                   ItemsSource="{Binding DataContext.LineTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                   SelectedItem="{Binding SelectedLineType, Mode=TwoWay}"
                   IsEnabled="{Binding IsColorAndLineTypeEnabled}"
-                  Margin="5,0,0,0" FontSize="10">
+                  Margin="5,0,0,0">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -67,7 +66,7 @@
                         <Path Grid.Column="0" Stroke="Black" StrokeThickness="1.5"
                               Data="{Binding Converter={StaticResource LineTypeToGeometryConverter}}"
                               Width="50" Height="16" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Grid.Column="1" Text="{Binding}" VerticalAlignment="Center" FontSize="10"/>
+                        <TextBlock Grid.Column="1" Text="{Binding}" VerticalAlignment="Center"/>
                     </Grid>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
