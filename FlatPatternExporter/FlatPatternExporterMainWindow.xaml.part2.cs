@@ -72,15 +72,18 @@ public partial class FlatPatternExporterMainWindow : Window
     }
     
 
-    private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, BOM? bom, int itemNumber,
-        PartDocument? partDoc = null)
+    // Перегрузка для сборок - открывает документ по partNumber
+    private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber)
     {
-        // Открываем документ, если он не передан
-        if (partDoc == null)
-        {
-            partDoc = OpenPartDocument(partNumber);
-            if (partDoc == null) return null!;
-        }
+        var partDoc = OpenPartDocument(partNumber);
+        if (partDoc == null) return null!;
+        
+        return await GetPartDataAsync(partDoc, quantity, itemNumber);
+    }
+
+    // Основной метод - работает с уже открытым документом  
+    private async Task<PartData> GetPartDataAsync(PartDocument partDoc, int quantity, int itemNumber)
+    {
 
         // Создаем новый объект PartData
         var partData = new PartData
@@ -1236,9 +1239,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     }
 
 
-    private void UpdateDocumentInfo(string documentType, string partNumber, string description, Document doc)
+    private void UpdateDocumentInfo(string documentType, Document? doc)
     {
-        if (string.IsNullOrEmpty(documentType) && string.IsNullOrEmpty(partNumber) && string.IsNullOrEmpty(description))
+        if (string.IsNullOrEmpty(documentType) || doc == null)
         {
             ProgressLabel.Text = "Информация о документе не доступна";
             DocumentTypeLabel.Text = "";
@@ -1246,13 +1249,15 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             DescriptionLabel.Text = "";
             ModelStateLabel.Text = "";
             IsPrimaryModelState = true; // Сбрасываем состояние модели по умолчанию
-                    return;
+            return;
         }
 
-        var modelStateInfo = GetModelStateName(doc);
         var mgr = new PropertyManager(doc);
+        var partNumber = mgr.GetMappedProperty("PartNumber");
+        var description = mgr.GetMappedProperty("Description");
+        var modelStateInfo = GetModelStateName(doc);
         var isPrimaryModelState = mgr.IsPrimaryModelState();
-        
+
         // Заполняем отдельные поля в блоке информации о документе
         DocumentTypeLabel.Text = documentType;
         PartNumberLabel.Text = partNumber;
@@ -1274,7 +1279,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ClearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки
 
         // Обнуляем информацию о документе
-        UpdateDocumentInfo("", "", "", null!);
+        UpdateDocumentInfo("", null);
 
         // Отключаем кнопку "Анализ обозначений" и очищаем список конфликтов
         ConflictFilesButton.IsEnabled = false;

@@ -1217,9 +1217,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         var partCount = 0;
         var documentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" : "Деталь";
-        var partNumber = string.Empty;
-        var description = string.Empty;
-        var modelStateInfo = string.Empty;
+        
+        // Получаем и отображаем информацию о документе сразу
+        UpdateDocumentInfo(documentType, doc);
 
         _partsData.Clear();
         _itemCounter = 1;
@@ -1250,8 +1250,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, scanProgress));
             else if (SelectedProcessingMethod == ProcessingMethod.BOM)
                 await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, scanProgress));
-            (partNumber, description) = GetDocumentProperties((Document)asmDoc);
-            modelStateInfo = asmDoc.ComponentDefinition.BOM.BOMViews[1].ModelStateMemberName;
 
             // Анализируем конфликты и удаляем конфликтующие детали ДО обработки
             await Dispatcher.InvokeAsync(() =>
@@ -1282,8 +1280,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 {
                     if (_isCancelled) break;
 
-                    var partData = await GetPartDataAsync(part.Key, part.Value, asmDoc.ComponentDefinition.BOM,
-                        itemCounter++);
+                    var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++);
                     if (partData != null)
                     {
                         ((IProgress<PartData>)partProgress).Report(partData);
@@ -1302,9 +1299,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
             var partDoc = (PartDocument)doc;
-            (partNumber, description) = GetDocumentProperties((Document)partDoc);
             
-            partCount = await ProcessSinglePart(partDoc, partNumber, partProgress);
+            partCount = await ProcessSinglePart(partDoc, partProgress);
         }
 
         // Останавливаем секундомер, если он еще не остановлен
@@ -1318,7 +1314,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _isScanning = false;
         ScanProgressValue = 0;
         ProgressLabel.Text = _isCancelled ? $"Прервано ({elapsedTime})" : $"Найдено листовых деталей: {partCount} ({elapsedTime})";
-        UpdateDocumentInfo(documentType, partNumber, description, doc);
 
         ScanButton.Content = "Сканировать";
         ScanButton.IsEnabled = true;
@@ -1488,12 +1483,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             });
     }
 
-    private async Task<int> ProcessSinglePart(PartDocument partDoc, string partNumber, IProgress<PartData> partProgress)
+    private async Task<int> ProcessSinglePart(PartDocument partDoc, IProgress<PartData> partProgress)
     {
         if (partDoc.SubType == PropertyManager.SheetMetalSubType)
         {
             ProgressLabel.Text = "Обработка детали...";
-            var partData = await GetPartDataAsync(partNumber, 1, null, 1, partDoc);
+            var partData = await GetPartDataAsync(partDoc, 1, 1);
             if (partData != null)
             {
                 ((IProgress<PartData>)partProgress).Report(partData);
