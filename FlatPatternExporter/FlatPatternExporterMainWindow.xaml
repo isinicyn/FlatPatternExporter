@@ -87,49 +87,7 @@
 
             <!-- Элементы управления по правому краю -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
-                <Button Content="About" Click="AboutButton_Click" FontSize="10" HorizontalAlignment="Right" Padding="1,1,1,1" Width="70" FontFamily="Tahoma" VerticalContentAlignment="Top" Cursor="Help" FontWeight="Bold" Height="75" VerticalAlignment="Top">
-                    <Button.Background>
-                        <ImageBrush ImageSource="/Resources/Pic/Beta1.png" TileMode="None" Stretch="Uniform" Opacity="1">
-                            <ImageBrush.RelativeTransform>
-                                <ScaleTransform CenterY="0.75" CenterX="0.5" ScaleY="0.75" ScaleX="0.75"/>
-                            </ImageBrush.RelativeTransform>
-                        </ImageBrush>
-                    </Button.Background>
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <!-- Убираем стандартный фон при наведении -->
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="BorderBrush" Value="#FFACACAC"/>
-                            <Setter Property="BorderThickness" Value="1"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}" 
-                                        BorderBrush="{TemplateBinding BorderBrush}" 
-                                        BorderThickness="{TemplateBinding BorderThickness}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,5,0,0"/>
-                                            <!-- Прижимаем текст к верху -->
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-
-                            <!-- Триггер для изменения границы при наведении -->
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="BorderBrush" Value="#0078D4"/>
-                                    <!-- Цвет границы при наведении -->
-                                    <Setter Property="BorderThickness" Value="1"/>
-                                    <!-- Увеличиваем толщину границы -->
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter Property="BorderBrush" Value="#003778"/>
-                                    <!-- Цвет границы при нажатии -->
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <Button Content="About" Click="AboutButton_Click" Width="70" Height="75" VerticalAlignment="Top"/>
             </StackPanel>
         </Grid>
 
@@ -189,6 +147,7 @@
                                 <CheckBox x:Name="MergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" Margin="0,0,0,5" IsChecked="{Binding MergeProfilesIntoPolyline, Mode=TwoWay}"/>
                                 <CheckBox x:Name="RebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" Margin="0,0,0,5" IsChecked="{Binding RebaseGeometry, Mode=TwoWay}"/>
                                 <CheckBox x:Name="TrimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" Margin="0,0,0,5" IsChecked="{Binding TrimCenterlines, Mode=TwoWay}"/>
+                                <Separator Style="{StaticResource HorizontalSeparatorStyle}" SnapsToDevicePixels="True"/>
                                 <CheckBox x:Name="OptimizeDxfCheckBox" Content="Оптимизация dxf" IsChecked="{Binding OptimizeDxf, Mode=TwoWay}" IsEnabled="{Binding IsOptimizeDxfEnabled}" Margin="0,0,0,5"/>
                             </StackPanel>
                             

@@ -213,18 +213,30 @@
         </Setter>
     </Style>
 
-    <!-- Стиль для вертикального разделителя -->
-    <Style x:Key="VerticalSeparatorStyle" TargetType="Separator">
+    <!-- Базовый стиль для разделителей -->
+    <Style x:Key="BaseSeparatorStyle" TargetType="Separator">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Separator">
-                    <Rectangle Fill="{DynamicResource SeparatorBrush}" Width="1" Opacity="0.25"/>
+                    <Rectangle Fill="{DynamicResource SeparatorBrush}" Opacity="0.25"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Margin" Value="0,5,0,5"/>
+        <Setter Property="Margin" Value="5"/>
+    </Style>
+
+    <!-- Стиль для вертикального разделителя -->
+    <Style x:Key="VerticalSeparatorStyle" TargetType="Separator" BasedOn="{StaticResource BaseSeparatorStyle}">
+        <Setter Property="Width" Value="1"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
+    </Style>
+
+    <!-- Стиль для горизонтального разделителя -->
+    <Style x:Key="HorizontalSeparatorStyle" TargetType="Separator" BasedOn="{StaticResource BaseSeparatorStyle}">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
     <!-- Стиль для предпросмотра имени файла -->
