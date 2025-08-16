@@ -162,19 +162,6 @@ namespace FlatPatternExporter
             _isMouseOverDataGrid = false;
         }
 
-        private void CloseWindow_Click(object sender, RoutedEventArgs e)
-        {
-            // Закрываем окно
-            this.Close();
-        }
-
-        private void WindowHeader_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                this.DragMove();
-            }
-        }
 
         private void CustomPropertyTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {

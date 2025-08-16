@@ -6,7 +6,7 @@
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     mc:Ignorable="av" x:Class="FlatPatternExporter.SelectIPropertyWindow"
     Title="Customization" Width="230" Background="{StaticResource BackgroundSecondaryBrush}" 
-    WindowStyle="None" ResizeMode="NoResize" 
+    ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"
     SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">
     <Window.Resources>
@@ -25,24 +25,8 @@
     </Window.Resources>
 
     <Grid Margin="0">
-        <!-- Заголовок окна с кнопкой закрытия -->
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-
-        <Border Background="{StaticResource BackgroundQuaternaryBrush}" Height="30" VerticalAlignment="Center" BorderThickness="0">
-            <DockPanel LastChildFill="False" MouseDown="WindowHeader_MouseDown">
-                <TextBlock Text="Выберите Property" FontWeight="Bold" Foreground="#555" FontSize="12" Margin="10,0,0,0" Width="185" VerticalAlignment="Center"/>
-                <Button Content="X" Width="25" Height="25" DockPanel.Dock="Right" 
-                        VerticalAlignment="Center" HorizontalAlignment="Right" 
-                        Background="{StaticResource ErrorDarkBrush}" Foreground="{StaticResource BackgroundPrimaryBrush}" 
-                        BorderBrush="{x:Null}" Click="CloseWindow_Click" />
-            </DockPanel>
-        </Border>
-
         <!-- Основное содержимое -->
-        <Grid Grid.Row="1">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="35"/>
