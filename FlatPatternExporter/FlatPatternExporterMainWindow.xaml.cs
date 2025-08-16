@@ -1160,6 +1160,24 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
+    private void IncrementMultiplierButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (int.TryParse(MultiplierTextBox.Text, out int currentValue))
+        {
+            currentValue++;
+            MultiplierTextBox.Text = currentValue.ToString();
+        }
+    }
+
+    private void DecrementMultiplierButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (int.TryParse(MultiplierTextBox.Text, out int currentValue) && currentValue > 1)
+        {
+            currentValue--;
+            MultiplierTextBox.Text = currentValue.ToString();
+        }
+    }
+
     private async void ScanButton_Click(object sender, RoutedEventArgs e)
     {
         // Если сканирование уже идет, выполняем прерывание
