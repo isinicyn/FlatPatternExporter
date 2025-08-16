@@ -117,7 +117,7 @@
                                 <CheckBox x:Name="ExcludeReferencePartsCheckBox" Content="Исключить ссылочные" IsChecked="{Binding ExcludeReferenceParts, Mode=TwoWay}" Margin="0,0,0,5"/>
                                 <CheckBox x:Name="ExcludePurchasedPartsCheckBox" Content="Исключить покупные" IsChecked="{Binding ExcludePurchasedParts, Mode=TwoWay}" Margin="0,0,0,5"/>
                                 <CheckBox x:Name="ExcludePhantomPartsCheckBox" Content="Исключить фантомные" IsChecked="{Binding ExcludePhantomParts, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="IncludeLibraryComponentsCheckBox" Content="Включить библиотечные компоненты" IsChecked="{Binding IncludeLibraryComponents, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                <CheckBox x:Name="IncludeLibraryComponentsCheckBox" Content="Включить библиотечные" IsChecked="{Binding IncludeLibraryComponents, Mode=TwoWay}" Margin="0,0,0,5"/>
                             </StackPanel>
                         </Grid>
                     </GroupBox>
@@ -208,19 +208,21 @@
                             <!-- Правая колонка -->
                             <StackPanel Grid.Row="0" Grid.Column="2">
                                 <CheckBox x:Name="EnableSubfolderCheckBox" Content="Создать подпапку" IsChecked="{Binding EnableSubfolder, Mode=TwoWay}" IsEnabled="{Binding IsSubfolderCheckBoxEnabled}" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="0,5,0,0" />
-                                <TextBox x:Name="SubfolderNameTextBox" Width="168" Height="24" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" Margin="0,5,0,0" VerticalContentAlignment="Center" Padding="2,0,0,0" HorizontalAlignment="Left" Background="{StaticResource BackgroundSecondaryBrush}" />
+                                <TextBox x:Name="SubfolderNameTextBox" Height="24" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" Margin="0,5,0,0" VerticalContentAlignment="Center" Padding="2,0,0,0" HorizontalAlignment="Stretch" Background="{StaticResource BackgroundSecondaryBrush}" />
                                 <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="Сортировать по материалу" IsChecked="{Binding OrganizeByMaterial, Mode=TwoWay}" Margin="0,5,0,0"/>
                                 <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="Сортировать по толщине" IsChecked="{Binding OrganizeByThickness, Mode=TwoWay}" Margin="0,5,0,5"/>
                             </StackPanel>
                             
                             <!-- Элементы управления фиксированной папкой - отдельная строка -->
-                            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
-                                <Button x:Name="SelectFixedFolderButton" Content="..." Width="30" Click="SelectFixedFolderButton_Click" Height="24" Padding="1,1,1,1" Margin="2,0,0,0" />
-                                <Border Background="{StaticResource BackgroundSecondaryBrush}" 
+                            <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="SelectFixedFolderButton" Grid.Column="0" Content="..." Width="30" Click="SelectFixedFolderButton_Click" Height="24" Padding="1,1,1,1" Margin="2,0,10,0" />
+                                <Border Grid.Column="1" Background="{StaticResource BackgroundSecondaryBrush}" 
                                         BorderBrush="{StaticResource BorderPrimaryBrush}" 
                                         BorderThickness="1" 
-                                        Margin="10,0,0,0" 
-                                        Width="360" 
                                         Height="24" 
                                         Padding="5,0">
                                     <TextBlock x:Name="FixedFolderPathTextBlock" 
@@ -229,7 +231,7 @@
                                                Opacity="0.75" 
                                                VerticalAlignment="Center" />
                                 </Border>
-                            </StackPanel>
+                            </Grid>
                         </Grid>
                     </GroupBox>
 
