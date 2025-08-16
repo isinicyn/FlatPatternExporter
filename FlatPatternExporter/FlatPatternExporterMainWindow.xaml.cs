@@ -159,7 +159,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         set 
         {
             _fixedFolderPath = value;
-            UpdateFixedFolderPathDisplay(value);
+            FixedFolderPathTextBlock.Text = value.Length > 55 ? $"... {value[^55..]}" : value;
         }
     }
     private List<string> _libraryPaths = new List<string>();
@@ -282,13 +282,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    public void UpdateFixedFolderPathDisplay(string path)
-    {
-        if (path.Length > 40)
-            FixedFolderPathTextBlock.Text = "..." + path.Substring(path.Length - 40);
-        else
-            FixedFolderPathTextBlock.Text = path;
-    }
 
     public ObservableCollection<LayerSetting> LayerSettings { get; set; }
     public ObservableCollection<string> AvailableColors { get; set; }
