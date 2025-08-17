@@ -38,13 +38,13 @@
                         </TreeView.Resources>
                         <TreeView.ItemTemplate>
                             <HierarchicalDataTemplate ItemsSource="{Binding Files}">
-                                <TextBlock FontWeight="Bold" FontSize="11">
+                                <TextBlock FontWeight="Bold">
                                     <Run Text="Обозначение: "/>
                                     <Run Text="{Binding PartNumber}"/>
                                 </TextBlock>
                                 <HierarchicalDataTemplate.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock FontSize="11">
+                                        <TextBlock>
                                             <Run Text="Файл: "/>
                                             <Run Text="{Binding FileName}"/>
                                             <Run Text=" | Состояние: "/>
@@ -63,7 +63,7 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="0,1,0,0" Padding="15,10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="ОК" 
-                        Width="120" 
+                        Width="80" 
                         Style="{StaticResource FileNameActionButtonStyle}"
                         Click="OkButton_Click"/>
             </StackPanel>

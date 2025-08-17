@@ -21,7 +21,7 @@
                     <!-- Обозначение (Part Number) -->
                     <StackPanel Margin="0,0,0,10">
                         <TextBlock Text="Обозначение (Part Number):" 
-                                   FontSize="11" 
+                                   Style="{StaticResource BaseTextBlockStyle}" 
                                    FontWeight="Bold" 
                                    Margin="0,0,0,5"/>
                         <TextBox x:Name="partNumberTextBox" 
@@ -33,7 +33,7 @@
                     <!-- Наименование (Description) -->
                     <StackPanel Margin="0,0,0,5">
                         <TextBlock Text="Наименование (Description):" 
-                                   FontSize="11" 
+                                   Style="{StaticResource BaseTextBlockStyle}" 
                                    FontWeight="Bold" 
                                    Margin="0,0,0,5"/>
                         <TextBox x:Name="descriptionTextBox" 
@@ -49,12 +49,12 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="0,1,0,0" Padding="15,10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="Отмена" 
-                        Width="120" 
+                        Width="80" 
                         Margin="0,0,5,0"
                         Style="{StaticResource FileNameActionButtonStyle}"
                         Click="CancelButton_Click"/>
                 <Button Content="ОК" 
-                        Width="120" 
+                        Width="80" 
                         Style="{StaticResource FileNameActionButtonStyle}"
                         Click="OkButton_Click"/>
             </StackPanel>

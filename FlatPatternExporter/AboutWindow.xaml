@@ -22,15 +22,13 @@
                     <DockPanel Margin="0,0,0,5">
                         <TextBlock x:Name="VersionTextBlock" 
                                    Text="Версия программы: 1.0.0" 
-                                   FontSize="11" 
-                                   VerticalAlignment="Center"/>
+                                   Style="{StaticResource BaseTextBlockStyle}"/>
                         <Button Width="32" Height="32" 
-                                Margin="5,0,0,0" 
+                                Margin="{StaticResource SmallMarginThickness}" 
                                 HorizontalAlignment="Right" 
                                 VerticalAlignment="Center" 
                                 Click="CopyVersionToClipboard_Click" 
-                                ToolTip="Копировать версию"
-                                Style="{StaticResource SymbolButtonStyle}">
+                                ToolTip="Копировать версию">
                             <Image Source="/Resources/Pic/copy-icon.png" 
                                    Stretch="Uniform" 
                                    Width="16" 
@@ -39,23 +37,23 @@
                     </DockPanel>
 
                     <TextBlock Text="Автор: Ivan Sinicyn" 
-                               FontSize="11" 
+                               Style="{StaticResource BaseTextBlockStyle}" 
                                Margin="0,0,0,1"/>
                     <TextBlock Text="Email: isinicyn@gmail.com" 
-                               FontSize="11" 
+                               Style="{StaticResource BaseTextBlockStyle}" 
                                Margin="0,0,0,1"/>
                     <TextBlock Text="Лицензия: Свободная" 
-                               FontSize="11" 
+                               Style="{StaticResource BaseTextBlockStyle}" 
                                Margin="0,0,0,1"/>
                     <TextBlock x:Name="LastUpdateTextBlock" 
                                Text="Последнее обновление: 10/09/2023" 
-                               FontSize="11" 
+                               Style="{StaticResource BaseTextBlockStyle}" 
                                Margin="0,0,0,1"/>
                 </StackPanel>
             </GroupBox>
 
             <TextBlock Text="Создано при поддержке ChatGPT 4o, Claude 3.5 Sonnet, Claude Sonnet 4, Mistral Large 2" 
-                       FontSize="10" 
+                       FontSize="{StaticResource SmallFontSize}" 
                        Foreground="{StaticResource TextMutedBrush}" 
                        TextWrapping="Wrap"
                        HorizontalAlignment="Left"/>
@@ -65,7 +63,7 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="0,1,0,0" Padding="15,10">
             <Button Content="Закрыть" 
                     HorizontalAlignment="Right" 
-                    Width="120" 
+                    Width="80" 
                     Style="{StaticResource FileNameActionButtonStyle}"
                     Click="CloseButton_Click"/>
         </Border>

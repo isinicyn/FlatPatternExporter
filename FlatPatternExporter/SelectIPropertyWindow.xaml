@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     mc:Ignorable="av" x:Class="FlatPatternExporter.SelectIPropertyWindow"
-    Title="Customization" Width="230" Background="{StaticResource BackgroundSecondaryBrush}" 
+    Title="Customization" Background="{StaticResource BackgroundSecondaryBrush}" 
     ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"
     SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">
@@ -29,7 +29,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition/>
-                <RowDefinition Height="35"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
             <ListBox x:Name="IPropertyListBox" 
@@ -62,10 +62,10 @@
                                         Margin="0,2,0,0"
                                         Padding="5,3">
                                     <TextBlock Text="{Binding Name}" 
+                                               Style="{StaticResource BaseTextBlockStyle}"
                                                FontWeight="Bold" 
-                                               FontSize="10" 
-                                               Foreground="{StaticResource TextTertiaryBrush}"
-                                               VerticalAlignment="Center"/>
+                                               FontSize="{StaticResource SmallFontSize}" 
+                                               Foreground="{StaticResource TextTertiaryBrush}"/>
                                 </Border>
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
@@ -76,26 +76,30 @@
                     <DataTemplate>
                         <Border Background="{StaticResource SelectionBackgroundBrush}" 
                                 BorderBrush="{StaticResource BorderTertiaryBrush}" 
-                                BorderThickness="1,1,1,1"
-                                Padding="2,2,2,2"
-                                SnapsToDevicePixels="True" Width="215" Margin="0,0,0,0" Height="22.5">
+                                BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                                Padding="1"
+                                SnapsToDevicePixels="True" 
+                                Margin="0"
+                                Height="{StaticResource StandardElementHeight}" Width="175">
                             <TextBlock Text="{Binding ListDisplayName}" 
+                                       Style="{StaticResource BaseTextBlockStyle}"
                                        FontWeight="Bold" 
-                                       VerticalAlignment="Center"
                                        HorizontalAlignment="Left" 
-                                       Foreground="{StaticResource TextSecondaryBrush}"
-                                       FontSize="11" Margin="5,0,0,0"/>
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTip="{Binding ListDisplayName}"
+                                       Margin="2,1"/>
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
             
             <!-- Поле для добавления custom property -->
-            <Border Grid.Row="1" Background="{StaticResource BackgroundQuaternaryBrush}" BorderThickness="0.5,0,0.5,0.5">
+            <Border Grid.Row="1" Background="{StaticResource BackgroundQuaternaryBrush}" BorderThickness="{StaticResource StandardBorderThicknessValue}">
                 <Border.BorderBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
                 </Border.BorderBrush>
-                <Grid Margin="5">
+                <Grid Margin="{StaticResource SmallMarginThickness}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition Width="30"/>
@@ -103,25 +107,20 @@
                     
                     <TextBox x:Name="CustomPropertyTextBox" 
                              Grid.Column="0"
-                             Height="25"
-                             VerticalContentAlignment="Center"
-                             Background="{StaticResource BackgroundPrimaryBrush}"
+                             Style="{StaticResource BaseTextBoxStyle}"
                              BorderBrush="{StaticResource BorderTertiaryBrush}"
-                             BorderThickness="1"
-                             Padding="5,0"
                              TextChanged="CustomPropertyTextBox_TextChanged"/>
                     
                     <Button x:Name="AddCustomPropertyButton"
                             Grid.Column="1"
                             Content="+"
-                            Width="25"
-                            Height="25"
+                            Width="{StaticResource StandardElementHeight}"
+                            Style="{StaticResource BaseButtonStyle}"
                             Background="{StaticResource SuccessLightBrush}"
                             Foreground="{StaticResource BackgroundPrimaryBrush}"
                             BorderBrush="{StaticResource SuccessDarkBrush}"
-                            BorderThickness="1"
                             FontWeight="Bold"
-                            FontSize="14"
+                            FontSize="{StaticResource LargeFontSize}"
                             IsEnabled="False"
                             Click="AddCustomPropertyButton_Click"/>
                 </Grid>

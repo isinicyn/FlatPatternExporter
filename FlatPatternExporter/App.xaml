@@ -9,6 +9,21 @@
                 <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
                 <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Глобальные стили по умолчанию -->
+            <Style TargetType="Window">
+                <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            </Style>
+            
+            <Style TargetType="UserControl">
+                <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+            </Style>
+            
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
