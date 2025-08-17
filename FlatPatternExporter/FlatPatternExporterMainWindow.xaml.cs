@@ -1217,8 +1217,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             return;
         }
 
-        if (doc.DocumentType != DocumentTypeEnum.kAssemblyDocumentObject &&
-            doc.DocumentType != DocumentTypeEnum.kPartDocumentObject)
+        var documentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" :
+                          doc.DocumentType == DocumentTypeEnum.kPartDocumentObject ? "Деталь" : null;
+        
+        if (documentType == null)
         {
             MessageBox.Show("Откройте сборку или деталь для сканирования.", "Ошибка", MessageBoxButton.OK,
                 MessageBoxImage.Warning);
@@ -1240,7 +1242,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var stopwatch = Stopwatch.StartNew();
 
         var partCount = 0;
-        var documentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" : "Деталь";
         
         // Получаем и отображаем информацию о документе сразу
         UpdateDocumentInfo(documentType, doc);
