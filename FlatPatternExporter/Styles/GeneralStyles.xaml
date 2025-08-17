@@ -18,7 +18,7 @@
     <sys:Double x:Key="StandardBorderThickness">1</sys:Double>
     
     <!-- Стандартные отступы для элементов -->
-    <Thickness x:Key="StandardMarginThickness">10</Thickness>
+    <Thickness x:Key="StandardMarginThickness">6</Thickness>
     <Thickness x:Key="SmallMarginThickness">5</Thickness>
     <Thickness x:Key="TinyMarginThickness">2</Thickness>
     <Thickness x:Key="StandardPaddingThickness">10,5</Thickness>
@@ -167,14 +167,14 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="#FFE0E0E0"/>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Border" Property="Background" Value="#FFF0F0F0"/>
-                            <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="#FF888888"/>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
+                            <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="{StaticResource TextDisabledBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -422,7 +422,7 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                             <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
-                            <Setter Property="Foreground" Value="#999999"/>
+                            <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -459,17 +459,17 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="{DynamicResource RedLightBackgroundBrush}"/>
                             <Setter Property="BorderBrush" Value="{DynamicResource RedLightBorderBrush}"/>
-                            <Setter Property="Foreground" Value="#CC0000"/>
+                            <Setter Property="Foreground" Value="{StaticResource ErrorDarkBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter Property="Background" Value="{DynamicResource RedMediumBackgroundBrush}"/>
                             <Setter Property="BorderBrush" Value="{DynamicResource RedMediumBorderBrush}"/>
-                            <Setter Property="Foreground" Value="#990000"/>
+                            <Setter Property="Foreground" Value="{StaticResource ErrorDarkBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                             <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
-                            <Setter Property="Foreground" Value="#CCCCCC"/>
+                            <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}"/>
                             <Setter Property="Cursor" Value="Arrow"/>
                         </Trigger>
                     </ControlTemplate.Triggers>

@@ -444,7 +444,7 @@
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding EnableFileNameConstructor}" Value="False">
                                                         <Setter Property="Text" Value="Функция отключена - при экспорте будет использовано обозначение детали"/>
-                                                        <Setter Property="Foreground" Value="#666666"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -487,7 +487,7 @@
                         <TextBlock Text="Поиск..." 
                                    Foreground="{StaticResource TextDisabledBrush}" 
                                    Margin="{StaticResource SmallMarginThickness}"
-                                   IsHitTestVisible="False">
+                                   IsHitTestVisible="False" VerticalAlignment="Center" Padding="5,0,0,0">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
                                     <Setter Property="Visibility" Value="Collapsed"/>

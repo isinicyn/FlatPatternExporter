@@ -189,7 +189,7 @@
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="BorderBrush" Value="#FFE0DDDD"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,0"/>
         <Setter Property="ContextMenu" Value="{x:Null}"/>
     </Style>
@@ -197,7 +197,7 @@
     <!-- Стиль для заголовков строк -->
     <Style x:Key="DataGridRowHeaderStyle" TargetType="DataGridRowHeader">
         <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="#FFE0DDDD"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="Width" Value="15"/>
         <Setter Property="ContextMenu" Value="{x:Null}"/>

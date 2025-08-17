@@ -5,7 +5,7 @@
         Width="450"
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize" 
-        Background="White"
+        Background="{StaticResource BackgroundPrimaryBrush}"
         FontFamily="Segoe UI" SizeToContent="Height">
 
 

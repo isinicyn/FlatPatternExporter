@@ -5,7 +5,7 @@
         Title="Детали конфликта обозначений" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize" 
-        Background="White"
+        Background="{StaticResource BackgroundPrimaryBrush}"
         FontFamily="Segoe UI" 
         SizeToContent="WidthAndHeight"
         MinWidth="600">
