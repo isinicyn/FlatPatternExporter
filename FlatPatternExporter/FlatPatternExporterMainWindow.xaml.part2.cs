@@ -651,6 +651,16 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
+        var documentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" :
+                          doc.DocumentType == DocumentTypeEnum.kPartDocumentObject ? "Деталь" : null;
+        
+        if (documentType == null)
+        {
+            MessageBox.Show("Откройте сборку или деталь для экспорта.", "Ошибка", MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
         if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch)) return;
 
         ClearButton.IsEnabled = false;
