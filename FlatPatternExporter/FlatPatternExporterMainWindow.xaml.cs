@@ -1217,17 +1217,15 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             return;
         }
 
-        SetInventorUserInterfaceState(true);
-
-
         if (doc.DocumentType != DocumentTypeEnum.kAssemblyDocumentObject &&
             doc.DocumentType != DocumentTypeEnum.kPartDocumentObject)
         {
             MessageBox.Show("Откройте сборку или деталь для сканирования.", "Ошибка", MessageBoxButton.OK,
                 MessageBoxImage.Warning);
-            SetInventorUserInterfaceState(false);
             return;
         }
+
+        SetInventorUserInterfaceState(true);
 
         ResetProgressBar();
         ScanProgressValue = 0;

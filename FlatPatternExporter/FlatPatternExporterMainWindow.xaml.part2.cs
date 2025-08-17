@@ -750,8 +750,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
-        SetInventorUserInterfaceState(true);
-
         Document? doc = _thisApplication?.ActiveDocument;
         if (doc == null)
         {
@@ -765,15 +763,15 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             MessageBox.Show("Активный документ изменился. Пожалуйста, повторите сканирование перед экспортом.",
                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             MultiplierTextBox.Text = "1";
-            SetInventorUserInterfaceState(false);
             return;
         }
 
         if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch))
         {
-            SetInventorUserInterfaceState(false);
             return;
         }
+
+        SetInventorUserInterfaceState(true);
 
         ClearButton.IsEnabled = false;
         ScanButton.IsEnabled = false;
