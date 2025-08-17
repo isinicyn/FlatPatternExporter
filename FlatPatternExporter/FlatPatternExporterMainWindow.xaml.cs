@@ -1031,7 +1031,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         );
     }
 
-    private void InitializeInventor()
+    /// <summary>
+    /// Переподключается к Inventor каждый раз
+    /// </summary>
+    /// <returns>true если Inventor доступен, false если нет</returns>
+    private bool EnsureInventorConnection()
     {
         try
         {
@@ -1039,6 +1043,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (_thisApplication != null)
             {
                 InitializeProjectAndLibraryData();
+                return true;
             }
         }
         catch (COMException)
@@ -1046,12 +1051,21 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             MessageBox.Show(
                 "Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.", "Ошибка",
                 MessageBoxButton.OK, MessageBoxImage.Error);
+            _thisApplication = null;
         }
         catch (Exception ex)
         {
             MessageBox.Show("Произошла ошибка при подключении к Inventor: " + ex.Message, "Ошибка", MessageBoxButton.OK,
                 MessageBoxImage.Error);
+            _thisApplication = null;
         }
+
+        return false;
+    }
+
+    private void InitializeInventor()
+    {
+        EnsureInventorConnection();
     }
     private void InitializeProjectAndLibraryData()
     {
@@ -1189,19 +1203,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             return;
         }
 
-        if (_thisApplication == null)
+        if (!EnsureInventorConnection())
         {
-            InitializeInventor();
-            if (_thisApplication == null)
-            {
-                MessageBox.Show("Inventor не запущен. Пожалуйста, запустите Inventor и попробуйте снова.", "Ошибка",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+            return;
         }
 
         // Проверка на наличие активного документа
-        Document? doc = _thisApplication.ActiveDocument;
+        Document? doc = _thisApplication?.ActiveDocument;
         if (doc == null)
         {
             MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",

@@ -638,14 +638,12 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         // Очистка таблицы перед началом скрытого экспорта
         ClearList_Click(this, null!);
 
-        if (_thisApplication == null)
+        if (!EnsureInventorConnection())
         {
-            MessageBox.Show("Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.", "Ошибка",
-                MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
-        Document doc = _thisApplication.ActiveDocument;
+        Document? doc = _thisApplication?.ActiveDocument;
         if (doc == null)
         {
             MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",
@@ -747,16 +745,14 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
-        if (_thisApplication == null)
+        if (!EnsureInventorConnection())
         {
-            MessageBox.Show("Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.", "Ошибка",
-                MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
         SetInventorUserInterfaceState(true);
 
-        Document? doc = _thisApplication.ActiveDocument;
+        Document? doc = _thisApplication?.ActiveDocument;
         if (doc == null)
         {
             MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",
