@@ -82,7 +82,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Состояние процессов
     private bool _isScanning;
     private bool _isExporting;
-    private bool _isCancelled;
+    private CancellationTokenSource? _operationCts;
     private bool _hasMissingReferences = false;
     private int _itemCounter = 1;
     private bool _isInitializing = true;
@@ -591,6 +591,113 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
+    /// Централизованное управление состоянием UI
+    /// </summary>
+    private void SetUIState(UIState state)
+    {
+        ScanButton.IsEnabled = state.ScanEnabled;
+        ExportButton.IsEnabled = state.ExportEnabled;
+        ClearButton.IsEnabled = state.ClearEnabled;
+        ScanButton.Content = state.ScanButtonText;
+        ExportButton.Content = state.ExportButtonText;
+        ProgressLabel.Text = state.ProgressText;
+        
+        if (state.ProgressValue >= 0)
+        {
+            ScanProgressValue = state.ProgressValue;
+            ExportProgressValue = state.ProgressValue;
+        }
+        
+        SetInventorUserInterfaceState(state.InventorUIDisabled);
+    }
+
+    /// <summary>
+    /// Обновление состояния UI после завершения операции
+    /// </summary>
+    private void SetUIStateAfterOperation(OperationResult result, OperationType operationType)
+    {
+        var baseState = operationType == OperationType.Scan ? UIState.Initial : UIState.Initial;
+        
+        baseState.ExportEnabled = _partsData.Count > 0 && !result.WasCancelled;
+        baseState.ClearEnabled = _partsData.Count > 0;
+        
+        var statusText = result.WasCancelled 
+            ? $"Прервано ({GetElapsedTime(result.ElapsedTime)})"
+            : operationType == OperationType.Scan
+                ? $"Найдено листовых деталей: {result.ProcessedCount} ({GetElapsedTime(result.ElapsedTime)})"
+                : $"Завершено ({GetElapsedTime(result.ElapsedTime)})";
+        
+        baseState.ProgressText = statusText;
+        baseState.ProgressValue = 0;
+        baseState.InventorUIDisabled = false;
+        
+        SetUIState(baseState);
+    }
+
+    /// <summary>
+    /// Централизованный показ результатов операции пользователю
+    /// </summary>
+    private void ShowOperationResult(OperationResult result, OperationType operationType, bool isQuickMode = false)
+    {
+        if (result.WasCancelled)
+        {
+            var operationName = operationType == OperationType.Scan ? "сканирования" : "экспорта";
+            MessageBox.Show($"Процесс {operationName} был прерван.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        switch (operationType)
+        {
+            case OperationType.Scan:
+                // Для сканирования показываем специальные сообщения о конфликтах и ссылках
+                if (_conflictingParts.Count > 0)
+                {
+                    MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для просмотра деталей конфликтов.",
+                        "Конфликт обозначений", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                else if (_hasMissingReferences)
+                {
+                    MessageBox.Show("В сборке обнаружены компоненты с потерянными ссылками. Некоторые данные могли быть пропущены.",
+                        "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                break;
+                
+            case OperationType.Export:
+                var exportTitle = isQuickMode ? "Быстрый экспорт DXF завершен" : "Экспорт DXF завершен";
+                MessageBox.Show(
+                    $"{exportTitle}.\nВсего файлов обработано: {result.ProcessedCount + result.SkippedCount}\nПропущено (без разверток): {result.SkippedCount}\nВсего экспортировано: {result.ProcessedCount}\nВремя выполнения: {GetElapsedTime(result.ElapsedTime)}",
+                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Централизованная обработка ошибок для операций
+    /// </summary>
+    private async Task<T> ExecuteWithErrorHandlingAsync<T>(
+        Func<Task<T>> operation,
+        string operationName) where T : OperationResult, new()
+    {
+        try
+        {
+            return await operation();
+        }
+        catch (OperationCanceledException)
+        {
+            // Операция была отменена - возвращаем результат с флагом отмены
+            var result = new T();
+            result.WasCancelled = true;
+            return result;
+        }
+        catch (Exception ex)
+        {
+            var result = new T();
+            result.Errors.Add($"Ошибка {operationName}: {ex.Message}");
+            return result;
+        }
+    }
+
+    /// <summary>
     /// Централизованный метод для управления интерфейсом Inventor
     /// </summary>
     /// <param name="disableInteraction">true - отключить взаимодействие с пользователем, false - включить</param>
@@ -622,6 +729,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     protected override void OnClosed(EventArgs e)
     {
+        // Отменяем активные операции и освобождаем ресурсы
+        _operationCts?.Cancel();
+        _operationCts?.Dispose();
+        
         // Сохраняем настройки при закрытии
         SaveSettings();
         
@@ -1032,6 +1143,55 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
+    /// Централизованная валидация активного документа
+    /// </summary>
+    private DocumentValidationResult ValidateActiveDocument()
+    {
+        if (!EnsureInventorConnection())
+        {
+            return new DocumentValidationResult
+            {
+                IsValid = false,
+                ErrorMessage = "Не удалось подключиться к Inventor"
+            };
+        }
+
+        var doc = _thisApplication?.ActiveDocument;
+        if (doc == null)
+        {
+            return new DocumentValidationResult
+            {
+                IsValid = false,
+                ErrorMessage = "Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова."
+            };
+        }
+
+        var docType = doc.DocumentType switch
+        {
+            DocumentTypeEnum.kAssemblyDocumentObject => DocumentType.Assembly,
+            DocumentTypeEnum.kPartDocumentObject => DocumentType.Part,
+            _ => DocumentType.Invalid
+        };
+
+        if (docType == DocumentType.Invalid)
+        {
+            return new DocumentValidationResult
+            {
+                IsValid = false,
+                ErrorMessage = "Откройте сборку или деталь для работы с приложением."
+            };
+        }
+
+        return new DocumentValidationResult
+        {
+            Document = doc,
+            DocType = docType,
+            IsValid = true,
+            DocumentTypeName = docType == DocumentType.Assembly ? "Сборка" : "Деталь"
+        };
+    }
+
+    /// <summary>
     /// Переподключается к Inventor каждый раз
     /// </summary>
     /// <returns>true если Inventor доступен, false если нет</returns>
@@ -1192,64 +1352,178 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
+    /// <summary>
+    /// Унифицированный метод сканирования документа
+    /// </summary>
+    private async Task<OperationResult> ScanDocumentAsync(
+        Document document, 
+        CancellationToken cancellationToken = default,
+        bool updateUI = true,
+        IProgress<ScanProgress>? progress = null)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        var result = new OperationResult();
+        
+        try
+        {
+            var documentType = document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" : "Деталь";
+            
+            if (updateUI)
+            {
+                // Получаем и отображаем информацию о документе
+                UpdateDocumentInfo(documentType, document);
+                _partsData.Clear();
+                _itemCounter = 1;
+            }
+            
+            _partNumberTracker.Clear();
+            ConflictFilesButton.IsEnabled = false;
+
+            var sheetMetalParts = new Dictionary<string, int>();
+
+            if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+            {
+                var asmDoc = (AssemblyDocument)document;
+                
+                if (SelectedProcessingMethod == ProcessingMethod.Traverse)
+                    await Task.Run(() => ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, progress, cancellationToken), cancellationToken);
+                else if (SelectedProcessingMethod == ProcessingMethod.BOM)
+                    await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, progress, cancellationToken), cancellationToken);
+
+                // Анализируем конфликты и удаляем конфликтующие детали
+                if (updateUI)
+                {
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        ProgressLabel.Text = "Анализ конфликтов обозначений...";
+                    });
+                }
+                
+                await AnalyzePartNumberConflictsAsync();
+                FilterConflictingParts(sheetMetalParts);
+
+                result.ProcessedCount = sheetMetalParts.Count;
+
+                if (updateUI)
+                {
+                    // Переключаем прогресс на обработку деталей
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        ScanProgressValue = 0;
+                        ProgressLabel.Text = "Обработка деталей...";
+                    });
+
+                    var itemCounter = 1;
+                    var totalParts = sheetMetalParts.Count;
+                    var processedParts = 0;
+                    
+                    var partProgress = new Progress<PartData>(partData =>
+                    {
+                        partData.Item = _itemCounter;
+                        _partsData.Add(partData);
+                        _itemCounter++;
+                    });
+
+                    await Task.Run(async () =>
+                    {
+                        foreach (var part in sheetMetalParts)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++);
+                            if (partData != null)
+                            {
+                                ((IProgress<PartData>)partProgress).Report(partData);
+                            }
+                            
+                            processedParts++;
+                            await Dispatcher.InvokeAsync(() =>
+                            {
+                                ScanProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
+                                ProgressLabel.Text = $"Обработка деталей - {processedParts} из {totalParts}";
+                            });
+                        }
+                    }, cancellationToken);
+                }
+            }
+            else if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
+            {
+                var partDoc = (PartDocument)document;
+                
+                if (updateUI)
+                {
+                    var partProgress = new Progress<PartData>(partData =>
+                    {
+                        partData.Item = _itemCounter;
+                        _partsData.Add(partData);
+                        _itemCounter++;
+                    });
+                    
+                    result.ProcessedCount = await ProcessSinglePart(partDoc, partProgress);
+                }
+                else
+                {
+                    if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+                    {
+                        var mgr = new PropertyManager((Document)partDoc);
+                        var partNumber = mgr.GetMappedProperty("PartNumber");
+                        sheetMetalParts.Add(partNumber, 1);
+                        result.ProcessedCount = 1;
+                    }
+                }
+            }
+
+            if (updateUI && int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
+                UpdateQuantitiesWithMultiplier(multiplier);
+
+            result.WasCancelled = cancellationToken.IsCancellationRequested;
+            
+            if (updateUI)
+            {
+                _lastScannedDocument = cancellationToken.IsCancellationRequested ? null : document;
+                _tokenService.UpdatePartsData(_partsData);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            result.WasCancelled = true;
+        }
+        catch (Exception ex)
+        {
+            result.Errors.Add(ex.Message);
+        }
+        finally
+        {
+            stopwatch.Stop();
+            result.ElapsedTime = stopwatch.Elapsed;
+        }
+
+        return result;
+    }
+
     private async void ScanButton_Click(object sender, RoutedEventArgs e)
     {
         // Если сканирование уже идет, выполняем прерывание
         if (_isScanning)
         {
-            _isCancelled = true;
-            ScanButton.Content = "Прерывание...";
-            ScanButton.IsEnabled = false;
+            _operationCts?.Cancel();
+            SetUIState(new UIState { ScanEnabled = false, ScanButtonText = "Прерывание..." });
             return;
         }
 
-        if (!EnsureInventorConnection())
+        // Валидация документа
+        var validation = ValidateActiveDocument();
+        if (!validation.IsValid)
         {
+            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
-        // Проверка на наличие активного документа
-        Document? doc = _thisApplication?.ActiveDocument;
-        if (doc == null)
-        {
-            MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        var documentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" :
-                          doc.DocumentType == DocumentTypeEnum.kPartDocumentObject ? "Деталь" : null;
-        
-        if (documentType == null)
-        {
-            MessageBox.Show("Откройте сборку или деталь для сканирования.", "Ошибка", MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-            return;
-        }
-
-        SetInventorUserInterfaceState(true);
-
-        ResetProgressBar();
-        ScanProgressValue = 0;
-        ProgressLabel.Text = "Подготовка к сканированию...";
-        ScanButton.Content = "Прервать";
-        ExportButton.IsEnabled = false;
-        ClearButton.IsEnabled = false;
+        // Настройка UI для сканирования
+        SetUIState(UIState.Scanning);
         _isScanning = true;
-        _isCancelled = false;
-        _hasMissingReferences = false; // Сброс флага потерянных ссылок
-
-        var stopwatch = Stopwatch.StartNew();
-
-        var partCount = 0;
-        
-        // Получаем и отображаем информацию о документе сразу
-        UpdateDocumentInfo(documentType, doc);
-
-        _partsData.Clear();
-        _itemCounter = 1;
-        _partNumberTracker.Clear(); // Очищаем трекер конфликтов
-        ConflictFilesButton.IsEnabled = false; // Отключаем кнопку конфликтов в начале сканирования
+        _operationCts = new CancellationTokenSource();
+        _hasMissingReferences = false;
 
         // Прогресс для сканирования структуры сборки
         var scanProgress = new Progress<ScanProgress>(progress =>
@@ -1258,115 +1532,17 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             ProgressLabel.Text = $"{progress.CurrentOperation} - {progress.CurrentItem}";
         });
 
-        // Прогресс для добавления готовых деталей в таблицу
-        var partProgress = new Progress<PartData>(partData =>
-        {
-            partData.Item = _itemCounter;
-            _partsData.Add(partData);
-            _itemCounter++;
-        });
+        // Выполнение сканирования
+        var result = await ExecuteWithErrorHandlingAsync(
+            () => ScanDocumentAsync(validation.Document!, _operationCts.Token, updateUI: true, scanProgress),
+            "сканирования");
 
-        if (doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
-        {
-            var asmDoc = (AssemblyDocument)doc;
-            var sheetMetalParts = new Dictionary<string, int>();
-            if (SelectedProcessingMethod == ProcessingMethod.Traverse)
-                await Task.Run(() =>
-                    ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, scanProgress));
-            else if (SelectedProcessingMethod == ProcessingMethod.BOM)
-                await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, scanProgress));
-
-            // Анализируем конфликты и удаляем конфликтующие детали ДО обработки
-            await Dispatcher.InvokeAsync(() =>
-            {
-                ProgressLabel.Text = "Анализ конфликтов обозначений...";
-            });
-            
-            await AnalyzePartNumberConflictsAsync();
-            FilterConflictingParts(sheetMetalParts);
-            
-            // Подсчитываем количество деталей ПОСЛЕ фильтрации конфликтов
-            partCount = sheetMetalParts.Count;
-
-            // Переключаем прогресс на обработку деталей
-            await Dispatcher.InvokeAsync(() =>
-            {
-                ScanProgressValue = 0;
-                ProgressLabel.Text = "Обработка деталей...";
-            });
-
-            var itemCounter = 1;
-            var totalParts = sheetMetalParts.Count;
-            var processedParts = 0;
-            
-            await Task.Run(async () =>
-            {
-                foreach (var part in sheetMetalParts)
-                {
-                    if (_isCancelled) break;
-
-                    var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++);
-                    if (partData != null)
-                    {
-                        ((IProgress<PartData>)partProgress).Report(partData);
-                    }
-                    
-                    // Обновляем прогресс обработки деталей
-                    processedParts++;
-                    await Dispatcher.InvokeAsync(() =>
-                    {
-                        ScanProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
-                        ProgressLabel.Text = $"Обработка деталей - {processedParts} из {totalParts}";
-                    });
-                }
-            });
-        }
-        else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-        {
-            var partDoc = (PartDocument)doc;
-            
-            partCount = await ProcessSinglePart(partDoc, partProgress);
-        }
-
-        // Останавливаем секундомер, если он еще не остановлен
-        if (stopwatch.IsRunning)
-            stopwatch.Stop();
-        var elapsedTime = GetElapsedTime(stopwatch.Elapsed);
-
-        if (int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
-            UpdateQuantitiesWithMultiplier(multiplier);
-
+        // Обработка завершения операции
         _isScanning = false;
-        ScanProgressValue = 0;
-        ProgressLabel.Text = _isCancelled ? $"Прервано ({elapsedTime})" : $"Найдено листовых деталей: {partCount} ({elapsedTime})";
+        SetUIStateAfterOperation(result, OperationType.Scan);
 
-        ScanButton.Content = "Сканировать";
-        ScanButton.IsEnabled = true;
-        ExportButton.IsEnabled = partCount > 0 && !_isCancelled;
-        ClearButton.IsEnabled = _partsData.Count > 0;
-        _lastScannedDocument = _isCancelled ? null : doc;
-
-        // Обновляем данные в TokenService после сканирования
-        _tokenService.UpdatePartsData(_partsData);
-
-        SetInventorUserInterfaceState(false);
-
-        if (_isCancelled)
-        {
-            MessageBox.Show("Процесс сканирования был прерван.", "Информация", MessageBoxButton.OK,
-                MessageBoxImage.Information);
-        }
-        else if (_conflictingParts.Count > 0)
-        {
-            MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для просмотра деталей конфликтов.",
-                "Конфликт обозначений",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-        else if (_hasMissingReferences)
-        {
-            MessageBox.Show("В сборке обнаружены компоненты с потерянными ссылками. Некоторые данные могли быть пропущены.",
-                "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
+        // Показ результатов пользователю
+        ShowOperationResult(result, OperationType.Scan);
     }
     private void ConflictFilesButton_Click(object sender, RoutedEventArgs e)
     {
@@ -1476,14 +1652,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             "FlatPatternLength",
             "FlatPatternArea"
         };
-    }
-
-    private (string partNumber, string description) GetDocumentProperties(Document document)
-    {
-        var mgr = new PropertyManager((Document)document);
-        var partNumber = mgr.GetMappedProperty("PartNumber");
-        var description = mgr.GetMappedProperty("Description");
-        return (partNumber, description);
     }
 
     private void AddPartToConflictTracker(string partNumber, string fileName, string modelState)
@@ -1965,3 +2133,98 @@ public enum ProcessingStatus
     Error          // Ошибка экспорта (красный)
 }
 
+// Enum для типа документа
+public enum DocumentType
+{
+    Assembly,
+    Part,
+    Invalid
+}
+
+// Enum для типа операции
+public enum OperationType
+{
+    Scan,
+    Export
+}
+
+// Класс для управления состоянием UI
+public class UIState
+{
+    public bool ScanEnabled { get; set; }
+    public bool ExportEnabled { get; set; }
+    public bool ClearEnabled { get; set; }
+    public string ScanButtonText { get; set; } = "";
+    public string ExportButtonText { get; set; } = "";
+    public string ProgressText { get; set; } = "";
+    public double ProgressValue { get; set; }
+    public bool InventorUIDisabled { get; set; }
+    
+    public static UIState Initial => new()
+    {
+        ScanEnabled = true,
+        ExportEnabled = false,
+        ClearEnabled = false,
+        ScanButtonText = "Сканировать",
+        ExportButtonText = "Экспорт",
+        ProgressText = "Документ не выбран",
+        ProgressValue = 0,
+        InventorUIDisabled = false
+    };
+    
+    public static UIState Scanning => new()
+    {
+        ScanEnabled = true,
+        ExportEnabled = false,
+        ClearEnabled = false,
+        ScanButtonText = "Прервать",
+        ExportButtonText = "Экспорт",
+        ProgressText = "Подготовка к сканированию...",
+        ProgressValue = 0,
+        InventorUIDisabled = true
+    };
+    
+    public static UIState Exporting => new()
+    {
+        ScanEnabled = false,
+        ExportEnabled = true,
+        ClearEnabled = false,
+        ScanButtonText = "Сканировать",
+        ExportButtonText = "Прервать",
+        ProgressText = "Экспорт данных...",
+        ProgressValue = 0,
+        InventorUIDisabled = true
+    };
+}
+
+// Контекст для экспорта
+public class ExportContext
+{
+    public string TargetDirectory { get; set; } = "";
+    public int Multiplier { get; set; } = 1;
+    public Dictionary<string, int> SheetMetalParts { get; set; } = new();
+    public bool GenerateThumbnails { get; set; } = true;
+    public bool IsValid { get; set; } = true;
+    public string ErrorMessage { get; set; } = "";
+}
+
+// Результат операции
+public class OperationResult
+{
+    public int ProcessedCount { get; set; }
+    public int SkippedCount { get; set; }
+    public TimeSpan ElapsedTime { get; set; }
+    public bool WasCancelled { get; set; }
+    public List<string> Errors { get; set; } = new();
+    public bool IsSuccess => !WasCancelled && Errors.Count == 0;
+}
+
+// Результат валидации документа
+public class DocumentValidationResult
+{
+    public Document? Document { get; set; }
+    public DocumentType DocType { get; set; }
+    public bool IsValid { get; set; }
+    public string ErrorMessage { get; set; } = "";
+    public string DocumentTypeName { get; set; } = "";
+}

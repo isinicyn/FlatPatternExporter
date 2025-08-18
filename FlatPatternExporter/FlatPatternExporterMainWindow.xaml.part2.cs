@@ -230,7 +230,7 @@ public partial class FlatPatternExporterMainWindow : Window
         return fullFileName;
     }
 
-    private void ProcessComponentOccurrences(ComponentOccurrences occurrences, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null)
+    private void ProcessComponentOccurrences(ComponentOccurrences occurrences, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null, CancellationToken cancellationToken = default)
     {
         // Предварительно считаем только компоненты, которые пройдут фильтрацию
         var filteredOccurrences = new List<ComponentOccurrence>();
@@ -258,7 +258,7 @@ public partial class FlatPatternExporterMainWindow : Window
 
         foreach (ComponentOccurrence occ in filteredOccurrences)
         {
-            if (_isCancelled) break;
+            cancellationToken.ThrowIfCancellationRequested();
 
             try
             {
@@ -284,7 +284,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 }
                 else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
                 {
-                    ProcessComponentOccurrences((ComponentOccurrences)occ.SubOccurrences, sheetMetalParts); // Рекурсивный вызов без прогресса
+                    ProcessComponentOccurrences((ComponentOccurrences)occ.SubOccurrences, sheetMetalParts, cancellationToken: cancellationToken); // Рекурсивный вызов без прогресса
                 }
                 
                 // Обновляем прогресс
@@ -314,7 +314,7 @@ public partial class FlatPatternExporterMainWindow : Window
             }
         }
     }
-    private void ProcessBOM(BOM bom, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null)
+    private void ProcessBOM(BOM bom, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -328,7 +328,7 @@ public partial class FlatPatternExporterMainWindow : Window
 
             foreach (var (row, parentQuantity) in allBomRows)
             {
-                if (_isCancelled) break;
+                cancellationToken.ThrowIfCancellationRequested();
 
                 try
                 {
@@ -530,6 +530,72 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
+/// <summary>
+/// Централизованная подготовка контекста экспорта
+/// </summary>
+private async Task<ExportContext> PrepareExportContextAsync(Document document, bool requireScan = true)
+{
+    var context = new ExportContext();
+    
+    try
+    {
+        // Проверяем документ на валидность
+        if (requireScan && document != _lastScannedDocument)
+        {
+            context.IsValid = false;
+            context.ErrorMessage = "Активный документ изменился. Пожалуйста, повторите сканирование перед экспортом.";
+            return context;
+        }
+
+        // Подготавливаем папку экспорта
+        if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch))
+        {
+            context.IsValid = false;
+            context.ErrorMessage = "Ошибка при подготовке параметров экспорта";
+            return context;
+        }
+
+        context.TargetDirectory = targetDir;
+        context.Multiplier = multiplier;
+
+        // Сканируем документ для получения данных
+        var sheetMetalParts = new Dictionary<string, int>();
+
+        if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+        {
+            var asmDoc = (AssemblyDocument)document;
+            _partNumberTracker.Clear();
+            
+            if (SelectedProcessingMethod == ProcessingMethod.Traverse)
+                await Task.Run(() => ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
+            else if (SelectedProcessingMethod == ProcessingMethod.BOM)
+                await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
+
+            FilterConflictingParts(sheetMetalParts);
+        }
+        else if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
+        {
+            var partDoc = (PartDocument)document;
+            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+            {
+                var mgr = new PropertyManager((Document)partDoc);
+                var partNumber = mgr.GetMappedProperty("PartNumber");
+                sheetMetalParts.Add(partNumber, 1);
+            }
+        }
+
+        context.SheetMetalParts = sheetMetalParts;
+        context.IsValid = true;
+    }
+    catch (Exception ex)
+    {
+        context.IsValid = false;
+        context.ErrorMessage = $"Ошибка при подготовке экспорта: {ex.Message}";
+    }
+
+    return context;
+}
+
 private bool PrepareForExport(out string targetDir, out int multiplier, out Stopwatch stopwatch)
 {
     stopwatch = new Stopwatch();
@@ -596,7 +662,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         return false;
     }
 
-    _isCancelled = false;
 
     ExportProgressValue = 0;
     ProgressLabel.Text = "Экспорт данных...";
@@ -633,108 +698,78 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
     }
 
+    private List<PartData> CreatePartDataListFromParts(Dictionary<string, int> parts, int multiplier)
+    {
+        return parts.Select(part => new PartData
+        {
+            PartNumber = part.Key,
+            OriginalQuantity = part.Value,
+            Quantity = part.Value * multiplier
+        }).ToList();
+    }
+
     private async Task ExportWithoutScan()
     {
         // Очистка таблицы перед началом скрытого экспорта
         ClearList_Click(this, null!);
 
-        if (!EnsureInventorConnection())
+        // Валидация документа
+        var validation = ValidateActiveDocument();
+        if (!validation.IsValid)
         {
+            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
-        Document? doc = _thisApplication?.ActiveDocument;
-        if (doc == null)
+        // Подготовка контекста экспорта (без требования предварительного сканирования)
+        var context = await PrepareExportContextAsync(validation.Document!, requireScan: false);
+        if (!context.IsValid)
         {
-            MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
-        var documentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" :
-                          doc.DocumentType == DocumentTypeEnum.kPartDocumentObject ? "Деталь" : null;
-        
-        if (documentType == null)
-        {
-            MessageBox.Show("Откройте сборку или деталь для экспорта.", "Ошибка", MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-            return;
-        }
-
-        if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch)) return;
-
-        ClearButton.IsEnabled = false;
-        ScanButton.IsEnabled = false;
-        ExportButton.Content = "Прервать";
-        ExportButton.IsEnabled = true; // Принудительно активируем для режима Ctrl
+        // Настройка UI для быстрого экспорта
+        var exportState = UIState.Exporting;
+        exportState.ExportEnabled = true; // Принудительно активируем для режима Ctrl
+        SetUIState(exportState);
         _isExporting = true;
+        _operationCts = new CancellationTokenSource();
 
-        var processedCount = 0;
-        var skippedCount = 0;
+        var stopwatch = Stopwatch.StartNew();
 
-        // Скрытое сканирование
-        var sheetMetalParts = new Dictionary<string, int>();
+        // Создаем временный список PartData для экспорта (без UI обновлений)
+        var tempPartsDataList = CreatePartDataListFromParts(context.SheetMetalParts, context.Multiplier);
 
-        if (doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+        // Выполнение экспорта через централизованную обработку ошибок
+        context.GenerateThumbnails = false;
+        var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
-            var asmDoc = (AssemblyDocument)doc;
-            _partNumberTracker.Clear(); // Очищаем трекер конфликтов
+            var processedCount = 0;
+            var skippedCount = 0;
+            await Task.Run(() => ExportDXF(tempPartsDataList, context.TargetDirectory, context.Multiplier, 
+                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts.Token), _operationCts.Token);
             
-            if (SelectedProcessingMethod == ProcessingMethod.Traverse)
-                await Task.Run(() =>
-                    ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
-            else if (SelectedProcessingMethod == ProcessingMethod.BOM)
-                await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
-
-            // Фильтруем конфликтные детали (данные уже собраны в _partNumberTracker)
-            FilterConflictingParts(sheetMetalParts);
-
-            // Создаем временный список PartData для экспорта
-            var tempPartsDataList = new List<PartData>();
-            foreach (var part in sheetMetalParts)
-                tempPartsDataList.Add(new PartData
-                {
-                    PartNumber = part.Key,
-                    OriginalQuantity = part.Value,
-                    Quantity = part.Value * multiplier
-                });
-
-            await Task.Run(() =>
-                ExportDXF(tempPartsDataList, targetDir, multiplier, ref processedCount, ref skippedCount,
-                    false)); // false - без генерации миниатюр
-        }
-        else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-        {
-            var partDoc = (PartDocument)doc;
-            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+            return new OperationResult
             {
-                var mgr = new PropertyManager((Document)partDoc);
-                var partNumber = mgr.GetMappedProperty("PartNumber");
-                var tempPartData = new List<PartData>
-                {
-                    new()
-                    {
-                        PartNumber = partNumber,
-                        OriginalQuantity = 1,
-                        Quantity = multiplier
-                    }
-                };
-                await Task.Run(() =>
-                    ExportDXF(tempPartData, targetDir, multiplier, ref processedCount, ref skippedCount,
-                        false)); // false - без генерации миниатюр
-            }
-            else
-            {
-                MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
-        }
+                ProcessedCount = processedCount,
+                SkippedCount = skippedCount,
+                ElapsedTime = stopwatch.Elapsed,
+                WasCancelled = _operationCts.Token.IsCancellationRequested
+            };
+        }, "быстрого экспорта");
 
-        // Здесь мы НЕ обновляем fileCountLabelBottom
-        FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
+        // Завершение операции
+        _isExporting = false;
 
-        // Деактивируем кнопку "Экспорт" после завершения скрытого экспорта
+        // Используем единообразный подход для завершения операции
+        SetUIStateAfterOperation(result, OperationType.Export);
+        
+        // Дополнительно отключаем кнопку экспорта для быстрого режима
         ExportButton.IsEnabled = false;
+        
+        // Показ результата быстрого экспорта
+        ShowOperationResult(result, OperationType.Export, isQuickMode: true);
     }
 
 
@@ -743,74 +778,68 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         // Если экспорт уже идет, выполняем прерывание
         if (_isExporting)
         {
-            _isCancelled = true;
-            ExportButton.Content = "Прерывание...";
-            ExportButton.IsEnabled = false;
+            _operationCts?.Cancel();
+            SetUIState(new UIState { ExportEnabled = false, ExportButtonText = "Прерывание..." });
             return;
         }
 
+        // Режим быстрого экспорта с Ctrl
         if (_isCtrlPressed)
         {
             await ExportWithoutScan();
             return;
         }
 
-        if (!EnsureInventorConnection())
+        // Валидация документа
+        var validation = ValidateActiveDocument();
+        if (!validation.IsValid)
         {
+            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
-        Document? doc = _thisApplication?.ActiveDocument;
-        if (doc == null)
+        // Подготовка контекста экспорта
+        var context = await PrepareExportContextAsync(validation.Document!, requireScan: true);
+        if (!context.IsValid)
         {
-            MessageBox.Show("Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова.", "Ошибка",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (context.ErrorMessage.Contains("сканирование"))
+                MultiplierTextBox.Text = "1";
             return;
         }
 
-        if (doc != _lastScannedDocument)
-        {
-            MessageBox.Show("Активный документ изменился. Пожалуйста, повторите сканирование перед экспортом.",
-                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            MultiplierTextBox.Text = "1";
-            return;
-        }
-
-        if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch))
-        {
-            return;
-        }
-
-        SetInventorUserInterfaceState(true);
-
-        ClearButton.IsEnabled = false;
-        ScanButton.IsEnabled = false;
-        ExportButton.Content = "Прервать";
+        // Настройка UI для экспорта
+        SetUIState(UIState.Exporting);
         _isExporting = true;
+        _operationCts = new CancellationTokenSource();
 
-        if (doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+        var stopwatch = Stopwatch.StartNew();
+
+        // Выполнение экспорта через централизованную обработку ошибок
+        var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.PartNumber)).ToList();
+        var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
-            var asmDoc = (AssemblyDocument)doc;
-            var sheetMetalParts = new Dictionary<string, int>();
-            if (SelectedProcessingMethod == ProcessingMethod.Traverse)
-                await Task.Run(() =>
-                    ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
-            else if (SelectedProcessingMethod == ProcessingMethod.BOM)
-                await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
+            var processedCount = 0;
+            var skippedCount = 0;
+            await Task.Run(() => ExportDXF(partsDataList, context.TargetDirectory, context.Multiplier, 
+                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts.Token), _operationCts.Token);
+            
+            return new OperationResult
+            {
+                ProcessedCount = processedCount,
+                SkippedCount = skippedCount,
+                ElapsedTime = stopwatch.Elapsed,
+                WasCancelled = _operationCts.Token.IsCancellationRequested
+            };
+        }, "экспорта");
 
-            await ExportDXFFiles(sheetMetalParts, targetDir, multiplier, stopwatch);
-        }
-        else if (doc.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-        {
-            var partDoc = (PartDocument)doc;
-            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
-                await ExportSinglePartDXF(partDoc, targetDir, multiplier, stopwatch);
-            else
-                MessageBox.Show("Активный документ не является листовым металлом.", "Ошибка", MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-        }
+        // Завершение операции
+        _isExporting = false;
 
-        SetInventorUserInterfaceState(false);
+        SetUIStateAfterOperation(result, OperationType.Export);
+        
+        // Показ результата
+        ShowOperationResult(result, OperationType.Export);
     }
 
     private string GetElapsedTime(TimeSpan timeSpan)
@@ -850,16 +879,24 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         var processedCount = 0;
         var skippedCount = itemsWithoutFlatPattern.Count;
 
-        await Task.Run(() =>
+        _operationCts = new CancellationTokenSource();
+        try
         {
-            ExportDXF(selectedItems, targetDir, multiplier, ref processedCount, ref skippedCount,
-                true); // true - с генерацией миниатюр
-        });
+            await Task.Run(() =>
+            {
+                ExportDXF(selectedItems, targetDir, multiplier, ref processedCount, ref skippedCount,
+                    true, _operationCts.Token); // true - с генерацией миниатюр
+            }, _operationCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Операция была отменена - это нормальное поведение
+        }
 
 
         ClearButton.IsEnabled = true; // Активируем кнопку "Очистить" после завершения экспорта
         ScanButton.IsEnabled = true; // Активируем кнопку "Сканировать" после завершения экспорта
-        FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
+        FinalizeExport(_operationCts?.Token.IsCancellationRequested ?? false, stopwatch, processedCount, skippedCount);
     }
 
     private void OverrideQuantity_Click(object sender, RoutedEventArgs e)
@@ -883,7 +920,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     }
 
     private void ExportDXF(IEnumerable<PartData> partsDataList, string targetDir, int multiplier,
-        ref int processedCount, ref int skippedCount, bool generateThumbnails)
+        ref int processedCount, ref int skippedCount, bool generateThumbnails, CancellationToken cancellationToken = default)
     {
         var organizeByMaterial = false;
         var organizeByThickness = false;
@@ -904,7 +941,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         foreach (var partData in partsDataList)
         {
-            if (_isCancelled) break;
+            cancellationToken.ThrowIfCancellationRequested();
 
             var partNumber = partData.PartNumber;
             var qty = partData.IsOverridden ? partData.Quantity : partData.OriginalQuantity * multiplier;
@@ -1022,8 +1059,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                             if (result == MessageBoxResult.Yes)
                             {
-                                _isCancelled = true; // Прерываем операцию
-                                break;
+                                throw new OperationCanceledException(); // Прерываем операцию
                             }
 
                             while (IsFileLocked(filePath))
@@ -1038,14 +1074,13 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                                 if (waitResult == MessageBoxResult.Cancel)
                                 {
-                                    _isCancelled = true; // Прерываем операцию
-                                    break;
+                                    throw new OperationCanceledException(); // Прерываем операцию
                                 }
 
                                 Thread.Sleep(1000); // Ожидание 1 секунды перед повторной проверкой
                             }
 
-                            if (_isCancelled) break;
+                            cancellationToken.ThrowIfCancellationRequested();
                         }
 
                         oDataIO.WriteDataToFile(dxfOptions, filePath);
@@ -1134,40 +1169,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         return false;
     }
 
-    private async Task ExportDXFFiles(Dictionary<string, int> sheetMetalParts, string targetDir, int multiplier,
-        Stopwatch stopwatch)
-    {
-        var processedCount = 0;
-        var skippedCount = 0;
-
-        var partsDataList = _partsData.Where(p => sheetMetalParts.ContainsKey(p.PartNumber)).ToList();
-        await Task.Run(
-            () => ExportDXF(partsDataList, targetDir, multiplier, ref processedCount, ref skippedCount,
-                true)); // true - с генерацией миниатюр
-
-        FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
-    }
-
-    private async Task ExportSinglePartDXF(PartDocument partDoc, string targetDir, int multiplier, Stopwatch stopwatch)
-    {
-        var processedCount = 0;
-        var skippedCount = 0;
-
-        var mgr = new PropertyManager((Document)partDoc);
-        var partNumber = mgr.GetMappedProperty("PartNumber");
-        var partData = _partsData.FirstOrDefault(p => p.PartNumber == partNumber);
-
-        if (partData != null)
-        {
-            var partsDataList = new List<PartData> { partData };
-            await Task.Run(() =>
-                ExportDXF(partsDataList, targetDir, multiplier, ref processedCount, ref skippedCount,
-                    true)); // true - с генерацией миниатюр
-        }
-
-        FinalizeExport(_isCancelled, stopwatch, processedCount, skippedCount);
-    }
-
     private PartDocument? OpenPartDocument(string partNumber)
     {
         var docs = _thisApplication?.Documents;
@@ -1188,8 +1189,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         return null; // Возвращаем null, если документ не найден
     }
 
-
-
     private bool IsValidPath(string path)
     {
         try
@@ -1202,8 +1201,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return false;
         }
     }
-
-
     private void MultiplierTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
@@ -1233,15 +1230,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         // Выключаем кнопку сброса
         ClearMultiplierButton.IsEnabled = false;
     }
-
-
-
-    private void ResetProgressBar()
-    {
-        ScanProgressValue = 0;
-        ProgressLabel.Text = "";
-    }
-
 
     private void UpdateDocumentInfo(string documentType, Document? doc)
     {
