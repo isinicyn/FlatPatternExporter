@@ -1522,7 +1522,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (_isScanning)
         {
             _operationCts?.Cancel();
-            SetUIState(new UIState { ScanEnabled = false, ScanButtonText = "Прерывание..." });
+            SetUIState(new UIState { ScanEnabled = false, ScanButtonText = UIState.CANCELLING_TEXT });
             return;
         }
 
@@ -2174,6 +2174,11 @@ public enum OperationType
 // Класс для управления состоянием UI
 public class UIState
 {
+    private const string SCAN_BUTTON_TEXT = "Сканировать";
+    private const string CANCEL_BUTTON_TEXT = "Прервать";
+    private const string EXPORT_BUTTON_TEXT = "Экспорт";
+    public const string CANCELLING_TEXT = "Прерывание...";
+    
     public bool ScanEnabled { get; set; }
     public bool ExportEnabled { get; set; }
     public bool ClearEnabled { get; set; }
@@ -2190,8 +2195,8 @@ public class UIState
         ScanEnabled = true,
         ExportEnabled = false,
         ClearEnabled = false,
-        ScanButtonText = "Сканировать",
-        ExportButtonText = "Экспорт",
+        ScanButtonText = SCAN_BUTTON_TEXT,
+        ExportButtonText = EXPORT_BUTTON_TEXT,
         ProgressText = "Документ не выбран",
         ProgressValue = 0,
         InventorUIDisabled = false,
@@ -2204,8 +2209,8 @@ public class UIState
         ScanEnabled = true,
         ExportEnabled = false,
         ClearEnabled = false,
-        ScanButtonText = "Прервать",
-        ExportButtonText = "Экспорт",
+        ScanButtonText = CANCEL_BUTTON_TEXT,
+        ExportButtonText = EXPORT_BUTTON_TEXT,
         ProgressText = "Подготовка к сканированию...",
         ProgressValue = 0,
         InventorUIDisabled = true,
@@ -2218,8 +2223,8 @@ public class UIState
         ScanEnabled = false,
         ExportEnabled = true,
         ClearEnabled = false,
-        ScanButtonText = "Сканировать",
-        ExportButtonText = "Прервать",
+        ScanButtonText = SCAN_BUTTON_TEXT,
+        ExportButtonText = CANCEL_BUTTON_TEXT,
         ProgressText = "Экспорт данных...",
         ProgressValue = 0,
         InventorUIDisabled = true,
@@ -2232,8 +2237,8 @@ public class UIState
         ScanEnabled = true,
         ExportEnabled = false,
         ClearEnabled = false,
-        ScanButtonText = "Сканировать",
-        ExportButtonText = "Экспорт",
+        ScanButtonText = SCAN_BUTTON_TEXT,
+        ExportButtonText = EXPORT_BUTTON_TEXT,
         ProgressText = "",
         ProgressValue = 0,
         InventorUIDisabled = false,
@@ -2246,8 +2251,8 @@ public class UIState
         ScanEnabled = true,
         ExportEnabled = hasData && !wasCancelled,
         ClearEnabled = hasData,
-        ScanButtonText = "Сканировать",
-        ExportButtonText = "Экспорт",
+        ScanButtonText = SCAN_BUTTON_TEXT,
+        ExportButtonText = EXPORT_BUTTON_TEXT,
         ProgressText = statusText,
         ProgressValue = 0,
         InventorUIDisabled = false,
