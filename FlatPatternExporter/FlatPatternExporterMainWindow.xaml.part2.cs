@@ -761,6 +761,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     private async void ExportButton_Click(object sender, RoutedEventArgs e)
     {
+        // Переносим фокус на кнопку сканирования, чтобы убрать выделение с кнопки экспорта
+        ScanButton.Focus();
+        
         // Если экспорт уже идет, выполняем прерывание
         if (_isExporting)
         {
