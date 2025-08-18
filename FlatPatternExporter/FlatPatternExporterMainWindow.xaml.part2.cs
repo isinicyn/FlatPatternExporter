@@ -721,9 +721,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
 
         // Настройка UI для быстрого экспорта
-        var exportState = UIState.Exporting;
-        exportState.ExportEnabled = true; // Принудительно активируем для режима Ctrl
-        SetUIState(exportState);
+        SetUIState(UIState.Exporting);
         _isExporting = true;
         _operationCts = new CancellationTokenSource();
 
