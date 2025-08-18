@@ -186,7 +186,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         InitializeInventor();
         InitializeProjectFolder(); // Инициализация папки проекта при запуске
         PartsDataGrid.ItemsSource = _partsData;
-        ClearButton.IsEnabled = false;
         PartsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
         PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
@@ -239,7 +238,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         KeyDown += MainWindow_KeyDown;
         KeyUp += MainWindow_KeyUp;
 
-        ProgressLabel.Text = "Документ не выбран";
+        SetUIState(UIState.Initial);
         
         // Загружаем настройки при запуске
         LoadSettings();
@@ -604,8 +603,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         
         if (state.ProgressValue >= 0)
         {
-            ScanProgressValue = state.ProgressValue;
-            ExportProgressValue = state.ProgressValue;
+            if (state.UpdateScanProgress)
+                ScanProgressValue = state.ProgressValue;
+            if (state.UpdateExportProgress)
+                ExportProgressValue = state.ProgressValue;
         }
         
         SetInventorUserInterfaceState(state.InventorUIDisabled);
@@ -616,22 +617,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// </summary>
     private void SetUIStateAfterOperation(OperationResult result, OperationType operationType)
     {
-        var baseState = operationType == OperationType.Scan ? UIState.Initial : UIState.Initial;
-        
-        baseState.ExportEnabled = _partsData.Count > 0 && !result.WasCancelled;
-        baseState.ClearEnabled = _partsData.Count > 0;
-        
         var statusText = result.WasCancelled 
             ? $"Прервано ({GetElapsedTime(result.ElapsedTime)})"
             : operationType == OperationType.Scan
                 ? $"Найдено листовых деталей: {result.ProcessedCount} ({GetElapsedTime(result.ElapsedTime)})"
                 : $"Завершено ({GetElapsedTime(result.ElapsedTime)})";
         
-        baseState.ProgressText = statusText;
-        baseState.ProgressValue = 0;
-        baseState.InventorUIDisabled = false;
-        
-        SetUIState(baseState);
+        var state = UIState.CreateAfterOperationState(_partsData.Count > 0, result.WasCancelled, statusText);
+        SetUIState(state);
     }
 
     /// <summary>
@@ -1247,10 +1240,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
         {
             _isCtrlPressed = true;
-            if (!_isExporting && !_isScanning)
-            {
-                ExportButton.IsEnabled = true;
-            }
+            UpdateUIForCtrlState();
         }
     }
 
@@ -1259,11 +1249,30 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
         {
             _isCtrlPressed = false;
-            if (!_isExporting && !_isScanning)
-            {
-                ExportButton.IsEnabled = _partsData.Count > 0;
-            }
+            UpdateUIForCtrlState();
         }
+    }
+
+    private void UpdateUIForCtrlState()
+    {
+        if (!_isExporting && !_isScanning)
+        {
+            var currentState = UIState.CreateAfterOperationState(_partsData.Count > 0, false, ProgressLabel.Text);
+            currentState.ExportEnabled = _isCtrlPressed || _partsData.Count > 0;
+            SetUIState(currentState);
+        }
+    }
+
+    /// <summary>
+    /// Обновление прогресса экспорта через централизованную систему UI
+    /// </summary>
+    private void UpdateExportProgress(double progressValue)
+    {
+        var progressState = UIState.Exporting;
+        progressState.ProgressValue = progressValue;
+        progressState.UpdateExportProgress = true;
+        progressState.UpdateScanProgress = false;
+        SetUIState(progressState);
     }
 
 
@@ -1395,7 +1404,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 {
                     await Dispatcher.InvokeAsync(() =>
                     {
-                        ProgressLabel.Text = "Анализ конфликтов обозначений...";
+                        var analysisState = UIState.Scanning;
+                        analysisState.ProgressText = "Анализ конфликтов обозначений...";
+                        SetUIState(analysisState);
                     });
                 }
                 
@@ -1409,8 +1420,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     // Переключаем прогресс на обработку деталей
                     await Dispatcher.InvokeAsync(() =>
                     {
-                        ScanProgressValue = 0;
-                        ProgressLabel.Text = "Обработка деталей...";
+                        var processingState = UIState.Scanning;
+                        processingState.ProgressText = "Обработка деталей...";
+                        processingState.ProgressValue = 0;
+                        SetUIState(processingState);
                     });
 
                     var itemCounter = 1;
@@ -1439,8 +1452,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                             processedParts++;
                             await Dispatcher.InvokeAsync(() =>
                             {
-                                ScanProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
-                                ProgressLabel.Text = $"Обработка деталей - {processedParts} из {totalParts}";
+                                var progressState = UIState.Scanning;
+                                progressState.ProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
+                                progressState.ProgressText = $"Обработка деталей - {processedParts} из {totalParts}";
+                                SetUIState(progressState);
                             });
                         }
                     }, cancellationToken);
@@ -1528,8 +1543,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Прогресс для сканирования структуры сборки
         var scanProgress = new Progress<ScanProgress>(progress =>
         {
-            ScanProgressValue = progress.TotalItems > 0 ? (double)progress.ProcessedItems / progress.TotalItems * 100 : 0;
-            ProgressLabel.Text = $"{progress.CurrentOperation} - {progress.CurrentItem}";
+            var progressState = UIState.Scanning;
+            progressState.ProgressValue = progress.TotalItems > 0 ? (double)progress.ProcessedItems / progress.TotalItems * 100 : 0;
+            progressState.ProgressText = $"{progress.CurrentOperation} - {progress.CurrentItem}";
+            SetUIState(progressState);
         });
 
         // Выполнение сканирования
@@ -1680,12 +1697,18 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (partDoc.SubType == PropertyManager.SheetMetalSubType)
         {
-            ProgressLabel.Text = "Обработка детали...";
+            var processingState = UIState.Scanning;
+            processingState.ProgressText = "Обработка детали...";
+            SetUIState(processingState);
+            
             var partData = await GetPartDataAsync(partDoc, 1, 1);
             if (partData != null)
             {
                 ((IProgress<PartData>)partProgress).Report(partData);
-                ScanProgressValue = 100;
+                
+                var completedState = UIState.Scanning;
+                completedState.ProgressValue = 100;
+                SetUIState(completedState);
                 return 1; // Успешно обработана 1 деталь
             }
         }
@@ -2159,6 +2182,8 @@ public class UIState
     public string ProgressText { get; set; } = "";
     public double ProgressValue { get; set; }
     public bool InventorUIDisabled { get; set; }
+    public bool UpdateScanProgress { get; set; } = true;
+    public bool UpdateExportProgress { get; set; } = true;
     
     public static UIState Initial => new()
     {
@@ -2169,7 +2194,9 @@ public class UIState
         ExportButtonText = "Экспорт",
         ProgressText = "Документ не выбран",
         ProgressValue = 0,
-        InventorUIDisabled = false
+        InventorUIDisabled = false,
+        UpdateScanProgress = true,
+        UpdateExportProgress = true
     };
     
     public static UIState Scanning => new()
@@ -2181,7 +2208,9 @@ public class UIState
         ExportButtonText = "Экспорт",
         ProgressText = "Подготовка к сканированию...",
         ProgressValue = 0,
-        InventorUIDisabled = true
+        InventorUIDisabled = true,
+        UpdateScanProgress = true,
+        UpdateExportProgress = false
     };
     
     public static UIState Exporting => new()
@@ -2193,7 +2222,37 @@ public class UIState
         ExportButtonText = "Прервать",
         ProgressText = "Экспорт данных...",
         ProgressValue = 0,
-        InventorUIDisabled = true
+        InventorUIDisabled = true,
+        UpdateScanProgress = false,
+        UpdateExportProgress = true
+    };
+    
+    public static UIState CreateClearedState() => new()
+    {
+        ScanEnabled = true,
+        ExportEnabled = false,
+        ClearEnabled = false,
+        ScanButtonText = "Сканировать",
+        ExportButtonText = "Экспорт",
+        ProgressText = "",
+        ProgressValue = 0,
+        InventorUIDisabled = false,
+        UpdateScanProgress = true,
+        UpdateExportProgress = false
+    };
+    
+    public static UIState CreateAfterOperationState(bool hasData, bool wasCancelled, string statusText) => new()
+    {
+        ScanEnabled = true,
+        ExportEnabled = hasData && !wasCancelled,
+        ClearEnabled = hasData,
+        ScanButtonText = "Сканировать",
+        ExportButtonText = "Экспорт",
+        ProgressText = statusText,
+        ProgressValue = 0,
+        InventorUIDisabled = false,
+        UpdateScanProgress = true,
+        UpdateExportProgress = true
     };
 }
 

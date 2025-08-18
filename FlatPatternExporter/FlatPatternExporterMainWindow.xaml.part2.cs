@@ -533,7 +533,7 @@ public partial class FlatPatternExporterMainWindow : Window
 /// <summary>
 /// Централизованная подготовка контекста экспорта
 /// </summary>
-private async Task<ExportContext> PrepareExportContextAsync(Document document, bool requireScan = true)
+private async Task<ExportContext> PrepareExportContextAsync(Document document, bool requireScan = true, bool showProgress = false)
 {
     var context = new ExportContext();
     
@@ -567,9 +567,9 @@ private async Task<ExportContext> PrepareExportContextAsync(Document document, b
             _partNumberTracker.Clear();
             
             if (SelectedProcessingMethod == ProcessingMethod.Traverse)
-                await Task.Run(() => ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts));
+                await Task.Run(() => ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, showProgress ? null : null));
             else if (SelectedProcessingMethod == ProcessingMethod.BOM)
-                await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts));
+                await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, showProgress ? null : null));
 
             FilterConflictingParts(sheetMetalParts);
         }
@@ -663,8 +663,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     }
 
 
-    ExportProgressValue = 0;
-    ProgressLabel.Text = "Экспорт данных...";
+    SetUIState(UIState.Exporting);
 
     stopwatch = Stopwatch.StartNew();
 
@@ -677,25 +676,17 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         var elapsedTime = GetElapsedTime(stopwatch.Elapsed);
 
         _isExporting = false;
-        ExportProgressValue = 0;
-        ExportButton.Content = "Экспорт";
-        ExportButton.IsEnabled = true;
-        ScanButton.IsEnabled = true;
-        ClearButton.IsEnabled = _partsData.Count > 0;
+        
+        var result = new OperationResult
+        {
+            ProcessedCount = processedCount,
+            SkippedCount = skippedCount,
+            ElapsedTime = stopwatch.Elapsed,
+            WasCancelled = isCancelled
+        };
 
-        if (isCancelled)
-        {
-            ProgressLabel.Text = $"Прервано ({elapsedTime})";
-            MessageBox.Show("Процесс экспорта был прерван.", "Информация", MessageBoxButton.OK,
-                MessageBoxImage.Information);
-        }
-        else
-        {
-            ProgressLabel.Text = $"Завершено ({elapsedTime})";
-            MessageBox.Show(
-                $"Экспорт DXF завершен.\nВсего файлов обработано: {processedCount + skippedCount}\nПропущено (без разверток): {skippedCount}\nВсего экспортировано: {processedCount}\nВремя выполнения: {elapsedTime}",
-                "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        SetUIStateAfterOperation(result, OperationType.Export);
+        ShowOperationResult(result, OperationType.Export);
     }
 
     private List<PartData> CreatePartDataListFromParts(Dictionary<string, int> parts, int multiplier)
@@ -721,8 +712,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             return;
         }
 
-        // Подготовка контекста экспорта (без требования предварительного сканирования)
-        var context = await PrepareExportContextAsync(validation.Document!, requireScan: false);
+        // Подготовка контекста экспорта (без требования предварительного сканирования и без отображения прогресса)
+        var context = await PrepareExportContextAsync(validation.Document!, requireScan: false, showProgress: false);
         if (!context.IsValid)
         {
             MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -762,14 +753,11 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         // Завершение операции
         _isExporting = false;
 
+        // Показ результата быстрого экспорта до установки состояния UI
+        ShowOperationResult(result, OperationType.Export, isQuickMode: true);
+        
         // Используем единообразный подход для завершения операции
         SetUIStateAfterOperation(result, OperationType.Export);
-        
-        // Дополнительно отключаем кнопку экспорта для быстрого режима
-        ExportButton.IsEnabled = false;
-        
-        // Показ результата быстрого экспорта
-        ShowOperationResult(result, OperationType.Export, isQuickMode: true);
     }
 
 
@@ -799,7 +787,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
 
         // Подготовка контекста экспорта
-        var context = await PrepareExportContextAsync(validation.Document!, requireScan: true);
+        var context = await PrepareExportContextAsync(validation.Document!, requireScan: true, showProgress: true);
         if (!context.IsValid)
         {
             MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -873,8 +861,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch)) return;
 
-        ClearButton.IsEnabled = false; // Деактивируем кнопку "Очистить" в процессе экспорта
-        ScanButton.IsEnabled = false; // Деактивируем кнопку "Сканировать" в процессе экспорта
 
         var processedCount = 0;
         var skippedCount = itemsWithoutFlatPattern.Count;
@@ -894,8 +880,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
 
 
-        ClearButton.IsEnabled = true; // Активируем кнопку "Очистить" после завершения экспорта
-        ScanButton.IsEnabled = true; // Активируем кнопку "Сканировать" после завершения экспорта
         FinalizeExport(_operationCts?.Token.IsCancellationRequested ?? false, stopwatch, processedCount, skippedCount);
     }
 
@@ -933,7 +917,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         Dispatcher.Invoke(() =>
         {
-            ExportProgressValue = 0; // Сбрасываем прогресс перед началом
+            UpdateExportProgress(0);
         });
 
         var localProcessedCount = processedCount;
@@ -1133,7 +1117,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
                 Dispatcher.Invoke(() => 
                 { 
-                    ExportProgressValue = totalParts > 0 ? (double)localProcessedCount / totalParts * 100 : 0;
+                    UpdateExportProgress(totalParts > 0 ? (double)localProcessedCount / totalParts * 100 : 0);
                 });
             }
             catch (Exception ex)
@@ -1148,7 +1132,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         Dispatcher.Invoke(() =>
         {
-            ExportProgressValue = 100; // Установка значения 100% по завершению
+            UpdateExportProgress(100);
         });
     }
 
@@ -1235,7 +1219,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         if (string.IsNullOrEmpty(documentType) || doc == null)
         {
-            ProgressLabel.Text = "Информация о документе не доступна";
+            var noDocState = UIState.Initial;
+            noDocState.ProgressText = "Информация о документе не доступна";
+            SetUIState(noDocState);
             DocumentTypeLabel.Text = "";
             PartNumberLabel.Text = "";
             DescriptionLabel.Text = "";
@@ -1265,10 +1251,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     {
         // Очищаем данные в таблице или любом другом источнике данных
         _partsData.Clear();
-        ScanProgressValue = 0;
-        ProgressLabel.Text = "";
-        ExportButton.IsEnabled = false;
-        ClearButton.IsEnabled = false; // Делаем кнопку "Очистить" неактивной после очистки
+        SetUIState(UIState.CreateClearedState());
 
         // Обнуляем информацию о документе
         UpdateDocumentInfo("", null);
@@ -1300,7 +1283,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             }
             else
             {
-                ProgressLabel.Text = $"Удалено {selectedItems.Count} строк(и)";
+                var deletionState = UIState.CreateAfterOperationState(_partsData.Count > 0, false, $"Удалено {selectedItems.Count} строк(и)");
+                SetUIState(deletionState);
             }
         }
     }
