@@ -114,6 +114,12 @@
         <Setter Property="Stretch" Value="Uniform"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsEnabled}" Value="False">
+                <Setter Property="Stroke" Value="{DynamicResource TextDisabledBrush}"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Стиль для элементов ListBox без стандартной подсветки -->
