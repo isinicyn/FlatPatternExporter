@@ -11,9 +11,6 @@
     WindowStartupLocation="CenterScreen"
     SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">
     <Window.Resources>
-        <!-- Стандартный конвертер для Boolean -> Visibility -->
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        
         <!-- CollectionViewSource для группировки по категориям -->
         <CollectionViewSource x:Key="GroupedProperties"
                               Source="{Binding AvailableProperties}">
@@ -98,15 +95,20 @@
                                 
                                 <Button Grid.Column="1"
                                         x:Name="RemovePropertyButton"
-                                        Style="{StaticResource ResetButtonStyle}"
                                         ToolTip="Удалить колонку"
                                         Margin="2,0"
                                         Click="RemovePropertyButton_Click"
                                         Tag="{Binding}">
-                                    <Button.Visibility>
-                                        <Binding Path="IsAdded" 
-                                                 Converter="{StaticResource BooleanToVisibilityConverter}"/>
-                                    </Button.Visibility>
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource ResetButtonStyle}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsAdded}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
                                 </Button>
                             </Grid>
                         </Border>
