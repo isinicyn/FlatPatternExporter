@@ -5,7 +5,7 @@
         PreviewMouseLeftButtonDown="MainWindow_PreviewMouseLeftButtonDown"
         Title="FPEx"
         MinHeight="600" MinWidth="1710"
-        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip">
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Width="1735">
 
 
     <Grid>
@@ -90,8 +90,10 @@
             </StackPanel>
         </Grid>
 
-        <!-- Строка 1: Вкладки настроек -->
-        <TabControl Grid.Row="1" Margin="10,10,10,10" SelectionChanged="TabControl_SelectionChanged">
+        <!-- Строка 1: Настройки -->
+        <Expander Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}" Header="Настройки" IsExpanded="False" FlowDirection="RightToLeft" 
+                  Style="{StaticResource SquareExpanderStyle}">
+            <TabControl SelectionChanged="TabControl_SelectionChanged" FlowDirection="LeftToRight">
             <TabItem Header="Основные">
                 <WrapPanel Orientation="Horizontal" Margin="10">
                     <GroupBox Header="Обработка компонентов" Margin="0,0,10,0">
@@ -456,7 +458,8 @@
                     </Grid>
                 </Grid>
             </TabItem>
-        </TabControl>
+            </TabControl>
+        </Expander>
 
         <!-- Строка 2: Панель поиска и множителя -->
         <Grid Grid.Row="2" Margin="10,0,10,10">
