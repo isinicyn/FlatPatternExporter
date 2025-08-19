@@ -39,7 +39,8 @@
                      SelectionMode="Single" 
                      MouseDoubleClick="iPropertyListBox_MouseDoubleClick"
                      Background="Transparent"
-                     BorderThickness="0.5,0.5,0.5,0" av:ItemsSource="{av:SampleData ItemCount=5}">
+                     BorderThickness="0.5,0.5,0.5,0" av:ItemsSource="{av:SampleData ItemCount=5}"
+                     ItemContainerStyle="{StaticResource CustomListBoxItemStyle}">
                 <ListBox.BorderBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
                 </ListBox.BorderBrush>
@@ -71,10 +72,12 @@
                 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="{StaticResource SelectionBackgroundBrush}" 
+                        <Border x:Name="ItemBorder"
+                                Background="{StaticResource SelectionBackgroundBrush}" 
                                 BorderBrush="{StaticResource BorderTertiaryBrush}" 
                                 BorderThickness="{StaticResource StandardBorderThicknessValue}"
                                 Padding="5,0,0,0"
+                                Margin="2"
                                 SnapsToDevicePixels="True" 
                                 Height="{StaticResource LargeElementHeight}" Width="200">
                             <Grid>
@@ -112,6 +115,13 @@
                                 </Button>
                             </Grid>
                         </Border>
+                        <DataTemplate.Triggers>
+                            <!-- Триггер для наведения мыши -->
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
