@@ -93,71 +93,71 @@
         <Expander x:Name="SettingsExpander" Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}" Header="Настройки" IsExpanded="False" FlowDirection="RightToLeft" 
                   Style="{StaticResource SquareExpanderStyle}">
             <TabControl SelectionChanged="TabControl_SelectionChanged" FlowDirection="LeftToRight">
-            <TabItem Header="Основные">
-                <WrapPanel Orientation="Horizontal" Margin="10">
-                    <GroupBox Header="Обработка компонентов" Margin="0,0,10,0">
-                        <Grid Margin="10,5,10,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            
-                            <!-- Метод сканирования -->
-                            <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <RadioButton x:Name="TraverseRadioButton" Content="По структуре сборки" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <RadioButton x:Name="BomRadioButton" Content="По спецификации" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,0,0,5"/>
-                            </StackPanel>
-                            
-                            <!-- Вертикальный разделитель -->
-                            <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5" UseLayoutRounding="True"/>
-                            
-                            <!-- Фильтрация компонентов -->
-                            <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <CheckBox x:Name="ExcludeReferencePartsCheckBox" Content="Исключить ссылочные" IsChecked="{Binding ExcludeReferenceParts, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="ExcludePurchasedPartsCheckBox" Content="Исключить покупные" IsChecked="{Binding ExcludePurchasedParts, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="ExcludePhantomPartsCheckBox" Content="Исключить фантомные" IsChecked="{Binding ExcludePhantomParts, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="IncludeLibraryComponentsCheckBox" Content="Включить библиотечные" IsChecked="{Binding IncludeLibraryComponents, Mode=TwoWay}" Margin="0,0,0,5"/>
-                            </StackPanel>
-                        </Grid>
-                    </GroupBox>
+                <TabItem Header="Основные">
+                    <WrapPanel Orientation="Horizontal" Margin="10">
+                        <GroupBox Header="Обработка компонентов" Margin="0,0,10,0">
+                            <Grid Margin="10,5,10,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                    <GroupBox Header="Настройки экспорта DXF" Margin="0,0,10,0">
-                        <Grid Margin="10,5,10,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            
-                            <!-- Настройки экспорта DXF -->
-                            <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Label Content="Версия AutoCAD:" VerticalAlignment="Center"/>
-                                    <ComboBox x:Name="AcadVersionComboBox" 
+                                <!-- Метод сканирования -->
+                                <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                    <RadioButton x:Name="TraverseRadioButton" Content="По структуре сборки" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <RadioButton x:Name="BomRadioButton" Content="По спецификации" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                </StackPanel>
+
+                                <!-- Вертикальный разделитель -->
+                                <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5" UseLayoutRounding="True"/>
+
+                                <!-- Фильтрация компонентов -->
+                                <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                    <CheckBox x:Name="ExcludeReferencePartsCheckBox" Content="Исключить ссылочные" IsChecked="{Binding ExcludeReferenceParts, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <CheckBox x:Name="ExcludePurchasedPartsCheckBox" Content="Исключить покупные" IsChecked="{Binding ExcludePurchasedParts, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <CheckBox x:Name="ExcludePhantomPartsCheckBox" Content="Исключить фантомные" IsChecked="{Binding ExcludePhantomParts, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <CheckBox x:Name="IncludeLibraryComponentsCheckBox" Content="Включить библиотечные" IsChecked="{Binding IncludeLibraryComponents, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox Header="Настройки экспорта DXF" Margin="0,0,10,0">
+                            <Grid Margin="10,5,10,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Настройки экспорта DXF -->
+                                <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                        <Label Content="Версия AutoCAD:" VerticalAlignment="Center"/>
+                                        <ComboBox x:Name="AcadVersionComboBox" 
                                                   Width="70" 
                                                   Style="{StaticResource BaseComboBoxStyle}"
                                                   ItemsSource="{Binding AcadVersions}"
                                                   DisplayMemberPath="DisplayName"
                                                   SelectedValuePath="Value"
                                                   SelectedIndex="{Binding SelectedAcadVersionIndex, Mode=TwoWay}"/>
+                                    </StackPanel>
+                                    <CheckBox x:Name="MergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" IsChecked="{Binding MergeProfilesIntoPolyline, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <CheckBox x:Name="RebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" IsChecked="{Binding RebaseGeometry, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <CheckBox x:Name="TrimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" IsChecked="{Binding TrimCenterlines, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <Separator Style="{StaticResource HorizontalSeparatorStyle}" SnapsToDevicePixels="True" Margin="0,0,0,5"/>
+                                    <CheckBox x:Name="OptimizeDxfCheckBox" Content="Оптимизация dxf" IsChecked="{Binding OptimizeDxf, Mode=TwoWay}" IsEnabled="{Binding IsOptimizeDxfEnabled}" Margin="0,0,0,5"/>
                                 </StackPanel>
-                                <CheckBox x:Name="MergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" IsChecked="{Binding MergeProfilesIntoPolyline, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="RebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" IsChecked="{Binding RebaseGeometry, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="TrimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" IsChecked="{Binding TrimCenterlines, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <Separator Style="{StaticResource HorizontalSeparatorStyle}" SnapsToDevicePixels="True" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="OptimizeDxfCheckBox" Content="Оптимизация dxf" IsChecked="{Binding OptimizeDxf, Mode=TwoWay}" IsEnabled="{Binding IsOptimizeDxfEnabled}" Margin="0,0,0,5"/>
-                            </StackPanel>
-                            
-                            <!-- Вертикальный разделитель -->
-                            <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5" UseLayoutRounding="True"/>
-                            
-                            <!-- Замена сплайнов -->
-                            <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <CheckBox x:Name="EnableSplineReplacementCheckBox" Content="Замена сплайнов" IsChecked="{Binding EnableSplineReplacement, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Label Content="Тип замены:" VerticalAlignment="Center" Padding="0,5,5,5"/>
-                                    <ComboBox x:Name="SplineReplacementComboBox" 
+
+                                <!-- Вертикальный разделитель -->
+                                <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,0,10,5" UseLayoutRounding="True"/>
+
+                                <!-- Замена сплайнов -->
+                                <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                    <CheckBox x:Name="EnableSplineReplacementCheckBox" Content="Замена сплайнов" IsChecked="{Binding EnableSplineReplacement, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                        <Label Content="Тип замены:" VerticalAlignment="Center" Padding="0,5,5,5"/>
+                                        <ComboBox x:Name="SplineReplacementComboBox" 
                                                   Width="65" 
                                                   IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" 
                                                   Style="{StaticResource BaseComboBoxStyle}" 
@@ -166,297 +166,297 @@
                                                   DisplayMemberPath="DisplayName"
                                                   SelectedValuePath="Index"
                                                   SelectedIndex="{Binding SelectedSplineReplacementIndex, Mode=TwoWay}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                        <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="0,5,5,5"/>
+                                        <TextBox x:Name="SplineToleranceTextBox" Width="65" Text="0.01" IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" Style="{StaticResource BaseTextBoxStyle}"/>
+                                    </StackPanel>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="0,5,5,5"/>
-                                    <TextBox x:Name="SplineToleranceTextBox" Width="65" Text="0.01" IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" Style="{StaticResource BaseTextBoxStyle}"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </GroupBox>
+                            </Grid>
+                        </GroupBox>
 
-                    <GroupBox Header="Размещение экспорта" Margin="0,0,10,0">
-                        <Grid Margin="10,5,10,0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Левая колонка -->
-                            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top">
-                                <RadioButton x:Name="ChooseFolderRadioButton" Content="Указать папку перед экспортом" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ChooseFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <RadioButton x:Name="ComponentFolderRadioButton" Content="Папка компонента" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ComponentFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <RadioButton x:Name="PartFolderRadioButton" Content="В папке детали" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=PartFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <RadioButton x:Name="ProjectFolderRadioButton" Content="Папка проекта" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ProjectFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <RadioButton x:Name="FixedFolderRadioButton" Content="Фиксированная папка" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=FixedFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
-                            </StackPanel>
-                            
-                            <!-- Вертикальный разделитель -->
-                            <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,5" UseLayoutRounding="True"/>
-                            
-                            <!-- Правая колонка -->
-                            <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Top">
-                                <CheckBox x:Name="EnableSubfolderCheckBox" Content="Создать подпапку" IsChecked="{Binding EnableSubfolder, Mode=TwoWay}" IsEnabled="{Binding IsSubfolderCheckBoxEnabled}" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="0,0,0,5"/>
-                                <TextBox x:Name="SubfolderNameTextBox" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Stretch" Background="{StaticResource BackgroundSecondaryBrush}" Margin="0,0,0,5" Style="{StaticResource BaseTextBoxStyle}"/>
-                                <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="Сортировать по материалу" IsChecked="{Binding OrganizeByMaterial, Mode=TwoWay}" Margin="0,0,0,5"/>
-                                <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="Сортировать по толщине" IsChecked="{Binding OrganizeByThickness, Mode=TwoWay}" Margin="0,0,0,5"/>
-                            </StackPanel>
-                            
-                            <!-- Элементы управления фиксированной папкой - отдельная строка -->
-                            <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,5">
+                        <GroupBox Header="Размещение экспорта" Margin="0,0,10,0">
+                            <Grid Margin="10,5,10,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Button x:Name="SelectFixedFolderButton" Grid.Column="0" Content="..." Width="30" Click="SelectFixedFolderButton_Click" Style="{StaticResource BaseButtonStyle}" Margin="2,0,10,0" />
-                                <Border Grid.Column="1" Background="{StaticResource BackgroundSecondaryBrush}" 
+
+                                <!-- Левая колонка -->
+                                <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top">
+                                    <RadioButton x:Name="ChooseFolderRadioButton" Content="Указать папку перед экспортом" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ChooseFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <RadioButton x:Name="ComponentFolderRadioButton" Content="Папка компонента" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ComponentFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <RadioButton x:Name="PartFolderRadioButton" Content="В папке детали" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=PartFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <RadioButton x:Name="ProjectFolderRadioButton" Content="Папка проекта" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ProjectFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <RadioButton x:Name="FixedFolderRadioButton" Content="Фиксированная папка" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=FixedFolder, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                </StackPanel>
+
+                                <!-- Вертикальный разделитель -->
+                                <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="10,5" UseLayoutRounding="True"/>
+
+                                <!-- Правая колонка -->
+                                <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Top">
+                                    <CheckBox x:Name="EnableSubfolderCheckBox" Content="Создать подпапку" IsChecked="{Binding EnableSubfolder, Mode=TwoWay}" IsEnabled="{Binding IsSubfolderCheckBoxEnabled}" ToolTip="Недопустимые символы: \ / : * ? &quot; &lt; &gt; |" Margin="0,0,0,5"/>
+                                    <TextBox x:Name="SubfolderNameTextBox" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Stretch" Background="{StaticResource BackgroundSecondaryBrush}" Margin="0,0,0,5" Style="{StaticResource BaseTextBoxStyle}"/>
+                                    <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="Сортировать по материалу" IsChecked="{Binding OrganizeByMaterial, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                    <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="Сортировать по толщине" IsChecked="{Binding OrganizeByThickness, Mode=TwoWay}" Margin="0,0,0,5"/>
+                                </StackPanel>
+
+                                <!-- Элементы управления фиксированной папкой - отдельная строка -->
+                                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="SelectFixedFolderButton" Grid.Column="0" Content="..." Width="30" Click="SelectFixedFolderButton_Click" Style="{StaticResource BaseButtonStyle}" Margin="2,0,10,0" />
+                                    <Border Grid.Column="1" Background="{StaticResource BackgroundSecondaryBrush}" 
                                         BorderBrush="{StaticResource BorderPrimaryBrush}" 
                                         BorderThickness="{StaticResource StandardBorderThicknessValue}" 
                                         Height="{StaticResource StandardElementHeight}" 
                                         Padding="5,0">
-                                    <TextBlock x:Name="FixedFolderPathTextBlock" 
+                                        <TextBlock x:Name="FixedFolderPathTextBlock" 
                                                Text="Путь не выбран" 
                                                TextTrimming="CharacterEllipsis" 
                                                Opacity="0.75" 
                                                VerticalAlignment="Center" />
-                                </Border>
+                                    </Border>
+                                </Grid>
                             </Grid>
+                        </GroupBox>
+
+                    </WrapPanel>
+                </TabItem>
+                <TabItem Header="Настройка слоев">
+                    <GroupBox Header="Индивидуальная настройка слоев (Отметьте для включения геометрии, оставьте поле пустым для имени слоя по умолчанию)" Margin="10" Padding="0,5,0,0">
+                        <Grid Background="{StaticResource BackgroundPrimaryBrush}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="10,0,10,0" Grid.Column="0">
+                                <local:LayerSettingControl x:Name="OuterProfileLayerControl" DataContext="{Binding LayerSettings[5]}" Pseudonym="OuterProfile"/>
+                                <local:LayerSettingControl x:Name="InteriorProfilesLayerControl" DataContext="{Binding LayerSettings[6]}" Pseudonym="InteriorProfiles"/>
+                                <local:LayerSettingControl x:Name="BendUpLayerControl" DataContext="{Binding LayerSettings[0]}" Pseudonym="BendUp"/>
+                                <local:LayerSettingControl x:Name="BendDownLayerControl" DataContext="{Binding LayerSettings[1]}" Pseudonym="BendDown"/>
+                                <local:LayerSettingControl x:Name="ToolCenterUpLayerControl" DataContext="{Binding LayerSettings[2]}" Pseudonym="ToolCenterUp"/>
+                                <local:LayerSettingControl x:Name="ToolCenterDownLayerControl" DataContext="{Binding LayerSettings[3]}" Pseudonym="ToolCenterDown"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,10,0">
+                                <local:LayerSettingControl x:Name="TangentLayerControl" DataContext="{Binding LayerSettings[12]}" Pseudonym="Tangent"/>
+                                <local:LayerSettingControl x:Name="RollLinesLayerControl" DataContext="{Binding LayerSettings[14]}" Pseudonym="RollLines"/>
+                                <local:LayerSettingControl x:Name="TangentRollLinesLayerControl" DataContext="{Binding LayerSettings[13]}" Pseudonym="TangentRollLines"/>
+                                <local:LayerSettingControl x:Name="ArcCentersLayerControl" DataContext="{Binding LayerSettings[4]}" Pseudonym="ArcCenters"/>
+                                <local:LayerSettingControl x:Name="FeatureProfilesUpLayerControl" DataContext="{Binding LayerSettings[7]}" Pseudonym="FeatureProfilesUp"/>
+                                <local:LayerSettingControl x:Name="FeatureProfilesDownLayerControl" DataContext="{Binding LayerSettings[8]}" Pseudonym="FeatureProfilesDown"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="2" Margin="10,0,10,0">
+                                <local:LayerSettingControl x:Name="UnconsumedSketchConstructionLayerControl" DataContext="{Binding LayerSettings[15]}" Pseudonym="UnconsumedSketchConstruction"/>
+                                <local:LayerSettingControl x:Name="UnconsumedSketchesLayerControl" DataContext="{Binding LayerSettings[11]}" Pseudonym="UnconsumedSketches"/>
+                                <local:LayerSettingControl x:Name="AltRepFrontLayerControl" DataContext="{Binding LayerSettings[9]}" Pseudonym="AltRepFront"/>
+                                <local:LayerSettingControl x:Name="AltRepBackLayerControl" DataContext="{Binding LayerSettings[10]}" Pseudonym="AltRepBack"/>
+                            </StackPanel>
+                            <Separator Grid.Row="0" Grid.Column="0" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right" Margin="0,5,0,5"/>
+                            <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right" Margin="0,5,0,5"/>
                         </Grid>
                     </GroupBox>
+                </TabItem>
+                <TabItem Header="Имя выгружаемого файла">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                </WrapPanel>
-            </TabItem>
-            <TabItem Header="Настройка слоев">
-                <GroupBox Header="Индивидуальная настройка слоев (Отметьте для включения геометрии, оставьте поле пустым для имени слоя по умолчанию)" Margin="10" Padding="0,5,0,0">
-                    <Grid Background="{StaticResource BackgroundPrimaryBrush}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="571*"/>
-                            <ColumnDefinition Width="571*"/>
-                            <ColumnDefinition Width="571*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Margin="10,0,10,0" Grid.Column="0">
-                            <local:LayerSettingControl x:Name="OuterProfileLayerControl" DataContext="{Binding LayerSettings[5]}" Pseudonym="OuterProfile"/>
-                            <local:LayerSettingControl x:Name="InteriorProfilesLayerControl" DataContext="{Binding LayerSettings[6]}" Pseudonym="InteriorProfiles"/>
-                            <local:LayerSettingControl x:Name="BendUpLayerControl" DataContext="{Binding LayerSettings[0]}" Pseudonym="BendUp"/>
-                            <local:LayerSettingControl x:Name="BendDownLayerControl" DataContext="{Binding LayerSettings[1]}" Pseudonym="BendDown"/>
-                            <local:LayerSettingControl x:Name="ToolCenterUpLayerControl" DataContext="{Binding LayerSettings[2]}" Pseudonym="ToolCenterUp"/>
-                            <local:LayerSettingControl x:Name="ToolCenterDownLayerControl" DataContext="{Binding LayerSettings[3]}" Pseudonym="ToolCenterDown"/>
-                        </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,10,0">
-                            <local:LayerSettingControl x:Name="TangentLayerControl" DataContext="{Binding LayerSettings[12]}" Pseudonym="Tangent"/>
-                            <local:LayerSettingControl x:Name="RollLinesLayerControl" DataContext="{Binding LayerSettings[14]}" Pseudonym="RollLines"/>
-                            <local:LayerSettingControl x:Name="TangentRollLinesLayerControl" DataContext="{Binding LayerSettings[13]}" Pseudonym="TangentRollLines"/>
-                            <local:LayerSettingControl x:Name="ArcCentersLayerControl" DataContext="{Binding LayerSettings[4]}" Pseudonym="ArcCenters"/>
-                            <local:LayerSettingControl x:Name="FeatureProfilesUpLayerControl" DataContext="{Binding LayerSettings[7]}" Pseudonym="FeatureProfilesUp"/>
-                            <local:LayerSettingControl x:Name="FeatureProfilesDownLayerControl" DataContext="{Binding LayerSettings[8]}" Pseudonym="FeatureProfilesDown"/>
-                        </StackPanel>
-                        <StackPanel Grid.Row="0" Grid.Column="2" Margin="10,0,10,0">
-                            <local:LayerSettingControl x:Name="UnconsumedSketchConstructionLayerControl" DataContext="{Binding LayerSettings[15]}" Pseudonym="UnconsumedSketchConstruction"/>
-                            <local:LayerSettingControl x:Name="UnconsumedSketchesLayerControl" DataContext="{Binding LayerSettings[11]}" Pseudonym="UnconsumedSketches"/>
-                            <local:LayerSettingControl x:Name="AltRepFrontLayerControl" DataContext="{Binding LayerSettings[9]}" Pseudonym="AltRepFront"/>
-                            <local:LayerSettingControl x:Name="AltRepBackLayerControl" DataContext="{Binding LayerSettings[10]}" Pseudonym="AltRepBack"/>
-                        </StackPanel>
-                        <Separator Grid.Row="0" Grid.Column="0" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right" Margin="0,5,0,5"/>
-                        <Separator Grid.Row="0" Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right" Margin="0,5,0,5"/>
-                    </Grid>
-                </GroupBox>
-            </TabItem>
-            <TabItem Header="Имя выгружаемого файла">
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Заголовок с чекбоксом и подсказкой -->
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
-                        <CheckBox x:Name="EnableFileNameConstructorCheckBox" 
+                        <!-- Заголовок с чекбоксом и подсказкой -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                            <CheckBox x:Name="EnableFileNameConstructorCheckBox" 
                                   Content="Включить конфигуратор имени файла" 
                                   IsChecked="{Binding EnableFileNameConstructor, Mode=TwoWay}" 
                                   Margin="0,0,8,0" VerticalContentAlignment="Center" Padding="4,0,0,0"/>
-                        <TextBlock Text="ℹ" 
+                            <TextBlock Text="ℹ" 
                                    FontSize="{StaticResource LargeFontSize}" 
                                    Foreground="{StaticResource TextDisabledBrush}"
                                    Cursor="Help"
                                    Margin="0,0,15,0" VerticalAlignment="Center">
-                            <TextBlock.ToolTip>
-                                <ToolTip>
-                                    <StackPanel>
-                                        <TextBlock Text="Инструкция по использованию:" FontWeight="Bold" Margin="0,0,0,5"/>
-                                        <TextBlock Text="• Дважды кликните по токену для добавления в конец шаблона"/>
-                                        <TextBlock Text="• Перетащите токен в нужную позицию в шаблоне"/>
-                                        <TextBlock Text="• Редактируйте шаблон напрямую для добавления разделителей"/>
-                                        <TextBlock Text="• Пример: {PartNumber} - {Quantity} x {Thickness}" FontStyle="Italic" Margin="0,5,0,0"/>
-                                    </StackPanel>
-                                </ToolTip>
-                            </TextBlock.ToolTip>
+                                <TextBlock.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel>
+                                            <TextBlock Text="Инструкция по использованию:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                            <TextBlock Text="• Дважды кликните по токену для добавления в конец шаблона"/>
+                                            <TextBlock Text="• Перетащите токен в нужную позицию в шаблоне"/>
+                                            <TextBlock Text="• Редактируйте шаблон напрямую для добавления разделителей"/>
+                                            <TextBlock Text="• Пример: {PartNumber} - {Quantity} x {Thickness}" FontStyle="Italic" Margin="0,5,0,0"/>
+                                        </StackPanel>
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
                         </TextBlock>
-                        
-                        <!-- Управление пресетами -->
-                        <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
-                            <TextBlock Text="Пресеты:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="SemiBold"/>
-                            <Grid>
-                                <ComboBox x:Name="TemplatePresetsComboBox" 
+
+                            <!-- Управление пресетами -->
+                            <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
+                                <TextBlock Text="Пресеты:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="SemiBold"/>
+                                <Grid>
+                                    <ComboBox x:Name="TemplatePresetsComboBox" 
                                           Width="150"
                                           ItemsSource="{Binding TemplatePresets}"
                                           DisplayMemberPath="Name"
                                           SelectedItem="{Binding SelectedTemplatePreset, Mode=TwoWay}"
                                           SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
                                           ToolTip="Выберите сохраненный пресет шаблона">
-                                    <ComboBox.Style>
-                                        <Style TargetType="ComboBox" BasedOn="{StaticResource PresetComboBoxStyle}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
-                                                    <Setter Property="IsEnabled" Value="False" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ComboBox.Style>
-                                </ComboBox>
-                                <TextBlock Text="Нет пресетов" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0" Foreground="{StaticResource TextDisabledBrush}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding HasItems, ElementName=TemplatePresetsComboBox}" Value="False">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <TextBlock Text="Выберите пресет" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0" Foreground="{StaticResource TextDisabledBrush}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding HasItems, ElementName=TemplatePresetsComboBox}" Value="True"/>
-                                                        <Condition Binding="{Binding SelectedItem, ElementName=TemplatePresetsComboBox}" Value="{x:Null}"/>
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </MultiDataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
-                            <Button x:Name="DeletePresetButton"
-                                    Content="Удалить"
-                                    Click="DeletePresetButton_Click"
-                                    Style="{StaticResource PresetDeleteButtonStyle}"
-                                    IsEnabled="{Binding SelectedTemplatePreset, Converter={x:Static local:ObjectToBooleanConverter.Instance}}"
-                                    ToolTip="Удалить выбранный пресет"/>
-                        </StackPanel>
-                    </StackPanel>
-                    
-                    <Grid Grid.Row="1" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*" MinWidth="350"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="2*" MinWidth="400"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Левая колонка: Источники данных -->
-                        <GroupBox Grid.Column="0" Header="Источники данных" Margin="0,0,5,0">
-                            <StackPanel Margin="10,5,10,5">
-                                <TextBlock Text="Доступные свойства:" Margin="0,0,0,5" FontWeight="SemiBold"/>
-                                <ListBox x:Name="AvailableTokensListBox" 
-                                         ItemsSource="{Binding AvailableTokens}" 
-                                         Style="{StaticResource TokenListBoxStyle}"
-                                         PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
-                                         MouseMove="AvailableTokensListBox_MouseMove"
-                                         MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
-                                
-                                <!-- Поле для ввода произвольного текста -->
-                                <TextBlock Text="Произвольный текст:" Margin="0,10,0,5" FontWeight="SemiBold"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox x:Name="CustomTextBox" 
-                                             Width="200"
-                                             Style="{StaticResource BaseTextBoxStyle}"
-                                             KeyDown="CustomTextBox_KeyDown"
-                                             ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
-                                    <Button x:Name="AddCustomTextButton"
-                                            Content="Добавить"
-                                            Style="{StaticResource BaseButtonStyle}"
-                                            Margin="{StaticResource SmallMarginThickness}"
-                                            Click="AddCustomTextButton_Click"
-                                            ToolTip="Добавить введенный текст как кастомный токен"/>
-                                </StackPanel>
-                                
-                                <!-- Панель с предустановленными символами -->
-                                <TextBlock Text="Быстрые символы:" Style="{StaticResource BaseTextBlockStyle}" Margin="0,10,0,5" FontWeight="SemiBold"/>
-                                <WrapPanel Orientation="Horizontal">
-                                    <Button Content="-" Click="AddSymbolButton_Click" Tag="-" ToolTip="Тире" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="_" Click="AddSymbolButton_Click" Tag="_" ToolTip="Подчеркивание" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="." Click="AddSymbolButton_Click" Tag="." ToolTip="Точка" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="␣" Click="AddSymbolButton_Click" Tag=" " ToolTip="Пробел" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="(" Click="AddSymbolButton_Click" Tag="(" ToolTip="Открывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content=")" Click="AddSymbolButton_Click" Tag=")" ToolTip="Закрывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="[" Click="AddSymbolButton_Click" Tag="[" ToolTip="Открывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="]" Click="AddSymbolButton_Click" Tag="]" ToolTip="Закрывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="+" Click="AddSymbolButton_Click" Tag="+" ToolTip="Плюс" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="=" Click="AddSymbolButton_Click" Tag="=" ToolTip="Знак равенства" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="x" Click="AddSymbolButton_Click" Tag="x" ToolTip="x (для обозначения 'на')" Style="{StaticResource SymbolButtonStyle}"/>
-                                    <Button Content="#" Click="AddSymbolButton_Click" Tag="#" ToolTip="Решетка" Style="{StaticResource SymbolButtonStyle}"/>
-                                </WrapPanel>
-                            </StackPanel>
-                        </GroupBox>
-
-                        <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="0,12,0,5"/>
-
-                        <!-- Правая колонка: Шаблон и предпросмотр -->
-                        <GroupBox Grid.Column="2" Header="Шаблон и предпросмотр" Margin="5,0,0,0">
-                            <StackPanel Margin="10,5,10,5">
-                                <TextBlock Text="Шаблон имени файла:" Margin="0,0,0,5" FontWeight="SemiBold"/>
-                                <local:TokenizedTextBox x:Name="FileNameTemplateTokenBox"
-                                                       Template="{Binding TokenService.FileNameTemplate, Mode=TwoWay}"
-                                                       AvailableTokens="{Binding AvailableTokens}"
-                                                       TokenService="{Binding TokenService}"
-                                                       Margin="0,0,0,0"/>
-                                
-                                <!-- Сохранение пресета -->
-                                <TextBlock Text="Сохранить как пресет:" Margin="0,10,0,5" FontWeight="SemiBold"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox x:Name="PresetNameTextBox" 
-                                             Style="{StaticResource FileNameInputTextBoxStyle}"
-                                             ToolTip="Введите имя для нового пресета"/>
-                                    <Button x:Name="SavePresetInlineButton"
-                                            Content="Сохранить"
-                                            Click="SavePresetInlineButton_Click"
-                                            Style="{StaticResource FileNameActionButtonStyle}"
-                                            ToolTip="Сохранить текущий шаблон как пресет"/>
-                                </StackPanel>
-                                
-                                <!-- Предпросмотр результата -->
-                                <TextBlock Text="Предпросмотр:" Margin="0,10,0,5" FontWeight="SemiBold"/>
-                                <Border Style="{StaticResource FileNamePreviewBorderStyle}">
-                                    <TextBlock x:Name="FileNamePreviewTextBlock" 
-                                              ToolTip="{Binding TokenService.FileNamePreview}" Cursor="">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock" BasedOn="{StaticResource FileNamePreviewTextStyle}">
-                                                <Setter Property="Text" Value="{Binding TokenService.FileNamePreview}"/>
+                                        <ComboBox.Style>
+                                            <Style TargetType="ComboBox" BasedOn="{StaticResource PresetComboBoxStyle}">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding EnableFileNameConstructor}" Value="False">
-                                                        <Setter Property="Text" Value="Функция отключена - при экспорте будет использовано обозначение детали"/>
-                                                        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+                                                    <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ComboBox.Style>
+                                    </ComboBox>
+                                    <TextBlock Text="Нет пресетов" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0" Foreground="{StaticResource TextDisabledBrush}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasItems, ElementName=TemplatePresetsComboBox}" Value="False">
+                                                        <Setter Property="Visibility" Value="Visible"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                </Border>
+                                    <TextBlock Text="Выберите пресет" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0" Foreground="{StaticResource TextDisabledBrush}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding HasItems, ElementName=TemplatePresetsComboBox}" Value="True"/>
+                                                            <Condition Binding="{Binding SelectedItem, ElementName=TemplatePresetsComboBox}" Value="{x:Null}"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                                <Button x:Name="DeletePresetButton"
+                                    Content="Удалить"
+                                    Click="DeletePresetButton_Click"
+                                    Style="{StaticResource PresetDeleteButtonStyle}"
+                                    IsEnabled="{Binding SelectedTemplatePreset, Converter={x:Static local:ObjectToBooleanConverter.Instance}}"
+                                    ToolTip="Удалить выбранный пресет"/>
                             </StackPanel>
-                        </GroupBox>
+                        </StackPanel>
+
+                        <Grid Grid.Row="1" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" MinWidth="350"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="2*" MinWidth="400"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Левая колонка: Источники данных -->
+                            <GroupBox Grid.Column="0" Header="Источники данных" Margin="0,0,5,0">
+                                <StackPanel Margin="10,5,10,5">
+                                    <TextBlock Text="Доступные свойства:" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                    <ListBox x:Name="AvailableTokensListBox" 
+                                         ItemsSource="{Binding AvailableTokens}" 
+                                         Style="{StaticResource TokenListBoxStyle}"
+                                         PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
+                                         MouseMove="AvailableTokensListBox_MouseMove"
+                                         MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
+
+                                    <!-- Поле для ввода произвольного текста -->
+                                    <TextBlock Text="Произвольный текст:" Margin="0,10,0,5" FontWeight="SemiBold"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBox x:Name="CustomTextBox" 
+                                             Width="200"
+                                             Style="{StaticResource BaseTextBoxStyle}"
+                                             KeyDown="CustomTextBox_KeyDown"
+                                             ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
+                                        <Button x:Name="AddCustomTextButton"
+                                            Content="Добавить"
+                                            Style="{StaticResource BaseButtonStyle}"
+                                            Margin="{StaticResource SmallMarginThickness}"
+                                            Click="AddCustomTextButton_Click"
+                                            ToolTip="Добавить введенный текст как кастомный токен"/>
+                                    </StackPanel>
+
+                                    <!-- Панель с предустановленными символами -->
+                                    <TextBlock Text="Быстрые символы:" Style="{StaticResource BaseTextBlockStyle}" Margin="0,10,0,5" FontWeight="SemiBold"/>
+                                    <WrapPanel Orientation="Horizontal">
+                                        <Button Content="-" Click="AddSymbolButton_Click" Tag="-" ToolTip="Тире" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="_" Click="AddSymbolButton_Click" Tag="_" ToolTip="Подчеркивание" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="." Click="AddSymbolButton_Click" Tag="." ToolTip="Точка" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="␣" Click="AddSymbolButton_Click" Tag=" " ToolTip="Пробел" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="(" Click="AddSymbolButton_Click" Tag="(" ToolTip="Открывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content=")" Click="AddSymbolButton_Click" Tag=")" ToolTip="Закрывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="[" Click="AddSymbolButton_Click" Tag="[" ToolTip="Открывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="]" Click="AddSymbolButton_Click" Tag="]" ToolTip="Закрывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="+" Click="AddSymbolButton_Click" Tag="+" ToolTip="Плюс" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="=" Click="AddSymbolButton_Click" Tag="=" ToolTip="Знак равенства" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="x" Click="AddSymbolButton_Click" Tag="x" ToolTip="x (для обозначения 'на')" Style="{StaticResource SymbolButtonStyle}"/>
+                                        <Button Content="#" Click="AddSymbolButton_Click" Tag="#" ToolTip="Решетка" Style="{StaticResource SymbolButtonStyle}"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="0,12,0,5"/>
+
+                            <!-- Правая колонка: Шаблон и предпросмотр -->
+                            <GroupBox Grid.Column="2" Header="Шаблон и предпросмотр" Margin="5,0,0,0">
+                                <StackPanel Margin="10,5,10,5">
+                                    <TextBlock Text="Шаблон имени файла:" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                    <local:TokenizedTextBox x:Name="FileNameTemplateTokenBox"
+                                                       Template="{Binding TokenService.FileNameTemplate, Mode=TwoWay}"
+                                                       AvailableTokens="{Binding AvailableTokens}"
+                                                       TokenService="{Binding TokenService}"
+                                                       Margin="0,0,0,0"/>
+
+                                    <!-- Сохранение пресета -->
+                                    <TextBlock Text="Сохранить как пресет:" Margin="0,10,0,5" FontWeight="SemiBold"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBox x:Name="PresetNameTextBox" 
+                                             Style="{StaticResource FileNameInputTextBoxStyle}"
+                                             ToolTip="Введите имя для нового пресета"/>
+                                        <Button x:Name="SavePresetInlineButton"
+                                            Content="Сохранить"
+                                            Click="SavePresetInlineButton_Click"
+                                            Style="{StaticResource FileNameActionButtonStyle}"
+                                            ToolTip="Сохранить текущий шаблон как пресет"/>
+                                    </StackPanel>
+
+                                    <!-- Предпросмотр результата -->
+                                    <TextBlock Text="Предпросмотр:" Margin="0,10,0,5" FontWeight="SemiBold"/>
+                                    <Border Style="{StaticResource FileNamePreviewBorderStyle}">
+                                        <TextBlock x:Name="FileNamePreviewTextBlock" 
+                                              ToolTip="{Binding TokenService.FileNamePreview}" Cursor="">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource FileNamePreviewTextStyle}">
+                                                    <Setter Property="Text" Value="{Binding TokenService.FileNamePreview}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding EnableFileNameConstructor}" Value="False">
+                                                            <Setter Property="Text" Value="Функция отключена - при экспорте будет использовано обозначение детали"/>
+                                                            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </StackPanel>
+                            </GroupBox>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </TabItem>
+                </TabItem>
             </TabControl>
         </Expander>
 
@@ -478,75 +478,75 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                <!-- Поиск - выравнивание по левому краю -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" 
+                    <!-- Поиск - выравнивание по левому краю -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" 
                            Margin="{StaticResource StandardMarginThickness}" VerticalAlignment="Center">
-                    <Grid>
-                        <TextBox x:Name="SearchTextBox" 
+                        <Grid>
+                            <TextBox x:Name="SearchTextBox" 
                                  Width="200"
                                  Style="{StaticResource BaseTextBoxStyle}"
                                  TextChanged="SearchTextBox_TextChanged"/>
-                        <TextBlock Text="Поиск..." 
+                            <TextBlock Text="Поиск..." 
                                    Foreground="{StaticResource TextDisabledBrush}" 
                                    Margin="{StaticResource SmallMarginThickness}"
                                    IsHitTestVisible="False" VerticalAlignment="Center" Padding="5,0,0,0">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}" Value="">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Grid>
-                    <Border Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
-                        <Button x:Name="ClearSearchButton" 
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                        <Border Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
+                            <Button x:Name="ClearSearchButton" 
                                 Click="ClearSearchButton_Click" 
                                 Style="{StaticResource ResetButtonStyle}"
                                 IsEnabled="False"/>
-                    </Border>
-                </StackPanel>
+                        </Border>
+                    </StackPanel>
 
-                <!-- Множитель - выравнивание по правому краю -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" 
+                    <!-- Множитель - выравнивание по правому краю -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" 
                            Margin="{StaticResource StandardMarginThickness}" VerticalAlignment="Center">
-                    <Label Content="Множитель" Style="{StaticResource BaseLabelStyle}" Margin="0,0,5,0"/>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBox x:Name="MultiplierTextBox" Text="1" 
+                        <Label Content="Множитель" Style="{StaticResource BaseLabelStyle}" Margin="0,0,5,0"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox x:Name="MultiplierTextBox" Text="1" 
                                  PreviewTextInput="MultiplierTextBox_PreviewTextInput" 
                                  TextChanged="MultiplierTextBox_TextChanged" 
                                  Style="{StaticResource BaseTextBoxStyle}" 
                                  Width="30"/>
-                        <StackPanel Orientation="Vertical" Margin="{StaticResource TinyMarginThickness}">
-                            <Button x:Name="IncrementMultiplierButton" 
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource TinyMarginThickness}">
+                                <Button x:Name="IncrementMultiplierButton" 
                                     Content="▲" 
                                     ToolTip="Увеличить на 1"
                                     Click="IncrementMultiplierButton_Click"
                                     Style="{StaticResource SpinnerButtonStyle}"/>
-                            <Button x:Name="DecrementMultiplierButton" 
+                                <Button x:Name="DecrementMultiplierButton" 
                                     Content="▼" 
                                     ToolTip="Уменьшить на 1"
                                     Click="DecrementMultiplierButton_Click"
                                     Style="{StaticResource SpinnerButtonStyle}"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                    <Border Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
-                        <Button x:Name="ClearMultiplierButton" 
+                        <Border Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
+                            <Button x:Name="ClearMultiplierButton" 
                                 Click="ClearMultiplierButton_Click" 
                                 Style="{StaticResource ResetButtonStyle}" 
                                 ToolTip="Сбросить множитель на 1"
                                 IsEnabled="False"/>
-                    </Border>
-                </StackPanel>
+                        </Border>
+                    </StackPanel>
                 </Grid>
             </Border>
 
             <!-- Таблица данных -->
             <Grid Grid.Row="1">
-            <DataGrid x:Name="PartsDataGrid"
+                <DataGrid x:Name="PartsDataGrid"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
                       CanUserAddRows="False"
@@ -572,47 +572,47 @@
                       CellStyle="{StaticResource DataGridCellStyle}"
                       PreviewKeyDown="PartsDataGrid_PreviewKeyDown">
 
-                <!-- Контекстное меню -->
-                <DataGrid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Экспортировать выбранные DXF" Click="ExportSelectedDXF_Click" x:Name="ExportSelectedDXFMenuItem"/>
-                        <MenuItem Header="Переопределить количество" Click="OverrideQuantity_Click" x:Name="OverrideQuantityMenuItem"/>
-                        <Separator/>
-                        <MenuItem Header="Открыть расположение файла" Click="OpenFileLocation_Click" x:Name="OpenFileLocationMenuItem"/>
-                        <MenuItem Header="Открыть выбранные модели" Click="OpenSelectedModels_Click" x:Name="OpenSelectedModelsMenuItem"/>
-                        <Separator/>
-                        <MenuItem Header="Редактировать iProperty" Click="EditIProperty_Click" x:Name="EditIPropertyMenuItem"/>
-                        <Separator/>
-                        <MenuItem Header="Удалить выбранные строки" Click="RemoveSelectedRows_Click" x:Name="RemoveSelectedRowsMenuItem"/>
-                        <MenuItem Header="Очистить список" Click="ClearList_Click"/>
-                    </ContextMenu>
-                </DataGrid.ContextMenu>
+                    <!-- Контекстное меню -->
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Экспортировать выбранные DXF" Click="ExportSelectedDXF_Click" x:Name="ExportSelectedDXFMenuItem"/>
+                            <MenuItem Header="Переопределить количество" Click="OverrideQuantity_Click" x:Name="OverrideQuantityMenuItem"/>
+                            <Separator/>
+                            <MenuItem Header="Открыть расположение файла" Click="OpenFileLocation_Click" x:Name="OpenFileLocationMenuItem"/>
+                            <MenuItem Header="Открыть выбранные модели" Click="OpenSelectedModels_Click" x:Name="OpenSelectedModelsMenuItem"/>
+                            <Separator/>
+                            <MenuItem Header="Редактировать iProperty" Click="EditIProperty_Click" x:Name="EditIPropertyMenuItem"/>
+                            <Separator/>
+                            <MenuItem Header="Удалить выбранные строки" Click="RemoveSelectedRows_Click" x:Name="RemoveSelectedRowsMenuItem"/>
+                            <MenuItem Header="Очистить список" Click="ClearList_Click"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
 
-                <DataGrid.Columns>
-                </DataGrid.Columns>
-            </DataGrid>
+                    <DataGrid.Columns>
+                    </DataGrid.Columns>
+                </DataGrid>
 
-            <!-- Оверлей для случая отсутствия колонок -->
-            <Border x:Name="NoColumnsOverlay" 
+                <!-- Оверлей для случая отсутствия колонок -->
+                <Border x:Name="NoColumnsOverlay" 
                     Background="{StaticResource BackgroundPrimaryBrush}" 
                     BorderBrush="{StaticResource BorderPrimaryBrush}" 
                     BorderThickness="1"
                     Visibility="Collapsed">
-                <StackPanel VerticalAlignment="Center" 
+                    <StackPanel VerticalAlignment="Center" 
                             HorizontalAlignment="Center">
-                    <Path Style="{StaticResource TableIconStyle}"
+                        <Path Style="{StaticResource TableIconStyle}"
                           Width="48" 
                           Height="48" 
                           HorizontalAlignment="Center" 
                           Margin="0,0,0,15"
                           Opacity="0.4"/>
-                    <TextBlock Text="Колонки не выбраны" 
+                        <TextBlock Text="Колонки не выбраны" 
                                FontSize="16" 
                                FontWeight="Bold" 
                                HorizontalAlignment="Center" 
                                Margin="0,0,0,8"
                                Foreground="{StaticResource TextSecondaryBrush}"/>
-                    <TextBlock Text="Для отображения данных добавьте колонки через кнопку с иконкой добавления" 
+                        <TextBlock Text="Для отображения данных добавьте колонки через кнопку с иконкой добавления" 
                                FontSize="{StaticResource LargeFontSize}" 
                                HorizontalAlignment="Center" 
                                TextWrapping="Wrap"
@@ -620,20 +620,20 @@
                                Foreground="{StaticResource TextMutedBrush}"
                                MaxWidth="400"
                                Margin="0,0,0,20"/>
-                    <Button Click="AddPresetIPropertyButton_Click"
+                        <Button Click="AddPresetIPropertyButton_Click"
                             Style="{StaticResource OverlayButtonStyle}">
-                        <StackPanel Orientation="Horizontal">
-                            <Path Style="{StaticResource AddIconStyle}"
+                            <StackPanel Orientation="Horizontal">
+                                <Path Style="{StaticResource AddIconStyle}"
                                   Width="14" 
                                   Height="14" 
                                   Margin="0,0,6,0"/>
-                            <TextBlock Text="Добавить колонки" 
+                                <TextBlock Text="Добавить колонки" 
                                        VerticalAlignment="Center" 
                                        Foreground="{StaticResource TextSecondaryBrush}"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </Border>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
             </Grid>
         </Grid>
 

@@ -44,12 +44,16 @@
                   IsEnabled="{Binding IsColorAndLineTypeEnabled}" VerticalContentAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Width="16" Height="16"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Grid.Column="0" Width="16" Height="16"
                                  Fill="{Binding Converter={StaticResource ColorToBrushConverter}}"
                                  Margin="0,0,4,0"/>
-                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
-                    </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
@@ -68,7 +72,7 @@
                         <Path Grid.Column="0" Stroke="{StaticResource TextSecondaryBrush}" StrokeThickness="1.5"
                               Data="{Binding Converter={StaticResource LineTypeToGeometryConverter}}"
                               Width="50" Height="16" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <TextBlock Grid.Column="1" Text="{Binding}" Style="{StaticResource BaseTextBlockStyle}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding}" Style="{StaticResource BaseTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
