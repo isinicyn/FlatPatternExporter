@@ -167,10 +167,11 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HighlightBrush}"/>
+                            <Setter TargetName="PART_ProgressBar" Property="Opacity" Value="0.6"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HighlightBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Border" Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
