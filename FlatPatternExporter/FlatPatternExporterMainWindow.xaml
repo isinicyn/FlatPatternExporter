@@ -562,8 +562,6 @@
                       AlternationCount="2"
                       EnableRowVirtualization="False"
                       SelectionChanged="partsDataGrid_SelectionChanged"
-                      Drop="partsDataGrid_Drop" 
-                      AllowDrop="True"
                       RowHeaderWidth="0"
                       ContextMenuOpening="partsDataGrid_ContextMenuOpening"
                       RowStyle="{StaticResource DataGridRowStyle}"

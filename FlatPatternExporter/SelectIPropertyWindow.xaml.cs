@@ -7,8 +7,6 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Controls;
 using Application = System.Windows.Application;
-using DragDropEffects = System.Windows.DragDropEffects;
-using DragEventArgs = System.Windows.DragEventArgs;
 using ListBox = System.Windows.Controls.ListBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
@@ -16,7 +14,6 @@ namespace FlatPatternExporter
 {
     public partial class SelectIPropertyWindow : Window
     {
-        private bool _isMouseOverDataGrid; // Добавили переменную
         private readonly FlatPatternExporterMainWindow _mainWindow; // Поле для хранения ссылки на MainWindow
         private readonly ObservableCollection<PresetIProperty> _presetIProperties;
         private bool _isUpdatingAvailableProperties = false; // Flag to prevent premature closure
@@ -91,48 +88,7 @@ namespace FlatPatternExporter
             }
         }
 
-        private void iPropertyListBox_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed && IPropertyListBox.SelectedItem != null)
-            {
-                var listBox = sender as ListBox;
-                var selectedItem = IPropertyListBox.SelectedItem as PresetIProperty;
 
-                if (listBox != null && selectedItem != null)
-                {
-                    // Убедимся, что мышь находится над элементом списка, а не над заголовком группы
-                    var element = e.OriginalSource as DependencyObject;
-                    while (element != null && !(element is ListBoxItem))
-                    {
-                        element = VisualTreeHelper.GetParent(element);
-                    }
-
-                    if (element is ListBoxItem)
-                    {
-                        DragDrop.DoDragDrop(listBox, selectedItem, DragDropEffects.Move);
-                    }
-                }
-            }
-        }
-
-        private void iPropertyListBox_Drop(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(typeof(PresetIProperty)) && _isMouseOverDataGrid)
-            {
-                var droppedProperty = e.Data.GetData(typeof(PresetIProperty)) as PresetIProperty;
-                if (droppedProperty != null && !_mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == droppedProperty.ColumnHeader))
-                {
-                    // Обновляем список доступных свойств
-                    AvailableProperties.Remove(droppedProperty);
-
-                    // Добавляем колонку в DataGrid сразу после добавления свойства
-                    _mainWindow.AddIPropertyColumn(droppedProperty);
-
-                    // Добавляем в список выбранных свойств
-                    SelectedProperties.Add(droppedProperty);
-                }
-            }
-        }
 
         private void iPropertyListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -152,15 +108,6 @@ namespace FlatPatternExporter
             }
         }
 
-        public void partsDataGrid_DragOver(object sender, DragEventArgs e)
-        {
-            _isMouseOverDataGrid = true;
-        }
-
-        public void partsDataGrid_DragLeave(object sender, DragEventArgs e)
-        {
-            _isMouseOverDataGrid = false;
-        }
 
 
         private void CustomPropertyTextBox_TextChanged(object sender, TextChangedEventArgs e)

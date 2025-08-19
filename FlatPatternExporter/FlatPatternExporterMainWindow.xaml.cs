@@ -197,9 +197,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Инициализация путей библиотек
         InitializeLibraryPaths();
 
-        PartsDataGrid.DragOver += PartsDataGrid_DragOver;
-        PartsDataGrid.DragLeave += PartsDataGrid_DragLeave;
-
         // Инициализация CollectionViewSource для фильтрации
         _partsDataView = new CollectionViewSource { Source = _partsData };
         _partsDataView.Filter += PartsData_Filter;
@@ -704,21 +701,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
 
 
-    private void PartsDataGrid_DragOver(object sender, DragEventArgs e)
-    {
-        // Уведомляем SelectIPropertyWindow, что курсор находится над DataGrid
-        var selectIPropertyWindow =
-            System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
-        if (selectIPropertyWindow != null) selectIPropertyWindow.partsDataGrid_DragOver(sender, e);
-    }
-
-    private void PartsDataGrid_DragLeave(object sender, DragEventArgs e)
-    {
-        // Уведомляем SelectIPropertyWindow, что курсор ушел из DataGrid
-        var selectIPropertyWindow =
-            System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
-        if (selectIPropertyWindow != null) selectIPropertyWindow.partsDataGrid_DragLeave(sender, e);
-    }
 
     protected override void OnClosed(EventArgs e)
     {
@@ -936,37 +918,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
 
-    private void partsDataGrid_Drop(object sender, DragEventArgs e)
-    {
-        if (e.Data.GetDataPresent(typeof(PresetIProperty)))
-        {
-            var droppedData = e.Data.GetData(typeof(PresetIProperty)) as PresetIProperty;
-            if (droppedData != null && !PartsDataGrid.Columns.Any(c => c.Header.ToString() == droppedData.ColumnHeader))
-            {
-                // Определяем позицию мыши
-                var position = e.GetPosition(PartsDataGrid);
 
-                // Найти колонку, перед которой должна быть вставлена новая колонка
-                var insertIndex = -1;
-                double totalWidth = 0;
-
-                for (var i = 0; i < PartsDataGrid.Columns.Count; i++)
-                {
-                    totalWidth += PartsDataGrid.Columns[i].ActualWidth;
-                    if (position.X < totalWidth)
-                    {
-                        insertIndex = i;
-                        break;
-                    }
-                }
-
-                // Добавляем колонку на нужную позицию
-                AddIPropertyColumn(droppedData, insertIndex);
-            }
-        }
-    }
-
-    public void AddIPropertyColumn(PresetIProperty iProperty, int? insertIndex = null)
+    public void AddIPropertyColumn(PresetIProperty iProperty)
     {
         // Проверяем, существует ли уже колонка с таким заголовком
         if (PartsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.ColumnHeader))
@@ -989,12 +942,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             column = CreateTextColumn(iProperty.ColumnHeader, iProperty.InventorPropertyName);
         }
 
-        // Если указан индекс вставки, вставляем колонку в нужное место
-        if (insertIndex.HasValue && insertIndex.Value >= 0 && insertIndex.Value < PartsDataGrid.Columns.Count)
-            PartsDataGrid.Columns.Insert(insertIndex.Value, column);
-        else
-            // В противном случае добавляем колонку в конец
-            PartsDataGrid.Columns.Add(column);
+        // Добавляем колонку в конец
+        PartsDataGrid.Columns.Add(column);
 
         // Обновляем список доступных свойств
         var selectIPropertyWindow =
