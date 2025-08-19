@@ -4,12 +4,16 @@
     xmlns:av="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+    xmlns:local="clr-namespace:FlatPatternExporter"
     mc:Ignorable="av" x:Class="FlatPatternExporter.SelectIPropertyWindow"
     Title="Customization" Background="{StaticResource BackgroundSecondaryBrush}" 
     ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"
     SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">
     <Window.Resources>
+        <!-- Стандартный конвертер для Boolean -> Visibility -->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        
         <!-- CollectionViewSource для группировки по категориям -->
         <CollectionViewSource x:Key="GroupedProperties"
                               Source="{Binding AvailableProperties}">
@@ -55,12 +59,12 @@
                                 <Border Background="{StaticResource BorderLightBrush}" 
                                         BorderBrush="{StaticResource BorderDarkBrush}" 
                                         BorderThickness="1"
-                                        Margin="0,2,0,0"
+                                        Margin="5,2,5,0"
                                         Padding="5,3">
                                     <TextBlock Text="{Binding Name}" 
                                                Style="{StaticResource BaseTextBlockStyle}"
                                                FontWeight="Bold" 
-                                               FontSize="{StaticResource SmallFontSize}" 
+                                               FontSize="{StaticResource StandardFontSize}" 
                                                Foreground="{StaticResource TextTertiaryBrush}"/>
                                 </Border>
                             </DataTemplate>
@@ -73,18 +77,38 @@
                         <Border Background="{StaticResource SelectionBackgroundBrush}" 
                                 BorderBrush="{StaticResource BorderTertiaryBrush}" 
                                 BorderThickness="{StaticResource StandardBorderThicknessValue}"
-                                Padding="1"
+                                Padding="5,0,0,0"
                                 SnapsToDevicePixels="True" 
-                                Margin="0"
-                                Height="{StaticResource StandardElementHeight}" Width="175">
-                            <TextBlock Text="{Binding ListDisplayName}" 
-                                       Style="{StaticResource BaseTextBlockStyle}"
-                                       FontWeight="Bold" 
-                                       HorizontalAlignment="Left" 
-                                       VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis"
-                                       ToolTip="{Binding ListDisplayName}"
-                                       Margin="2,1"/>
+                                Height="{StaticResource LargeElementHeight}" Width="200">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding ListDisplayName}" 
+                                           Style="{StaticResource BaseTextBlockStyle}"
+                                           FontWeight="Bold" 
+                                           HorizontalAlignment="Left" 
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip="{Binding ListDisplayName}"
+                                           Margin="2,1"/>
+                                
+                                <Button Grid.Column="1"
+                                        x:Name="RemovePropertyButton"
+                                        Style="{StaticResource ResetButtonStyle}"
+                                        ToolTip="Удалить колонку"
+                                        Margin="2,0"
+                                        Click="RemovePropertyButton_Click"
+                                        Tag="{Binding}">
+                                    <Button.Visibility>
+                                        <Binding Path="IsAdded" 
+                                                 Converter="{StaticResource BooleanToVisibilityConverter}"/>
+                                    </Button.Visibility>
+                                </Button>
+                            </Grid>
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

@@ -1,14 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Controls;
-using Application = System.Windows.Application;
-using ListBox = System.Windows.Controls.ListBox;
-using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace FlatPatternExporter
 {
@@ -25,10 +19,8 @@ namespace FlatPatternExporter
             _presetIProperties = presetIProperties;
             _mainWindow = mainWindow; // Сохраняем ссылку на MainWindow
 
-            // Инициализируем AvailableProperties, исключая уже присутствующие колонки
-            AvailableProperties =
-                new ObservableCollection<PresetIProperty>(_presetIProperties.Where(p =>
-                    !_mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == p.ColumnHeader)));
+            // Инициализируем AvailableProperties со всеми свойствами
+            AvailableProperties = new ObservableCollection<PresetIProperty>(_presetIProperties);
             DataContext = this;
             SelectedProperties = new List<PresetIProperty>();
 
@@ -37,9 +29,9 @@ namespace FlatPatternExporter
 
             // Подписка на событие изменения коллекции PresetIProperties
             _presetIProperties.CollectionChanged += PresetIProperties_CollectionChanged;
-
-            // ItemsSource теперь установлен через CollectionViewSource в XAML
-            // для обеспечения группировки по категориям
+            
+            // Инициализируем состояние IsAdded для уже добавленных колонок
+            UpdateAvailableProperties();
         }
 
         public ObservableCollection<PresetIProperty> AvailableProperties { get; set; }
@@ -68,19 +60,12 @@ namespace FlatPatternExporter
             try
             {
                 _isUpdatingAvailableProperties = true;
-                AvailableProperties.Clear();
-
-                foreach (var property in _presetIProperties)
-                {
-                    if (!_mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.ColumnHeader))
-                    {
-                        AvailableProperties.Add(property);
-                    }
-                }
                 
-                // Принудительно обновляем CollectionViewSource для корректного отображения группировки
-                var groupedPropertiesResource = FindResource("GroupedProperties") as CollectionViewSource;
-                groupedPropertiesResource?.View?.Refresh();
+                // Обновляем состояние IsAdded для всех свойств
+                foreach (var property in AvailableProperties)
+                {
+                    property.IsAdded = _mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.ColumnHeader);
+                }
             }
             finally
             {
@@ -94,16 +79,14 @@ namespace FlatPatternExporter
         {
             if (IPropertyListBox.SelectedItem is PresetIProperty selectedProperty)
             {
-                if (!SelectedProperties.Contains(selectedProperty))
+                // Проверяем, есть ли уже такая колонка
+                if (!_mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == selectedProperty.ColumnHeader))
                 {
-                    // Добавляем выбранное свойство в список выбранных
-                    SelectedProperties.Add(selectedProperty);
-                    // Убираем его из доступных свойств
-                    AvailableProperties.Remove(selectedProperty);
-
-                    // Обновляем отображение в DataGrid
-                    var mainWindow = Application.Current.Windows.OfType<FlatPatternExporterMainWindow>().FirstOrDefault();
-                    mainWindow?.AddIPropertyColumn(selectedProperty);
+                    // Добавляем колонку в DataGrid
+                    _mainWindow.AddIPropertyColumn(selectedProperty);
+                    
+                    // Обновляем состояние IsAdded
+                    selectedProperty.IsAdded = true;
                 }
             }
         }
@@ -157,5 +140,23 @@ namespace FlatPatternExporter
                 CustomPropertyTextBox.Text = "";
             }
         }
+
+        private void RemovePropertyButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button button && button.Tag is PresetIProperty property)
+            {
+                // Находим колонку по заголовку
+                var columnToRemove = _mainWindow.PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == property.ColumnHeader);
+                if (columnToRemove != null)
+                {
+                    // Удаляем колонку из DataGrid
+                    _mainWindow.PartsDataGrid.Columns.Remove(columnToRemove);
+                    
+                    // Обновляем состояние IsAdded
+                    property.IsAdded = false;
+                }
+            }
+        }
     }
+
 }

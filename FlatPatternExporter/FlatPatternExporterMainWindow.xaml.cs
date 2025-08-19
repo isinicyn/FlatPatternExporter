@@ -1994,12 +1994,28 @@ public class HeaderAdorner : Adorner
 }
 
 
-public class PresetIProperty
+public class PresetIProperty : INotifyPropertyChanged
 {
     public string ColumnHeader { get; set; } = string.Empty; // Заголовок колонки в DataGrid (например, "Обозначение")
     public string ListDisplayName { get; set; } = string.Empty; // Отображение в списке выбора свойств (например, "Обозначение")
     public string InventorPropertyName { get; set; } = string.Empty; // Соответствующее имя свойства iProperty в Inventor (например, "PartNumber")
     public string Category { get; set; } = string.Empty; // Категория свойства для группировки
+
+    private bool _isAdded;
+    public bool IsAdded
+    {
+        get => _isAdded;
+        set
+        {
+            if (_isAdded != value)
+            {
+                _isAdded = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsAdded)));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }
 
 // Структура для отслеживания прогресса сканирования
