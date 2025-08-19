@@ -13,7 +13,7 @@
             <RowDefinition Height="100" />
             <RowDefinition Height="Auto"/>
             <RowDefinition />
-            <RowDefinition Height="25" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Строка 0: Верхняя панель -->
@@ -92,7 +92,7 @@
         <!-- Строка 1: Настройки -->
         <Expander x:Name="SettingsExpander" Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}" Header="Настройки" IsExpanded="False" FlowDirection="RightToLeft" 
                   Style="{StaticResource SquareExpanderStyle}">
-            <TabControl SelectionChanged="TabControl_SelectionChanged" FlowDirection="LeftToRight">
+            <TabControl FlowDirection="LeftToRight">
                 <TabItem Header="Основные">
                     <WrapPanel Orientation="Horizontal" Margin="10">
                         <GroupBox Header="Обработка компонентов" Margin="0,0,10,0">
@@ -637,20 +637,20 @@
             </Grid>
         </Grid>
 
-        <!-- Строка 3: Строка состояния -->
-        <Border Grid.Row="3" Background="{StaticResource StatusBarBackgroundBrush}" Height="25" VerticalAlignment="Center">
-            <Grid>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,10,0">
-                    <TextBlock Text="Статус: "/>
-                    <TextBlock x:Name="ProgressLabel" Text="" 
-                               TextWrapping="Wrap" Height="Auto" MaxWidth="800"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0"
-                            x:Name="ProjectStackPanel" ToolTip="Путь к проекту">
-                    <TextBlock Text="Проект: " VerticalAlignment="Center"/>
-                    <TextBlock x:Name="ProjectNameTop" Text="" VerticalAlignment="Center"/>
-                </StackPanel>
-            </Grid>
-        </Border>
+        <!-- Строка 3: StatusBar -->
+        <StatusBar Grid.Row="3" Style="{StaticResource BaseStatusBarStyle}">
+            <StatusBarItem Style="{StaticResource BaseStatusBarItemStyle}">
+                <TextBlock>
+                    <Run Text="Статус: " FontWeight="Bold"/>
+                    <Run x:Name="ProgressLabelRun" Text=""/>
+                </TextBlock>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right" x:Name="ProjectStackPanelItem" Style="{StaticResource BaseStatusBarItemStyle}" ToolTip="Путь к проекту" Margin="0,0,10,0">
+                <TextBlock>
+                    <Run Text="Проект: " FontWeight="Bold"/>
+                    <Run x:Name="ProjectNameRun" Text=""/>
+                </TextBlock>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>

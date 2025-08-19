@@ -599,7 +599,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         ClearButton.IsEnabled = state.ClearEnabled;
         ScanButton.Content = state.ScanButtonText;
         ExportButton.Content = state.ExportButtonText;
-        ProgressLabel.Text = state.ProgressText;
+        ProgressLabelRun.Text = state.ProgressText;
         
         if (state.ProgressValue >= 0)
         {
@@ -1257,7 +1257,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (!_isExporting && !_isScanning)
         {
-            var currentState = UIState.CreateAfterOperationState(_partsData.Count > 0, false, ProgressLabel.Text);
+            var currentState = UIState.CreateAfterOperationState(_partsData.Count > 0, false, ProgressLabelRun.Text);
             currentState.ExportEnabled = _isCtrlPressed || _partsData.Count > 0;
             SetUIState(currentState);
         }
@@ -1621,8 +1621,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var activeProject = _thisApplication.DesignProjectManager.ActiveDesignProject;
             var projectName = activeProject.Name;
             var projectWorkspacePath = activeProject.WorkspacePath;
-            ProjectNameTop.Text = projectName;
-            ProjectStackPanel.ToolTip = projectWorkspacePath;
+            ProjectNameRun.Text = projectName;
+            ProjectStackPanelItem.ToolTip = projectWorkspacePath;
         }
         catch (Exception ex)
         {
@@ -1786,13 +1786,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             FileNameTemplateTokenBox.AddToken($"{{{selectedToken}}}");
         }
-    }
-
-
-
-    private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-
     }
 }
 

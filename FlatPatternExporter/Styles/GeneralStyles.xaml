@@ -566,6 +566,22 @@
         </Setter>
     </Style>
 
+    <!-- Стиль для StatusBar -->
+    <Style x:Key="BaseStatusBarStyle" TargetType="StatusBar">
+        <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="Height" Value="{StaticResource LargeElementHeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
+    </Style>
+
+    <!-- Стиль для StatusBarItem -->
+    <Style x:Key="BaseStatusBarItemStyle" TargetType="StatusBarItem">
+        <Setter Property="Padding" Value="8,2"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
     <!-- Стиль для Expander с прямыми углами -->
     <Style x:Key="SquareExpanderStyle" TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}">
         <Setter Property="BorderBrush" Value="{StaticResource BorderPrimaryBrush}"/>
