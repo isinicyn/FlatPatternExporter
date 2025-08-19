@@ -90,7 +90,7 @@
         </Grid>
 
         <!-- Строка 1: Настройки -->
-        <Expander Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}" Header="Настройки" IsExpanded="False" FlowDirection="RightToLeft" 
+        <Expander x:Name="SettingsExpander" Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}" Header="Настройки" IsExpanded="False" FlowDirection="RightToLeft" 
                   Style="{StaticResource SquareExpanderStyle}">
             <TabControl SelectionChanged="TabControl_SelectionChanged" FlowDirection="LeftToRight">
             <TabItem Header="Основные">

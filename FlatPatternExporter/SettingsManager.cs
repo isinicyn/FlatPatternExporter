@@ -59,6 +59,8 @@ public class ApplicationSettings
     public string SelectedTemplatePresetName { get; set; } = "";
     
     public ObservableCollection<LayerSettingData> LayerSettings { get; set; } = new();
+    
+    public bool IsExpanded { get; set; } = false;
 }
 
 public static class SettingsManager
@@ -131,7 +133,8 @@ public static class SettingsManager
             FixedFolderPath = window.FixedFolderPath,
             OptimizeDxf = window.OptimizeDxf,
             EnableFileNameConstructor = window.EnableFileNameConstructor,
-            FileNameTemplate = window.TokenService.FileNameTemplate
+            FileNameTemplate = window.TokenService.FileNameTemplate,
+            IsExpanded = window.SettingsExpander?.IsExpanded ?? false
         };
         
         // Сохранение пресетов шаблонов
@@ -208,6 +211,9 @@ public static class SettingsManager
         window.OptimizeDxf = settings.OptimizeDxf;
         window.EnableFileNameConstructor = settings.EnableFileNameConstructor;
         window.TokenService.FileNameTemplate = settings.FileNameTemplate;
+        
+        if (window.SettingsExpander != null)
+            window.SettingsExpander.IsExpanded = settings.IsExpanded;
         
         // Загрузка пресетов шаблонов
         window.TemplatePresets.Clear();
