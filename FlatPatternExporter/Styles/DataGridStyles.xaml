@@ -183,7 +183,7 @@
     <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-        <Setter Property="Height" Value="32"/>
+        <Setter Property="Height" Value="{StaticResource LargeElementHeight}"/>
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>

@@ -6,6 +6,7 @@
     
     <!-- Размеры и отступы -->
     <sys:Double x:Key="StandardElementHeight">24</sys:Double>
+    <sys:Double x:Key="LargeElementHeight">32</sys:Double>
     <sys:Double x:Key="StandardFontSize">11</sys:Double>
     <sys:Double x:Key="SmallFontSize">10</sys:Double>
     <sys:Double x:Key="LargeFontSize">12</sys:Double>
@@ -580,7 +581,7 @@
                         <DockPanel>
                             <ToggleButton x:Name="HeaderSite"
                                           DockPanel.Dock="Top"
-                                          Height="{StaticResource StandardElementHeight}"
+                                          Height="{StaticResource LargeElementHeight}"
                                           IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
                                           Content="{TemplateBinding Header}">
                                 <ToggleButton.Template>
