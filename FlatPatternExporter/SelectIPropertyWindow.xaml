@@ -113,16 +113,13 @@
                     
                     <Button x:Name="AddCustomPropertyButton"
                             Grid.Column="1"
-                            Content="+"
                             Width="{StaticResource StandardElementHeight}"
                             Style="{StaticResource BaseButtonStyle}"
-                            Background="{StaticResource SuccessLightBrush}"
-                            Foreground="{StaticResource BackgroundPrimaryBrush}"
-                            BorderBrush="{StaticResource SuccessDarkBrush}"
-                            FontWeight="Bold"
-                            FontSize="{StaticResource LargeFontSize}"
                             IsEnabled="False"
-                            Click="AddCustomPropertyButton_Click"/>
+                            Click="AddCustomPropertyButton_Click">
+                        <Path Style="{StaticResource AddIconStyle}" 
+                              Width="12" Height="12"/>
+                    </Button>
                 </Grid>
             </Border>
         </Grid>

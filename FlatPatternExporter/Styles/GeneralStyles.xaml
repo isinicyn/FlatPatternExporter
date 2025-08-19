@@ -113,6 +113,7 @@
         <Setter Property="StrokeThickness" Value="2"/>
         <Setter Property="Stretch" Value="Uniform"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
     </Style>
 
     <!-- Стили для блока информации о документе -->
