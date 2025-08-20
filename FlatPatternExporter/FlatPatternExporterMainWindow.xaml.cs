@@ -642,7 +642,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 // Для сканирования показываем специальные сообщения о конфликтах и ссылках
                 if (_conflictingParts.Count > 0)
                 {
-                    MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Анализ обозначений\" на панели инструментов для просмотра деталей конфликтов.",
+                    MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Конфликты\" на панели управления для просмотра деталей конфликтов.",
                         "Конфликт обозначений", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 else if (_hasMissingReferences)
@@ -1514,7 +1514,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (_conflictFileDetails == null || _conflictFileDetails.Count == 0)
         {
-            MessageBox.Show("Нет конфликтующих обозначений для отображения.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 

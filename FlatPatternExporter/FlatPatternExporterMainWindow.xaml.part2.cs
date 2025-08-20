@@ -1257,7 +1257,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         // Обнуляем информацию о документе
         UpdateDocumentInfo("", null);
 
-        // Отключаем кнопку "Анализ обозначений" и очищаем список конфликтов
+        // Отключаем кнопку "Конфликты" и очищаем список конфликтов
         ConflictFilesButton.IsEnabled = false;
         _conflictFileDetails.Clear(); // Очищаем список с конфликтами (или используем нужную коллекцию)
         _partNumberTracker.Clear(); // Очищаем трекер конфликтов
