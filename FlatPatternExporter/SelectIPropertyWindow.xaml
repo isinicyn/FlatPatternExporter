@@ -25,7 +25,7 @@
         </CollectionViewSource>
     </Window.Resources>
 
-    <Grid Margin="{StaticResource ZeroMarginThickness}">
+    <Grid>
         <!-- Основное содержимое -->
         <Grid>
             <Grid.RowDefinitions>

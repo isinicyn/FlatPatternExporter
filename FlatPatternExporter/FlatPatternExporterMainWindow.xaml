@@ -395,7 +395,7 @@
                                                        Template="{Binding TokenService.FileNameTemplate, Mode=TwoWay}"
                                                        AvailableTokens="{Binding AvailableTokens}"
                                                        TokenService="{Binding TokenService}"
-                                                       Margin="{StaticResource ZeroMarginThickness}"/>
+                                                       />
 
                                     <!-- Сохранение пресета -->
                                     <TextBlock Text="Сохранить как пресет:" Style="{StaticResource SectionHeaderTextStyle}"/>
@@ -444,7 +444,7 @@
             </Grid.RowDefinitions>
 
             <!-- Элементы управления поиском и множителем -->
-            <Border Grid.Row="0" Margin="{StaticResource ZeroMarginThickness}" 
+            <Border Grid.Row="0"
                     Background="{StaticResource BackgroundPrimaryBrush}" 
                     BorderBrush="{StaticResource BorderPrimaryBrush}" 
                     BorderThickness="{StaticResource StandardTopBorderThicknessValue}">

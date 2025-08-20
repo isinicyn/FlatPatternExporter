@@ -101,7 +101,6 @@
     <Thickness x:Key="LeftSmallPaddingThickness">5,0,0,0</Thickness>
     <Thickness x:Key="LabelInlinePaddingThickness">0,5,5,5</Thickness>
     <Thickness x:Key="SmallRectPaddingThickness">5,3</Thickness>
-    <Thickness x:Key="ZeroMarginThickness">0</Thickness>
     <Thickness x:Key="UniformTinyPaddingThickness">2</Thickness>
     <Thickness x:Key="UniformSmallPaddingThickness">4</Thickness>
     <Thickness x:Key="LeftTinyPlusPaddingThickness">4,0,0,0</Thickness>
