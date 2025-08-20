@@ -50,7 +50,8 @@
 
     <!-- Стиль GroupBox: единые паддинги и заголовок -->
     <Style x:Key="BaseGroupBoxStyle" TargetType="GroupBox">
-        <Setter Property="Padding" Value="{StaticResource SectionContentMarginThickness}"/>
+        <!-- Убрали внутренний Padding по умолчанию, чтобы избежать дублирования с Margin первого дочернего контейнера -->
+        <Setter Property="Padding" Value="0"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderSecondaryBrush}"/>
         <Setter Property="HeaderTemplate">
             <Setter.Value>
@@ -755,7 +756,8 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="Background" Value="{StaticResource BackgroundSecondaryBrush}"/>
-        <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
+        <!-- Убрали Padding, чтобы избежать наложения с Margin корневых контейнеров вкладок -->
+        <Setter Property="Padding" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Expander">
