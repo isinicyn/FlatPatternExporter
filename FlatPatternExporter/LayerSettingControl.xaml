@@ -12,7 +12,7 @@
         <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
           IsChecked="{Binding IsChecked, Mode=TwoWay}"
           Width="180" VerticalContentAlignment="Center"
-          IsEnabled="{Binding IsEnabled}"/>
+          IsEnabled="{Binding IsEnabled}" Margin="0,5,5,5"/>
         <Grid Width="95" Margin="{StaticResource RightSmallMarginThickness}">
             <TextBox x:Name="CustomTextBox"
                      Text="{Binding CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -23,9 +23,9 @@
             <TextBlock Text="{Binding LayerName}"
                        Foreground="{StaticResource TextTransparentMutedBrush}"
                        IsHitTestVisible="False"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Left"
-                       Margin="{StaticResource LeftSmallMarginThickness}" TextTrimming="CharacterEllipsis">
+                       Margin="{StaticResource SmallMarginThickness}"
+                       Padding="{StaticResource LeftSmallPaddingThickness}"
+                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed"/>
