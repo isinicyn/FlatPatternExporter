@@ -4,8 +4,8 @@
         xmlns:local="clr-namespace:FlatPatternExporter"
         PreviewMouseLeftButtonDown="MainWindow_PreviewMouseLeftButtonDown"
         Title="FPEx"
-        MinHeight="600" MinWidth="1710"
-        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Width="1735">
+        MinHeight="600" MinWidth="1735"
+        WindowStartupLocation="CenterScreen">
 
 
     <Grid>
@@ -122,7 +122,7 @@
                                     <CheckBox x:Name="RebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" IsChecked="{Binding RebaseGeometry, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                     <CheckBox x:Name="TrimCenterlinesCheckBox" Content="Обрезать осевые линии по контуру" IsChecked="{Binding TrimCenterlines, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                     <Separator Style="{StaticResource HorizontalSeparatorStyle}" SnapsToDevicePixels="True" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <CheckBox x:Name="OptimizeDxfCheckBox" Content="Оптимизация dxf" IsChecked="{Binding OptimizeDxf, Mode=TwoWay}" IsEnabled="{Binding IsOptimizeDxfEnabled}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <CheckBox x:Name="OptimizeDxfCheckBox" Content="Оптимизация размера файла DXF" IsChecked="{Binding OptimizeDxf, Mode=TwoWay}" IsEnabled="{Binding IsOptimizeDxfEnabled}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                 </StackPanel>
 
                                 <!-- Вертикальный разделитель -->
@@ -640,7 +640,7 @@
                     <Run x:Name="ProgressLabelRun" Text=""/>
                 </TextBlock>
             </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right" x:Name="ProjectStackPanelItem" Style="{StaticResource BaseStatusBarItemStyle}" ToolTip="Путь к проекту" Margin="{StaticResource RightStandardMarginThickness}">
+            <StatusBarItem HorizontalAlignment="Right" x:Name="ProjectStackPanelItem" Style="{StaticResource BaseStatusBarItemStyle}" ToolTip="Путь к проекту">
                 <TextBlock>
                     <Run Text="Проект: " FontWeight="Bold"/>
                     <Run x:Name="ProjectNameRun" Text=""/>

@@ -7,9 +7,8 @@
     xmlns:local="clr-namespace:FlatPatternExporter"
     mc:Ignorable="av" x:Class="FlatPatternExporter.SelectIPropertyWindow"
     Title="Выбор свойства"
-    ResizeMode="NoResize" 
-    WindowStartupLocation="CenterScreen"
-    SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">
+    ResizeMode="CanResize" 
+    WindowStartupLocation="CenterScreen" MinWidth="270" MaxWidth="270" VerticalAlignment="Top" MinHeight="500" Height="500">
     <Window.Resources>
         <!-- CollectionViewSource для группировки по категориям -->
         <CollectionViewSource x:Key="GroupedProperties"
@@ -32,7 +31,7 @@
                 <RowDefinition/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
+
             <ListBox x:Name="IPropertyListBox" 
                      Grid.Row="0"
                      ItemsSource="{Binding Source={StaticResource GroupedProperties}}" 
@@ -40,11 +39,9 @@
                      MouseDoubleClick="iPropertyListBox_MouseDoubleClick"
                      Background="{DynamicResource TransparentBrush}"
                      BorderThickness="{StaticResource StandardBorderThicknessValue}" av:ItemsSource="{av:SampleData ItemCount=5}"
-                     ItemContainerStyle="{StaticResource CustomListBoxItemStyle}">
-                <ListBox.BorderBrush>
-                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
-                </ListBox.BorderBrush>
-                
+                     ItemContainerStyle="{StaticResource CustomListBoxItemStyle}" Margin="{StaticResource SmallMarginThickness}">
+
+
                 <!-- Стиль для группировки -->
                 <ListBox.GroupStyle>
                     <GroupStyle>
@@ -69,23 +66,23 @@
                         </GroupStyle.HeaderTemplate>
                     </GroupStyle>
                 </ListBox.GroupStyle>
-                
+
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                                <Border x:Name="ItemBorder"
+                        <Border x:Name="ItemBorder"
                                         Background="{StaticResource SelectionBackgroundBrush}" 
                                         BorderBrush="{StaticResource BorderTertiaryBrush}" 
                                         BorderThickness="{StaticResource StandardBorderThicknessValue}"
                                         Padding="{StaticResource HorizontalSmallPaddingThickness}"
                                         Margin="{StaticResource TinyMarginThickness}"
                                         SnapsToDevicePixels="True" 
-                                         Height="{StaticResource LargeElementHeight}" Width="200">
+                                         Height="{StaticResource LargeElementHeight}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                
+
                                 <TextBlock Grid.Column="0"
                                            Text="{Binding ListDisplayName}" 
                                            Style="{StaticResource SectionHeaderTextStyle}"
@@ -94,7 +91,7 @@
                                            TextTrimming="CharacterEllipsis"
                                            ToolTip="{Binding ListDisplayName}"
                                            Margin="{StaticResource HorizontalTinyVerticalHairlineMarginThickness}"/>
-                                
+
                                 <Button Grid.Column="1"
                                         x:Name="RemovePropertyButton"
                                         ToolTip="Удалить колонку"
@@ -124,9 +121,9 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            
+
             <!-- Поле для добавления custom property -->
-            <Border Grid.Row="1" Background="{StaticResource BackgroundQuaternaryBrush}" BorderThickness="{StaticResource StandardBorderThicknessValue}">
+            <Border Grid.Row="1" Background="{StaticResource BackgroundQuaternaryBrush}" BorderThickness="{StaticResource StandardBorderThicknessValue}" Margin="{StaticResource SmallMarginThickness}">
                 <Border.BorderBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
                 </Border.BorderBrush>
@@ -135,7 +132,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
+
                     <!-- Заголовок раздела -->
                     <TextBlock Grid.Row="0"
                                Text="Пользовательское свойство"
@@ -143,28 +140,28 @@
                                FontWeight="Bold"
                                Foreground="{StaticResource TextTertiaryBrush}"
                                Margin="{StaticResource LeftTinyBottomSmallMarginThickness}"/>
-                    
+
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                    
-                    <TextBox x:Name="CustomPropertyTextBox" 
+
+                        <TextBox x:Name="CustomPropertyTextBox" 
                              Grid.Column="0"
                              Style="{StaticResource BaseTextBoxStyle}"
                              BorderBrush="{StaticResource BorderTertiaryBrush}"
                              TextChanged="CustomPropertyTextBox_TextChanged"/>
-                    
-                    <Button x:Name="AddCustomPropertyButton"
+
+                        <Button x:Name="AddCustomPropertyButton"
                             Grid.Column="1"
                             Width="{StaticResource StandardElementHeight}"
                             Style="{StaticResource BaseButtonStyle}"
                             IsEnabled="False"
                             Click="AddCustomPropertyButton_Click">
-                        <Path Style="{StaticResource AddIconStyle}" 
+                            <Path Style="{StaticResource AddIconStyle}" 
                               Width="12" Height="12"/>
-                    </Button>
+                        </Button>
                     </Grid>
                 </Grid>
             </Border>
