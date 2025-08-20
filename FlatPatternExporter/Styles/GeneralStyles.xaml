@@ -26,6 +26,7 @@
     <Thickness x:Key="SmallPaddingThickness">5,2</Thickness>
     <Thickness x:Key="ButtonPaddingThickness">12,6</Thickness>
     <Thickness x:Key="ControlPaddingThickness">6,4</Thickness>
+    <Thickness x:Key="TextBoxPaddingThickness">2,0,2,0</Thickness>
     <Thickness x:Key="StandardBorderThicknessValue">1</Thickness>
 
     <!-- Направленные и комбинированные отступы (часто употребимые) -->
@@ -165,7 +166,7 @@
     <Style x:Key="BaseTextBoxStyle" TargetType="TextBox">
         <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
-        <Setter Property="Padding" Value="{StaticResource ControlPaddingThickness}"/>
+        <Setter Property="Padding" Value="{StaticResource TextBoxPaddingThickness}"/>
         <Setter Property="Margin" Value="{StaticResource TinyMarginThickness}"/>
         <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>

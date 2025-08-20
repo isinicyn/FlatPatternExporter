@@ -76,7 +76,7 @@
                                         Background="{StaticResource SelectionBackgroundBrush}" 
                                         BorderBrush="{StaticResource BorderTertiaryBrush}" 
                                         BorderThickness="{StaticResource StandardBorderThicknessValue}"
-                                        Padding="{StaticResource RightSmallMarginThickness}"
+                                        Padding="{StaticResource HorizontalSmallPaddingThickness}"
                                         Margin="{StaticResource TinyMarginThickness}"
                                         SnapsToDevicePixels="True" 
                                          Height="{StaticResource LargeElementHeight}" Width="200">

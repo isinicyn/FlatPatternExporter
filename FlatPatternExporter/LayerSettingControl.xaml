@@ -24,7 +24,7 @@
                        Foreground="{StaticResource TextTransparentMutedBrush}"
                        IsHitTestVisible="False"
                        Margin="{StaticResource SmallMarginThickness}"
-                       Padding="{StaticResource LeftSmallPaddingThickness}"
+                       Padding="{StaticResource TextBoxPaddingThickness}"
                        TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
