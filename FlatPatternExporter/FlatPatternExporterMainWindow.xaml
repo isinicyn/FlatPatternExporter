@@ -10,7 +10,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="100" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto"/>
             <RowDefinition />
             <RowDefinition Height="Auto" />
@@ -25,9 +25,9 @@
 
             <!-- Элементы управления по левому краю -->
             <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
-                <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="{StaticResource RightStandardMarginThickness}" Height="75" Width="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" RenderTransformOrigin="0,0"/>
-                <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Width="75" Height="75" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource BaseProgressButtonStyle}"/>
-                <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Width="75" Height="75" Style="{StaticResource BaseProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования" Margin="{StaticResource RightStandardMarginThickness}"/>
+                <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareProgressButtonStyle}" Tag="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" RenderTransformOrigin="0,0"/>
+                <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareProgressButtonStyle}"/>
+                <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Style="{StaticResource LargeSquareProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования" Margin="{StaticResource RightStandardMarginThickness}"/>
 
 
                 <Border Margin="{StaticResource RightStandardMarginThickness}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="350"
@@ -61,7 +61,7 @@
 
             <!-- Элементы управления по правому краю -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
-                <Button Content="About" Click="AboutButton_Click" Width="70" Height="75" VerticalAlignment="Top"/>
+                <Button Content="About" Click="AboutButton_Click" VerticalAlignment="Top" Style="{StaticResource LargeSquareButtonStyle}"/>
             </StackPanel>
         </Grid>
 
@@ -492,10 +492,8 @@
                         
                         <!-- Кнопка добавления свойства -->
                             <Button x:Name="AddPresetIPropertyButton" Click="AddPresetIPropertyButton_Click" 
-                                Height="{StaticResource StandardElementHeight}" Width="100" 
-                                HorizontalContentAlignment="Center" 
                                 Margin="{StaticResource RightStandardMarginThickness}" 
-                                Style="{StaticResource BaseButtonStyle}">
+                                Style="{StaticResource ToolbarActionButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <Path Style="{StaticResource AddIconStyle}"
                                       Width="12" 
@@ -511,9 +509,7 @@
                             <Button Name="ConflictFilesButton" 
                                 IsEnabled="False" 
                                 Click="ConflictFilesButton_Click" 
-                                Width="100" 
-                                Height="{StaticResource StandardElementHeight}" 
-                                Style="{StaticResource WarningButtonStyle}" 
+                                Style="{StaticResource ToolbarWarningButtonStyle}" 
                                 Margin="{StaticResource RightStandardMarginThickness}">
                             <Button.Content>
                                 <TextBlock Text="Конфликты" 

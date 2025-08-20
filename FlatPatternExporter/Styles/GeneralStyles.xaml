@@ -318,6 +318,24 @@
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
+    <!-- Крупная квадратная кнопка (унификация для toolbar-кнопок) -->
+    <Style x:Key="LargeSquareButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+        <Setter Property="Width" Value="75"/>
+        <Setter Property="Height" Value="75"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Крупная квадратная прогресс-кнопка -->
+    <Style x:Key="LargeSquareProgressButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseProgressButtonStyle}">
+        <Setter Property="Width" Value="75"/>
+        <Setter Property="Height" Value="75"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
     <!-- Универсальный стиль для токенов в виде блоков -->
     <Style x:Key="TokenBlockStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
@@ -405,6 +423,17 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource WarningBrush}"/>
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <!-- Кнопки панели инструментов (малые) -->
+    <Style x:Key="ToolbarActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+        <Setter Property="MinWidth" Value="80"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="ToolbarWarningButtonStyle" TargetType="Button" BasedOn="{StaticResource WarningButtonStyle}">
+        <Setter Property="MinWidth" Value="80"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
 
     <!-- Стиль для кнопки на оверлее -->
@@ -525,6 +554,7 @@
 
     <Style x:Key="FileNameActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
         <Setter Property="Margin" Value="5,0,0,0"/>
+        <Setter Property="MinWidth" Value="80"/>
     </Style>
 
     <Style x:Key="PresetComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource BaseComboBoxStyle}"/>
@@ -710,6 +740,14 @@
     <Style x:Key="BaseStatusBarItemStyle" TargetType="StatusBarItem">
         <Setter Property="Padding" Value="8,2"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Низ диалогов: панель с кнопками -->
+    <Style x:Key="DialogBottomBarStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BackgroundTertiaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderSecondaryBrush}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource StandardTopOnlyBorderThicknessValue}"/>
+        <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
     </Style>
 
     <!-- Стиль для Expander с прямыми углами -->

@@ -60,10 +60,9 @@
         </StackPanel>
 
         <!-- Кнопки -->
-        <Border Grid.Row="1" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="{StaticResource StandardTopOnlyBorderThicknessValue}" Padding="{StaticResource StandardPaddingThickness}">
+        <Border Grid.Row="1" Style="{StaticResource DialogBottomBarStyle}">
             <Button Content="Закрыть" 
                     HorizontalAlignment="Right" 
-                    Width="80" 
                     Style="{StaticResource FileNameActionButtonStyle}"
                     Click="CloseButton_Click"/>
         </Border>

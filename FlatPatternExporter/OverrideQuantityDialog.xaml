@@ -36,15 +36,13 @@
         </StackPanel>
 
         <!-- Кнопки -->
-        <Border Grid.Row="1" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="{StaticResource StandardTopOnlyBorderThicknessValue}" Padding="{StaticResource StandardPaddingThickness}">
+        <Border Grid.Row="1" Style="{StaticResource DialogBottomBarStyle}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="Отмена" 
-                        Width="80" 
                         Margin="{StaticResource RightSmallMarginThickness}"
                         Style="{StaticResource FileNameActionButtonStyle}"
                         Click="CancelButton_Click"/>
                 <Button Content="ОК" 
-                        Width="80" 
                         Style="{StaticResource FileNameActionButtonStyle}"
                         Click="OkButton_Click"/>
             </StackPanel>
