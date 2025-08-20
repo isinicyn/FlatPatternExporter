@@ -5,7 +5,6 @@
         Title="Детали конфликта обозначений" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize" 
-        Background="{StaticResource BackgroundPrimaryBrush}"
         SizeToContent="WidthAndHeight"
         MinWidth="600">
 

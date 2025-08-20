@@ -97,6 +97,8 @@
     <Thickness x:Key="HorizontalTinyVerticalHairlineMarginThickness">2,1</Thickness>
     <Thickness x:Key="LeftTinyBottomSmallMarginThickness">2,0,0,5</Thickness>
     <Thickness x:Key="VerticalHairlineMarginThickness">0,1,0,1</Thickness>
+    <!-- Специальный отступ для чекбокса в настройке слоёв (компенсация каскадных отступов) -->
+    <Thickness x:Key="CheckBoxOverrideMarginThickness">0,5,5,5</Thickness>
 
     <!-- Паддинги -->
     <Thickness x:Key="HorizontalSmallPaddingThickness">5,0</Thickness>

@@ -6,7 +6,7 @@
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:local="clr-namespace:FlatPatternExporter"
     mc:Ignorable="av" x:Class="FlatPatternExporter.SelectIPropertyWindow"
-    Title="Выбор свойства" Background="{StaticResource BackgroundSecondaryBrush}" 
+    Title="Выбор свойства"
     ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"
     SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">

@@ -4,7 +4,6 @@
         Title="Редактировать iProperty"
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize" 
-        Background="{StaticResource BackgroundPrimaryBrush}"
         SizeToContent="WidthAndHeight">
 
 

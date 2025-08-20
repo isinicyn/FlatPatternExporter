@@ -4,7 +4,6 @@
         Title="Переопределить количество" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize" 
-        Background="{StaticResource BackgroundPrimaryBrush}"
         SizeToContent="WidthAndHeight"
         MinWidth="300">
 
