@@ -5,8 +5,8 @@
     
     <Border Background="{StaticResource BackgroundPrimaryBrush}" 
             BorderBrush="{StaticResource BorderPrimaryBrush}" 
-            BorderThickness="1" MinHeight="32"
-            Padding="2">
+            BorderThickness="{StaticResource StandardBorderThicknessValue}" MinHeight="{StaticResource LargeElementHeight}"
+            Padding="{StaticResource TinyMarginThickness}">
         <WrapPanel x:Name="TokenContainer" 
                    Orientation="Horizontal" 
                    VerticalAlignment="Center"

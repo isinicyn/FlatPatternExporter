@@ -12,11 +12,14 @@
             
             <!-- Глобальные стили по умолчанию -->
             <Style TargetType="Window">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
             </Style>
             
             <Style TargetType="UserControl">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
             </Style>
@@ -24,6 +27,16 @@
             <Style TargetType="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
+
+            <!-- Имплицитные базовые стили для унификации элементов -->
+            <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}"/>
+            <Style TargetType="TextBox" BasedOn="{StaticResource BaseTextBoxStyle}"/>
+            <Style TargetType="ComboBox" BasedOn="{StaticResource BaseComboBoxStyle}"/>
+            <Style TargetType="CheckBox" BasedOn="{StaticResource BaseCheckBoxStyle}"/>
+            <Style TargetType="RadioButton" BasedOn="{StaticResource BaseRadioButtonStyle}"/>
+            <Style TargetType="Label" BasedOn="{StaticResource BaseLabelStyle}"/>
+            <Style TargetType="GroupBox" BasedOn="{StaticResource BaseGroupBoxStyle}"/>
+            <Style TargetType="ToolTip" BasedOn="{StaticResource BaseToolTipStyle}"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

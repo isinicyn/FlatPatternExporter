@@ -6,7 +6,7 @@
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:local="clr-namespace:FlatPatternExporter"
     mc:Ignorable="av" x:Class="FlatPatternExporter.SelectIPropertyWindow"
-    Title="Customization" Background="{StaticResource BackgroundSecondaryBrush}" 
+    Title="Выбор свойства" Background="{StaticResource BackgroundSecondaryBrush}" 
     ResizeMode="NoResize" 
     WindowStartupLocation="CenterScreen"
     SizeToContent="WidthAndHeight" VerticalAlignment="Top" MaxHeight="450" MinHeight="55">
@@ -25,7 +25,7 @@
         </CollectionViewSource>
     </Window.Resources>
 
-    <Grid Margin="0">
+    <Grid Margin="{StaticResource ZeroMarginThickness}">
         <!-- Основное содержимое -->
         <Grid>
             <Grid.RowDefinitions>
@@ -38,8 +38,8 @@
                      ItemsSource="{Binding Source={StaticResource GroupedProperties}}" 
                      SelectionMode="Single" 
                      MouseDoubleClick="iPropertyListBox_MouseDoubleClick"
-                     Background="Transparent"
-                     BorderThickness="0.5,0.5,0.5,0" av:ItemsSource="{av:SampleData ItemCount=5}"
+                     Background="{DynamicResource TransparentBrush}"
+                     BorderThickness="{StaticResource StandardBorderThicknessValue}" av:ItemsSource="{av:SampleData ItemCount=5}"
                      ItemContainerStyle="{StaticResource CustomListBoxItemStyle}">
                 <ListBox.BorderBrush>
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
@@ -56,9 +56,9 @@
                             <DataTemplate>
                                 <Border Background="{StaticResource BorderLightBrush}" 
                                         BorderBrush="{StaticResource BorderDarkBrush}" 
-                                        BorderThickness="1"
-                                        Margin="5,2,2,0"
-                                        Padding="5,3">
+                                        BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                                        Margin="{StaticResource GroupHeaderBorderMarginThickness}"
+                                        Padding="{StaticResource SmallRectPaddingThickness}">
                                     <TextBlock Text="{Binding Name}" 
                                                Style="{StaticResource BaseTextBlockStyle}"
                                                FontWeight="Bold" 
@@ -72,14 +72,14 @@
                 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border x:Name="ItemBorder"
-                                Background="{StaticResource SelectionBackgroundBrush}" 
-                                BorderBrush="{StaticResource BorderTertiaryBrush}" 
-                                BorderThickness="{StaticResource StandardBorderThicknessValue}"
-                                Padding="5,0,0,0"
-                                Margin="2"
-                                SnapsToDevicePixels="True" 
-                                Height="{StaticResource LargeElementHeight}" Width="200">
+                                <Border x:Name="ItemBorder"
+                                        Background="{StaticResource SelectionBackgroundBrush}" 
+                                        BorderBrush="{StaticResource BorderTertiaryBrush}" 
+                                        BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                                        Padding="{StaticResource RightSmallMarginThickness}"
+                                        Margin="{StaticResource TinyMarginThickness}"
+                                        SnapsToDevicePixels="True" 
+                                         Height="{StaticResource LargeElementHeight}" Width="200">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
@@ -88,18 +88,17 @@
                                 
                                 <TextBlock Grid.Column="0"
                                            Text="{Binding ListDisplayName}" 
-                                           Style="{StaticResource BaseTextBlockStyle}"
-                                           FontWeight="Bold" 
+                                           Style="{StaticResource SectionHeaderTextStyle}"
                                            HorizontalAlignment="Left" 
                                            VerticalAlignment="Center"
                                            TextTrimming="CharacterEllipsis"
                                            ToolTip="{Binding ListDisplayName}"
-                                           Margin="2,1"/>
+                                           Margin="{StaticResource HorizontalTinyVerticalHairlineMarginThickness}"/>
                                 
                                 <Button Grid.Column="1"
                                         x:Name="RemovePropertyButton"
                                         ToolTip="Удалить колонку"
-                                        Margin="2,0"
+                                        Margin="{StaticResource HorizontalTinyMarginThickness}"
                                         Click="RemovePropertyButton_Click"
                                         Tag="{Binding}">
                                     <Button.Style>
@@ -143,7 +142,7 @@
                                Style="{StaticResource BaseTextBlockStyle}"
                                FontWeight="Bold"
                                Foreground="{StaticResource TextTertiaryBrush}"
-                               Margin="2,0,0,5"/>
+                               Margin="{StaticResource LeftTinyBottomSmallMarginThickness}"/>
                     
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>

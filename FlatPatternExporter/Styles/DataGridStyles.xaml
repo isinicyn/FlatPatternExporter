@@ -40,14 +40,14 @@
     <!-- Шаблон для колонки "Изобр. детали" -->
     <DataTemplate x:Key="PartImageTemplate">
         <Image Source="{Binding Preview}" 
-               Margin="0,1,0,1" 
+               Margin="{StaticResource VerticalHairlineMarginThickness}" 
                HorizontalAlignment="Center" 
                VerticalAlignment="Center"/>
     </DataTemplate>
 
     <!-- Шаблон для колонки "Изобр. развертки" -->
     <DataTemplate x:Key="DxfImageTemplate">
-        <Grid Margin="0,1,0,1">
+        <Grid Margin="{StaticResource VerticalHairlineMarginThickness}">
             <Image Source="{Binding DxfPreview}" 
                    HorizontalAlignment="Center" 
                    VerticalAlignment="Center"/>
@@ -84,7 +84,7 @@
                        Width="3" 
                        HorizontalAlignment="Left" 
                        VerticalAlignment="Stretch" 
-                       Margin="2,0,0,0">
+                       Margin="{StaticResource LeftTinyMarginThickness}">
                 <Rectangle.Style>
                     <Style TargetType="Rectangle">
                         <Setter Property="Fill" Value="{DynamicResource ErrorBrush}"/>
@@ -135,7 +135,7 @@
     <DataTemplate x:Key="ProcessingStatusTemplate">
         <Border Width="10" Height="10" 
                 BorderBrush="{DynamicResource TextDisabledBrush}" 
-                BorderThickness="1" 
+                BorderThickness="{StaticResource StandardBorderThicknessValue}" 
                 HorizontalAlignment="Center" 
                 VerticalAlignment="Center">
             <Border.Style>

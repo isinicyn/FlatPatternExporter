@@ -6,7 +6,6 @@
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize" 
         Background="{StaticResource BackgroundPrimaryBrush}"
-        FontFamily="Segoe UI" 
         SizeToContent="WidthAndHeight"
         MinWidth="600">
 
@@ -18,9 +17,9 @@
         </Grid.RowDefinitions>
 
         <!-- Основное содержимое -->
-        <StackPanel Grid.Row="0" Margin="15">
-            <GroupBox Header="Конфликтующие обозначения и файлы" Margin="0,0,0,15">
-                <StackPanel Margin="10,10,10,5">
+        <StackPanel Grid.Row="0" Margin="{StaticResource StandardPaddingThickness}">
+            <GroupBox Header="Конфликтующие обозначения и файлы" Margin="{StaticResource BottomLargeMarginThickness}">
+                <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <!-- TreeView для отображения конфликтов -->
                     <TreeView x:Name="ConflictTreeView" 
                               Style="{StaticResource ConflictTreeViewStyle}"
@@ -60,7 +59,7 @@
         </StackPanel>
 
         <!-- Кнопки -->
-        <Border Grid.Row="1" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="0,1,0,0" Padding="15,10">
+        <Border Grid.Row="1" Background="{StaticResource BackgroundTertiaryBrush}" BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="{StaticResource StandardTopOnlyBorderThicknessValue}" Padding="{StaticResource StandardPaddingThickness}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="ОК" 
                         Width="80" 

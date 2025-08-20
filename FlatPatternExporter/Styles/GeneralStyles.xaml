@@ -28,6 +28,114 @@
     <Thickness x:Key="ControlPaddingThickness">6,4</Thickness>
     <Thickness x:Key="StandardBorderThicknessValue">1</Thickness>
 
+    <!-- Направленные и комбинированные отступы (часто употребимые) -->
+    <Thickness x:Key="RightSmallMarginThickness">0,0,5,0</Thickness>
+    <Thickness x:Key="LeftSmallMarginThickness">5,0,0,0</Thickness>
+    <Thickness x:Key="BottomSmallMarginThickness">0,0,0,5</Thickness>
+    <Thickness x:Key="BottomLargeMarginThickness">0,0,0,15</Thickness>
+    <Thickness x:Key="HorizontalSmallMarginThickness">5,0</Thickness>
+    <Thickness x:Key="VerticalSmallMarginThickness">0,5</Thickness>
+    <Thickness x:Key="VerticalTinyMarginThickness">0,2</Thickness>
+    <Thickness x:Key="SectionContentMarginThickness">10,5,10,5</Thickness>
+    <Thickness x:Key="UniformStandardMarginThickness">10</Thickness>
+    <Thickness x:Key="RightStandardMarginThickness">0,0,10,0</Thickness>
+    <Thickness x:Key="OuterTopMarginThickness">10,10,10,0</Thickness>
+    <Thickness x:Key="OuterBottomMarginThickness">10,0,10,10</Thickness>
+    <Thickness x:Key="SectionHeaderMarginThickness">0,10,0,5</Thickness>
+
+    <!-- Базовый стиль для текстовых блоков (должен быть раньше ссылок на него) -->
+    <Style x:Key="BaseTextBlockStyle" TargetType="TextBlock">
+        <!-- FontSize и Foreground наследуются от Window, VerticalAlignment из глобального стиля TextBlock -->
+    </Style>
+
+    <!-- Стиль GroupBox: единые паддинги и заголовок -->
+    <Style x:Key="BaseGroupBoxStyle" TargetType="GroupBox">
+        <Setter Property="Padding" Value="{StaticResource SectionContentMarginThickness}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderSecondaryBrush}"/>
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" 
+                               Style="{StaticResource BaseTextBlockStyle}"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextTertiaryBrush}"/>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Стиль ToolTip: единые шрифты и отступы -->
+    <Style x:Key="BaseToolTipStyle" TargetType="ToolTip">
+        <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
+        <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
+    </Style>
+
+    <!-- Частые маргины для разделителей и сплиттеров -->
+    <Thickness x:Key="VerticalSeparatorOuterMarginThickness">10,0,10,5</Thickness>
+    <Thickness x:Key="VerticalSeparatorCenteredMarginThickness">10,5</Thickness>
+    <Thickness x:Key="GridSplitterMarginThickness">0,12,0,5</Thickness>
+    <Thickness x:Key="HorizontalStandardMarginThickness">10,0,10,0</Thickness>
+    <Thickness x:Key="LeftTinyMarginThickness">2,0,0,0</Thickness>
+    <Thickness x:Key="RightTinyPlusMarginThickness">0,0,4,0</Thickness>
+    <Thickness x:Key="RightSmallPlusMarginThickness">0,0,6,0</Thickness>
+    <Thickness x:Key="RightMediumMarginThickness">0,0,8,0</Thickness>
+    <Thickness x:Key="RightLargeMarginThickness">0,0,15,0</Thickness>
+    <Thickness x:Key="TopSmallMarginThickness">0,5,0,0</Thickness>
+    <Thickness x:Key="BottomXLargeMarginThickness">0,0,0,20</Thickness>
+    <Thickness x:Key="BottomSmallPlusMarginThickness">0,0,0,8</Thickness>
+    <Thickness x:Key="BottomMediumMarginThickness">0,0,0,10</Thickness>
+    <Thickness x:Key="BottomHairlineMarginThickness">0,0,0,1</Thickness>
+    <Thickness x:Key="LeftTinyRightStandardMarginThickness">2,0,10,0</Thickness>
+    <Thickness x:Key="GroupHeaderBorderMarginThickness">5,2,2,0</Thickness>
+    <Thickness x:Key="HorizontalTinyMarginThickness">2,0</Thickness>
+    <Thickness x:Key="HorizontalTinyVerticalHairlineMarginThickness">2,1</Thickness>
+    <Thickness x:Key="LeftTinyBottomSmallMarginThickness">2,0,0,5</Thickness>
+    <Thickness x:Key="VerticalHairlineMarginThickness">0,1,0,1</Thickness>
+
+    <!-- Паддинги -->
+    <Thickness x:Key="HorizontalSmallPaddingThickness">5,0</Thickness>
+    <Thickness x:Key="LeftSmallPaddingThickness">5,0,0,0</Thickness>
+    <Thickness x:Key="LabelInlinePaddingThickness">0,5,5,5</Thickness>
+    <Thickness x:Key="SmallRectPaddingThickness">5,3</Thickness>
+    <Thickness x:Key="ZeroMarginThickness">0</Thickness>
+    <Thickness x:Key="UniformTinyPaddingThickness">2</Thickness>
+    <Thickness x:Key="UniformSmallPaddingThickness">4</Thickness>
+    <Thickness x:Key="LeftTinyPlusPaddingThickness">4,0,0,0</Thickness>
+    <Thickness x:Key="StandardTopOnlyBorderThicknessValue">0,1,0,0</Thickness>
+
+    <!-- Неравномерная толщина рамки -->
+    <Thickness x:Key="StandardTopBorderThicknessValue">1,1,1,0</Thickness>
+
+    <!-- Заголовки секций: текст -->
+    <Style x:Key="SectionHeaderTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="{StaticResource SectionHeaderMarginThickness}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}"/>
+    </Style>
+
+    <!-- Заголовок в оверлеях -->
+    <Style x:Key="OverlayTitleTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Margin" Value="{StaticResource BottomSmallPlusMarginThickness}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Подсказка в оверлеях -->
+    <Style x:Key="OverlayHintTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+        <Setter Property="FontSize" Value="{StaticResource LargeFontSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="MaxWidth" Value="400"/>
+    </Style>
+
     <!-- SVG иконка добавления - простой плюс -->
     <Geometry x:Key="AddIconGeometry">M12,2 L12,22 M2,12 L22,12</Geometry>
 
@@ -39,10 +147,7 @@
         <Setter Property="Margin" Value="{StaticResource TinyMarginThickness}"/>
     </Style>
     
-    <!-- Базовый стиль для текстовых блоков -->
-    <Style x:Key="BaseTextBlockStyle" TargetType="TextBlock">
-        <!-- FontSize и Foreground наследуются от Window, VerticalAlignment из глобального стиля TextBlock -->
-    </Style>
+    
     
     <!-- Базовый стиль для кнопок -->
     <Style x:Key="BaseButtonStyle" TargetType="Button">
@@ -175,7 +280,7 @@
                             <Grid>
                                 <!-- Прогресс-бар как фон -->
                                 <ProgressBar x:Name="PART_ProgressBar" 
-                                       Background="Transparent"
+                                       Background="{DynamicResource TransparentBrush}"
                                        Foreground="{DynamicResource ProgressBarBrush}"
                                        BorderThickness="0"
                                        Minimum="0" 
@@ -265,7 +370,7 @@
     <Style x:Key="TokenListBoxStyle" TargetType="ListBox">
         <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
         <Setter Property="ItemContainerStyle" Value="{StaticResource TokenItemStyle}"/>
@@ -275,7 +380,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            Padding="2">
+                            Padding="{StaticResource UniformTinyPaddingThickness}">
                         <ScrollViewer Focusable="False"
                                       HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                                       VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
@@ -344,7 +449,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Margin" Value="5"/>
+        <Setter Property="Margin" Value="{StaticResource SmallMarginThickness}"/>
     </Style>
 
     <!-- Стиль для вертикального разделителя -->
@@ -463,14 +568,14 @@
     <Style x:Key="ResetButtonStyle" TargetType="Button">
         <Setter Property="Content" Value="✖"/>
         <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
-        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontSize" Value="{StaticResource SmallFontSize}"/>
         <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Height" Value="24"/>
+        <Setter Property="Width" Value="{StaticResource StandardElementHeight}"/>
+        <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -511,14 +616,14 @@
     <Style x:Key="ConflictTreeViewStyle" TargetType="TreeView">
         <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="10"/>
+        <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
+        <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
     </Style>
 
     <!-- Простой стиль для TreeViewItem -->
     <Style x:Key="ConflictTreeViewItemStyle" TargetType="TreeViewItem">
         <Setter Property="IsExpanded" Value="True"/>
-        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="Margin" Value="0,1"/>
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
@@ -557,7 +662,7 @@
         <Setter Property="FontSize" Value="6"/>
         <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -629,7 +734,7 @@
                                           Content="{TemplateBinding Header}">
                                 <ToggleButton.Template>
                                     <ControlTemplate TargetType="ToggleButton">
-                                        <Border Background="Transparent" Padding="4">
+                                        <Border Background="{DynamicResource TransparentBrush}" Padding="{StaticResource UniformSmallPaddingThickness}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="20"/>

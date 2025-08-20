@@ -8,12 +8,12 @@
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
     </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+    <StackPanel Orientation="Horizontal" Margin="{StaticResource VerticalTinyMarginThickness}">
         <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
           IsChecked="{Binding IsChecked, Mode=TwoWay}"
           Width="180" VerticalContentAlignment="Center"
           IsEnabled="{Binding IsEnabled}"/>
-        <Grid Width="95" Margin="0,0,5,0">
+        <Grid Width="95" Margin="{StaticResource RightSmallMarginThickness}">
             <TextBox x:Name="CustomTextBox"
                      Text="{Binding CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      IsEnabled="{Binding IsCustomNameEnabled}"
@@ -25,7 +25,7 @@
                        IsHitTestVisible="False"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
-                       Margin="5,0,0,0" TextTrimming="CharacterEllipsis">
+                       Margin="{StaticResource LeftSmallMarginThickness}" TextTrimming="CharacterEllipsis">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -51,7 +51,7 @@
                         </Grid.ColumnDefinitions>
                         <Ellipse Grid.Column="0" Width="16" Height="16"
                                  Fill="{Binding Converter={StaticResource ColorToBrushConverter}}"
-                                 Margin="0,0,4,0"/>
+                                 Margin="{StaticResource RightTinyPlusMarginThickness}"/>
                         <TextBlock Grid.Column="1" Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </DataTemplate>
@@ -61,7 +61,7 @@
                   ItemsSource="{Binding DataContext.LineTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                   SelectedItem="{Binding SelectedLineType, Mode=TwoWay}"
                   IsEnabled="{Binding IsColorAndLineTypeEnabled}"
-                  Margin="5,0,0,0" VerticalContentAlignment="Center">
+                  Margin="{StaticResource LeftSmallMarginThickness}" VerticalContentAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -71,7 +71,7 @@
                         </Grid.ColumnDefinitions>
                         <Path Grid.Column="0" Stroke="{StaticResource TextSecondaryBrush}" StrokeThickness="1.5"
                               Data="{Binding Converter={StaticResource LineTypeToGeometryConverter}}"
-                              Width="50" Height="16" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                              Width="50" Height="16" VerticalAlignment="Center" Margin="{StaticResource RightTinyPlusMarginThickness}"/>
                         <TextBlock Grid.Column="1" Text="{Binding}" Style="{StaticResource BaseTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </DataTemplate>
@@ -81,6 +81,6 @@
                 CommandParameter="{Binding}"
                 IsEnabled="{Binding CanReset}"
                 Style="{StaticResource ResetButtonStyle}"
-                Margin="5,0,0,0"/>
+                Margin="{StaticResource LeftSmallMarginThickness}"/>
     </StackPanel>
 </UserControl>
