@@ -360,7 +360,7 @@
                                              ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
                                         <Button x:Name="AddCustomTextButton"
                                             Content="Добавить"
-                                            Style="{StaticResource BaseButtonStyle}"
+                                            Style="{StaticResource BaseActionButtonStyle}"
                                             Margin="{StaticResource SmallMarginThickness}"
                                             Click="AddCustomTextButton_Click"
                                             ToolTip="Добавить введенный текст как кастомный токен"/>

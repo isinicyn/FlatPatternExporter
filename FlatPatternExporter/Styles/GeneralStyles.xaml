@@ -7,6 +7,7 @@
     <!-- Размеры и отступы -->
     <sys:Double x:Key="StandardElementHeight">24</sys:Double>
     <sys:Double x:Key="LargeElementHeight">32</sys:Double>
+    <sys:Double x:Key="StandardButtonMinWidth">80</sys:Double>
     <sys:Double x:Key="StandardFontSize">11</sys:Double>
     <sys:Double x:Key="SmallFontSize">10</sys:Double>
     <sys:Double x:Key="LargeFontSize">12</sys:Double>
@@ -141,6 +142,33 @@
 
     <!-- SVG иконка добавления - простой плюс -->
     <Geometry x:Key="AddIconGeometry">M12,2 L12,22 M2,12 L22,12</Geometry>
+
+    <!-- Базовые шаблоны для переиспользования -->
+    
+    <!-- Базовый шаблон для интерактивных кнопок -->
+    <ControlTemplate x:Key="BaseInteractiveButtonTemplate" TargetType="Button">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" 
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              TextBlock.Foreground="{TemplateBinding Foreground}"
+                              TextBlock.FontSize="{TemplateBinding FontSize}"/>
+        </Border>
+    </ControlTemplate>
+
+    <!-- Специальный шаблон для overlay кнопок -->
+    <ControlTemplate x:Key="OverlayButtonTemplate" TargetType="Button">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+            <ContentPresenter HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Margin="{TemplateBinding Padding}"/>
+        </Border>
+    </ControlTemplate>
 
     <!-- Базовые стили элементов управления -->
 
@@ -452,15 +480,21 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Кнопки панели инструментов (малые) -->
-    <Style x:Key="ToolbarActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
-        <Setter Property="MinWidth" Value="80"/>
+    <!-- Базовый стиль для стандартных кнопок действий -->
+    <Style x:Key="BaseActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+        <Setter Property="MinWidth" Value="{StaticResource StandardButtonMinWidth}"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
 
-    <Style x:Key="ToolbarWarningButtonStyle" TargetType="Button" BasedOn="{StaticResource WarningButtonStyle}">
-        <Setter Property="MinWidth" Value="80"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    <!-- Кнопки панели инструментов (малые) -->
+    <Style x:Key="ToolbarActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}"/>
+
+    <Style x:Key="ToolbarWarningButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource WarningBrush}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Стиль для кнопки на оверлее -->
@@ -470,29 +504,17 @@
         <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderSecondaryBrush}"/>
         <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          Margin="{TemplateBinding Padding}"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource BorderTertiaryBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource BorderDarkBrush}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Template" Value="{StaticResource OverlayButtonTemplate}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderTertiaryBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderDarkBrush}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Базовый стиль для разделителей -->
@@ -579,45 +601,31 @@
         <Setter Property="Width" Value="200"/>
     </Style>
 
-    <Style x:Key="FileNameActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+    <Style x:Key="FileNameActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}">
         <Setter Property="Margin" Value="5,0,0,0"/>
-        <Setter Property="MinWidth" Value="80"/>
     </Style>
 
     <Style x:Key="PresetComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource BaseComboBoxStyle}"/>
 
-    <Style x:Key="PresetDeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+    <Style x:Key="PresetDeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}">
         <Setter Property="Margin" Value="5,0,0,0"/>
-        <Setter Property="MinWidth" Value="60"/>
         <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="Center" 
-                                          VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource RedLightBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource RedLightBorderBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource RedMediumBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource RedMediumBorderBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
-                            <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Template" Value="{StaticResource BaseInteractiveButtonTemplate}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource RedLightBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource RedLightBorderBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource RedMediumBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource RedMediumBorderBrush}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Универсальный стиль для кнопок сброса -->
@@ -633,39 +641,25 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter HorizontalAlignment="Center" 
-                                          VerticalAlignment="Center"
-                                          Content="{TemplateBinding Content}"
-                                          TextBlock.Foreground="{TemplateBinding Foreground}"
-                                          TextBlock.FontSize="{TemplateBinding FontSize}"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource RedLightBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource RedLightBorderBrush}"/>
-                            <Setter Property="Foreground" Value="{StaticResource ErrorDarkBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource RedMediumBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource RedMediumBorderBrush}"/>
-                            <Setter Property="Foreground" Value="{StaticResource ErrorDarkBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
-                            <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}"/>
-                            <Setter Property="Cursor" Value="Arrow"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Template" Value="{StaticResource BaseInteractiveButtonTemplate}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource RedLightBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource RedLightBorderBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource ErrorDarkBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource RedMediumBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource RedMediumBorderBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource ErrorDarkBrush}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}"/>
+                <Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Простой стиль для TreeView -->
@@ -720,37 +714,23 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter HorizontalAlignment="Center" 
-                                          VerticalAlignment="Center"
-                                          Content="{TemplateBinding Content}"
-                                          TextBlock.Foreground="{TemplateBinding Foreground}"
-                                          TextBlock.FontSize="{TemplateBinding FontSize}"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource BorderTertiaryBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource BorderDarkBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}"/>
-                            <Setter Property="Cursor" Value="Arrow"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Template" Value="{StaticResource BaseInteractiveButtonTemplate}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderTertiaryBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderDarkBrush}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}"/>
+                <Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Стиль для StatusBar -->
