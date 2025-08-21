@@ -196,6 +196,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Инициализация путей библиотек
         InitializeLibraryPaths();
 
+        // Настройка TokenService для работы с визуальным контейнером
+        TokenService?.SetTokenContainer(TokenContainer);
+        
         // Инициализация CollectionViewSource для фильтрации
         _partsDataView = new CollectionViewSource { Source = _partsData };
         _partsDataView.Filter += PartsData_Filter;
@@ -780,8 +783,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var customText = CustomTextBox.Text;
         if (string.IsNullOrEmpty(customText)) return;
         
-        // Добавляем текст через TokenizedTextBox
-        FileNameTemplateTokenBox.AddCustomText(customText);
+        // Добавляем текст через TokenService
+        TokenService?.AddCustomText(customText);
         
         // Очищаем поле ввода
         CustomTextBox.Text = string.Empty;
@@ -791,8 +794,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (sender is System.Windows.Controls.Button button && button.Tag is string symbol)
         {
-            // Добавляем символ через TokenizedTextBox
-            FileNameTemplateTokenBox.AddCustomText(symbol);
+            // Добавляем символ через TokenService
+            TokenService?.AddCustomText(symbol);
         }
     }
 
@@ -1704,7 +1707,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var listBox = sender as System.Windows.Controls.ListBox;
         if (listBox?.SelectedItem is string selectedToken)
         {
-            FileNameTemplateTokenBox.AddToken($"{{{selectedToken}}}");
+            TokenService?.AddToken($"{{{selectedToken}}}");
         }
     }
 }

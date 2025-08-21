@@ -1,8 +1,20 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace FlatPatternExporter;
+
+public class TokenElement
+{
+    public string Name { get; set; } = string.Empty;
+    public int StartIndex { get; set; }
+    public int EndIndex { get; set; }
+    public Border? VisualElement { get; set; }
+    public bool IsCustomText { get; set; } = false;
+}
 
 public class TokenService : INotifyPropertyChanged
 {
@@ -10,6 +22,8 @@ public class TokenService : INotifyPropertyChanged
     private static readonly Regex CustomTextRegex = new(@"\{CUSTOM:([^}]+)\}", RegexOptions.Compiled);
     private readonly Dictionary<string, Func<PartData, string>> _tokenResolvers;
     private IList<PartData> _partsData;
+    private List<TokenElement> _tokenElements = new();
+    private WrapPanel? _tokenContainer;
 
     private string _fileNameTemplate = string.Empty;
     private string _fileNamePreview = string.Empty;
@@ -245,5 +259,116 @@ public class TokenService : INotifyPropertyChanged
         var (preview, isValid) = UpdateFileNamePreview(_fileNameTemplate, _partsData);
         FileNamePreview = preview;
         IsFileNameTemplateValid = isValid;
+        UpdateVisualContent();
+    }
+
+    public void SetTokenContainer(WrapPanel tokenContainer)
+    {
+        _tokenContainer = tokenContainer;
+        UpdateVisualContent();
+    }
+
+    private void UpdateVisualContent()
+    {
+        if (_tokenContainer == null) return;
+
+        _tokenContainer.Children.Clear();
+        _tokenElements.Clear();
+
+        if (string.IsNullOrEmpty(_fileNameTemplate)) return;
+
+        var allMatches = new List<(Match match, bool isCustom)>();
+        
+        foreach (Match match in TokenRegex.Matches(_fileNameTemplate))
+            allMatches.Add((match, false));
+        
+        foreach (Match match in CustomTextRegex.Matches(_fileNameTemplate))
+            allMatches.Add((match, true));
+        
+        allMatches.Sort((a, b) => a.match.Index.CompareTo(b.match.Index));
+        
+        for (int i = 0; i < allMatches.Count; i++)
+        {
+            var (match, isCustom) = allMatches[i];
+            var tokenElement = new TokenElement
+            {
+                Name = match.Groups[1].Value,
+                StartIndex = match.Index,
+                EndIndex = match.Index + match.Length - 1,
+                IsCustomText = isCustom
+            };
+            
+            AddTokenElement(tokenElement, i);
+            _tokenElements.Add(tokenElement);
+        }
+    }
+
+    private void AddTokenElement(TokenElement tokenElement, int index)
+    {
+        if (_tokenContainer == null) return;
+
+        var border = new Border
+        {
+            Style = _tokenContainer.FindResource("TokenBlockStyle") as Style,
+            Tag = tokenElement.IsCustomText ? "CustomText" : null
+        };
+
+        var textBlock = new TextBlock
+        {
+            Text = tokenElement.IsCustomText ? $"{tokenElement.Name}" : tokenElement.Name,
+            Style = _tokenContainer.FindResource("TokenTextStyle") as Style
+        };
+
+        border.Child = textBlock;
+        tokenElement.VisualElement = border;
+
+        border.MouseDown += (s, e) =>
+        {
+            if (e.RightButton == MouseButtonState.Pressed) RemoveTokenByIndex(index);
+        };
+
+        _tokenContainer.Children.Add(border);
+    }
+
+    private void RemoveTokenByIndex(int index)
+    {
+        if (index < 0 || index >= _tokenElements.Count) return;
+        
+        var tokenElement = _tokenElements[index];
+        var tokenText = tokenElement.IsCustomText 
+            ? $"{{CUSTOM:{tokenElement.Name}}}"
+            : $"{{{tokenElement.Name}}}";
+        
+        var newTemplate = _fileNameTemplate.Remove(tokenElement.StartIndex, tokenText.Length);
+        FileNameTemplate = newTemplate;
+    }
+
+    public void AddToken(string tokenName)
+    {
+        if (string.IsNullOrEmpty(tokenName)) return;
+        
+        FileNameTemplate += tokenName;
+    }
+
+    public void AddCustomText(string customText)
+    {
+        if (string.IsNullOrEmpty(customText)) return;
+        
+        var customTextPattern = @"\{CUSTOM:([^}]+)\}$";
+        var match = Regex.Match(_fileNameTemplate, customTextPattern);
+        
+        if (match.Success)
+        {
+            var existingCustomText = match.Groups[1].Value;
+            var combinedText = existingCustomText + customText;
+            var combinedToken = $"{{CUSTOM:{combinedText}}}";
+            
+            FileNameTemplate = _fileNameTemplate.Substring(0, match.Index) + combinedToken;
+        }
+        else
+        {
+            var customToken = $"{{CUSTOM:{customText}}}";
+            FileNameTemplate += customToken;
+        }
     }
 }

@@ -389,11 +389,16 @@
                             <GroupBox Grid.Column="2" Header="Шаблон и предпросмотр" Margin="{StaticResource LeftSmallMarginThickness}">
                                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                                     <TextBlock Text="Шаблон имени файла:" Style="{StaticResource SectionHeaderTextStyle}"/>
-                                    <local:TokenizedTextBox x:Name="FileNameTemplateTokenBox"
-                                                       Template="{Binding TokenService.FileNameTemplate, Mode=TwoWay}"
-                                                       AvailableTokens="{Binding AvailableTokens}"
-                                                       TokenService="{Binding TokenService}"
-                                                       />
+                                    <Border x:Name="FileNameTemplateTokenBox"
+                                            Background="{StaticResource BackgroundPrimaryBrush}" 
+                                            BorderBrush="{StaticResource BorderPrimaryBrush}" 
+                                            BorderThickness="{StaticResource StandardBorderThicknessValue}" 
+                                            MinHeight="{StaticResource LargeElementHeight}"
+                                            Padding="{StaticResource TinyMarginThickness}">
+                                        <WrapPanel x:Name="TokenContainer" 
+                                                   Orientation="Horizontal" 
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
 
                                     <!-- Сохранение пресета -->
                                     <TextBlock Text="Сохранить как пресет:" Style="{StaticResource SectionHeaderTextStyle}"/>
