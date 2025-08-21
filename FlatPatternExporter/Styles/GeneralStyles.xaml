@@ -486,8 +486,10 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
 
-    <!-- Кнопки панели инструментов (малые) -->
-    <Style x:Key="ToolbarActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}"/>
+    <!-- Стиль для кнопок действий с левым отступом -->
+    <Style x:Key="LeftMarginActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}">
+        <Setter Property="Margin" Value="5,0,0,0"/>
+    </Style>
 
     <Style x:Key="ToolbarWarningButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}">
         <Style.Triggers>
@@ -601,14 +603,11 @@
         <Setter Property="Width" Value="200"/>
     </Style>
 
-    <Style x:Key="FileNameActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}">
-        <Setter Property="Margin" Value="5,0,0,0"/>
-    </Style>
+    <Style x:Key="FileNameActionButtonStyle" TargetType="Button" BasedOn="{StaticResource LeftMarginActionButtonStyle}"/>
 
     <Style x:Key="PresetComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource BaseComboBoxStyle}"/>
 
-    <Style x:Key="PresetDeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}">
-        <Setter Property="Margin" Value="5,0,0,0"/>
+    <Style x:Key="PresetDeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource LeftMarginActionButtonStyle}">
         <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
         <Setter Property="Template" Value="{StaticResource BaseInteractiveButtonTemplate}"/>
         <Style.Triggers>

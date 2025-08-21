@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:FlatPatternExporter"
         PreviewMouseLeftButtonDown="MainWindow_PreviewMouseLeftButtonDown"
         Title="FPEx"
-        MinHeight="600" MinWidth="1735"
+        MinHeight="600" MinWidth="1745"
         WindowStartupLocation="CenterScreen">
 
 
@@ -215,7 +215,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <StackPanel Margin="{StaticResource HorizontalStandardMarginThickness}" Grid.Column="0">
+                            <StackPanel Margin="{StaticResource VerticalSeparatorCenteredMarginThickness}" Grid.Column="0">
                                 <local:LayerSettingControl x:Name="OuterProfileLayerControl" DataContext="{Binding LayerSettings[5]}" Pseudonym="OuterProfile"/>
                                 <local:LayerSettingControl x:Name="InteriorProfilesLayerControl" DataContext="{Binding LayerSettings[6]}" Pseudonym="InteriorProfiles"/>
                                 <local:LayerSettingControl x:Name="BendUpLayerControl" DataContext="{Binding LayerSettings[0]}" Pseudonym="BendUp"/>
@@ -223,7 +223,7 @@
                                 <local:LayerSettingControl x:Name="ToolCenterUpLayerControl" DataContext="{Binding LayerSettings[2]}" Pseudonym="ToolCenterUp"/>
                                 <local:LayerSettingControl x:Name="ToolCenterDownLayerControl" DataContext="{Binding LayerSettings[3]}" Pseudonym="ToolCenterDown"/>
                             </StackPanel>
-                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="{StaticResource HorizontalStandardMarginThickness}">
+                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="{StaticResource VerticalSeparatorCenteredMarginThickness}">
                                 <local:LayerSettingControl x:Name="TangentLayerControl" DataContext="{Binding LayerSettings[12]}" Pseudonym="Tangent"/>
                                 <local:LayerSettingControl x:Name="RollLinesLayerControl" DataContext="{Binding LayerSettings[14]}" Pseudonym="RollLines"/>
                                 <local:LayerSettingControl x:Name="TangentRollLinesLayerControl" DataContext="{Binding LayerSettings[13]}" Pseudonym="TangentRollLines"/>
@@ -231,7 +231,7 @@
                                 <local:LayerSettingControl x:Name="FeatureProfilesUpLayerControl" DataContext="{Binding LayerSettings[7]}" Pseudonym="FeatureProfilesUp"/>
                                 <local:LayerSettingControl x:Name="FeatureProfilesDownLayerControl" DataContext="{Binding LayerSettings[8]}" Pseudonym="FeatureProfilesDown"/>
                             </StackPanel>
-                            <StackPanel Grid.Row="0" Grid.Column="2" Margin="{StaticResource HorizontalStandardMarginThickness}">
+                            <StackPanel Grid.Row="0" Grid.Column="2" Margin="{StaticResource VerticalSeparatorCenteredMarginThickness}">
                                 <local:LayerSettingControl x:Name="UnconsumedSketchConstructionLayerControl" DataContext="{Binding LayerSettings[15]}" Pseudonym="UnconsumedSketchConstruction"/>
                                 <local:LayerSettingControl x:Name="UnconsumedSketchesLayerControl" DataContext="{Binding LayerSettings[11]}" Pseudonym="UnconsumedSketches"/>
                                 <local:LayerSettingControl x:Name="AltRepFrontLayerControl" DataContext="{Binding LayerSettings[9]}" Pseudonym="AltRepFront"/>
@@ -493,7 +493,7 @@
                         <!-- Кнопка добавления свойства -->
                             <Button x:Name="AddPresetIPropertyButton" Click="AddPresetIPropertyButton_Click" 
                                 Margin="{StaticResource RightStandardMarginThickness}" 
-                                Style="{StaticResource ToolbarActionButtonStyle}">
+                                Style="{StaticResource BaseActionButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <Path Style="{StaticResource AddIconStyle}"
                                       Width="12" 
