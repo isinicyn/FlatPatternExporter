@@ -73,16 +73,16 @@ public partial class FlatPatternExporterMainWindow : Window
     
 
     // Перегрузка для сборок - открывает документ по partNumber
-    private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber)
+    private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber, bool loadThumbnail = true)
     {
         var partDoc = OpenPartDocument(partNumber);
         if (partDoc == null) return null!;
         
-        return await GetPartDataAsync(partDoc, quantity, itemNumber);
+        return await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
     }
 
     // Основной метод - работает с уже открытым документом  
-    private async Task<PartData> GetPartDataAsync(PartDocument partDoc, int quantity, int itemNumber)
+    private async Task<PartData> GetPartDataAsync(PartDocument partDoc, int quantity, int itemNumber, bool loadThumbnail = true)
     {
 
         // Создаем новый объект PartData
@@ -109,7 +109,10 @@ public partial class FlatPatternExporterMainWindow : Window
         }
 
         // КАТЕГОРИЯ 2: Дополнительные свойства документа (изображения)
-        partData.Preview = await GetThumbnailAsync(partDoc);        
+        if (loadThumbnail)
+        {
+            partData.Preview = await GetThumbnailAsync(partDoc);
+        }        
 
         return partData;
     }
@@ -530,10 +533,10 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-/// <summary>
-/// Централизованная подготовка контекста экспорта
-/// </summary>
-private async Task<ExportContext> PrepareExportContextAsync(Document document, bool requireScan = true, bool showProgress = false)
+    /// <summary>
+    /// Централизованная подготовка контекста экспорта
+    /// </summary>
+    private async Task<ExportContext> PrepareExportContextAsync(Document document, bool requireScan = true, bool showProgress = false)
 {
     var context = new ExportContext();
     
@@ -670,33 +673,24 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     return true;
 }
 
-    private void FinalizeExport(bool isCancelled, Stopwatch stopwatch, int processedCount, int skippedCount)
-    {
-        stopwatch.Stop();
-        var elapsedTime = GetElapsedTime(stopwatch.Elapsed);
 
-        _isExporting = false;
+
+    private async Task<List<PartData>> CreatePartDataListFromPartsAsync(Dictionary<string, int> parts, int multiplier)
+    {
+        var partsDataList = new List<PartData>();
+        var itemCounter = 1;
         
-        var result = new OperationResult
+        foreach (var part in parts)
         {
-            ProcessedCount = processedCount,
-            SkippedCount = skippedCount,
-            ElapsedTime = stopwatch.Elapsed,
-            WasCancelled = isCancelled
-        };
-
-        SetUIStateAfterOperation(result, OperationType.Export);
-        ShowOperationResult(result, OperationType.Export);
-    }
-
-    private List<PartData> CreatePartDataListFromParts(Dictionary<string, int> parts, int multiplier)
-    {
-        return parts.Select(part => new PartData
-        {
-            PartNumber = part.Key,
-            OriginalQuantity = part.Value,
-            Quantity = part.Value * multiplier
-        }).ToList();
+            var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++, loadThumbnail: false);
+            if (partData != null)
+            {
+                partData.Quantity = partData.OriginalQuantity * multiplier;
+                partsDataList.Add(partData);
+            }
+        }
+        
+        return partsDataList;
     }
 
     private async Task ExportWithoutScan()
@@ -727,8 +721,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         var stopwatch = Stopwatch.StartNew();
 
-        // Создаем временный список PartData для экспорта (без UI обновлений)
-        var tempPartsDataList = CreatePartDataListFromParts(context.SheetMetalParts, context.Multiplier);
+        // Создаем временный список PartData для экспорта с полными данными
+        var tempPartsDataList = await CreatePartDataListFromPartsAsync(context.SheetMetalParts, context.Multiplier);
 
         // Выполнение экспорта через централизованную обработку ошибок
         context.GenerateThumbnails = false;
@@ -852,36 +846,61 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
         if (itemsWithoutFlatPattern.Count > 0)
         {
-            var result =
+            var dialogResult =
                 MessageBox.Show("Некоторые выбранные файлы не содержат разверток и будут пропущены. Продолжить?",
                     "Информация", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (result == MessageBoxResult.No) return;
+            if (dialogResult == MessageBoxResult.No) return;
 
             selectedItems = selectedItems.Except(itemsWithoutFlatPattern).ToList();
         }
 
-        if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch)) return;
+        // Валидация документа
+        var validation = ValidateActiveDocument();
+        if (!validation.IsValid)
+        {
+            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
+        // Подготовка контекста экспорта
+        var context = await PrepareExportContextAsync(validation.Document!, requireScan: true, showProgress: false);
+        if (!context.IsValid)
+        {
+            MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
-        var processedCount = 0;
-        var skippedCount = itemsWithoutFlatPattern.Count;
-
+        // Настройка UI для экспорта
+        SetUIState(UIState.Exporting);
+        _isExporting = true;
         _operationCts = new CancellationTokenSource();
-        try
+
+        var stopwatch = Stopwatch.StartNew();
+        
+        // Выполнение экспорта через централизованную обработку ошибок
+        var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
-            await Task.Run(() =>
+            var processedCount = 0;
+            var skippedCount = itemsWithoutFlatPattern.Count;
+            await Task.Run(() => ExportDXF(selectedItems, context.TargetDirectory, context.Multiplier, 
+                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts.Token), _operationCts.Token);
+            
+            return new OperationResult
             {
-                ExportDXF(selectedItems, targetDir, multiplier, ref processedCount, ref skippedCount,
-                    true, _operationCts.Token); // true - с генерацией миниатюр
-            }, _operationCts.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            // Операция была отменена - это нормальное поведение
-        }
+                ProcessedCount = processedCount,
+                SkippedCount = skippedCount,
+                ElapsedTime = stopwatch.Elapsed,
+                WasCancelled = _operationCts.Token.IsCancellationRequested
+            };
+        }, "экспорта выделенных деталей");
 
+        // Завершение операции
+        _isExporting = false;
 
-        FinalizeExport(_operationCts?.Token.IsCancellationRequested ?? false, stopwatch, processedCount, skippedCount);
+        SetUIStateAfterOperation(result, OperationType.Export);
+        
+        // Показ результата
+        ShowOperationResult(result, OperationType.Export);
     }
 
     private void OverrideQuantity_Click(object sender, RoutedEventArgs e)
