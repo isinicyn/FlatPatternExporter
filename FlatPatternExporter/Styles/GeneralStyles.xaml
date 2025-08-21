@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- Дизайн-система: базовые значения -->
-    
+
     <!-- Размеры и отступы -->
     <sys:Double x:Key="StandardElementHeight">24</sys:Double>
     <sys:Double x:Key="LargeElementHeight">32</sys:Double>
@@ -17,7 +17,7 @@
     <sys:Double x:Key="SmallMargin">5</sys:Double>
     <sys:Double x:Key="TinyMargin">2</sys:Double>
     <sys:Double x:Key="StandardBorderThickness">1</sys:Double>
-    
+
     <!-- Стандартные отступы для элементов -->
     <Thickness x:Key="StandardMarginThickness">6</Thickness>
     <Thickness x:Key="SmallMarginThickness">5</Thickness>
@@ -143,15 +143,15 @@
     <Geometry x:Key="AddIconGeometry">M12,2 L12,22 M2,12 L22,12</Geometry>
 
     <!-- Базовые стили элементов управления -->
-    
+
     <!-- Базовый стиль для всех элементов -->
     <Style x:Key="BaseControlStyle" TargetType="FrameworkElement">
         <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
         <Setter Property="Margin" Value="{StaticResource TinyMarginThickness}"/>
     </Style>
-    
-    
-    
+
+
+
     <!-- Базовый стиль для кнопок -->
     <Style x:Key="BaseButtonStyle" TargetType="Button">
         <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
@@ -163,7 +163,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
     </Style>
-    
+
     <!-- Базовый стиль для текстовых полей -->
     <Style x:Key="BaseTextBoxStyle" TargetType="TextBox">
         <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
@@ -176,7 +176,7 @@
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
-    
+
     <!-- Базовый стиль для комбобоксов -->
     <Style x:Key="BaseComboBoxStyle" TargetType="ComboBox">
         <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
@@ -189,7 +189,7 @@
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
-    
+
     <!-- Базовый стиль для чекбоксов -->
     <Style x:Key="BaseCheckBoxStyle" TargetType="CheckBox">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
@@ -197,7 +197,7 @@
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
-    
+
     <!-- Базовый стиль для радиокнопок -->
     <Style x:Key="BaseRadioButtonStyle" TargetType="RadioButton">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
@@ -205,13 +205,35 @@
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
-    
+
     <!-- Базовый стиль для лейблов -->
     <Style x:Key="BaseLabelStyle" TargetType="Label">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Padding" Value="{StaticResource SmallPaddingThickness}"/>
+    </Style>
+
+    <!-- Глобальные стили для TabControl -->
+    <Style TargetType="TabControl">
+        <Setter Property="Padding" Value="5"/>
+    </Style>
+
+    <Style TargetType="TabItem">
+        <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
+        <Setter Property="Margin" Value="-2,2,-2,0"/>
+        <Setter Property="Padding" Value="10,2"/>
+        <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                <Setter Property="Margin" Value="-2,0,-2,0"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Централизованный стиль для иконки добавления -->
@@ -675,7 +697,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            
+
             <!-- Стиль для TextBlock дочерних элементов (файлов) -->
             <Style TargetType="TextBlock" x:Key="FileTextBlockStyle" BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
@@ -811,14 +833,14 @@
                                     </ControlTemplate>
                                 </ToggleButton.Template>
                             </ToggleButton>
-                            
+
                             <ContentPresenter x:Name="ExpandSite"
                                               Visibility="Collapsed"
                                               DockPanel.Dock="Top"
                                               Margin="{TemplateBinding Padding}"/>
                         </DockPanel>
                     </Border>
-                    
+
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsExpanded" Value="True">
                             <Setter TargetName="ExpandSite" Property="Visibility" Value="Visible"/>
