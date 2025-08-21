@@ -346,8 +346,6 @@
                                     <ListBox x:Name="AvailableTokensListBox" 
                                          ItemsSource="{Binding AvailableTokens}" 
                                          Style="{StaticResource TokenListBoxStyle}"
-                                         PreviewMouseLeftButtonDown="AvailableTokensListBox_PreviewMouseLeftButtonDown"
-                                         MouseMove="AvailableTokensListBox_MouseMove"
                                          MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="{StaticResource LargeElementHeight}" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
 
                                     <!-- Поле для ввода произвольного текста -->

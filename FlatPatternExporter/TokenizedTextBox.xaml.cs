@@ -4,9 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace FlatPatternExporter
 {
@@ -170,20 +168,6 @@ namespace FlatPatternExporter
             Template += tokenName; // Токены уже приходят в формате {TokenName}
         }
 
-        private void TokenContainer_Drop(object sender, System.Windows.DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(System.Windows.DataFormats.StringFormat))
-            {
-                var token = e.Data.GetData(System.Windows.DataFormats.StringFormat) as string;
-                if (!string.IsNullOrEmpty(token)) AddToken(token);
-            }
-        }
-
-        private void TokenContainer_DragOver(object sender, System.Windows.DragEventArgs e)
-        {
-            e.Effects = e.Data.GetDataPresent(System.Windows.DataFormats.StringFormat) ? System.Windows.DragDropEffects.Copy : System.Windows.DragDropEffects.None;
-            e.Handled = true;
-        }
 
         public void AddCustomText(string customText)
         {

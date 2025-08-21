@@ -20,7 +20,6 @@ using System.Windows.Threading;
 using DefineEdge;
 using Inventor;
 using Binding = System.Windows.Data.Binding;
-using DragEventArgs = System.Windows.DragEventArgs;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
@@ -1699,33 +1698,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
 
-    private System.Windows.Point _startPoint;
-    private bool _isDragging = false;
-
-    private void AvailableTokensListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        _startPoint = e.GetPosition(null);
-        _isDragging = false;
-    }
-
-    private void AvailableTokensListBox_MouseMove(object sender, MouseEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed && !_isDragging)
-        {
-            var currentPosition = e.GetPosition(null);
-            if ((Math.Abs(currentPosition.X - _startPoint.X) > SystemParameters.MinimumHorizontalDragDistance) ||
-                (Math.Abs(currentPosition.Y - _startPoint.Y) > SystemParameters.MinimumVerticalDragDistance))
-            {
-                var listBox = sender as System.Windows.Controls.ListBox;
-                if (listBox?.SelectedItem is string selectedToken)
-                {
-                    _isDragging = true;
-                    System.Windows.DragDrop.DoDragDrop(listBox, $"{{{selectedToken}}}", System.Windows.DragDropEffects.Copy);
-                    _isDragging = false;
-                }
-            }
-        }
-    }
 
     private void AvailableTokensListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {

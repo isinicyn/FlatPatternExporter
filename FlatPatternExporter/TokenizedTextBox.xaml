@@ -9,9 +9,6 @@
             Padding="{StaticResource TinyMarginThickness}">
         <WrapPanel x:Name="TokenContainer" 
                    Orientation="Horizontal" 
-                   VerticalAlignment="Center"
-                   AllowDrop="True"
-                   Drop="TokenContainer_Drop"
-                   DragOver="TokenContainer_DragOver"/>
+                   VerticalAlignment="Center"/>
     </Border>
 </UserControl>
