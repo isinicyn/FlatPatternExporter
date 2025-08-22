@@ -506,7 +506,22 @@ public partial class FlatPatternExporterMainWindow : Window
     }
     private bool IsLibraryComponent(string fullFileName)
     {
-        return _libraryPaths.Any(path => fullFileName.StartsWith(path, StringComparison.OrdinalIgnoreCase));
+        try
+        {
+            if (_thisApplication?.DesignProjectManager == null)
+                return false;
+                
+            _thisApplication.DesignProjectManager.IsFileInActiveProject(
+                fullFileName, 
+                out var projectPathType, 
+                out _);
+                
+            return projectPathType == LocationTypeEnum.kLibraryLocation;
+        }
+        catch
+        {
+            return false;
+        }
     }
     private bool ShouldExcludeComponent(BOMStructureEnum bomStructure, string fullFileName)
     {
@@ -579,7 +594,13 @@ public partial class FlatPatternExporterMainWindow : Window
         else if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
             var partDoc = (PartDocument)document;
-            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+            
+            // Проверяем, не является ли деталь библиотечным компонентом
+            if (!IncludeLibraryComponents && IsLibraryComponent(partDoc.FullFileName))
+            {
+                // Библиотечный компонент исключается
+            }
+            else if (partDoc.SubType == PropertyManager.SheetMetalSubType)
             {
                 var mgr = new PropertyManager((Document)partDoc);
                 var partNumber = mgr.GetMappedProperty("PartNumber");

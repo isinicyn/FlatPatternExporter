@@ -1494,6 +1494,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 var partDoc = (PartDocument)document;
                 
+                // Проверяем, не является ли деталь библиотечным компонентом
+                if (!IncludeLibraryComponents && IsLibraryComponent(partDoc.FullFileName))
+                {
+                    result.ProcessedCount = 0;
+                    return result;
+                }
+                
                 if (updateUI)
                 {
                     var partProgress = new Progress<PartData>(partData =>
