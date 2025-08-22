@@ -1679,6 +1679,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             "Material",
             "Thickness",
             "Description",
+            "ModelState",
             "Author",
             "Revision",
             "Project",
