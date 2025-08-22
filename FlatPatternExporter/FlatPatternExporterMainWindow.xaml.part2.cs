@@ -699,26 +699,15 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ClearList_Click(this, null!);
 
         // Валидация документа
-        var validation = ValidateActiveDocument();
-        if (!validation.IsValid)
-        {
-            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+        var validation = ValidateDocumentOrShowError();
+        if (validation == null) return;
 
         // Подготовка контекста экспорта (без требования предварительного сканирования и без отображения прогресса)
-        var context = await PrepareExportContextAsync(validation.Document!, requireScan: false, showProgress: false);
-        if (!context.IsValid)
-        {
-            MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+        var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: false, showProgress: false);
+        if (context == null) return;
 
         // Настройка UI для быстрого экспорта
-        SetUIState(UIState.Exporting);
-        _isExporting = true;
-        _operationCts = new CancellationTokenSource();
-
+        InitializeOperation(UIState.Exporting, ref _isExporting);
         var stopwatch = Stopwatch.StartNew();
 
         // Создаем временный список PartData для экспорта с полными данными
@@ -731,25 +720,13 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             var processedCount = 0;
             var skippedCount = 0;
             await Task.Run(() => ExportDXF(tempPartsDataList, context.TargetDirectory, context.Multiplier, 
-                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts.Token), _operationCts.Token);
+                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts!.Token), _operationCts!.Token);
             
-            return new OperationResult
-            {
-                ProcessedCount = processedCount,
-                SkippedCount = skippedCount,
-                ElapsedTime = stopwatch.Elapsed,
-                WasCancelled = _operationCts.Token.IsCancellationRequested
-            };
+            return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
         }, "быстрого экспорта");
 
         // Завершение операции
-        _isExporting = false;
-
-        // Показ результата быстрого экспорта до установки состояния UI
-        ShowOperationResult(result, OperationType.Export, isQuickMode: true);
-        
-        // Используем единообразный подход для завершения операции
-        SetUIStateAfterOperation(result, OperationType.Export);
+        CompleteOperation(result, OperationType.Export, ref _isExporting, isQuickMode: true);
     }
 
 
@@ -759,12 +736,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         ScanButton.Focus();
         
         // Если экспорт уже идет, выполняем прерывание
-        if (_isExporting)
-        {
-            _operationCts?.Cancel();
-            SetUIState(new UIState { ExportEnabled = false, ExportButtonText = "Прерывание..." });
-            return;
-        }
+        if (HandleExportCancellation()) return;
 
         // Режим быстрого экспорта с Ctrl
         if (_isCtrlPressed)
@@ -774,28 +746,15 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
 
         // Валидация документа
-        var validation = ValidateActiveDocument();
-        if (!validation.IsValid)
-        {
-            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+        var validation = ValidateDocumentOrShowError();
+        if (validation == null) return;
 
         // Подготовка контекста экспорта
-        var context = await PrepareExportContextAsync(validation.Document!, requireScan: true, showProgress: true);
-        if (!context.IsValid)
-        {
-            MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            if (context.ErrorMessage.Contains("сканирование"))
-                MultiplierTextBox.Text = "1";
-            return;
-        }
+        var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: true, showProgress: true);
+        if (context == null) return;
 
         // Настройка UI для экспорта
-        SetUIState(UIState.Exporting);
-        _isExporting = true;
-        _operationCts = new CancellationTokenSource();
-
+        InitializeOperation(UIState.Exporting, ref _isExporting);
         var stopwatch = Stopwatch.StartNew();
 
         // Выполнение экспорта через централизованную обработку ошибок
@@ -805,24 +764,13 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             var processedCount = 0;
             var skippedCount = 0;
             await Task.Run(() => ExportDXF(partsDataList, context.TargetDirectory, context.Multiplier, 
-                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts.Token), _operationCts.Token);
+                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts!.Token), _operationCts!.Token);
             
-            return new OperationResult
-            {
-                ProcessedCount = processedCount,
-                SkippedCount = skippedCount,
-                ElapsedTime = stopwatch.Elapsed,
-                WasCancelled = _operationCts.Token.IsCancellationRequested
-            };
+            return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
         }, "экспорта");
 
         // Завершение операции
-        _isExporting = false;
-
-        SetUIStateAfterOperation(result, OperationType.Export);
-        
-        // Показ результата
-        ShowOperationResult(result, OperationType.Export);
+        CompleteOperation(result, OperationType.Export, ref _isExporting);
     }
 
     private string GetElapsedTime(TimeSpan timeSpan)
@@ -855,26 +803,15 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         }
 
         // Валидация документа
-        var validation = ValidateActiveDocument();
-        if (!validation.IsValid)
-        {
-            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+        var validation = ValidateDocumentOrShowError();
+        if (validation == null) return;
 
         // Подготовка контекста экспорта
-        var context = await PrepareExportContextAsync(validation.Document!, requireScan: true, showProgress: false);
-        if (!context.IsValid)
-        {
-            MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+        var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: true, showProgress: false);
+        if (context == null) return;
 
         // Настройка UI для экспорта
-        SetUIState(UIState.Exporting);
-        _isExporting = true;
-        _operationCts = new CancellationTokenSource();
-
+        InitializeOperation(UIState.Exporting, ref _isExporting);
         var stopwatch = Stopwatch.StartNew();
         
         // Выполнение экспорта через централизованную обработку ошибок
@@ -883,24 +820,13 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
             var processedCount = 0;
             var skippedCount = itemsWithoutFlatPattern.Count;
             await Task.Run(() => ExportDXF(selectedItems, context.TargetDirectory, context.Multiplier, 
-                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts.Token), _operationCts.Token);
+                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts!.Token), _operationCts!.Token);
             
-            return new OperationResult
-            {
-                ProcessedCount = processedCount,
-                SkippedCount = skippedCount,
-                ElapsedTime = stopwatch.Elapsed,
-                WasCancelled = _operationCts.Token.IsCancellationRequested
-            };
+            return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
         }, "экспорта выделенных деталей");
 
         // Завершение операции
-        _isExporting = false;
-
-        SetUIStateAfterOperation(result, OperationType.Export);
-        
-        // Показ результата
-        ShowOperationResult(result, OperationType.Export);
+        CompleteOperation(result, OperationType.Export, ref _isExporting);
     }
 
     private void OverrideQuantity_Click(object sender, RoutedEventArgs e)

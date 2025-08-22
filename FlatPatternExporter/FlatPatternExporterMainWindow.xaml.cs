@@ -701,6 +701,84 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
+    /// <summary>
+    /// Централизованная валидация активного документа с показом ошибки
+    /// </summary>
+    private DocumentValidationResult? ValidateDocumentOrShowError()
+    {
+        var validation = ValidateActiveDocument();
+        if (!validation.IsValid)
+        {
+            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return null;
+        }
+        return validation;
+    }
+
+    /// <summary>
+    /// Централизованная подготовка контекста экспорта с показом ошибки
+    /// </summary>
+    private async Task<ExportContext?> PrepareExportContextOrShowError(Document document, bool requireScan = true, bool showProgress = false)
+    {
+        var context = await PrepareExportContextAsync(document, requireScan, showProgress);
+        if (!context.IsValid)
+        {
+            MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (context.ErrorMessage.Contains("сканирование"))
+                MultiplierTextBox.Text = "1";
+            return null;
+        }
+        return context;
+    }
+
+    /// <summary>
+    /// Централизованная инициализация операции
+    /// </summary>
+    private void InitializeOperation(UIState operationState, ref bool operationFlag)
+    {
+        SetUIState(operationState);
+        operationFlag = true;
+        _operationCts = new CancellationTokenSource();
+    }
+
+    /// <summary>
+    /// Централизованное завершение операции
+    /// </summary>
+    private void CompleteOperation(OperationResult result, OperationType operationType, ref bool operationFlag, bool isQuickMode = false)
+    {
+        operationFlag = false;
+        SetUIStateAfterOperation(result, operationType);
+        ShowOperationResult(result, operationType, isQuickMode);
+    }
+
+    /// <summary>
+    /// Централизованное создание результата экспортной операции
+    /// </summary>
+    private OperationResult CreateExportOperationResult(int processedCount, int skippedCount, TimeSpan elapsedTime)
+    {
+        return new OperationResult
+        {
+            ProcessedCount = processedCount,
+            SkippedCount = skippedCount,
+            ElapsedTime = elapsedTime,
+            WasCancelled = _operationCts!.Token.IsCancellationRequested
+        };
+    }
+
+    /// <summary>
+    /// Централизованная обработка прерывания экспорта
+    /// </summary>
+    private bool HandleExportCancellation()
+    {
+        if (_isExporting)
+        {
+            _operationCts?.Cancel();
+            SetUIState(new UIState { ExportEnabled = false, ExportButtonText = "Прерывание..." });
+            return true;
+        }
+        return false;
+    }
+
 
 
 
@@ -1478,17 +1556,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
 
         // Валидация документа
-        var validation = ValidateActiveDocument();
-        if (!validation.IsValid)
-        {
-            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
+        var validation = ValidateDocumentOrShowError();
+        if (validation == null) return;
 
         // Настройка UI для сканирования
-        SetUIState(UIState.Scanning);
-        _isScanning = true;
-        _operationCts = new CancellationTokenSource();
+        InitializeOperation(UIState.Scanning, ref _isScanning);
         _hasMissingReferences = false;
 
         // Прогресс для сканирования структуры сборки
@@ -1502,15 +1574,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         // Выполнение сканирования
         var result = await ExecuteWithErrorHandlingAsync(
-            () => ScanDocumentAsync(validation.Document!, _operationCts.Token, updateUI: true, scanProgress),
+            () => ScanDocumentAsync(validation.Document!, _operationCts!.Token, updateUI: true, scanProgress),
             "сканирования");
 
-        // Обработка завершения операции
-        _isScanning = false;
-        SetUIStateAfterOperation(result, OperationType.Scan);
-
-        // Показ результатов пользователю
-        ShowOperationResult(result, OperationType.Scan);
+        // Завершение операции
+        CompleteOperation(result, OperationType.Scan, ref _isScanning);
     }
     private void ConflictFilesButton_Click(object sender, RoutedEventArgs e)
     {
