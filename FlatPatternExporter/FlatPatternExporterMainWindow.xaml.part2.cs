@@ -161,19 +161,6 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private string GetModelStateName(Document doc)
-    {
-        try
-        {
-            return doc.ModelStateName ?? "Ошибка получения имени";
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Ошибка при получении Model State: {ex.Message}", "Ошибка", MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            return "Ошибка получения имени";
-        }
-    }
 
     private async Task<BitmapImage> GetThumbnailAsync(PartDocument document)
     {
@@ -549,7 +536,7 @@ public partial class FlatPatternExporterMainWindow : Window
         }
 
         // Подготавливаем папку экспорта
-        if (!PrepareForExport(out var targetDir, out var multiplier, out var stopwatch))
+        if (!PrepareForExport(out var targetDir, out var multiplier))
         {
             context.IsValid = false;
             context.ErrorMessage = "Ошибка при подготовке параметров экспорта";
@@ -603,11 +590,10 @@ public partial class FlatPatternExporterMainWindow : Window
     return context;
 }
 
-private bool PrepareForExport(out string targetDir, out int multiplier, out Stopwatch stopwatch)
+private bool PrepareForExport(out string targetDir, out int multiplier)
 {
-    stopwatch = new Stopwatch();
     targetDir = "";
-    multiplier = 1; // Присваиваем значение по умолчанию
+    multiplier = 1;
 
     // Обрабатываем выбор папки экспорта через enum
     switch (SelectedExportFolder)
@@ -672,30 +658,11 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
 
     SetUIState(UIState.Exporting);
 
-    stopwatch = Stopwatch.StartNew();
-
     return true;
 }
 
 
 
-    private async Task<List<PartData>> CreatePartDataListFromPartsAsync(Dictionary<string, int> parts, int multiplier)
-    {
-        var partsDataList = new List<PartData>();
-        var itemCounter = 1;
-        
-        foreach (var part in parts)
-        {
-            var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++, loadThumbnail: false);
-            if (partData != null)
-            {
-                partData.Quantity = partData.OriginalQuantity * multiplier;
-                partsDataList.Add(partData);
-            }
-        }
-        
-        return partsDataList;
-    }
 
     private async Task ExportWithoutScan()
     {
@@ -715,7 +682,18 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         var stopwatch = Stopwatch.StartNew();
 
         // Создаем временный список PartData для экспорта с полными данными
-        var tempPartsDataList = await CreatePartDataListFromPartsAsync(context.SheetMetalParts, context.Multiplier);
+        var tempPartsDataList = new List<PartData>();
+        var itemCounter = 1;
+        
+        foreach (var part in context.SheetMetalParts)
+        {
+            var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++, loadThumbnail: false);
+            if (partData != null)
+            {
+                partData.Quantity = partData.OriginalQuantity * context.Multiplier;
+                tempPartsDataList.Add(partData);
+            }
+        }
 
         // Выполнение экспорта через централизованную обработку ошибок
         context.GenerateThumbnails = false;
@@ -856,12 +834,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
     private void ExportDXF(IEnumerable<PartData> partsDataList, string targetDir, int multiplier,
         ref int processedCount, ref int skippedCount, bool generateThumbnails, CancellationToken cancellationToken = default)
     {
-        var organizeByMaterial = false;
-        var organizeByThickness = false;
-
-        // Используем свойства вместо прямого обращения к элементам управления
-        organizeByMaterial = OrganizeByMaterial;
-        organizeByThickness = OrganizeByThickness;
 
         var totalParts = partsDataList.Count();
 
@@ -904,10 +876,10 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
                 var material = partData.Material;
                 var thickness = partData.Thickness;
 
-                var materialDir = organizeByMaterial ? Path.Combine(targetDir, material) : targetDir;
+                var materialDir = OrganizeByMaterial ? Path.Combine(targetDir, material) : targetDir;
                 if (!Directory.Exists(materialDir)) Directory.CreateDirectory(materialDir);
 
-                var thicknessDir = organizeByThickness
+                var thicknessDir = OrganizeByThickness
                     ? Path.Combine(materialDir, thickness.ToString("F1"))
                     : materialDir;
                 if (!Directory.Exists(thicknessDir)) Directory.CreateDirectory(thicknessDir);
@@ -1183,7 +1155,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier, out Stop
         var mgr = new PropertyManager(doc);
         var partNumber = mgr.GetMappedProperty("PartNumber");
         var description = mgr.GetMappedProperty("Description");
-        var modelStateInfo = GetModelStateName(doc);
+        var modelStateInfo = mgr.GetModelState();
         var isPrimaryModelState = mgr.IsPrimaryModelState();
 
         // Заполняем отдельные поля в блоке информации о документе
