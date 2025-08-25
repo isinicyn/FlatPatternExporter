@@ -487,23 +487,6 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private void InitializeLibraryPaths()
-    {
-        if (_thisApplication == null) return;
-
-        try
-        {
-            var project = _thisApplication.DesignProjectManager.ActiveDesignProject;
-            foreach (ProjectPath projectPath in project.LibraryPaths)
-            {
-                _libraryPaths.Add(projectPath.Path);
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Ошибка при инициализации путей библиотек: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
     private bool IsLibraryComponent(string fullFileName)
     {
         try

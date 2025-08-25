@@ -161,7 +161,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             FixedFolderPathTextBlock.Text = value.Length > 55 ? $"... {value[^55..]}" : value;
         }
     }
-    private List<string> _libraryPaths = new List<string>();
     
     // Метод обработки
     private ProcessingMethod _selectedProcessingMethod = ProcessingMethod.BOM;
@@ -183,7 +182,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         InitializeComponent();
         InitializeInventor();
-        InitializeProjectFolder(); // Инициализация папки проекта при запуске
+        SetProjectFolderInfo(); // Инициализация папки проекта при запуске
         PartsDataGrid.ItemsSource = _partsData;
         PartsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
@@ -193,8 +192,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Обновляем видимость оверлея при изменении коллекции колонок
         ((System.Collections.Specialized.INotifyCollectionChanged)PartsDataGrid.Columns).CollectionChanged += (s, e) => UpdateNoColumnsOverlayVisibility();
         
-        // Инициализация путей библиотек
-        InitializeLibraryPaths();
 
         // Настройка TokenService для работы с визуальным контейнером
         TokenService?.SetTokenContainer(TokenContainer);
@@ -1224,7 +1221,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             _thisApplication = (Inventor.Application)MarshalCore.GetActiveObject("Inventor.Application");
             if (_thisApplication != null)
             {
-                InitializeProjectAndLibraryData();
+                InitializeProjectData();
                 return true;
             }
         }
@@ -1249,14 +1246,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         EnsureInventorConnection();
     }
-    private void InitializeProjectAndLibraryData()
+    private void InitializeProjectData()
     {
         if (_thisApplication != null)
         {
             try
             {
                 SetProjectFolderInfo();
-                InitializeLibraryPaths();
             }
             catch (Exception ex)
             {
@@ -1653,11 +1649,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             MessageBox.Show($"Не удалось получить информацию о проекте: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-    }
-    // Вызываем при инициализации приложения
-    private void InitializeProjectFolder()
-    {
-        SetProjectFolderInfo(); // Устанавливаем информацию о проекте
     }
 
     private void InitializeAcadVersions()
