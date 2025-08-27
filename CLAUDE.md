@@ -24,7 +24,6 @@ FlatPatternExporter/
     ├── ConflictDetailsWindow.xaml(.cs) # Окно деталей конфликтов
     ├── EditIPropertyDialog.xaml(.cs)   # Диалог редактирования свойств
     ├── SelectIPropertyWindow.xaml(.cs) # Окно выбора свойств
-    ├── OverrideQuantityDialog.xaml(.cs) # Диалог переопределения количества
     │
     ├── LayerSettingControl.xaml(.cs)   # Элемент управления слоями
     ├── TokenizedTextBox.xaml(.cs)      # Токенизированное текстовое поле
@@ -95,7 +94,6 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 **Диалоги управления свойствами**:
 - `EditIPropertyDialog` - Диалог редактирования свойств
 - `SelectIPropertyWindow` - Окно выбора свойств с интегрированным функционалом добавления пользовательских свойств
-- `OverrideQuantityDialog` - Диалог переопределения количества
 
 **Компоненты LayerSettings** (интегрированы):
 - `LayerSettingControl` - Пользовательский элемент управления для конфигурации слоев

@@ -813,25 +813,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         CompleteOperation(result, OperationType.Export, ref _isExporting);
     }
 
-    private void OverrideQuantity_Click(object sender, RoutedEventArgs e)
-    {
-        var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
-        
-        // Передаем текущее количество первого выбранного элемента для отображения пользователю
-        var currentQuantity = selectedItems.FirstOrDefault()?.Quantity;
-        var dialog = new OverrideQuantityDialog(currentQuantity);
-        dialog.Owner = this;
-        dialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-
-        if (dialog.ShowDialog() == true && dialog.NewQuantity.HasValue)
-        {
-            foreach (var item in selectedItems)
-            {
-                item.Quantity = dialog.NewQuantity.Value;
-                item.IsOverridden = true;
-            }
-        }
-    }
 
     private void ExportDXF(IEnumerable<PartData> partsDataList, string targetDir, int multiplier,
         ref int processedCount, ref int skippedCount, bool generateThumbnails, CancellationToken cancellationToken = default)
@@ -1226,7 +1207,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         var hasSingleSelection = PartsDataGrid.SelectedItems.Count == 1;
         
         ExportSelectedDXFMenuItem.IsEnabled = hasSelection;
-        OverrideQuantityMenuItem.IsEnabled = hasSelection;
         OpenFileLocationMenuItem.IsEnabled = hasSelection;
         OpenSelectedModelsMenuItem.IsEnabled = hasSelection;
         EditIPropertyMenuItem.IsEnabled = hasSingleSelection;

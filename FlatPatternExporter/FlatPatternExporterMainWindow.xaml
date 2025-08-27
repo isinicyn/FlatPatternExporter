@@ -583,7 +583,6 @@
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Экспортировать выбранные DXF" Click="ExportSelectedDXF_Click" x:Name="ExportSelectedDXFMenuItem"/>
-                            <MenuItem Header="Переопределить количество" Click="OverrideQuantity_Click" x:Name="OverrideQuantityMenuItem"/>
                             <Separator/>
                             <MenuItem Header="Открыть расположение файла" Click="OpenFileLocation_Click" x:Name="OpenFileLocationMenuItem"/>
                             <MenuItem Header="Открыть выбранные модели" Click="OpenSelectedModels_Click" x:Name="OpenSelectedModelsMenuItem"/>
