@@ -1020,6 +1020,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 templateColumn.CellEditingTemplate = editTemplate;
                 templateColumn.IsReadOnly = false;
             }
+            else
+            {
+                templateColumn.IsReadOnly = true;
+            }
 
             column = templateColumn;
         }

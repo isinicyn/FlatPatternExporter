@@ -1395,7 +1395,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         {
             Header = header,
             Binding = new Binding(bindingPath),
-            ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style
+            ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style,
+            IsReadOnly = true
         };
     }
 
