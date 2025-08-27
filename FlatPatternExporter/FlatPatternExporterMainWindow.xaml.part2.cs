@@ -92,8 +92,7 @@ public partial class FlatPatternExporterMainWindow : Window
             Item = itemNumber,
             
             // КАТЕГОРИЯ 6: Свойства количества и состояния
-            OriginalQuantity = quantity,
-            Quantity = quantity
+            OriginalQuantity = quantity
         };
 
         // Создаем единый экземпляр PropertyManager для всех операций
@@ -112,8 +111,10 @@ public partial class FlatPatternExporterMainWindow : Window
         if (loadThumbnail)
         {
             partData.Preview = await GetThumbnailAsync(partDoc);
-        }        
+        }
 
+        partData.SetQuantityInternal(quantity);
+        
         return partData;
     }
 
@@ -690,7 +691,8 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
             var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++, loadThumbnail: false);
             if (partData != null)
             {
-                partData.Quantity = partData.OriginalQuantity * context.Multiplier;
+                partData.SetQuantityInternal(partData.OriginalQuantity * context.Multiplier);
+                partData.IsMultiplied = context.Multiplier > 1;
                 tempPartsDataList.Add(partData);
             }
         }

@@ -167,9 +167,7 @@ public class TokenService : INotifyPropertyChanged
         return new PartData
         {
             PartNumber = "{PartNumber}",
-            Quantity = 0,
             Material = "{Material}",
-            Thickness = 0.0,
             Description = "{Description}",
             ModelState = "{ModelState}",
             Author = "{Author}",

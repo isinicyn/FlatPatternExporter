@@ -131,6 +131,16 @@
         </TextBlock>
     </DataTemplate>
 
+    <!-- Шаблон редактирования для колонки "Количество" -->
+    <DataTemplate x:Key="QuantityEditingTemplate">
+        <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                 HorizontalContentAlignment="Center">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{x:Static DataGrid.CommitEditCommand}"/>
+            </TextBox.InputBindings>
+        </TextBox>
+    </DataTemplate>
+
     <!-- Шаблон для колонки статуса обработки -->
     <DataTemplate x:Key="ProcessingStatusTemplate">
         <Border Width="10" Height="10" 

@@ -1007,11 +1007,21 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Проверка колонок с шаблонами
         if (ColumnTemplates.TryGetValue(iProperty.ColumnHeader, out var templateName))
         {
-            column = new DataGridTemplateColumn
+            var templateColumn = new DataGridTemplateColumn
             {
                 Header = iProperty.ColumnHeader,
                 CellTemplate = FindResource(templateName) as DataTemplate
             };
+
+            // Для колонки количества добавляем шаблон редактирования
+            if (iProperty.ColumnHeader == "Кол.")
+            {
+                var editTemplate = FindResource("QuantityEditingTemplate") as DataTemplate;
+                templateColumn.CellEditingTemplate = editTemplate;
+                templateColumn.IsReadOnly = false;
+            }
+
+            column = templateColumn;
         }
         else
         {
@@ -1362,9 +1372,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         foreach (var partData in _partsData)
         {
-            partData.IsOverridden = false; // Сброс переопределённых значений
-            partData.Quantity = partData.OriginalQuantity * multiplier;
-            partData.IsMultiplied = multiplier > 1; // Устанавливаем флаг множителя
+            partData.IsOverridden = false;
+            partData.SetQuantityInternal(partData.OriginalQuantity * multiplier);
+            partData.IsMultiplied = multiplier > 1;
         }
     }
 
@@ -1971,9 +1981,28 @@ public class PartData : INotifyPropertyChanged
         get => quantity;
         set
         {
-            quantity = value;
-            OnPropertyChanged();
+            System.Diagnostics.Debug.WriteLine($"PartData.Quantity setter: PartNumber={PartNumber}, OldValue={quantity}, NewValue={value}, IsOverridden={IsOverridden}");
+            if (value > 0 && quantity != value)
+            {
+                quantity = value;
+                IsOverridden = true;
+                IsMultiplied = false;
+                System.Diagnostics.Debug.WriteLine($"PartData.Quantity setter: Setting IsOverridden=true for {PartNumber}");
+                OnPropertyChanged();
+            }
+            else if (value > 0)
+            {
+                quantity = value;
+                OnPropertyChanged();
+            }
         }
+    }
+
+    internal void SetQuantityInternal(int value)
+    {
+        System.Diagnostics.Debug.WriteLine($"PartData.SetQuantityInternal: PartNumber={PartNumber}, OldValue={quantity}, NewValue={value}");
+        quantity = value;
+        OnPropertyChanged(nameof(Quantity));
     }
 
 

@@ -557,7 +557,7 @@
             <Grid Grid.Row="1">
                 <DataGrid x:Name="PartsDataGrid"
                       AutoGenerateColumns="False"
-                      IsReadOnly="True"
+                      IsReadOnly="False"
                       CanUserAddRows="False"
                       RowHeight="45"
                       GridLinesVisibility="None"
