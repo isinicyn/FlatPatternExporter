@@ -135,9 +135,6 @@
     <DataTemplate x:Key="QuantityEditingTemplate">
         <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
                  HorizontalContentAlignment="Center">
-            <TextBox.InputBindings>
-                <KeyBinding Key="Enter" Command="{x:Static DataGrid.CommitEditCommand}"/>
-            </TextBox.InputBindings>
         </TextBox>
     </DataTemplate>
 
