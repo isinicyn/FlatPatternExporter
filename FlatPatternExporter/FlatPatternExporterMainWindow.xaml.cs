@@ -175,7 +175,36 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         { "Изобр. детали", "PartImageTemplate" },
         { "Изобр. развертки", "DxfImageTemplate" },
         { "Обозначение", "PartNumberWithIndicatorTemplate" },
-        { "Кол.", "EditableQuantityTemplate" }
+        { "Кол.", "EditableQuantityTemplate" },
+        
+        // Summary Information  
+        { "Автор", "AuthorWithExpressionTemplate" },
+        { "Ревизия", "RevisionWithExpressionTemplate" },
+        { "Название", "TitleWithExpressionTemplate" },
+        { "Тема", "SubjectWithExpressionTemplate" },
+        { "Ключевые слова", "KeywordsWithExpressionTemplate" },
+        { "Примечание", "CommentsWithExpressionTemplate" },
+        
+        // Document Summary Information
+        { "Категория", "CategoryWithExpressionTemplate" },
+        { "Менеджер", "ManagerWithExpressionTemplate" },
+        { "Компания", "CompanyWithExpressionTemplate" },
+        
+        // Design Tracking Properties
+        { "Наименование", "DescriptionWithExpressionTemplate" },
+        { "Проект", "ProjectWithExpressionTemplate" },
+        { "Инвентарный номер", "StockNumberWithExpressionTemplate" },
+        { "Сметчик", "CostCenterWithExpressionTemplate" },
+        { "Проверил", "CheckedByWithExpressionTemplate" },
+        { "Нормоконтроль", "EngApprovedByWithExpressionTemplate" },
+        { "Статус", "UserStatusWithExpressionTemplate" },
+        { "Веб-ссылка", "CatalogWebLinkWithExpressionTemplate" },
+        { "Поставщик", "VendorWithExpressionTemplate" },
+        { "Утвердил", "MfgApprovedByWithExpressionTemplate" },
+        { "Статус разработки", "DesignStatusWithExpressionTemplate" },
+        { "Проектировщик", "DesignerWithExpressionTemplate" },
+        { "Инженер", "EngineerWithExpressionTemplate" },
+        { "Нач. отдела", "AuthorityWithExpressionTemplate" }
     };
 
 
@@ -1925,7 +1954,9 @@ public class PartData : INotifyPropertyChanged
     // КАТЕГОРИЯ 2/4: Обязательные свойства с уведомлениями (изменяются программно)
     private string partNumber = string.Empty;
     private string description = string.Empty;
-    private bool partNumberIsExpression = false;
+    
+    // Состояния выражений для редактируемых свойств
+    private readonly Dictionary<string, bool> _isExpressionFlags = new();
 
     public string PartNumber
     {
@@ -1940,18 +1971,53 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    public bool PartNumberIsExpression
+    /// <summary>
+    /// Проверяет, является ли указанное свойство выражением
+    /// </summary>
+    public bool IsPropertyExpression(string propertyName)
     {
-        get => partNumberIsExpression;
-        set
+        return _isExpressionFlags.TryGetValue(propertyName, out var isExpression) && isExpression;
+    }
+
+    /// <summary>
+    /// Устанавливает состояние выражения для свойства
+    /// </summary>
+    public void SetPropertyExpressionState(string propertyName, bool isExpression)
+    {
+        var oldValue = IsPropertyExpression(propertyName);
+        _isExpressionFlags[propertyName] = isExpression;
+        
+        if (oldValue != isExpression)
         {
-            if (partNumberIsExpression != value)
-            {
-                partNumberIsExpression = value;
-                OnPropertyChanged();
-            }
+            OnPropertyChanged($"{propertyName}IsExpression");
         }
     }
+
+    // Для обратной совместимости с существующими привязками
+    public bool PartNumberIsExpression => IsPropertyExpression("PartNumber");
+    public bool DescriptionIsExpression => IsPropertyExpression("Description");
+    public bool AuthorIsExpression => IsPropertyExpression("Author");
+    public bool RevisionIsExpression => IsPropertyExpression("Revision");
+    public bool TitleIsExpression => IsPropertyExpression("Title");
+    public bool SubjectIsExpression => IsPropertyExpression("Subject");
+    public bool KeywordsIsExpression => IsPropertyExpression("Keywords");
+    public bool CommentsIsExpression => IsPropertyExpression("Comments");
+    public bool CategoryIsExpression => IsPropertyExpression("Category");
+    public bool ManagerIsExpression => IsPropertyExpression("Manager");
+    public bool CompanyIsExpression => IsPropertyExpression("Company");
+    public bool ProjectIsExpression => IsPropertyExpression("Project");
+    public bool StockNumberIsExpression => IsPropertyExpression("StockNumber");
+    public bool CostCenterIsExpression => IsPropertyExpression("CostCenter");
+    public bool CheckedByIsExpression => IsPropertyExpression("CheckedBy");
+    public bool EngApprovedByIsExpression => IsPropertyExpression("EngApprovedBy");
+    public bool UserStatusIsExpression => IsPropertyExpression("UserStatus");
+    public bool CatalogWebLinkIsExpression => IsPropertyExpression("CatalogWebLink");
+    public bool VendorIsExpression => IsPropertyExpression("Vendor");
+    public bool MfgApprovedByIsExpression => IsPropertyExpression("MfgApprovedBy");
+    public bool DesignStatusIsExpression => IsPropertyExpression("DesignStatus");
+    public bool DesignerIsExpression => IsPropertyExpression("Designer");
+    public bool EngineerIsExpression => IsPropertyExpression("Engineer");
+    public bool AuthorityIsExpression => IsPropertyExpression("Authority");
 
 
     public string Description

@@ -15,6 +15,23 @@ namespace FlatPatternExporter
         public static readonly string SheetMetalSubType = "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}";
 
         /// <summary>
+        /// Список редактируемых свойств, которые могут быть выражениями
+        /// </summary>
+        private static readonly HashSet<string> EditableProperties = new()
+        {
+            // Design Tracking Properties
+            "Authority", "CatalogWebLink", "CheckedBy", "CostCenter", "Description", 
+            "Designer", "DesignStatus", "Engineer", "EngApprovedBy", "MfgApprovedBy", 
+            "PartNumber", "Project", "StockNumber", "UserStatus", "Vendor",
+            
+            // Summary Information  
+            "Author", "Comments", "Keywords", "Revision", "Subject", "Title",
+            
+            // Document Summary Information
+            "Category", "Company", "Manager"
+        };
+
+        /// <summary>
         /// Маппинг внутренних имен свойств на соответствующие наборы и имена в Inventor
         /// </summary>
         private static readonly Dictionary<string, (string SetName, string InventorName)> PropertyMapping = new()
@@ -384,6 +401,14 @@ namespace FlatPatternExporter
             }
 
             return presetProperties;
+        }
+
+        /// <summary>
+        /// Проверяет, является ли свойство редактируемым (может быть выражением)
+        /// </summary>
+        public static bool IsEditableProperty(string propertyName)
+        {
+            return EditableProperties.Contains(propertyName);
         }
 
         /// <summary>

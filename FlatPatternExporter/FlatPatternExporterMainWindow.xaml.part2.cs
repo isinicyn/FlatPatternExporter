@@ -33,9 +33,11 @@ public partial class FlatPatternExporterMainWindow : Window
 
         // Всегда обязательные свойства (независимо от наличия колонок)
         partData.PartNumber = mgr.GetMappedProperty("PartNumber");
-        partData.PartNumberIsExpression = mgr.IsMappedPropertyExpression("PartNumber");
         partData.Description = mgr.GetMappedProperty("Description");
         partData.Material = mgr.GetMappedProperty("Material");
+        
+        // Устанавливаем состояния выражений для всех редактируемых свойств
+        SetExpressionStatesForAllProperties(partData, mgr);
 
         // КАТЕГОРИЯ 4: Расширенные iProperty (загружаем все)
         partData.Author = mgr.GetMappedProperty("Author");
@@ -116,6 +118,29 @@ public partial class FlatPatternExporterMainWindow : Window
         partData.SetQuantityInternal(quantity);
         
         return partData;
+    }
+
+    /// <summary>
+    /// Устанавливает состояния выражений для всех редактируемых свойств
+    /// </summary>
+    private void SetExpressionStatesForAllProperties(PartData partData, PropertyManager mgr)
+    {
+        var editableProperties = new[]
+        {
+            "PartNumber", "Description", "Authority", "CatalogWebLink", "CheckedBy", "CostCenter",
+            "Designer", "DesignStatus", "Engineer", "EngApprovedBy", "MfgApprovedBy", "Project",
+            "StockNumber", "UserStatus", "Vendor", "Author", "Comments", "Keywords", "Revision",
+            "Subject", "Title", "Category", "Company", "Manager"
+        };
+
+        foreach (var property in editableProperties)
+        {
+            if (PropertyManager.IsEditableProperty(property))
+            {
+                var isExpression = mgr.IsMappedPropertyExpression(property);
+                partData.SetPropertyExpressionState(property, isExpression);
+            }
+        }
     }
 
     private BitmapImage GenerateDxfThumbnail(string dxfDirectory, string partNumber)
@@ -1476,8 +1501,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
             // Обновляем свойства детали в таблице после сохранения
             // Получаем актуальные значения (не выражения) для отображения
             selectedItem.PartNumber = mgr.GetMappedProperty("PartNumber");
-            selectedItem.PartNumberIsExpression = mgr.IsMappedPropertyExpression("PartNumber");
+            selectedItem.SetPropertyExpressionState("PartNumber", mgr.IsMappedPropertyExpression("PartNumber"));
             selectedItem.Description = mgr.GetMappedProperty("Description");
+            selectedItem.SetPropertyExpressionState("Description", mgr.IsMappedPropertyExpression("Description"));
         }
     }
 
