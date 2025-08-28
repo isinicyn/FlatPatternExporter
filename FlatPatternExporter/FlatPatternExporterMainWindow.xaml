@@ -572,7 +572,7 @@
                       EnableRowVirtualization="False"
                       SelectionChanged="partsDataGrid_SelectionChanged"
                       RowHeaderWidth="0"
-                      ContextMenuOpening="partsDataGrid_ContextMenuOpening"
+                      ContextMenuOpening="PartsDataGrid_ContextMenuOpening"
                       RowStyle="{StaticResource DataGridRowStyle}"
                       ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
                       RowHeaderStyle="{StaticResource DataGridRowHeaderStyle}"
@@ -588,6 +588,7 @@
                             <MenuItem Header="Открыть выбранные модели" Click="OpenSelectedModels_Click" x:Name="OpenSelectedModelsMenuItem"/>
                             <Separator/>
                             <MenuItem Header="Редактировать iProperty" Click="EditIProperty_Click" x:Name="EditIPropertyMenuItem"/>
+                            <MenuItem Header="Сбросить количество" Click="ResetQuantity_Click" x:Name="ResetQuantityMenuItem"/>
                             <Separator/>
                             <MenuItem Header="Удалить выбранные строки" Click="RemoveSelectedRows_Click" x:Name="RemoveSelectedRowsMenuItem"/>
                             <MenuItem Header="Очистить список" Click="ClearList_Click"/>

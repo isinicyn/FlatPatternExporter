@@ -1194,9 +1194,9 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         }
     }
 
-    private void partsDataGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    private void PartsDataGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        if (_partsData.Count == 0) 
+        if (_partsData.Count == 0)
         {
             e.Handled = true; // Предотвращаем открытие контекстного меню, если таблица пуста
             return;
@@ -1205,11 +1205,13 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         // Управляем доступностью пунктов меню в зависимости от выделения
         var hasSelection = PartsDataGrid.SelectedItems.Count > 0;
         var hasSingleSelection = PartsDataGrid.SelectedItems.Count == 1;
+        var hasOverriddenSelection = hasSelection && PartsDataGrid.SelectedItems.Cast<PartData>().Any(item => item.IsOverridden);
         
         ExportSelectedDXFMenuItem.IsEnabled = hasSelection;
         OpenFileLocationMenuItem.IsEnabled = hasSelection;
         OpenSelectedModelsMenuItem.IsEnabled = hasSelection;
         EditIPropertyMenuItem.IsEnabled = hasSingleSelection;
+        ResetQuantityMenuItem.IsEnabled = hasOverriddenSelection;
         RemoveSelectedRowsMenuItem.IsEnabled = hasSelection;
     }
 
@@ -1501,6 +1503,32 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         {
             RemoveSelectedRows_Click(this, new RoutedEventArgs());
             e.Handled = true;
+        }
+    }
+
+    private void ResetQuantity_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
+        if (!selectedItems.Any()) return;
+
+        var overriddenItems = selectedItems.Where(item => item.IsOverridden).ToList();
+        if (!overriddenItems.Any())
+        {
+            MessageBox.Show("В выбранных элементах нет переопределенных количеств.", "Информация", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var message = overriddenItems.Count == 1 
+            ? $"Сбросить количество для \"{overriddenItems[0].PartNumber}\" до исходного значения {overriddenItems[0].OriginalQuantity}?"
+            : $"Сбросить количество для {overriddenItems.Count} выбранных элементов до исходных значений?";
+
+        var result = MessageBox.Show(message, "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if (result != MessageBoxResult.Yes) return;
+
+        foreach (var item in overriddenItems)
+        {
+            item.Quantity = item.OriginalQuantity;
         }
     }
 }
