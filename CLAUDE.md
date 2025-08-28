@@ -22,7 +22,6 @@ FlatPatternExporter/
     ├── FlatPatternExporterMainWindow.xaml(.cs,.part2.cs)  # Главное окно
     ├── AboutWindow.xaml(.cs)           # Окно "О программе"
     ├── ConflictDetailsWindow.xaml(.cs) # Окно деталей конфликтов
-    ├── EditIPropertyDialog.xaml(.cs)   # Диалог редактирования свойств
     ├── SelectIPropertyWindow.xaml(.cs) # Окно выбора свойств
     │
     ├── LayerSettingControl.xaml(.cs)   # Элемент управления слоями
@@ -92,7 +91,6 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `AboutWindow` - Окно "О программе"
 
 **Диалоги управления свойствами**:
-- `EditIPropertyDialog` - Диалог редактирования свойств
 - `SelectIPropertyWindow` - Окно выбора свойств с интегрированным функционалом добавления пользовательских свойств
 
 **Компоненты LayerSettings** (интегрированы):

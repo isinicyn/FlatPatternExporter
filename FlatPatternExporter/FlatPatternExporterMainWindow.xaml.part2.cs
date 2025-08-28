@@ -1235,7 +1235,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         ExportSelectedDXFMenuItem.IsEnabled = hasSelection;
         OpenFileLocationMenuItem.IsEnabled = hasSelection;
         OpenSelectedModelsMenuItem.IsEnabled = hasSelection;
-        EditIPropertyMenuItem.IsEnabled = hasSingleSelection;
         ResetQuantityMenuItem.IsEnabled = hasOverriddenSelection;
         RemoveSelectedRowsMenuItem.IsEnabled = hasSelection;
     }
@@ -1355,9 +1354,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
 
     private void PartsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        // Активация пункта "Редактировать iProperty" только при выборе одной строки
-        EditIPropertyMenuItem.IsEnabled = PartsDataGrid.SelectedItems.Count == 1;
-        
         // Обновляем предпросмотр с выбранной строкой
         var selectedPart = PartsDataGrid.SelectedItem as PartData;
         _tokenService.UpdatePreviewWithSelectedData(selectedPart);
@@ -1446,66 +1442,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         _ = FillPropertyDataAsync(propertyName);
     }
 
-    private void EditIProperty_Click(object sender, RoutedEventArgs e)
-    {
-        var selectedItem = PartsDataGrid.SelectedItem as PartData;
-        if (selectedItem == null) return;
-        
-        // Открываем документ детали
-        var partDoc = OpenPartDocument(selectedItem.PartNumber);
-        if (partDoc == null)
-        {
-            MessageBox.Show("Не удалось открыть документ детали для редактирования.", "Ошибка", MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            return;
-        }
-
-        var mgr = new PropertyManager((Document)partDoc);
-        
-        // Получаем выражения или значения для передачи в диалог
-        var partNumberForEdit = selectedItem.PartNumberIsExpression 
-            ? mgr.GetMappedPropertyExpression("PartNumber") 
-            : selectedItem.PartNumber;
-            
-        var descriptionIsExpression = mgr.IsMappedPropertyExpression("Description");
-        var descriptionForEdit = descriptionIsExpression 
-            ? mgr.GetMappedPropertyExpression("Description") 
-            : selectedItem.Description;
-        
-        var editDialog = new EditIPropertyDialog(partNumberForEdit, descriptionForEdit);
-        if (editDialog.ShowDialog() == true)
-        {
-            // Обновляем iProperty в файле детали
-            // Если изначально было выражение и новое значение начинается с "=", устанавливаем выражение
-            if (selectedItem.PartNumberIsExpression && editDialog.PartNumber.StartsWith("="))
-            {
-                mgr.SetMappedPropertyExpression("PartNumber", editDialog.PartNumber);
-            }
-            else
-            {
-                mgr.SetMappedProperty("PartNumber", editDialog.PartNumber);
-            }
-            
-            if (descriptionIsExpression && editDialog.Description.StartsWith("="))
-            {
-                mgr.SetMappedPropertyExpression("Description", editDialog.Description);
-            }
-            else
-            {
-                mgr.SetMappedProperty("Description", editDialog.Description);
-            }
-
-            // Сохраняем изменения
-            partDoc.Save2();
-
-            // Обновляем свойства детали в таблице после сохранения
-            // Получаем актуальные значения (не выражения) для отображения
-            selectedItem.PartNumber = mgr.GetMappedProperty("PartNumber");
-            selectedItem.SetPropertyExpressionState("PartNumber", mgr.IsMappedPropertyExpression("PartNumber"));
-            selectedItem.Description = mgr.GetMappedProperty("Description");
-            selectedItem.SetPropertyExpressionState("Description", mgr.IsMappedPropertyExpression("Description"));
-        }
-    }
 
 
     private void AboutButton_Click(object sender, RoutedEventArgs e)
