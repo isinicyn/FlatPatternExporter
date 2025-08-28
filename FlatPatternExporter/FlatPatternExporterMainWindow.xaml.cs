@@ -178,6 +178,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         { "Кол.", "QuantityTemplate" }
     };
 
+    private static readonly Dictionary<string, string> EditingTemplates = new()
+    {
+        { "Кол.", "QuantityEditingTemplate" }
+    };
+
     public FlatPatternExporterMainWindow()
     {
         InitializeComponent();
@@ -1013,10 +1018,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 CellTemplate = FindResource(templateName) as DataTemplate
             };
 
-            // Для колонки количества добавляем шаблон редактирования
-            if (iProperty.ColumnHeader == "Кол.")
+            // Для редактируемых колонок добавляем шаблон редактирования
+            if (EditingTemplates.TryGetValue(iProperty.ColumnHeader, out var editingTemplateName))
             {
-                var editTemplate = FindResource("QuantityEditingTemplate") as DataTemplate;
+                var editTemplate = FindResource(editingTemplateName) as DataTemplate;
                 templateColumn.CellEditingTemplate = editTemplate;
                 templateColumn.IsReadOnly = false;
             }
