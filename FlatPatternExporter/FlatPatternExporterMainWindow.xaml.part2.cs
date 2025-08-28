@@ -1328,7 +1328,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         }
     }
 
-    private void partsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void PartsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         // Активация пункта "Редактировать iProperty" только при выборе одной строки
         EditIPropertyMenuItem.IsEnabled = PartsDataGrid.SelectedItems.Count == 1;

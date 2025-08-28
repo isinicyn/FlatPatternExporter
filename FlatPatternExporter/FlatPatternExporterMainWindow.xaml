@@ -570,7 +570,7 @@
                       SelectionMode="Extended"
                       AlternationCount="2"
                       EnableRowVirtualization="False"
-                      SelectionChanged="partsDataGrid_SelectionChanged"
+                      SelectionChanged="PartsDataGrid_SelectionChanged"
                       RowHeaderWidth="0"
                       ContextMenuOpening="PartsDataGrid_ContextMenuOpening"
                       RowStyle="{StaticResource DataGridRowStyle}"
