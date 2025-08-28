@@ -109,33 +109,43 @@
         </Grid>
     </DataTemplate>
 
-    <!-- Шаблон для колонки "Количество" с цветовой индикацией -->
-    <DataTemplate x:Key="QuantityTemplate">
-        <TextBlock Text="{Binding Quantity}">
-            <TextBlock.Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsOverridden}" Value="True">
-                            <Setter Property="Foreground" Value="{DynamicResource QuantityOverriddenBrush}"/>
-                        </DataTrigger>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding IsOverridden}" Value="False"/>
-                                <Condition Binding="{Binding IsMultiplied}" Value="True"/>
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Foreground" Value="{DynamicResource QuantityMultipliedBrush}"/>
-                        </MultiDataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
-    </DataTemplate>
-
-    <!-- Шаблон редактирования для колонки "Количество" -->
-    <DataTemplate x:Key="QuantityEditingTemplate">
-        <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
-                 HorizontalContentAlignment="Center">
-        </TextBox>
+    <!-- Шаблон для колонки "Количество" с цветовой индикацией и возможностью редактирования -->
+    <DataTemplate x:Key="EditableQuantityTemplate">
+        <Grid>
+            <!-- Отображение в режиме чтения -->
+            <TextBlock Text="{Binding Quantity}" x:Name="DisplayTextBlock">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsOverridden}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource QuantityOverriddenBrush}"/>
+                            </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsOverridden}" Value="False"/>
+                                    <Condition Binding="{Binding IsMultiplied}" Value="True"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="{DynamicResource QuantityMultipliedBrush}"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            
+            <!-- Редактирование в режиме редактирования -->
+            <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                     HorizontalContentAlignment="Center"
+                     x:Name="EditTextBox"
+                     Visibility="Collapsed"/>
+        </Grid>
+        
+        <DataTemplate.Triggers>
+            <!-- Переключение между режимами отображения и редактирования -->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Path=IsEditing}" Value="True">
+                <Setter TargetName="DisplayTextBlock" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="EditTextBox" Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+        </DataTemplate.Triggers>
     </DataTemplate>
 
     <!-- Шаблон для колонки статуса обработки -->

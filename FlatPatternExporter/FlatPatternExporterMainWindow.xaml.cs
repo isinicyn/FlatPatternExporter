@@ -175,13 +175,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         { "Изобр. детали", "PartImageTemplate" },
         { "Изобр. развертки", "DxfImageTemplate" },
         { "Обозначение", "PartNumberWithIndicatorTemplate" },
-        { "Кол.", "QuantityTemplate" }
+        { "Кол.", "EditableQuantityTemplate" }
     };
 
-    private static readonly Dictionary<string, string> EditingTemplates = new()
-    {
-        { "Кол.", "QuantityEditingTemplate" }
-    };
 
     public FlatPatternExporterMainWindow()
     {
@@ -1015,20 +1011,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var templateColumn = new DataGridTemplateColumn
             {
                 Header = iProperty.ColumnHeader,
-                CellTemplate = FindResource(templateName) as DataTemplate
+                CellTemplate = FindResource(templateName) as DataTemplate,
+                IsReadOnly = !templateName.StartsWith("Editable")
             };
-
-            // Для редактируемых колонок добавляем шаблон редактирования
-            if (EditingTemplates.TryGetValue(iProperty.ColumnHeader, out var editingTemplateName))
-            {
-                var editTemplate = FindResource(editingTemplateName) as DataTemplate;
-                templateColumn.CellEditingTemplate = editTemplate;
-                templateColumn.IsReadOnly = false;
-            }
-            else
-            {
-                templateColumn.IsReadOnly = true;
-            }
 
             column = templateColumn;
         }
