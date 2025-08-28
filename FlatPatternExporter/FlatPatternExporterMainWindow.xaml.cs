@@ -1979,9 +1979,9 @@ public class PartData : INotifyPropertyChanged
             if (value > 0 && quantity != value)
             {
                 quantity = value;
-                IsOverridden = true;
+                IsOverridden = value != OriginalQuantity;
                 IsMultiplied = false;
-                System.Diagnostics.Debug.WriteLine($"PartData.Quantity setter: Setting IsOverridden=true for {PartNumber}");
+                System.Diagnostics.Debug.WriteLine($"PartData.Quantity setter: Setting IsOverridden={IsOverridden} for {PartNumber}");
                 OnPropertyChanged();
             }
             else if (value > 0)
