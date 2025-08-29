@@ -24,14 +24,13 @@
                                    Style="{StaticResource BaseTextBlockStyle}"/>
                         <Button Width="{StaticResource LargeElementHeight}" Height="{StaticResource LargeElementHeight}" 
                                 Margin="{StaticResource SmallMarginThickness}" 
-                                HorizontalAlignment="Right" 
-                                VerticalAlignment="Center" 
                                 Click="CopyVersionToClipboard_Click" 
-                                ToolTip="Копировать версию">
-                            <Image Source="/Resources/Pic/copy-icon.png" 
-                                   Stretch="Uniform" 
-                                   Width="16" 
-                                   Height="16"/>
+                                ToolTip="Копировать версию" HorizontalAlignment="Right">
+                            <Viewbox Width="16" Height="16">
+                                <Path Data="{StaticResource CopyIconGeometry}" 
+                                      Stroke="{DynamicResource TextSecondaryBrush}" 
+                                      StrokeThickness="1.5" Stretch="Fill"/>
+                            </Viewbox>
                         </Button>
                     </DockPanel>
 
