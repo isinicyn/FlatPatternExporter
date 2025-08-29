@@ -1811,8 +1811,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-
-
     private void AvailableTokensListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         var listBox = sender as System.Windows.Controls.ListBox;

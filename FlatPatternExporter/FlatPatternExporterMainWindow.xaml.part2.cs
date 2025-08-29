@@ -553,8 +553,11 @@ public partial class FlatPatternExporterMainWindow : Window
     
     try
     {
-        // Очищаем трекер конфликтов и список конфликтующих деталей для изоляции от предыдущих сканирований
-        ClearConflictData();
+        // Очищаем конфликты только если сменился документ (чтобы не показывать неактуальные конфликты)
+        if (requireScan && document != _lastScannedDocument)
+        {
+            ClearConflictData();
+        }
         
         // Проверяем документ на валидность
         if (requireScan && document != _lastScannedDocument)
