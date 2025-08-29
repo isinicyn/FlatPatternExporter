@@ -12,7 +12,7 @@ FlatPatternExporter/
 ├── LICENSE.txt                         # Лицензия
 ├── README.md                           # Документация проекта
 ├── FlatPatternExporter.sln             # Файл решения Visual Studio
-├── HELP/                               # Документация
+├── HELP/                               # Временные файлы справки
 └── FlatPatternExporter/                # Основной проект
     ├── FlatPatternExporter.csproj      # Файл проекта
     ├── App.xaml(.cs)                   # Главное приложение
@@ -25,7 +25,7 @@ FlatPatternExporter/
     ├── SelectIPropertyWindow.xaml(.cs) # Окно выбора свойств
     │
     ├── LayerSettingControl.xaml(.cs)   # Элемент управления слоями
-    ├── TokenizedTextBox.xaml(.cs)      # Токенизированное текстовое поле
+    ├── TextWithFxIndicator.xaml(.cs)   # Компонент с FX индикатором
     │
     ├── Styles/                         # XAML стили
     │   ├── ColorResources.xaml
@@ -33,7 +33,7 @@ FlatPatternExporter/
     │   └── GeneralStyles.xaml
     │
     ├── MarshalCore.cs                  # COM interop
-    ├── DXFThumbnailCreator.cs          # Генерация миниатюр
+    ├── DxfGenerator.cs                 # Генератор DXF
     ├── IPictureDispConverter.cs        # Конвертер изображений
     ├── PropertyManager.cs              # Управление свойствами
     ├── SettingsManager.cs              # Настройки пользователя
@@ -105,11 +105,11 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 
 **Утилиты**:
 - `MarshalCore` - Основная функциональность COM interop  
-- `DXFThumbnailCreator` - Генерация миниатюр DXF файлов
+- `DxfGenerator` - Генератор и обработка DXF файлов
 - `IPictureDispConverter` - Конвертер изображений
 - `SettingsManager` - Система сохранения и загрузки настроек пользователя в XML
 - `PropertyManager` - Управление пользовательскими свойствами iProperty
-- `TokenizedTextBox` - Пользовательский элемент управления для токенизированного ввода текста
+- `TextWithFxIndicator` - Компонент с FX индикатором для текстовых полей
 - `TokenService` - Централизованная обработка токенов для генерации имен файлов
 
 ### Управление версиями
@@ -182,6 +182,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Архитектура UI соответствует принципам WPF Data Binding
 - Для новых RadioButton групп используется enum + `EnumToBooleanConverter`
 - **НЕ добавлять комментарии об изменениях в код** - использовать только чистый код без комментариев о внесенных правках
+- **НЕ детализировать содержимое папки HELP** - это временные справочные файлы, упоминать только общее назначение
 
 ## Стиль кодирования
 
