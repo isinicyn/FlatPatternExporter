@@ -364,3 +364,7 @@ FodyWeavers.xsd
 
 # Project documentation and analysis
 HELP/
+
+# IDE and tool configurations
+.kiro/
+.vscode/

@@ -72,14 +72,7 @@ namespace FlatPatternExporter
 
             // Возвращаем заглушку, если не удалось получить дату
             return "Дата не определена";
-        }
-        // Метод для получения пути к директории с GIT-репозиторием
-        // Убедитесь, что этот путь корректен, если репозиторий в другой папке
-        private string GetGitRepositoryPath()
-        {
-            // Например, если GIT-репозиторий находится в корневой папке проекта
-            return AppDomain.CurrentDomain.BaseDirectory;
-        }
+        }        
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
