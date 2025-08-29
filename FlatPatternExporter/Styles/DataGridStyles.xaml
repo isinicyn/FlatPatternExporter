@@ -19,195 +19,11 @@
         <Setter Property="Visibility" Value="Collapsed"/>
     </Style>
 
-    <!-- Стиль для индикатора выражения PartNumber -->
-    <Style x:Key="PartNumberExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
+    <!-- Универсальный стиль индикатора выражения fx.
+         Привяжите булев флаг к Tag у TextBlock. -->
+    <Style x:Key="FxIndicatorByTagStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding PartNumberIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <!-- Стили для остальных редактируемых свойств -->
-    <Style x:Key="DescriptionExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding DescriptionIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="AuthorExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding AuthorIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="RevisionExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RevisionIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="TitleExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding TitleIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="SubjectExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding SubjectIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="KeywordsExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding KeywordsIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="CommentsExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding CommentsIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="CategoryExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding CategoryIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="ManagerExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ManagerIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="CompanyExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding CompanyIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="ProjectExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ProjectIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="StockNumberExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding StockNumberIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="CostCenterExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding CostCenterIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="CheckedByExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding CheckedByIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="EngApprovedByExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding EngApprovedByIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="UserStatusExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding UserStatusIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="CatalogWebLinkExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding CatalogWebLinkIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="VendorExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding VendorIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="MfgApprovedByExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding MfgApprovedByIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="DesignStatusExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding DesignStatusIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="DesignerExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding DesignerIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="EngineerExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding EngineerIsExpression}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="AuthorityExpressionIndicatorStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding AuthorityIsExpression}" Value="True">
+            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
                 <Setter Property="Visibility" Value="Visible"/>
             </DataTrigger>
         </Style.Triggers>
@@ -263,13 +79,12 @@
         </Grid>
     </DataTemplate>
 
-    <!-- Шаблон для колонки "Обозначение" с индикатором развертки -->
-    <DataTemplate x:Key="PartNumberWithIndicatorTemplate">
+    <!-- Шаблон для колонки ID с индикатором развертки -->
+    <DataTemplate x:Key="IDWithFlatPatternIndicatorTemplate">
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="7"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Rectangle Grid.Column="0" 
                        Width="3" 
@@ -290,406 +105,110 @@
                 </Rectangle.Style>
             </Rectangle>
             <TextBlock Grid.Column="1" 
-                       Text="{Binding PartNumber}" 
+                       Text="{Binding Item}" 
                        VerticalAlignment="Center" 
                        HorizontalAlignment="Center" 
                        Style="{StaticResource CenteredCellStyle}" 
                        TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="2" 
-                       Style="{StaticResource PartNumberExpressionIndicatorStyle}"/>
         </Grid>
+    </DataTemplate>
+
+    <!-- Шаблон для колонки "Обозначение" с индикатором выражения -->
+    <DataTemplate x:Key="PartNumberWithExpressionTemplate">
+        <local:TextWithFxIndicator Text="{Binding PartNumber}" IsExpression="{Binding PartNumberIsExpression}"/>
     </DataTemplate>
 
     <!-- Универсальные шаблоны для редактируемых свойств с индикаторами выражений -->
     <DataTemplate x:Key="DescriptionWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Description}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource DescriptionExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Description}" IsExpression="{Binding DescriptionIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="AuthorWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Author}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource AuthorExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Author}" IsExpression="{Binding AuthorIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="RevisionWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Revision}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource RevisionExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Revision}" IsExpression="{Binding RevisionIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="TitleWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Title}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource TitleExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Title}" IsExpression="{Binding TitleIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="SubjectWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Subject}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource SubjectExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Subject}" IsExpression="{Binding SubjectIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="KeywordsWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Keywords}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource KeywordsExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Keywords}" IsExpression="{Binding KeywordsIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CommentsWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Comments}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource CommentsExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Comments}" IsExpression="{Binding CommentsIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CategoryWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Category}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource CategoryExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Category}" IsExpression="{Binding CategoryIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="ManagerWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Manager}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource ManagerExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Manager}" IsExpression="{Binding ManagerIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CompanyWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Company}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource CompanyExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Company}" IsExpression="{Binding CompanyIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="ProjectWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Project}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource ProjectExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Project}" IsExpression="{Binding ProjectIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="StockNumberWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding StockNumber}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource StockNumberExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding StockNumber}" IsExpression="{Binding StockNumberIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CostCenterWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding CostCenter}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource CostCenterExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding CostCenter}" IsExpression="{Binding CostCenterIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CheckedByWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding CheckedBy}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource CheckedByExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding CheckedBy}" IsExpression="{Binding CheckedByIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="EngApprovedByWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding EngApprovedBy}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource EngApprovedByExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding EngApprovedBy}" IsExpression="{Binding EngApprovedByIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="UserStatusWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding UserStatus}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource UserStatusExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding UserStatus}" IsExpression="{Binding UserStatusIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CatalogWebLinkWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding CatalogWebLink}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource CatalogWebLinkExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding CatalogWebLink}" IsExpression="{Binding CatalogWebLinkIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="VendorWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Vendor}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource VendorExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Vendor}" IsExpression="{Binding VendorIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="MfgApprovedByWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding MfgApprovedBy}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource MfgApprovedByExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding MfgApprovedBy}" IsExpression="{Binding MfgApprovedByIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="DesignStatusWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding DesignStatus}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource DesignStatusExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding DesignStatus}" IsExpression="{Binding DesignStatusIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="DesignerWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Designer}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource DesignerExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Designer}" IsExpression="{Binding DesignerIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="EngineerWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Engineer}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource EngineerExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Engineer}" IsExpression="{Binding EngineerIsExpression}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="AuthorityWithExpressionTemplate">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" 
-                       Text="{Binding Authority}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Center" 
-                       Style="{StaticResource CenteredCellStyle}" 
-                       TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" 
-                       Style="{StaticResource AuthorityExpressionIndicatorStyle}"/>
-        </Grid>
+        <local:TextWithFxIndicator Text="{Binding Authority}" IsExpression="{Binding AuthorityIsExpression}"/>
     </DataTemplate>
 
     <!-- Шаблон для колонки "Количество" с цветовой индикацией и возможностью редактирования -->

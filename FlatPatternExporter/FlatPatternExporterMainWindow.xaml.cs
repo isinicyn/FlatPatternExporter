@@ -174,7 +174,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         { "Обр.", "ProcessingStatusTemplate" },
         { "Изобр. детали", "PartImageTemplate" },
         { "Изобр. развертки", "DxfImageTemplate" },
-        { "Обозначение", "PartNumberWithIndicatorTemplate" },
+        { "ID", "IDWithFlatPatternIndicatorTemplate" },
         { "Кол.", "EditableQuantityTemplate" },
         
         // Summary Information  
@@ -191,6 +191,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         { "Компания", "CompanyWithExpressionTemplate" },
         
         // Design Tracking Properties
+        { "Обозначение", "PartNumberWithExpressionTemplate" },
         { "Наименование", "DescriptionWithExpressionTemplate" },
         { "Проект", "ProjectWithExpressionTemplate" },
         { "Инвентарный номер", "StockNumberWithExpressionTemplate" },
