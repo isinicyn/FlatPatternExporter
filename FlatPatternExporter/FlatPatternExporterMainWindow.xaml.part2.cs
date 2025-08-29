@@ -72,7 +72,6 @@ public partial class FlatPatternExporterMainWindow : Window
         partData.FlatPatternArea = mgr.GetMappedProperty("FlatPatternArea");
         partData.Appearance = mgr.GetMappedProperty("Appearance");
     }
-    
 
     // Перегрузка для сборок - открывает документ по partNumber
     private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber, bool loadThumbnail = true)
@@ -186,7 +185,6 @@ public partial class FlatPatternExporterMainWindow : Window
             return null!;
         }
     }
-
 
     private async Task<BitmapImage> GetThumbnailAsync(PartDocument document)
     {
@@ -330,6 +328,7 @@ public partial class FlatPatternExporterMainWindow : Window
             }
         }
     }
+
     private void ProcessBOM(BOM bom, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null, CancellationToken cancellationToken = default)
     {
         try
@@ -519,6 +518,7 @@ public partial class FlatPatternExporterMainWindow : Window
             return false;
         }
     }
+
     private bool ShouldExcludeComponent(BOMStructureEnum bomStructure, string fullFileName)
     {
         if (ExcludeReferenceParts && bomStructure == BOMStructureEnum.kReferenceBOMStructure)
@@ -535,6 +535,7 @@ public partial class FlatPatternExporterMainWindow : Window
 
         return false;
     }
+
     private void SelectFixedFolderButton_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new FolderBrowserDialog();
@@ -621,79 +622,76 @@ public partial class FlatPatternExporterMainWindow : Window
     return context;
 }
 
-private bool PrepareForExport(out string targetDir, out int multiplier)
-{
-    targetDir = "";
-    multiplier = 1;
-
-    // Обрабатываем выбор папки экспорта через enum
-    switch (SelectedExportFolder)
+    private bool PrepareForExport(out string targetDir, out int multiplier)
     {
-        case ExportFolderType.ChooseFolder:
-            // Открываем диалог выбора папки
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                targetDir = dialog.SelectedPath;
-            else
-                return false;
-            break;
+        targetDir = "";
+        multiplier = 1;
+
+        // Обрабатываем выбор папки экспорта через enum
+        switch (SelectedExportFolder)
+        {
+            case ExportFolderType.ChooseFolder:
+                // Открываем диалог выбора папки
+                var dialog = new FolderBrowserDialog();
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    targetDir = dialog.SelectedPath;
+                else
+                    return false;
+                break;
             
-        case ExportFolderType.ComponentFolder:
-            // Папка компонента
-            targetDir = Path.GetDirectoryName(_thisApplication?.ActiveDocument?.FullFileName) ?? "";
-            break;
+            case ExportFolderType.ComponentFolder:
+                // Папка компонента
+                targetDir = Path.GetDirectoryName(_thisApplication?.ActiveDocument?.FullFileName) ?? "";
+                break;
             
-        case ExportFolderType.FixedFolder:
-            if (string.IsNullOrEmpty(_fixedFolderPath))
-            {
-                MessageBox.Show("Выберите фиксированную папку.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-            targetDir = _fixedFolderPath;
-            break;
-            
-        case ExportFolderType.ProjectFolder:
-            try
-            {
-                targetDir = _thisApplication?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? "";
-                if (string.IsNullOrEmpty(targetDir))
+            case ExportFolderType.FixedFolder:
+                if (string.IsNullOrEmpty(_fixedFolderPath))
                 {
-                    MessageBox.Show("Не удалось получить путь проекта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Выберите фиксированную папку.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при получении папки проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-            break;
+                targetDir = _fixedFolderPath;
+                break;
             
-        case ExportFolderType.PartFolder:
-            // Обрабатывается отдельно в ExportDXF методе
-            break;
+            case ExportFolderType.ProjectFolder:
+                try
+                {
+                    targetDir = _thisApplication?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? "";
+                    if (string.IsNullOrEmpty(targetDir))
+                    {
+                        MessageBox.Show("Не удалось получить путь проекта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при получении папки проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+                break;
+            
+            case ExportFolderType.PartFolder:
+                // Обрабатывается отдельно в ExportDXF методе
+                break;
+        }
+
+        if (EnableSubfolder && !string.IsNullOrEmpty(SubfolderNameTextBox.Text))
+        {
+            targetDir = Path.Combine(targetDir!, SubfolderNameTextBox.Text);
+            if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
+        }
+
+        if (!int.TryParse(MultiplierTextBox.Text, out multiplier))
+        {
+            MessageBox.Show("Введите допустимое целое число для множителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            return false;
+        }
+
+
+        SetUIState(UIState.Exporting);
+
+        return true;
     }
-
-    if (EnableSubfolder && !string.IsNullOrEmpty(SubfolderNameTextBox.Text))
-    {
-        targetDir = Path.Combine(targetDir!, SubfolderNameTextBox.Text);
-        if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
-    }
-
-    if (!int.TryParse(MultiplierTextBox.Text, out multiplier))
-    {
-        MessageBox.Show("Введите допустимое целое число для множителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        return false;
-    }
-
-
-    SetUIState(UIState.Exporting);
-
-    return true;
-}
-
-
-
 
     private async Task ExportWithoutScan()
     {
@@ -742,7 +740,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         // Завершение операции
         CompleteOperation(result, OperationType.Export, ref _isExporting, isQuickMode: true);
     }
-
 
     private async void ExportButton_Click(object sender, RoutedEventArgs e)
     {
@@ -842,7 +839,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         // Завершение операции
         CompleteOperation(result, OperationType.Export, ref _isExporting);
     }
-
 
     private void ExportDXF(IEnumerable<PartData> partsDataList, string targetDir, int multiplier,
         ref int processedCount, ref int skippedCount, bool generateThumbnails, CancellationToken cancellationToken = default)
@@ -1120,6 +1116,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
             return false;
         }
     }
+
     private void MultiplierTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
@@ -1299,7 +1296,6 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
             OpenInventorDocument(fullPath, targetModelState);
         }
     }
-
     private string? GetPartDocumentFullPath(string partNumber)
     {
         var docs = _thisApplication?.Documents;
@@ -1397,6 +1393,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
             await Task.Delay(10);
         }
     }
+
     private void RemoveCustomIPropertyColumn(string propertyName)
     {
         // Удаление столбца из DataGrid
@@ -1445,14 +1442,11 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         _ = FillPropertyDataAsync(propertyName);
     }
 
-
-
     private void AboutButton_Click(object sender, RoutedEventArgs e)
     {
         var aboutWindow = new AboutWindow(this); // Передаем текущий экземпляр MainWindow
         aboutWindow.ShowDialog(); // Отображаем окно как диалоговое
     }
-
 
     private void UpdateNoColumnsOverlayVisibility()
     {

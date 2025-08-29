@@ -50,7 +50,7 @@
                 </StackPanel>
             </GroupBox>
 
-            <TextBlock Text="Создано при поддержке ChatGPT 4o, Claude 3.5 Sonnet, Claude Sonnet 4, Mistral Large 2" 
+            <TextBlock Text="Создано при поддержке ChatGPT 4o, Claude 3.5 Sonnet, Claude 4 Sonnet, Mistral Large 2" 
                        FontSize="{StaticResource SmallFontSize}" 
                        Foreground="{StaticResource TextMutedBrush}" 
                        TextWrapping="Wrap"

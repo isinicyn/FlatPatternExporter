@@ -41,10 +41,6 @@ FlatPatternExporter/
     ├── LayerSettingsClasses.cs         # Классы настроек слоев
     ├── TokenService.cs                 # Сервис работы с токенами
     │
-    ├── Resources/Pic/                  # Изображения ресурсов
-    │   ├── Beta1.png
-    │   └── copy-icon.png
-    │
     └── Properties/                     # Свойства проекта
         ├── launchSettings.json
         └── PublishProfiles/

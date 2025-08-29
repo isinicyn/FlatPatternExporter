@@ -28,7 +28,6 @@ using Style = System.Windows.Style;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace FlatPatternExporter;
-
 public enum ExportFolderType
 {
     ChooseFolder = 0,      // Указать папку в процессе экспорта
@@ -307,7 +306,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
-
 
     public ObservableCollection<LayerSetting> LayerSettings { get; set; }
     public ObservableCollection<string> AvailableColors { get; set; }
@@ -2132,7 +2130,6 @@ public class HeaderAdorner : Adorner
     }
 }
 
-
 public class PresetIProperty : INotifyPropertyChanged
 {
     public string ColumnHeader { get; set; } = string.Empty; // Заголовок колонки в DataGrid (например, "Обозначение")
@@ -2165,7 +2162,6 @@ public class ScanProgress
     public string CurrentOperation { get; set; } = string.Empty;
     public string CurrentItem { get; set; } = string.Empty;
 }
-
 
 // Конвертер для работы с enum в RadioButton
 public class EnumToBooleanConverter : IValueConverter

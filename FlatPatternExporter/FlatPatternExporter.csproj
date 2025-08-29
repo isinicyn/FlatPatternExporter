@@ -61,10 +61,6 @@
     <Message Text="SourceRevisionId: $(SourceRevisionId)" Importance="high" />
   </Target>
 
-  <ItemGroup>
-    <None Remove="Resources\Pic\Beta1.png" />
-    <None Remove="Resources\Pic\copy-icon.png" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="FPExport.ico" />
@@ -82,13 +78,6 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Resources\Pic\Beta1.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Pic\copy-icon.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>  
+  
 
 </Project>
