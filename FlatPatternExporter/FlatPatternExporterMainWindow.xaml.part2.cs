@@ -553,6 +553,9 @@ public partial class FlatPatternExporterMainWindow : Window
     
     try
     {
+        // Очищаем трекер конфликтов и список конфликтующих деталей для изоляции от предыдущих сканирований
+        ClearConflictData();
+        
         // Проверяем документ на валидность
         if (requireScan && document != _lastScannedDocument)
         {
@@ -578,7 +581,6 @@ public partial class FlatPatternExporterMainWindow : Window
         if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
         {
             var asmDoc = (AssemblyDocument)document;
-            _partNumberTracker.Clear();
             
             if (SelectedProcessingMethod == ProcessingMethod.Traverse)
                 await Task.Run(() => ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, showProgress ? null : null));
@@ -1187,9 +1189,7 @@ private bool PrepareForExport(out string targetDir, out int multiplier)
         UpdateDocumentInfo("", null);
 
         // Отключаем кнопку "Конфликты" и очищаем список конфликтов
-        ConflictFilesButton.IsEnabled = false;
-        _conflictFileDetails.Clear(); // Очищаем список с конфликтами (или используем нужную коллекцию)
-        _partNumberTracker.Clear(); // Очищаем трекер конфликтов
+        ClearConflictData();
 
     }
 

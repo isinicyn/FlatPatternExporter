@@ -1444,8 +1444,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 _itemCounter = 1;
             }
             
-            _partNumberTracker.Clear();
-            ConflictFilesButton.IsEnabled = false;
+            ClearConflictData();
 
             var sheetMetalParts = new Dictionary<string, int>();
 
@@ -1722,6 +1721,17 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         };
     }
 
+    /// <summary>
+    /// Очищает все коллекции связанные с конфликтами для изоляции операций
+    /// </summary>
+    private void ClearConflictData()
+    {
+        _partNumberTracker.Clear();
+        _conflictingParts.Clear();
+        _conflictFileDetails.Clear();
+        ConflictFilesButton.IsEnabled = false; // Отключаем кнопку при очистке данных
+    }
+
     private void AddPartToConflictTracker(string partNumber, string fileName, string modelState)
     {
         var conflictInfo = new PartConflictInfo
@@ -1792,7 +1802,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             _conflictingParts.AddRange(conflictingPartNumbers.SelectMany(entry => entry.Value.Select(v => new PartData { PartNumber = v.PartNumber })));
 
-            // Используем Dispatcher для обновления UI без показа MessageBox
+            // Используем Dispatcher для обновления UI
             await Dispatcher.InvokeAsync(() =>
             {
                 ConflictFilesButton.IsEnabled = true; // Включаем кнопку для просмотра подробностей о конфликтах
