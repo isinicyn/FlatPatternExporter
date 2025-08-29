@@ -5,20 +5,14 @@
              x:Name="Root"
              MinHeight="0" MinWidth="0">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-
-        <TextBlock Grid.Column="0"
-                   Text="{Binding ElementName=Root, Path=Text}"
+        <TextBlock Text="{Binding ElementName=Root, Path=Text}"
                    VerticalAlignment="Center"
                    HorizontalAlignment="Center"
                    Style="{StaticResource CenteredCellStyle}"
-                   TextTrimming="CharacterEllipsis"/>
+                   TextTrimming="CharacterEllipsis"
+                   Margin="{StaticResource RightSmallMarginThickness}"/>
 
-        <TextBlock Grid.Column="1"
-                   Style="{StaticResource FxIndicatorByTagStyle}"
+        <TextBlock Style="{StaticResource FxIndicatorByTagStyle}"
                    Tag="{Binding ElementName=Root, Path=IsExpression}"/>
     </Grid>
 </UserControl>

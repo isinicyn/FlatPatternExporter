@@ -11,7 +11,7 @@
         <Setter Property="Text" Value="fx"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Right"/>
-        <Setter Property="Margin" Value="0,0,3,0"/>
+        <Setter Property="Margin" Value="{StaticResource RightSmallMarginThickness}"/>
         <Setter Property="FontStyle" Value="Italic"/>
         <Setter Property="FontSize" Value="{StaticResource SmallFontSize}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
