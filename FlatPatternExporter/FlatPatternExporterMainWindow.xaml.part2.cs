@@ -103,9 +103,9 @@ public partial class FlatPatternExporterMainWindow : Window
         ReadAllPropertiesFromPart(partDoc, partData, mgr);
 
         // КАТЕГОРИЯ 5: Получаем значения для пользовательских iProperty
-        foreach (var customProperty in _customPropertiesList)
+        foreach (var userDefinedProperty in _userDefinedPropertiesList)
         {
-            partData.CustomProperties[customProperty] = mgr.GetMappedProperty(customProperty);
+            partData.UserDefinedProperties[userDefinedProperty] = mgr.GetMappedProperty(userDefinedProperty);
         }
 
         // КАТЕГОРИЯ 2: Дополнительные свойства документа (изображения)
@@ -1376,26 +1376,26 @@ public partial class FlatPatternExporterMainWindow : Window
             {
                 var mgr = new PropertyManager((Document)partDoc);
                 var value = mgr.GetMappedProperty(propertyName) ?? "";
-                partData.AddCustomProperty(propertyName, value);
+                partData.AddUserDefinedProperty(propertyName, value);
             }
 
             await Task.Delay(10);
         }
     }
 
-    private void RemoveCustomIPropertyColumn(string propertyName)
+    private void RemoveUserDefinedIPropertyColumn(string propertyName)
     {
         // Удаление столбца из DataGrid
         var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header as string == propertyName);
         if (columnToRemove != null) PartsDataGrid.Columns.Remove(columnToRemove);
 
-        // Удаление всех данных, связанных с этим Custom IProperty
+        // Удаление всех данных, связанных с этим User Defined Property
         foreach (var partData in _partsData)
-            if (partData.CustomProperties.ContainsKey(propertyName))
-                partData.RemoveCustomProperty(propertyName);
+            if (partData.UserDefinedProperties.ContainsKey(propertyName))
+                partData.RemoveUserDefinedProperty(propertyName);
 
         // Обновляем список доступных свойств
-        _customPropertiesList.Remove(propertyName);
+        _userDefinedPropertiesList.Remove(propertyName);
     }
 
     /// <summary>
@@ -1412,7 +1412,7 @@ public partial class FlatPatternExporterMainWindow : Window
         };
     }
 
-    public void AddCustomIPropertyColumn(string propertyName)
+    public void AddUserDefinedIPropertyColumn(string propertyName)
     {
         // Проверяем, существует ли уже колонка с таким именем или заголовком
         if (PartsDataGrid.Columns.Any(c => c.Header as string == propertyName))
@@ -1423,7 +1423,7 @@ public partial class FlatPatternExporterMainWindow : Window
         }
 
         // Создаем текстовую колонку через централизованный метод
-        var column = CreateTextColumn(propertyName, $"CustomProperties[{propertyName}]");
+        var column = CreateTextColumn(propertyName, $"UserDefinedProperties[{propertyName}]");
 
         PartsDataGrid.Columns.Add(column);
 

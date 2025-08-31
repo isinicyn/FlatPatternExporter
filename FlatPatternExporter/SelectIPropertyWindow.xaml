@@ -147,18 +147,18 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBox x:Name="CustomPropertyTextBox" 
+                        <TextBox x:Name="UserDefinedPropertyTextBox" 
                              Grid.Column="0"
                              Style="{StaticResource BaseTextBoxStyle}"
                              BorderBrush="{StaticResource BorderTertiaryBrush}"
-                             TextChanged="CustomPropertyTextBox_TextChanged"/>
+                             TextChanged="UserDefinedPropertyTextBox_TextChanged"/>
 
-                        <Button x:Name="AddCustomPropertyButton"
+                        <Button x:Name="AddUserDefinedPropertyButton"
                             Grid.Column="1"
                             Width="{StaticResource StandardElementHeight}"
                             Style="{StaticResource BaseButtonStyle}"
                             IsEnabled="False"
-                            Click="AddCustomPropertyButton_Click">
+                            Click="AddUserDefinedPropertyButton_Click">
                             <Path Style="{StaticResource AddIconStyle}" 
                               Width="12" Height="12"/>
                         </Button>

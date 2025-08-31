@@ -94,35 +94,35 @@ public partial class SelectIPropertyWindow : Window
 
 
 
-        private void CustomPropertyTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void UserDefinedPropertyTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             // Активируем кнопку '+' только если текстовое поле не пустое
-            AddCustomPropertyButton.IsEnabled = !string.IsNullOrWhiteSpace(CustomPropertyTextBox.Text);
+            AddUserDefinedPropertyButton.IsEnabled = !string.IsNullOrWhiteSpace(UserDefinedPropertyTextBox.Text);
         }
 
-        private void AddCustomPropertyButton_Click(object sender, RoutedEventArgs e)
+        private void AddUserDefinedPropertyButton_Click(object sender, RoutedEventArgs e)
         {
-            string customPropertyName = CustomPropertyTextBox.Text;
+            string userDefinedPropertyName = UserDefinedPropertyTextBox.Text;
             
-            if (!string.IsNullOrWhiteSpace(customPropertyName))
+            if (!string.IsNullOrWhiteSpace(userDefinedPropertyName))
             {
                 // Проверяем, не добавлено ли уже это свойство
-                if (_mainWindow._customPropertiesList.Contains(customPropertyName))
+                if (_mainWindow._userDefinedPropertiesList.Contains(userDefinedPropertyName))
                 {
-                MessageBox.Show($"Свойство '{customPropertyName}' уже добавлено.", "Предупреждение",
+                MessageBox.Show($"Свойство '{userDefinedPropertyName}' уже добавлено.", "Предупреждение",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-            if (_mainWindow.PartsDataGrid.Columns.Any(c => c.Header as string == customPropertyName))
+            if (_mainWindow.PartsDataGrid.Columns.Any(c => c.Header as string == userDefinedPropertyName))
                 {
-                MessageBox.Show($"Столбец с именем '{customPropertyName}' уже существует.", "Предупреждение",
+                MessageBox.Show($"Столбец с именем '{userDefinedPropertyName}' уже существует.", "Предупреждение",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                // Добавляем в список custom properties
-                _mainWindow._customPropertiesList.Add(customPropertyName);
+                // Добавляем в список user defined properties
+                _mainWindow._userDefinedPropertiesList.Add(userDefinedPropertyName);
 
                 // Отключаем интерфейс Inventor на время операции
                 _mainWindow.SetInventorUserInterfaceState(true);
@@ -130,7 +130,7 @@ public partial class SelectIPropertyWindow : Window
                 try
                 {
                     // Создаем колонку (данные заполнятся автоматически)
-                    _mainWindow.AddCustomIPropertyColumn(customPropertyName);
+                    _mainWindow.AddUserDefinedIPropertyColumn(userDefinedPropertyName);
                 }
                 finally
                 {
@@ -138,7 +138,7 @@ public partial class SelectIPropertyWindow : Window
                 }
 
             // Очищаем текстовое поле
-            CustomPropertyTextBox.Text = "";
+            UserDefinedPropertyTextBox.Text = "";
         }
     }
 

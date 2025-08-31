@@ -26,7 +26,7 @@ public record ApplicationSettings
     public const string DefaultSplineTolerance = "0.01";
     
     public List<string> ColumnOrder { get; init; } = [];
-    public List<string> CustomProperties { get; init; } = [];
+    public List<string> UserDefinedProperties { get; init; } = [];
     
     public bool ExcludeReferenceParts { get; init; } = true;
     public bool ExcludePurchasedParts { get; init; } = true;
@@ -152,7 +152,7 @@ public static class SettingsManager
         return new ApplicationSettings
         {
             ColumnOrder = [..columnsInDisplayOrder],
-            CustomProperties = [..window.CustomPropertiesList],
+            UserDefinedProperties = [..window.UserDefinedPropertiesList],
             
             ExcludeReferenceParts = window.ExcludeReferenceParts,
             ExcludePurchasedParts = window.ExcludePurchasedParts,
@@ -239,8 +239,8 @@ public static class SettingsManager
                 .FirstOrDefault(p => p.Name == settings.SelectedTemplatePresetName);
         }
 
-        window.CustomPropertiesList.Clear();
-        settings.CustomProperties.ForEach(window.CustomPropertiesList.Add);
+        window.UserDefinedPropertiesList.Clear();
+        settings.UserDefinedProperties.ForEach(window.UserDefinedPropertiesList.Add);
 
         foreach (var columnName in settings.ColumnOrder)
         {
@@ -251,7 +251,7 @@ public static class SettingsManager
             }
             else
             {
-                window.AddCustomIPropertyColumn(columnName);
+                window.AddUserDefinedIPropertyColumn(columnName);
             }
         }
 

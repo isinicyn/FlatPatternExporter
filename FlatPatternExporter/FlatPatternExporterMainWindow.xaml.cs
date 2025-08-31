@@ -71,8 +71,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Данные и коллекции
     private readonly ObservableCollection<PartData> _partsData = new();
     private readonly CollectionViewSource _partsDataView;
-    public readonly List<string> _customPropertiesList = new();
-    public List<string> CustomPropertiesList => _customPropertiesList;
+    public readonly List<string> _userDefinedPropertiesList = new();
+    public List<string> UserDefinedPropertiesList => _userDefinedPropertiesList;
     private List<PartData> _conflictingParts = new();
     private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = new();
     private readonly ConcurrentDictionary<string, List<PartConflictInfo>> _partNumberTracker = new();
@@ -1023,7 +1023,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
             // Проверка на пользовательские свойства
             if (!matches)
-                foreach (var property in partData.CustomProperties)
+                foreach (var property in partData.UserDefinedProperties)
                     if (property.Value.ToLower().Contains(_actualSearchText))
                     {
                         matches = true;
@@ -1167,7 +1167,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 PartsDataGrid.Columns.Remove(columnToRemove);
 
                 // Удаляем кастомное свойство из списка и данных деталей
-                RemoveCustomIPropertyColumn(columnName);
+                RemoveUserDefinedIPropertyColumn(columnName);
 
                 // Обновляем список доступных свойств, если это кастомное свойство
                 var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>()
@@ -1890,7 +1890,7 @@ public class PartData : INotifyPropertyChanged
 
     // === КАТЕГОРИЯ 5: ПОЛЬЗОВАТЕЛЬСКИЕ IPROPERTIES ===
     // Динамически добавляемые пользователем свойства из "Inventor User Defined Properties"
-    private Dictionary<string, string> customProperties = new();
+    private Dictionary<string, string> userDefinedProperties = new();
 
     // === КАТЕГОРИЯ 6: СВОЙСТВА КОЛИЧЕСТВА И СОСТОЯНИЯ ===
     // Свойства для управления количеством и состоянием обработки
@@ -1951,12 +1951,12 @@ public class PartData : INotifyPropertyChanged
 
     // === СВОЙСТВА С УВЕДОМЛЕНИЯМИ ===
 
-    public Dictionary<string, string> CustomProperties
+    public Dictionary<string, string> UserDefinedProperties
     {
-        get => customProperties;
+        get => userDefinedProperties;
         set
         {
-            customProperties = value;
+            userDefinedProperties = value;
             OnPropertyChanged();
         }
     }
@@ -2098,18 +2098,18 @@ public class PartData : INotifyPropertyChanged
     }
 
     // Методы для работы с пользовательскими свойствами
-    public void AddCustomProperty(string propertyName, string propertyValue)
+    public void AddUserDefinedProperty(string propertyName, string propertyValue)
     {
-        if (CustomProperties.ContainsKey(propertyName))
-            CustomProperties[propertyName] = propertyValue;
+        if (UserDefinedProperties.ContainsKey(propertyName))
+            UserDefinedProperties[propertyName] = propertyValue;
         else
-            CustomProperties.Add(propertyName, propertyValue);
+            UserDefinedProperties.Add(propertyName, propertyValue);
 
-        OnPropertyChanged(nameof(CustomProperties));
+        OnPropertyChanged(nameof(UserDefinedProperties));
     }
-    public void RemoveCustomProperty(string propertyName)
+    public void RemoveUserDefinedProperty(string propertyName)
     {
-        customProperties.Remove(propertyName);
+        userDefinedProperties.Remove(propertyName);
     }
 
 }
