@@ -168,44 +168,59 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private bool _isPrimaryModelState = true;
     
     // Словарь колонок с шаблонами (все типы)
-    private static readonly Dictionary<string, string> ColumnTemplates = new()
+    private static readonly Dictionary<string, string> ColumnTemplates = InitializeColumnTemplates();
+
+    private static Dictionary<string, string> InitializeColumnTemplates()
     {
-        { "Обр.", "ProcessingStatusTemplate" },
-        { "Изобр. детали", "PartImageTemplate" },
-        { "Изобр. развертки", "DxfImageTemplate" },
-        { "ID", "IDWithFlatPatternIndicatorTemplate" },
-        { "Кол.", "EditableQuantityTemplate" },
-        
-        // Summary Information  
-        { "Автор", "AuthorWithExpressionTemplate" },
-        { "Ревизия", "RevisionWithExpressionTemplate" },
-        { "Название", "TitleWithExpressionTemplate" },
-        { "Тема", "SubjectWithExpressionTemplate" },
-        { "Ключевые слова", "KeywordsWithExpressionTemplate" },
-        { "Примечание", "CommentsWithExpressionTemplate" },
-        
-        // Document Summary Information
-        { "Категория", "CategoryWithExpressionTemplate" },
-        { "Менеджер", "ManagerWithExpressionTemplate" },
-        { "Компания", "CompanyWithExpressionTemplate" },
-        
-        // Design Tracking Properties
-        { "Обозначение", "PartNumberWithExpressionTemplate" },
-        { "Наименование", "DescriptionWithExpressionTemplate" },
-        { "Проект", "ProjectWithExpressionTemplate" },
-        { "Инвентарный номер", "StockNumberWithExpressionTemplate" },
-        { "Сметчик", "CostCenterWithExpressionTemplate" },
-        { "Проверил", "CheckedByWithExpressionTemplate" },
-        { "Нормоконтроль", "EngApprovedByWithExpressionTemplate" },
-        { "Статус", "UserStatusWithExpressionTemplate" },
-        { "Веб-ссылка", "CatalogWebLinkWithExpressionTemplate" },
-        { "Поставщик", "VendorWithExpressionTemplate" },
-        { "Утвердил", "MfgApprovedByWithExpressionTemplate" },
-        { "Статус разработки", "DesignStatusWithExpressionTemplate" },
-        { "Проектировщик", "DesignerWithExpressionTemplate" },
-        { "Инженер", "EngineerWithExpressionTemplate" },
-        { "Нач. отдела", "AuthorityWithExpressionTemplate" }
-    };
+        var templates = new Dictionary<string, string>
+        {
+            ["Обр."] = "ProcessingStatusTemplate",
+            ["Изобр. детали"] = "PartImageTemplate",
+            ["Изобр. развертки"] = "DxfImageTemplate",
+            ["ID"] = "IDWithFlatPatternIndicatorTemplate",
+            ["Кол."] = "EditableQuantityTemplate"
+        };
+
+        // Маппинг свойств на их русские названия колонок
+        var propertyToColumnName = new Dictionary<string, string>
+        {
+            ["Author"] = "Автор",
+            ["Revision"] = "Ревизия",
+            ["Title"] = "Название",
+            ["Subject"] = "Тема",
+            ["Keywords"] = "Ключевые слова",
+            ["Comments"] = "Примечание",
+            ["Category"] = "Категория",
+            ["Manager"] = "Менеджер",
+            ["Company"] = "Компания",
+            ["PartNumber"] = "Обозначение",
+            ["Description"] = "Наименование",
+            ["Project"] = "Проект",
+            ["StockNumber"] = "Инвентарный номер",
+            ["CostCenter"] = "Сметчик",
+            ["CheckedBy"] = "Проверил",
+            ["EngApprovedBy"] = "Нормоконтроль",
+            ["UserStatus"] = "Статус",
+            ["CatalogWebLink"] = "Веб-ссылка",
+            ["Vendor"] = "Поставщик",
+            ["MfgApprovedBy"] = "Утвердил",
+            ["DesignStatus"] = "Статус разработки",
+            ["Designer"] = "Проектировщик",
+            ["Engineer"] = "Инженер",
+            ["Authority"] = "Нач. отдела"
+        };
+
+        // Автоматически добавляем шаблоны для всех редактируемых свойств
+        foreach (var property in PropertyManager.GetEditableProperties())
+        {
+            if (propertyToColumnName.TryGetValue(property, out var columnName))
+            {
+                templates[columnName] = $"{property}WithExpressionTemplate";
+            }
+        }
+
+        return templates;
+    }
 
 
     public FlatPatternExporterMainWindow()

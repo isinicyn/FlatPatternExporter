@@ -3,22 +3,21 @@ using System.Diagnostics;
 using System.Windows;
 using Inventor;
 
-namespace FlatPatternExporter
+namespace FlatPatternExporter;
+/// <summary>
+/// Класс для централизованного управления доступом к свойствам документов Inventor.
+/// Обеспечивает единый интерфейс для работы с iProperty и обычными свойствами документов.
+/// </summary>
+public class PropertyManager
 {
-    /// <summary>
-    /// Класс для централизованного управления доступом к свойствам документов Inventor.
-    /// Обеспечивает единый интерфейс для работы с iProperty и обычными свойствами документов.
-    /// </summary>
-    public class PropertyManager
-    {
         private readonly Document _document;
         public static readonly string SheetMetalSubType = "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}";
 
         /// <summary>
         /// Список редактируемых свойств, которые могут быть выражениями
         /// </summary>
-        private static readonly HashSet<string> EditableProperties = new()
-        {
+    private static readonly HashSet<string> EditableProperties =
+    [
             // Design Tracking Properties
             "Authority", "CatalogWebLink", "CheckedBy", "CostCenter", "Description", 
             "Designer", "DesignStatus", "Engineer", "EngApprovedBy", "MfgApprovedBy", 
@@ -28,8 +27,8 @@ namespace FlatPatternExporter
             "Author", "Comments", "Keywords", "Revision", "Subject", "Title",
             
             // Document Summary Information
-            "Category", "Company", "Manager"
-        };
+        "Category", "Company", "Manager"
+    ];
 
         /// <summary>
         /// Маппинг внутренних имен свойств на соответствующие наборы и имена в Inventor
@@ -80,30 +79,28 @@ namespace FlatPatternExporter
         /// <summary>
         /// Словарь сопоставлений значений свойств для преобразования внутренних значений в читаемые
         /// </summary>
-        private static readonly Dictionary<string, Dictionary<string, string>> ValueMappings = new()
+    private static readonly Dictionary<string, Dictionary<string, string>> ValueMappings = new()
+    {
+        ["DesignStatus"] = new()
         {
-            {
-                "DesignStatus", new Dictionary<string, string>
-                {
-                    {"1", "Разработка"},
-                    {"2", "Утверждение"},
-                    {"3", "Завершен"}
-                }
-            }
-        };
+            ["1"] = "Разработка",
+            ["2"] = "Утверждение",
+            ["3"] = "Завершен"
+        }
+    };
 
         /// <summary>
         /// Свойства, которые требуют округления до двух знаков после запятой
         /// </summary>
-        private static readonly HashSet<string> NumericPropertiesForRounding = new()
-        {
+    private static readonly HashSet<string> NumericPropertiesForRounding =
+    [
             "FlatPatternLength",
             "FlatPatternWidth", 
             "FlatPatternArea",
             "Mass",
             "Volume",
-            "SurfaceArea"
-        };
+        "SurfaceArea"
+    ];
 
         public PropertyManager(Document document)
         {
@@ -118,16 +115,16 @@ namespace FlatPatternExporter
             string setName;
             string inventorName;
 
-            if (PropertyMapping.TryGetValue(ourName, out var mapping))
-            {
-                setName = mapping.SetName;
-                inventorName = mapping.InventorName;
-            }
-            else
-            {
-                setName = "Inventor User Defined Properties";
-                inventorName = ourName;
-            }
+        if (PropertyMapping.TryGetValue(ourName, out var mapping))
+        {
+            setName = mapping.SetName;
+            inventorName = mapping.InventorName;
+        }
+        else
+        {
+            setName = "Inventor User Defined Properties";
+            inventorName = ourName;
+        }
 
             try
             {
@@ -136,7 +133,7 @@ namespace FlatPatternExporter
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка доступа к свойству '{ourName}': {ex.Message}");
+            Debug.WriteLine($"Ошибка доступа к свойству '{ourName}': {ex.Message}");
                 return null;
             }
         }
@@ -149,28 +146,28 @@ namespace FlatPatternExporter
         public string GetMappedProperty(string ourName, bool getExpression = false)
         {
             var prop = GetPropertyObject(ourName);
-            if (prop == null) return string.Empty;
+            if (prop == null) return "";
 
             string result;
-            if (getExpression)
+        if (getExpression)
+        {
+            result = prop.Expression ?? "";
+        }
+        else
+        {
+            result = prop.Value?.ToString() ?? "";
+
+            // Округляем числовые значения
+            if (NumericPropertiesForRounding.Contains(ourName) && double.TryParse(result, out var numericValue))
             {
-                result = prop.Expression ?? string.Empty;
+                result = Math.Round(numericValue, 2).ToString("F2");
             }
-            else
+
+            // Применяем сопоставления значений
+            if (ValueMappings.TryGetValue(ourName, out var mappings) && mappings.TryGetValue(result, out var mappedValue))
             {
-                result = prop.Value?.ToString() ?? string.Empty;
-
-                // Округляем числовые значения
-                if (NumericPropertiesForRounding.Contains(ourName) && double.TryParse(result, out var numericValue))
-                {
-                    result = Math.Round(numericValue, 2).ToString("F2");
-                }
-
-                // Применяем сопоставления значений
-                if (ValueMappings.TryGetValue(ourName, out var mappings) && mappings.TryGetValue(result, out var mappedValue))
-                {
-                    result = mappedValue;
-                }
+                result = mappedValue;
+            }
             }
 
             return result;
@@ -209,8 +206,8 @@ namespace FlatPatternExporter
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка установки значения свойства '{ourName}': {ex.Message}");
-                System.Windows.MessageBox.Show($"Не удалось обновить свойство '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            Debug.WriteLine($"Ошибка установки значения свойства '{ourName}': {ex.Message}");
+            System.Windows.MessageBox.Show($"Не удалось обновить свойство '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -228,8 +225,8 @@ namespace FlatPatternExporter
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка установки выражения свойства '{ourName}': {ex.Message}");
-                System.Windows.MessageBox.Show($"Не удалось обновить выражение свойства '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            Debug.WriteLine($"Ошибка установки выражения свойства '{ourName}': {ex.Message}");
+            System.Windows.MessageBox.Show($"Не удалось обновить выражение свойства '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -246,8 +243,8 @@ namespace FlatPatternExporter
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка получения имени файла: {ex.Message}");
-                return string.Empty;
+            Debug.WriteLine($"Ошибка получения имени файла: {ex.Message}");
+            return "";
             }
         }
 
@@ -262,8 +259,8 @@ namespace FlatPatternExporter
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка получения полного пути к файлу: {ex.Message}");
-                return string.Empty;
+            Debug.WriteLine($"Ошибка получения полного пути к файлу: {ex.Message}");
+            return "";
             }
         }
 
@@ -274,12 +271,12 @@ namespace FlatPatternExporter
         {
             try
             {
-                return _document.ModelStateName ?? string.Empty;
+            return _document.ModelStateName ?? "";
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка получения состояния модели: {ex.Message}");
-                return string.Empty;
+            Debug.WriteLine($"Ошибка получения состояния модели: {ex.Message}");
+            return "";
             }
         }
 
@@ -300,7 +297,7 @@ namespace FlatPatternExporter
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка получения толщины: {ex.Message}");
+            Debug.WriteLine($"Ошибка получения толщины: {ex.Message}");
                 return 0.0;
             }
         }
@@ -321,7 +318,7 @@ namespace FlatPatternExporter
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка проверки наличия развертки: {ex.Message}");
+            Debug.WriteLine($"Ошибка проверки наличия развертки: {ex.Message}");
                 return false;
             }
         }
@@ -349,7 +346,7 @@ namespace FlatPatternExporter
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка проверки типа состояния модели: {ex.Message}");
+            Debug.WriteLine($"Ошибка проверки типа состояния модели: {ex.Message}");
                 return true; // По умолчанию считаем основным состоянием
             }
         }
@@ -359,8 +356,8 @@ namespace FlatPatternExporter
         /// </summary>
         public static ObservableCollection<PresetIProperty> GetPresetProperties()
         {
-            var presetProperties = new ObservableCollection<PresetIProperty>
-            {
+        ObservableCollection<PresetIProperty> presetProperties =
+        [
                 // Системные свойства приложения
                 new() { ColumnHeader = "Обр.", ListDisplayName = "Статус обработки", InventorPropertyName = "ProcessingStatus", Category = "Системные" },
                 new() { ColumnHeader = "ID", ListDisplayName = "Нумерация", InventorPropertyName = "Item", Category = "Системные" },
@@ -374,42 +371,50 @@ namespace FlatPatternExporter
 
                 // Количество и обработка
                 new() { ColumnHeader = "Кол.", ListDisplayName = "Количество", InventorPropertyName = "Quantity", Category = "Количество" },
-                new() { ColumnHeader = "Изобр. развертки", ListDisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", Category = "Обработка" }
-            };
+            new() { ColumnHeader = "Изобр. развертки", ListDisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", Category = "Обработка" }
+        ];
 
             // Автоматическое добавление свойств из PropertyMapping
             foreach (var mapping in PropertyMapping)
             {
-                var category = mapping.Value.SetName switch
+            var category = mapping.Value.SetName switch
                 {
                     "Summary Information" => "Summary Information",
                     "Document Summary Information" => "Document Summary Information", 
                     "Design Tracking Properties" => "Design Tracking Properties",
                     _ => "Прочие"
-                };
+            };
 
-                var columnHeader = GetDisplayNameForProperty(mapping.Key);
-                var listDisplayName = GetDisplayNameForProperty(mapping.Key);
+            var columnHeader = GetDisplayNameForProperty(mapping.Key);
+            var listDisplayName = GetDisplayNameForProperty(mapping.Key);
                 
-                presetProperties.Add(new() 
+            presetProperties.Add(new() 
                 { 
                     ColumnHeader = columnHeader,        // Заголовок колонки в DataGrid
                     ListDisplayName = listDisplayName, // Отображение в списке выбора
                     InventorPropertyName = mapping.Key, // Ключ для PropertyMapping
                     Category = category 
-                });
+            });
             }
 
             return presetProperties;
         }
 
-        /// <summary>
-        /// Проверяет, является ли свойство редактируемым (может быть выражением)
-        /// </summary>
-        public static bool IsEditableProperty(string propertyName)
-        {
-            return EditableProperties.Contains(propertyName);
-        }
+    /// <summary>
+    /// Проверяет, является ли свойство редактируемым (может быть выражением)
+    /// </summary>
+    public static bool IsEditableProperty(string propertyName)
+    {
+        return EditableProperties.Contains(propertyName);
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию всех редактируемых свойств
+    /// </summary>
+    public static IEnumerable<string> GetEditableProperties()
+    {
+        return EditableProperties;
+    }
 
         /// <summary>
         /// Получает русское отображаемое имя для свойства
@@ -453,7 +458,6 @@ namespace FlatPatternExporter
                 "FlatPatternArea" => "Площадь развертки",
                 "Appearance" => "Отделка",
                 _ => propertyKey
-            };
-        }
+        };
     }
 }

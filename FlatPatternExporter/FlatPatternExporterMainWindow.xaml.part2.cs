@@ -124,21 +124,10 @@ public partial class FlatPatternExporterMainWindow : Window
     /// </summary>
     private void SetExpressionStatesForAllProperties(PartData partData, PropertyManager mgr)
     {
-        var editableProperties = new[]
+        foreach (var property in PropertyManager.GetEditableProperties())
         {
-            "PartNumber", "Description", "Authority", "CatalogWebLink", "CheckedBy", "CostCenter",
-            "Designer", "DesignStatus", "Engineer", "EngApprovedBy", "MfgApprovedBy", "Project",
-            "StockNumber", "UserStatus", "Vendor", "Author", "Comments", "Keywords", "Revision",
-            "Subject", "Title", "Category", "Company", "Manager"
-        };
-
-        foreach (var property in editableProperties)
-        {
-            if (PropertyManager.IsEditableProperty(property))
-            {
-                var isExpression = mgr.IsMappedPropertyExpression(property);
-                partData.SetPropertyExpressionState(property, isExpression);
-            }
+            var isExpression = mgr.IsMappedPropertyExpression(property);
+            partData.SetPropertyExpressionState(property, isExpression);
         }
     }
 
