@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -71,6 +72,8 @@ public static class SettingsManager
         "settings.xml"
     );
 
+    private static readonly XmlSerializer Serializer = new(typeof(ApplicationSettings));
+
     public static ApplicationSettings LoadSettings()
     {
         try
@@ -80,12 +83,12 @@ public static class SettingsManager
                 return new ApplicationSettings();
             }
 
-            var serializer = new XmlSerializer(typeof(ApplicationSettings));
             using var fileStream = new FileStream(SettingsFilePath, FileMode.Open);
-            return (ApplicationSettings?)serializer.Deserialize(fileStream) ?? new ApplicationSettings();
+            return (ApplicationSettings?)Serializer.Deserialize(fileStream) ?? new ApplicationSettings();
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"Error loading settings: {ex.Message}");
             return new ApplicationSettings();
         }
     }
@@ -100,12 +103,12 @@ public static class SettingsManager
                 Directory.CreateDirectory(directory);
             }
 
-            var serializer = new XmlSerializer(typeof(ApplicationSettings));
             using var fileStream = new FileStream(SettingsFilePath, FileMode.Create);
-            serializer.Serialize(fileStream, settings);
+            Serializer.Serialize(fileStream, settings);
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"Error saving settings: {ex.Message}");
         }
     }
 
@@ -152,15 +155,14 @@ public static class SettingsManager
         settings.SelectedTemplatePresetName = window.SelectedTemplatePreset?.Name ?? "";
 
         var columnsInDisplayOrder = window.PartsDataGrid.Columns
-            .Where(c => c.Header is string)
+            .Where(c => c.Header is string headerValue && !string.IsNullOrEmpty(headerValue))
             .OrderBy(c => c.DisplayIndex)
-            .Select(c => c.Header as string)
-            .Where(name => !string.IsNullOrEmpty(name))
+            .Select(c => (string)c.Header)
             .ToList();
             
         foreach (var columnName in columnsInDisplayOrder)
         {
-            settings.ColumnOrder.Add(columnName!);
+            settings.ColumnOrder.Add(columnName);
         }
 
         foreach (var customProperty in window.CustomPropertiesList)
@@ -168,19 +170,17 @@ public static class SettingsManager
             settings.CustomProperties.Add(customProperty);
         }
 
-        foreach (var layerSetting in window.LayerSettings)
+        var changedLayerSettings = window.LayerSettings.Where(ls => ls.HasChanges()).ToList();
+        foreach (var layerSetting in changedLayerSettings)
         {
-            if (layerSetting.HasChanges())
+            settings.LayerSettings.Add(new LayerSettingData
             {
-                settings.LayerSettings.Add(new LayerSettingData
-                {
-                    DisplayName = layerSetting.DisplayName,
-                    IsChecked = layerSetting.IsChecked,
-                    CustomName = layerSetting.CustomName,
-                    SelectedColor = layerSetting.SelectedColor,
-                    SelectedLineType = layerSetting.SelectedLineType
-                });
-            }
+                DisplayName = layerSetting.DisplayName,
+                IsChecked = layerSetting.IsChecked,
+                CustomName = layerSetting.CustomName,
+                SelectedColor = layerSetting.SelectedColor,
+                SelectedLineType = layerSetting.SelectedLineType
+            });
         }
 
         return settings;
