@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:local="clr-namespace:FlatPatternExporter">
+    
+    <local:PropertyExpressionConverter x:Key="PropertyExpressionConverter" />
 
 
     <!-- Базовые стили для ячеек -->
@@ -115,100 +117,100 @@
 
     <!-- Шаблон для колонки "Обозначение" с индикатором выражения -->
     <DataTemplate x:Key="PartNumberWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding PartNumber}" IsExpression="{Binding PartNumberIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding PartNumber}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='PartNumber'}"/>
     </DataTemplate>
 
     <!-- Универсальные шаблоны для редактируемых свойств с индикаторами выражений -->
     <DataTemplate x:Key="DescriptionWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Description}" IsExpression="{Binding DescriptionIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Description}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Description'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="AuthorWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Author}" IsExpression="{Binding AuthorIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Author}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Author'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="RevisionWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Revision}" IsExpression="{Binding RevisionIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Revision}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Revision'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="TitleWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Title}" IsExpression="{Binding TitleIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Title}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Title'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="SubjectWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Subject}" IsExpression="{Binding SubjectIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Subject}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Subject'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="KeywordsWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Keywords}" IsExpression="{Binding KeywordsIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Keywords}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Keywords'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CommentsWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Comments}" IsExpression="{Binding CommentsIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Comments}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Comments'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CategoryWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Category}" IsExpression="{Binding CategoryIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Category}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Category'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="ManagerWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Manager}" IsExpression="{Binding ManagerIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Manager}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Manager'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CompanyWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Company}" IsExpression="{Binding CompanyIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Company}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Company'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="ProjectWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Project}" IsExpression="{Binding ProjectIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Project}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Project'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="StockNumberWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding StockNumber}" IsExpression="{Binding StockNumberIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding StockNumber}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='StockNumber'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CostCenterWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding CostCenter}" IsExpression="{Binding CostCenterIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding CostCenter}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='CostCenter'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CheckedByWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding CheckedBy}" IsExpression="{Binding CheckedByIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding CheckedBy}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='CheckedBy'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="EngApprovedByWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding EngApprovedBy}" IsExpression="{Binding EngApprovedByIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding EngApprovedBy}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='EngApprovedBy'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="UserStatusWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding UserStatus}" IsExpression="{Binding UserStatusIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding UserStatus}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='UserStatus'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="CatalogWebLinkWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding CatalogWebLink}" IsExpression="{Binding CatalogWebLinkIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding CatalogWebLink}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='CatalogWebLink'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="VendorWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Vendor}" IsExpression="{Binding VendorIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Vendor}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Vendor'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="MfgApprovedByWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding MfgApprovedBy}" IsExpression="{Binding MfgApprovedByIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding MfgApprovedBy}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='MfgApprovedBy'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="DesignStatusWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding DesignStatus}" IsExpression="{Binding DesignStatusIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding DesignStatus}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='DesignStatus'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="DesignerWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Designer}" IsExpression="{Binding DesignerIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Designer}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Designer'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="EngineerWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Engineer}" IsExpression="{Binding EngineerIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Engineer}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Engineer'}"/>
     </DataTemplate>
 
     <DataTemplate x:Key="AuthorityWithExpressionTemplate">
-        <local:TextWithFxIndicator Text="{Binding Authority}" IsExpression="{Binding AuthorityIsExpression}"/>
+        <local:TextWithFxIndicator Text="{Binding Authority}" IsExpression="{Binding Converter={StaticResource PropertyExpressionConverter}, ConverterParameter='Authority'}"/>
     </DataTemplate>
 
     <!-- Шаблон для колонки "Количество" с цветовой индикацией и возможностью редактирования -->

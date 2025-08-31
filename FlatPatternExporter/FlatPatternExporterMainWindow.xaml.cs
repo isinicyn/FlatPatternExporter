@@ -2015,31 +2015,6 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    // Для обратной совместимости с существующими привязками
-    public bool PartNumberIsExpression => IsPropertyExpression("PartNumber");
-    public bool DescriptionIsExpression => IsPropertyExpression("Description");
-    public bool AuthorIsExpression => IsPropertyExpression("Author");
-    public bool RevisionIsExpression => IsPropertyExpression("Revision");
-    public bool TitleIsExpression => IsPropertyExpression("Title");
-    public bool SubjectIsExpression => IsPropertyExpression("Subject");
-    public bool KeywordsIsExpression => IsPropertyExpression("Keywords");
-    public bool CommentsIsExpression => IsPropertyExpression("Comments");
-    public bool CategoryIsExpression => IsPropertyExpression("Category");
-    public bool ManagerIsExpression => IsPropertyExpression("Manager");
-    public bool CompanyIsExpression => IsPropertyExpression("Company");
-    public bool ProjectIsExpression => IsPropertyExpression("Project");
-    public bool StockNumberIsExpression => IsPropertyExpression("StockNumber");
-    public bool CostCenterIsExpression => IsPropertyExpression("CostCenter");
-    public bool CheckedByIsExpression => IsPropertyExpression("CheckedBy");
-    public bool EngApprovedByIsExpression => IsPropertyExpression("EngApprovedBy");
-    public bool UserStatusIsExpression => IsPropertyExpression("UserStatus");
-    public bool CatalogWebLinkIsExpression => IsPropertyExpression("CatalogWebLink");
-    public bool VendorIsExpression => IsPropertyExpression("Vendor");
-    public bool MfgApprovedByIsExpression => IsPropertyExpression("MfgApprovedBy");
-    public bool DesignStatusIsExpression => IsPropertyExpression("DesignStatus");
-    public bool DesignerIsExpression => IsPropertyExpression("Designer");
-    public bool EngineerIsExpression => IsPropertyExpression("Engineer");
-    public bool AuthorityIsExpression => IsPropertyExpression("Authority");
 
 
     public string Description
@@ -2208,6 +2183,26 @@ public class EnumToBooleanConverter : IValueConverter
             }
         }
 
+        return Binding.DoNothing;
+    }
+}
+
+public class PropertyExpressionConverter : IValueConverter
+{
+    public static readonly PropertyExpressionConverter Instance = new();
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is PartData partData && parameter is string propertyName)
+        {
+            return partData.IsPropertyExpression(propertyName);
+        }
+
+        return false;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
         return Binding.DoNothing;
     }
 }
