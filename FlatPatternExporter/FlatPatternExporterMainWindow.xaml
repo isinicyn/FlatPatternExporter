@@ -145,7 +145,7 @@
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="{StaticResource BottomSmallMarginThickness}">
                                         <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="{StaticResource LabelInlinePaddingThickness}"/>
-                                        <TextBox x:Name="SplineToleranceTextBox" Width="65" Text="0.01" IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" Style="{StaticResource BaseTextBoxStyle}"/>
+                                        <TextBox x:Name="SplineToleranceTextBox" Width="65" IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" Style="{StaticResource BaseTextBoxStyle}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Grid>
