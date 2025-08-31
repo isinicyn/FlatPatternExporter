@@ -8,7 +8,7 @@ namespace FlatPatternExporter;
 public class LayerSettingData
 {
     public string DisplayName { get; set; } = "";
-    public bool IsChecked { get; set; } = false;
+    public bool IsChecked { get; set; }
     public string CustomName { get; set; } = "";
     public string SelectedColor { get; set; } = "White";
     public string SelectedLineType { get; set; } = "Default";
@@ -24,43 +24,43 @@ public class TemplatePresetData
 [Serializable]
 public class ApplicationSettings
 {
-    public ObservableCollection<string> ColumnOrder { get; set; } = new();
-    public ObservableCollection<string> CustomProperties { get; set; } = new();
+    public ObservableCollection<string> ColumnOrder { get; set; } = [];
+    public ObservableCollection<string> CustomProperties { get; set; } = [];
     
     public bool ExcludeReferenceParts { get; set; } = true;
     public bool ExcludePurchasedParts { get; set; } = true;
     public bool ExcludePhantomParts { get; set; } = true;
-    public bool IncludeLibraryComponents { get; set; } = false;
+    public bool IncludeLibraryComponents { get; set; }
     
-    public bool OrganizeByMaterial { get; set; } = false;
-    public bool OrganizeByThickness { get; set; } = false;
+    public bool OrganizeByMaterial { get; set; }
+    public bool OrganizeByThickness { get; set; }
     
-    public bool EnableSplineReplacement { get; set; } = false;
+    public bool EnableSplineReplacement { get; set; }
     public int SelectedSplineReplacementIndex { get; set; } = 0;
     public string SplineTolerance { get; set; } = "0.01";
     public int SelectedAcadVersionIndex { get; set; } = 5;
     public bool MergeProfilesIntoPolyline { get; set; } = true;
     public bool RebaseGeometry { get; set; } = true;
-    public bool TrimCenterlines { get; set; } = false;
+    public bool TrimCenterlines { get; set; }
     
     public ExportFolderType SelectedExportFolder { get; set; } = ExportFolderType.ChooseFolder;
-    public bool EnableSubfolder { get; set; } = false;
+    public bool EnableSubfolder { get; set; }
     public string SubfolderName { get; set; } = "";
     public string FixedFolderPath { get; set; } = "";
     
     public ProcessingMethod SelectedProcessingMethod { get; set; } = ProcessingMethod.BOM;
     
-    public bool OptimizeDxf { get; set; } = false;
+    public bool OptimizeDxf { get; set; }
     
-    public bool EnableFileNameConstructor { get; set; } = false;
+    public bool EnableFileNameConstructor { get; set; }
     public string FileNameTemplate { get; set; } = "{PartNumber}";
     
-    public ObservableCollection<TemplatePresetData> TemplatePresets { get; set; } = new();
+    public ObservableCollection<TemplatePresetData> TemplatePresets { get; set; } = [];
     public string SelectedTemplatePresetName { get; set; } = "";
     
-    public ObservableCollection<LayerSettingData> LayerSettings { get; set; } = new();
+    public ObservableCollection<LayerSettingData> LayerSettings { get; set; } = [];
     
-    public bool IsExpanded { get; set; } = false;
+    public bool IsExpanded { get; set; }
 }
 
 public static class SettingsManager
@@ -128,7 +128,7 @@ public static class SettingsManager
             TrimCenterlines = window.TrimCenterlines,
             SelectedExportFolder = window.SelectedExportFolder,
             EnableSubfolder = window.EnableSubfolder,
-            SubfolderName = window.SubfolderNameTextBox?.Text ?? string.Empty,
+            SubfolderName = window.SubfolderNameTextBox?.Text ?? "",
             SelectedProcessingMethod = window.SelectedProcessingMethod,
             FixedFolderPath = window.FixedFolderPath,
             OptimizeDxf = window.OptimizeDxf,

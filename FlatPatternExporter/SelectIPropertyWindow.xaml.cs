@@ -3,14 +3,15 @@ using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
+using Button = System.Windows.Controls.Button;
+using MessageBox = System.Windows.MessageBox;
 
-namespace FlatPatternExporter
+namespace FlatPatternExporter;
+public partial class SelectIPropertyWindow : Window
 {
-    public partial class SelectIPropertyWindow : Window
-    {
-        private readonly FlatPatternExporterMainWindow _mainWindow; // Поле для хранения ссылки на MainWindow
-        private readonly ObservableCollection<PresetIProperty> _presetIProperties;
-        private bool _isUpdatingAvailableProperties = false; // Flag to prevent premature closure
+    private readonly FlatPatternExporterMainWindow _mainWindow; // Поле для хранения ссылки на MainWindow
+    private readonly ObservableCollection<PresetIProperty> _presetIProperties;
+    private bool _isUpdatingAvailableProperties; // Flag to prevent premature closure
 
         public SelectIPropertyWindow(ObservableCollection<PresetIProperty> presetIProperties, FlatPatternExporterMainWindow mainWindow)
         {
@@ -19,10 +20,10 @@ namespace FlatPatternExporter
             _presetIProperties = presetIProperties;
             _mainWindow = mainWindow; // Сохраняем ссылку на MainWindow
 
-            // Инициализируем AvailableProperties со всеми свойствами
-            AvailableProperties = new ObservableCollection<PresetIProperty>(_presetIProperties);
-            DataContext = this;
-            SelectedProperties = new List<PresetIProperty>();
+        // Инициализируем AvailableProperties со всеми свойствами
+        AvailableProperties = new ObservableCollection<PresetIProperty>(_presetIProperties);
+        DataContext = this;
+        SelectedProperties = [];
 
             // Подписка на событие изменения коллекции AvailableProperties
             AvailableProperties.CollectionChanged += AvailableProperties_CollectionChanged;
@@ -34,16 +35,16 @@ namespace FlatPatternExporter
             UpdateAvailableProperties();
         }
 
-        public ObservableCollection<PresetIProperty> AvailableProperties { get; set; }
-        public List<PresetIProperty> SelectedProperties { get; }
+    public ObservableCollection<PresetIProperty> AvailableProperties { get; set; }
+    public List<PresetIProperty> SelectedProperties { get; }
 
         // Обработчик события изменения коллекции AvailableProperties
         private void AvailableProperties_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (!_isUpdatingAvailableProperties && AvailableProperties.Count == 0)
             {
-                // Закрываем окно без предупреждения
-                this.Close();
+            // Закрываем окно без предупреждения
+            Close();
             }
         }
 
@@ -108,15 +109,15 @@ namespace FlatPatternExporter
                 // Проверяем, не добавлено ли уже это свойство
                 if (_mainWindow._customPropertiesList.Contains(customPropertyName))
                 {
-                    System.Windows.MessageBox.Show($"Свойство '{customPropertyName}' уже добавлено.", "Предупреждение",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Свойство '{customPropertyName}' уже добавлено.", "Предупреждение",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                if (_mainWindow.PartsDataGrid.Columns.Any(c => c.Header as string == customPropertyName))
+            if (_mainWindow.PartsDataGrid.Columns.Any(c => c.Header as string == customPropertyName))
                 {
-                    System.Windows.MessageBox.Show($"Столбец с именем '{customPropertyName}' уже существует.", "Предупреждение",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Столбец с именем '{customPropertyName}' уже существует.", "Предупреждение",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -136,14 +137,14 @@ namespace FlatPatternExporter
                     _mainWindow.SetInventorUserInterfaceState(false);
                 }
 
-                // Очищаем текстовое поле
-                CustomPropertyTextBox.Text = "";
-            }
+            // Очищаем текстовое поле
+            CustomPropertyTextBox.Text = "";
         }
+    }
 
         private void RemovePropertyButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.Button button && button.Tag is PresetIProperty property)
+        if (sender is Button button && button.Tag is PresetIProperty property)
             {
                 // Находим колонку по заголовку
                 var columnToRemove = _mainWindow.PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == property.ColumnHeader);
@@ -157,6 +158,4 @@ namespace FlatPatternExporter
                 }
             }
         }
-    }
-
 }
