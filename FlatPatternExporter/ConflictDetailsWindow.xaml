@@ -5,7 +5,7 @@
         Title="Детали конфликта обозначений" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="CanResize" 
-        Width="700"
+        Width="900"
         Height="450"
         MinWidth="600"
         MinHeight="300">
@@ -18,81 +18,105 @@
         </Grid.RowDefinitions>
 
         <!-- Основное содержимое -->
-        <GroupBox Grid.Row="0" 
-                  Header="Конфликтующие обозначения и файлы" 
-                  Margin="{StaticResource StandardPaddingThickness}">
-            <DataGrid x:Name="ConflictDataGrid"
-                      ItemsSource="{Binding ConflictItemsView}"
-                      AutoGenerateColumns="False"
-                      IsReadOnly="True"
-                      CanUserAddRows="False"
-                      CanUserDeleteRows="False"
-                      RowHeight="45"
-                      GridLinesVisibility="None"
-                      Background="{StaticResource BackgroundPrimaryBrush}"
-                      VerticalAlignment="Top"
-                      BorderBrush="{StaticResource BorderPrimaryBrush}"
-                      BorderThickness="{StaticResource StandardBorderThicknessValue}"
-                      HorizontalGridLinesBrush="{StaticResource GridLinesBrush}"
-                      VerticalGridLinesBrush="{StaticResource GridLinesBrush}"
-                      SelectionMode="Single"
-                      AlternationCount="2"
-                      EnableRowVirtualization="False"
-                      RowHeaderWidth="0"
-                      RowStyle="{StaticResource DataGridRowStyle}"
-                      ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
-                      RowHeaderStyle="{StaticResource DataGridRowHeaderStyle}"
-                      CellStyle="{StaticResource DataGridCellStyle}"
-                      CanUserSortColumns="True">
-                <DataGrid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Открыть файл" Click="OpenFileMenuItem_Click"/>
-                    </ContextMenu>
-                </DataGrid.ContextMenu>
-                <DataGrid.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.ContainerStyle>
-                            <Style TargetType="GroupItem">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="GroupItem">
-                                            <StackPanel Margin="0,0,0,10">
-                                                <Border Background="{DynamicResource SelectionBackgroundBrush}" 
-                                                        BorderBrush="{DynamicResource GridLinesBrush}"
-                                                        BorderThickness="0,0,0,1"
-                                                        Padding="{StaticResource SmallPaddingThickness}">
-                                                    <TextBlock FontWeight="Bold">
-                                                        <Run Text="Обозначение: "/>
-                                                        <Run Text="{Binding Name, Mode=OneWay}"/>
-                                                    </TextBlock>
-                                                </Border>
-                                                <ItemsPresenter />
-                                            </StackPanel>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </GroupStyle.ContainerStyle>
-                    </GroupStyle>
-                </DataGrid.GroupStyle>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Имя файла" 
-                                        Binding="{Binding FileName}" 
-                                        Width="2*">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}"/>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Состояние модели" 
-                                        Binding="{Binding ModelState}" 
-                                        Width="*">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}"/>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
+        <ScrollViewer Grid.Row="0" 
+                      Margin="{StaticResource StandardPaddingThickness}"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding ConflictGroups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Заголовок для обозначения -->
+                            <Border Grid.Column="0" Grid.Row="0"
+                                    Background="{DynamicResource SelectionBackgroundBrush}"
+                                    Height="{StaticResource LargeElementHeight}"
+                                    BorderBrush="{StaticResource BorderLightBrush}"
+                                    BorderThickness="1,1,1,1"
+                                    Margin="0,0,5,0">
+                                <TextBlock Text="Обозначение"
+                                           FontSize="{StaticResource StandardFontSize}"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource TextSecondaryBrush}"
+                                           Padding="{StaticResource StandardPaddingThickness}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                            
+                            <!-- Блок с обозначением -->
+                            <Border Grid.Column="0" Grid.Row="1"
+                                    Background="{StaticResource BackgroundPrimaryBrush}" 
+                                    BorderBrush="{StaticResource BorderPrimaryBrush}"
+                                    BorderThickness="1,0,1,1"
+                                    Margin="0,0,5,0">
+                                <TextBlock Text="{Binding PartNumber}" 
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"/>
+                            </Border>
+                            
+                            <!-- Таблица для группы -->
+                            <DataGrid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                                      ItemsSource="{Binding Files}"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      RowHeight="45"
+                                      GridLinesVisibility="None"
+                                      Background="{StaticResource BackgroundPrimaryBrush}"
+                                      BorderBrush="{StaticResource BorderPrimaryBrush}"
+                                      BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                                      HorizontalGridLinesBrush="{StaticResource GridLinesBrush}"
+                                      VerticalGridLinesBrush="{StaticResource GridLinesBrush}"
+                                      SelectionMode="Single"
+                                      AlternationCount="2"
+                                      EnableRowVirtualization="False"
+                                      RowHeaderWidth="0"
+                                      RowStyle="{StaticResource DataGridRowStyle}"
+                                      ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                                      RowHeaderStyle="{StaticResource DataGridRowHeaderStyle}"
+                                      CellStyle="{StaticResource DataGridCellStyle}"
+                                      CanUserSortColumns="True">
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Открыть файл" Click="OpenFileMenuItem_Click"/>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Имя файла" 
+                                                        Binding="{Binding FileNameOnly}" 
+                                                        Width="2*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}">
+                                                <Setter Property="ToolTip" Value="{Binding FileName}"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Состояние модели" 
+                                                        Binding="{Binding ModelState}" 
+                                                        Width="*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}"/>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
 
         <!-- Кнопки -->
         <Border Grid.Row="1" Style="{StaticResource DialogBottomBarStyle}">

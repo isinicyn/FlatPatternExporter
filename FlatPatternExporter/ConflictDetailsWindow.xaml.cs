@@ -10,18 +10,23 @@ namespace FlatPatternExporter;
 
 
 
-public class ConflictItem
+public class ConflictPartNumberGroup
 {
     public string PartNumber { get; set; } = "";
+    public List<ConflictFileInfo> Files { get; set; } = new();
+}
+
+public class ConflictFileInfo
+{
     public string FileName { get; set; } = "";
     public string ModelState { get; set; } = "";
     public string FilePath { get; set; } = "";
+    public string FileNameOnly => Path.GetFileName(FileName);
 }
 
 public partial class ConflictDetailsWindow
 {
-    public List<ConflictItem> ConflictItems { get; set; } = new();
-    public ICollectionView ConflictItemsView { get; set; } = null!;
+    public List<ConflictPartNumberGroup> ConflictGroups { get; set; } = new();
 
     public ConflictDetailsWindow(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
     {
@@ -32,26 +37,21 @@ public partial class ConflictDetailsWindow
 
     private void PrepareConflictData(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
     {
-        ConflictItems = conflictFileDetails
-            .SelectMany(entry => entry.Value.Select(conflictInfo => new ConflictItem
+        ConflictGroups = conflictFileDetails.Select(entry => new ConflictPartNumberGroup
+        {
+            PartNumber = entry.Key,
+            Files = entry.Value.Select(conflictInfo => new ConflictFileInfo
             {
-                PartNumber = entry.Key,
                 FileName = conflictInfo.FileName,
                 ModelState = conflictInfo.ModelState,
                 FilePath = conflictInfo.FileName
-            }))
-            .OrderBy(item => item.PartNumber)
-            .ThenBy(item => item.FileName)
-            .ToList();
-
-        // Создаем CollectionView для группировки
-        ConflictItemsView = CollectionViewSource.GetDefaultView(ConflictItems);
-        ConflictItemsView.GroupDescriptions.Add(new PropertyGroupDescription("PartNumber"));
+            }).OrderBy(f => f.FileName).ToList()
+        }).OrderBy(g => g.PartNumber).ToList();
     }
 
-    private void ExecuteOpenFile(ConflictItem? conflictItem)
+    private void ExecuteOpenFile(ConflictFileInfo? fileInfo)
     {
-        if (conflictItem?.FilePath == null)
+        if (fileInfo?.FilePath == null)
             return;
 
         // Получаем ссылку на главное окно для использования централизованного метода
@@ -60,15 +60,27 @@ public partial class ConflictDetailsWindow
         {
             // Используем централизованный метод открытия с состоянием модели
             // Обработка ошибок уже есть внутри OpenInventorDocument()
-            mainWindow.OpenInventorDocument(conflictItem.FilePath, conflictItem.ModelState);
+            mainWindow.OpenInventorDocument(fileInfo.FilePath, fileInfo.ModelState);
         }
     }
 
     private void OpenFileMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        if (ConflictDataGrid.SelectedItem is ConflictItem conflictItem)
+        if (sender is MenuItem menuItem)
         {
-            ExecuteOpenFile(conflictItem);
+            // Находим DataGrid, который содержит данное меню
+            var dataGrid = menuItem.GetValue(FrameworkElement.DataContextProperty) as DataGrid;
+            if (dataGrid?.SelectedItem is ConflictFileInfo fileInfo)
+            {
+                ExecuteOpenFile(fileInfo);
+            }
+            // Попробуем найти через PlacementTarget
+            else if (menuItem.Parent is ContextMenu contextMenu && 
+                     contextMenu.PlacementTarget is DataGrid targetGrid &&
+                     targetGrid.SelectedItem is ConflictFileInfo selectedFile)
+            {
+                ExecuteOpenFile(selectedFile);
+            }
         }
     }
 
