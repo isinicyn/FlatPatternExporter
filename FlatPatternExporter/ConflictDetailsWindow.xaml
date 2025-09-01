@@ -22,7 +22,67 @@
                       Margin="{StaticResource StandardPaddingThickness}"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
-            <ItemsControl ItemsSource="{Binding ConflictGroups}">
+            <StackPanel>
+                <!-- Общий заголовок для всех таблиц -->
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Border Grid.Column="0"
+                            Background="{DynamicResource SelectionBackgroundBrush}"
+                            Height="{StaticResource LargeElementHeight}"
+                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderThickness="1,1,1,1"
+                            Margin="0,0,5,0">
+                        <TextBlock Text="Обозначение"
+                                   FontSize="{StaticResource StandardFontSize}"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Padding="{StaticResource StandardPaddingThickness}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                    
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Border Grid.Column="0"
+                                Background="{DynamicResource SelectionBackgroundBrush}"
+                                Height="{StaticResource LargeElementHeight}"
+                                BorderBrush="{StaticResource BorderLightBrush}"
+                                BorderThickness="1,1,0,1">
+                            <TextBlock Text="Имя файла"
+                                       FontSize="{StaticResource StandardFontSize}"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Padding="{StaticResource StandardPaddingThickness}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        
+                        <Border Grid.Column="1"
+                                Background="{DynamicResource SelectionBackgroundBrush}"
+                                Height="{StaticResource LargeElementHeight}"
+                                BorderBrush="{StaticResource BorderLightBrush}"
+                                BorderThickness="1,1,1,1">
+                            <TextBlock Text="Состояние модели"
+                                       FontSize="{StaticResource StandardFontSize}"
+                                       FontWeight="Bold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Padding="{StaticResource StandardPaddingThickness}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                </Grid>
+                
+                <!-- Контейнер с таблицами -->
+                <ItemsControl ItemsSource="{Binding ConflictGroups}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="0,0,0,15">
@@ -30,32 +90,12 @@
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            
-                            <!-- Заголовок для обозначения -->
-                            <Border Grid.Column="0" Grid.Row="0"
-                                    Background="{DynamicResource SelectionBackgroundBrush}"
-                                    Height="{StaticResource LargeElementHeight}"
-                                    BorderBrush="{StaticResource BorderLightBrush}"
-                                    BorderThickness="1,1,1,1"
-                                    Margin="0,0,5,0">
-                                <TextBlock Text="Обозначение"
-                                           FontSize="{StaticResource StandardFontSize}"
-                                           FontWeight="Bold"
-                                           Foreground="{DynamicResource TextSecondaryBrush}"
-                                           Padding="{StaticResource StandardPaddingThickness}"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                            </Border>
                             
                             <!-- Блок с обозначением -->
-                            <Border Grid.Column="0" Grid.Row="1"
+                            <Border Grid.Column="0"
                                     Background="{StaticResource BackgroundPrimaryBrush}" 
                                     BorderBrush="{StaticResource BorderPrimaryBrush}"
-                                    BorderThickness="1,0,1,1"
+                                    BorderThickness="1,1,1,1"
                                     Margin="0,0,5,0">
                                 <TextBlock Text="{Binding PartNumber}" 
                                            FontWeight="Bold"
@@ -66,7 +106,7 @@
                             </Border>
                             
                             <!-- Таблица для группы -->
-                            <DataGrid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                            <DataGrid Grid.Column="1"
                                       ItemsSource="{Binding Files}"
                                       AutoGenerateColumns="False"
                                       IsReadOnly="True"
@@ -84,10 +124,10 @@
                                       EnableRowVirtualization="False"
                                       RowHeaderWidth="0"
                                       RowStyle="{StaticResource DataGridRowStyle}"
-                                      ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                                      HeadersVisibility="None"
                                       RowHeaderStyle="{StaticResource DataGridRowHeaderStyle}"
                                       CellStyle="{StaticResource DataGridCellStyle}"
-                                      CanUserSortColumns="True">
+                                      CanUserSortColumns="False">
                                 <DataGrid.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Открыть файл" Click="OpenFileMenuItem_Click"/>
@@ -115,7 +155,8 @@
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                </ItemsControl>
+            </StackPanel>
         </ScrollViewer>
 
         <!-- Кнопки -->
