@@ -818,7 +818,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (_isExporting)
         {
             _operationCts?.Cancel();
-            SetUIState(new UIState { ExportEnabled = false, ExportButtonText = "Прерывание..." });
+            SetUIState(UIState.CancellingExport);
             return true;
         }
         return false;
@@ -1610,7 +1610,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (_isScanning)
         {
             _operationCts?.Cancel();
-            SetUIState(new UIState { ScanEnabled = false, ScanButtonText = UIState.CANCELLING_TEXT });
+            SetUIState(UIState.CancellingScan);
             return;
         }
 
@@ -2351,6 +2351,20 @@ public class UIState
         UpdateExportProgress = false
     };
     
+    public static UIState CancellingScan => new()
+    {
+        ScanEnabled = false,
+        ScanButtonText = CANCELLING_TEXT,
+        ExportEnabled = false,
+        ExportButtonText = EXPORT_BUTTON_TEXT,
+        ClearEnabled = false,
+        ProgressText = "Прерывание...",
+        ProgressValue = 0,
+        InventorUIDisabled = true,
+        UpdateScanProgress = true,
+        UpdateExportProgress = false
+    };
+    
     public static UIState Exporting => new()
     {
         ScanEnabled = false,
@@ -2359,6 +2373,20 @@ public class UIState
         ScanButtonText = SCAN_BUTTON_TEXT,
         ExportButtonText = CANCEL_BUTTON_TEXT,
         ProgressText = "Экспорт данных...",
+        ProgressValue = 0,
+        InventorUIDisabled = true,
+        UpdateScanProgress = false,
+        UpdateExportProgress = true
+    };
+    
+    public static UIState CancellingExport => new()
+    {
+        ScanEnabled = false,
+        ScanButtonText = SCAN_BUTTON_TEXT,
+        ExportEnabled = false,
+        ExportButtonText = CANCELLING_TEXT,
+        ClearEnabled = false,
+        ProgressText = "Прерывание экспорта...",
         ProgressValue = 0,
         InventorUIDisabled = true,
         UpdateScanProgress = false,
