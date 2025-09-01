@@ -76,7 +76,7 @@ public partial class FlatPatternExporterMainWindow : Window
     // Перегрузка для сборок - открывает документ по partNumber
     private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber, bool loadThumbnail = true)
     {
-        var partDoc = OpenPartDocument(partNumber);
+        var partDoc = GetCachedPartDocument(partNumber) ?? OpenPartDocument(partNumber);
         if (partDoc == null) return null!;
         
         return await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
@@ -268,20 +268,26 @@ public partial class FlatPatternExporterMainWindow : Window
                 if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
                 {
                     var partDoc = occ.Definition.Document as PartDocument;
-                    if (partDoc != null && partDoc.SubType == PropertyManager.SheetMetalSubType)
+                    if (partDoc != null)
                     {
                         var mgr = new PropertyManager((Document)partDoc);
                         var partNumber = mgr.GetMappedProperty("PartNumber");
                         if (!string.IsNullOrEmpty(partNumber))
                         {
-                            // Добавляем в трекер конфликтов
-                            var modelState = mgr.GetModelState();
-                            AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
+                            // Добавляем документ в кеш
+                            AddDocumentToCache(partDoc, partNumber);
                             
-                            if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
-                                sheetMetalParts[partNumber]++;
-                            else
-                                sheetMetalParts.Add(partNumber, 1);
+                            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+                            {
+                                // Добавляем в трекер конфликтов
+                                var modelState = mgr.GetModelState();
+                                AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
+                                
+                                if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
+                                    sheetMetalParts[partNumber]++;
+                                else
+                                    sheetMetalParts.Add(partNumber, 1);
+                            }
                         }
                     }
                 }
@@ -460,23 +466,29 @@ public partial class FlatPatternExporterMainWindow : Window
             if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
             {
                 var partDoc = document as PartDocument;
-                if (partDoc != null && partDoc.SubType == PropertyManager.SheetMetalSubType)
+                if (partDoc != null)
                 {
                     var mgr = new PropertyManager((Document)partDoc);
                     var partNumber = mgr.GetMappedProperty("PartNumber");
                     if (!string.IsNullOrEmpty(partNumber))
                     {
-                        // Добавляем в трекер конфликтов
-                        var modelState = mgr.GetModelState();
-                        AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
+                        // Добавляем документ в кеш
+                        AddDocumentToCache(partDoc, partNumber);
                         
-                        // Учитываем общее количество: количество детали * количество родительских сборок
-                        var totalQuantity = row.ItemQuantity * parentQuantity;
-                        
-                        if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
-                            sheetMetalParts[partNumber] += totalQuantity;
-                        else
-                            sheetMetalParts.Add(partNumber, totalQuantity);
+                        if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+                        {
+                            // Добавляем в трекер конфликтов
+                            var modelState = mgr.GetModelState();
+                            AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
+                            
+                            // Учитываем общее количество: количество детали * количество родительских сборок
+                            var totalQuantity = row.ItemQuantity * parentQuantity;
+                            
+                            if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
+                                sheetMetalParts[partNumber] += totalQuantity;
+                            else
+                                sheetMetalParts.Add(partNumber, totalQuantity);
+                        }
                     }
                 }
             }
@@ -591,11 +603,20 @@ public partial class FlatPatternExporterMainWindow : Window
             {
                 // Библиотечный компонент исключается
             }
-            else if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+            else
             {
                 var mgr = new PropertyManager((Document)partDoc);
                 var partNumber = mgr.GetMappedProperty("PartNumber");
-                sheetMetalParts.Add(partNumber, 1);
+                if (!string.IsNullOrEmpty(partNumber))
+                {
+                    // Добавляем документ в кеш
+                    AddDocumentToCache(partDoc, partNumber);
+                    
+                    if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+                    {
+                        sheetMetalParts.Add(partNumber, 1);
+                    }
+                }
             }
         }
 
@@ -867,7 +888,7 @@ public partial class FlatPatternExporterMainWindow : Window
             PartDocument? partDoc = null;
             try
             {
-                partDoc = OpenPartDocument(partNumber);
+                partDoc = GetCachedPartDocument(partNumber) ?? OpenPartDocument(partNumber);
                 if (partDoc == null) throw new Exception("Файл детали не найден или не может быть открыт");
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
@@ -1075,6 +1096,10 @@ public partial class FlatPatternExporterMainWindow : Window
 
     private PartDocument? OpenPartDocument(string partNumber)
     {
+        // Сначала проверяем кеш
+        var cachedDoc = GetCachedPartDocument(partNumber);
+        if (cachedDoc != null) return cachedDoc;
+
         var docs = _thisApplication?.Documents;
         if (docs == null) return null;
 
@@ -1179,6 +1204,9 @@ public partial class FlatPatternExporterMainWindow : Window
 
         // Отключаем кнопку "Конфликты" и очищаем список конфликтов
         ClearConflictData();
+        
+        // Очищаем кеш документов
+        ClearDocumentCache();
 
     }
 
@@ -1287,6 +1315,10 @@ public partial class FlatPatternExporterMainWindow : Window
     }
     private string? GetPartDocumentFullPath(string partNumber)
     {
+        // Сначала проверяем кеш
+        if (_partNumberToFullFileName.TryGetValue(partNumber, out var cachedPath))
+            return cachedPath;
+
         var docs = _thisApplication?.Documents;
         if (docs == null) return null;
 
@@ -1371,7 +1403,7 @@ public partial class FlatPatternExporterMainWindow : Window
         // Для кастомных свойств загружаем данные из файлов
         foreach (var partData in _partsData)
         {
-            var partDoc = OpenPartDocument(partData.PartNumber);
+            var partDoc = GetCachedPartDocument(partData.PartNumber) ?? OpenPartDocument(partData.PartNumber);
             if (partDoc != null)
             {
                 var mgr = new PropertyManager((Document)partDoc);

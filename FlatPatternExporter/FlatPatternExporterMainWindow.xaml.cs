@@ -77,6 +77,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = new();
     private readonly ConcurrentDictionary<string, List<PartConflictInfo>> _partNumberTracker = new();
     
+    // Кеш документов для изоляции среды обработки
+    private readonly Dictionary<string, PartDocument> _documentCache = new();
+    private readonly Dictionary<string, string> _partNumberToFullFileName = new();
+    
     // Состояние процессов
     private bool _isScanning;
     private bool _isExporting;
@@ -1543,6 +1547,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     return result;
                 }
                 
+                var mgr = new PropertyManager((Document)partDoc);
+                var partNumber = mgr.GetMappedProperty("PartNumber");
+                if (!string.IsNullOrEmpty(partNumber))
+                {
+                    // Добавляем документ в кеш
+                    AddDocumentToCache(partDoc, partNumber);
+                }
+                
                 if (updateUI)
                 {
                     var partProgress = new Progress<PartData>(partData =>
@@ -1558,8 +1570,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 {
                     if (partDoc.SubType == PropertyManager.SheetMetalSubType)
                     {
-                        var mgr = new PropertyManager((Document)partDoc);
-                        var partNumber = mgr.GetMappedProperty("PartNumber");
                         sheetMetalParts.Add(partNumber, 1);
                         result.ProcessedCount = 1;
                     }
@@ -1743,6 +1753,26 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _conflictingParts.Clear();
         _conflictFileDetails.Clear();
         ConflictFilesButton.IsEnabled = false; // Отключаем кнопку при очистке данных
+    }
+
+    private void AddDocumentToCache(PartDocument partDoc, string partNumber)
+    {
+        if (!string.IsNullOrEmpty(partNumber) && !_documentCache.ContainsKey(partNumber))
+        {
+            _documentCache[partNumber] = partDoc;
+            _partNumberToFullFileName[partNumber] = partDoc.FullFileName;
+        }
+    }
+
+    private PartDocument? GetCachedPartDocument(string partNumber)
+    {
+        return _documentCache.TryGetValue(partNumber, out var partDoc) ? partDoc : null;
+    }
+
+    private void ClearDocumentCache()
+    {
+        _documentCache.Clear();
+        _partNumberToFullFileName.Clear();
     }
 
     private void AddPartToConflictTracker(string partNumber, string fileName, string modelState)
