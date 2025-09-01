@@ -4,9 +4,11 @@
         xmlns:local="clr-namespace:FlatPatternExporter"
         Title="Детали конфликта обозначений" 
         WindowStartupLocation="CenterScreen" 
-        ResizeMode="NoResize" 
-        SizeToContent="WidthAndHeight"
-        MinWidth="600">
+        ResizeMode="CanResize" 
+        Width="700"
+        Height="450"
+        MinWidth="600"
+        MinHeight="300">
 
 
     <Grid>
@@ -16,46 +18,81 @@
         </Grid.RowDefinitions>
 
         <!-- Основное содержимое -->
-        <StackPanel Grid.Row="0" Margin="{StaticResource StandardPaddingThickness}">
-            <GroupBox Header="Конфликтующие обозначения и файлы" Margin="{StaticResource BottomLargeMarginThickness}">
-                <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
-                    <!-- TreeView для отображения конфликтов -->
-                    <TreeView x:Name="ConflictTreeView" 
-                              Style="{StaticResource ConflictTreeViewStyle}"
-                              MinHeight="200"
-                              MaxHeight="400"
-                              ItemsSource="{Binding ConflictGroups}">
-                        <TreeView.Resources>
-                            <ContextMenu x:Key="FileContextMenu">
-                                <MenuItem Header="Открыть файл" Click="OpenFileMenuItem_Click"/>
-                            </ContextMenu>
-                            
-                            <Style TargetType="TreeViewItem" BasedOn="{StaticResource ConflictTreeViewItemStyle}">
-                                <Setter Property="ContextMenu" Value="{StaticResource FileContextMenu}"/>
+        <GroupBox Grid.Row="0" 
+                  Header="Конфликтующие обозначения и файлы" 
+                  Margin="{StaticResource StandardPaddingThickness}">
+            <DataGrid x:Name="ConflictDataGrid"
+                      ItemsSource="{Binding ConflictItemsView}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      RowHeight="45"
+                      GridLinesVisibility="None"
+                      Background="{StaticResource BackgroundPrimaryBrush}"
+                      VerticalAlignment="Top"
+                      BorderBrush="{StaticResource BorderPrimaryBrush}"
+                      BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                      HorizontalGridLinesBrush="{StaticResource GridLinesBrush}"
+                      VerticalGridLinesBrush="{StaticResource GridLinesBrush}"
+                      SelectionMode="Single"
+                      AlternationCount="2"
+                      EnableRowVirtualization="False"
+                      RowHeaderWidth="0"
+                      RowStyle="{StaticResource DataGridRowStyle}"
+                      ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                      RowHeaderStyle="{StaticResource DataGridRowHeaderStyle}"
+                      CellStyle="{StaticResource DataGridCellStyle}"
+                      CanUserSortColumns="True">
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Открыть файл" Click="OpenFileMenuItem_Click"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+                <DataGrid.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="GroupItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="GroupItem">
+                                            <StackPanel Margin="0,0,0,10">
+                                                <Border Background="{DynamicResource SelectionBackgroundBrush}" 
+                                                        BorderBrush="{DynamicResource GridLinesBrush}"
+                                                        BorderThickness="0,0,0,1"
+                                                        Padding="{StaticResource SmallPaddingThickness}">
+                                                    <TextBlock FontWeight="Bold">
+                                                        <Run Text="Обозначение: "/>
+                                                        <Run Text="{Binding Name, Mode=OneWay}"/>
+                                                    </TextBlock>
+                                                </Border>
+                                                <ItemsPresenter />
+                                            </StackPanel>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
                             </Style>
-                        </TreeView.Resources>
-                        <TreeView.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Files}">
-                                <TextBlock FontWeight="Bold">
-                                    <Run Text="Обозначение: "/>
-                                    <Run Text="{Binding PartNumber}"/>
-                                </TextBlock>
-                                <HierarchicalDataTemplate.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock>
-                                            <Run Text="Файл: "/>
-                                            <Run Text="{Binding FileName}"/>
-                                            <Run Text=" | Состояние: "/>
-                                            <Run Text="{Binding ModelState}"/>
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </HierarchicalDataTemplate.ItemTemplate>
-                            </HierarchicalDataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
-                </StackPanel>
-            </GroupBox>
-        </StackPanel>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </DataGrid.GroupStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Имя файла" 
+                                        Binding="{Binding FileName}" 
+                                        Width="2*">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}"/>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Состояние модели" 
+                                        Binding="{Binding ModelState}" 
+                                        Width="*">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}"/>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
 
         <!-- Кнопки -->
         <Border Grid.Row="1" Style="{StaticResource DialogBottomBarStyle}">
