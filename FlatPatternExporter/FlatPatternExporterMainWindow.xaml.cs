@@ -2393,6 +2393,20 @@ public class UIState
         UpdateExportProgress = true
     };
     
+    public static UIState PreparingQuickExport => new()
+    {
+        ScanEnabled = false,
+        ScanButtonText = SCAN_BUTTON_TEXT,
+        ExportEnabled = true,
+        ExportButtonText = CANCEL_BUTTON_TEXT,
+        ClearEnabled = false,
+        ProgressText = "Сканирование и подготовка данных...",
+        ProgressValue = 0,
+        InventorUIDisabled = true,
+        UpdateScanProgress = false,
+        UpdateExportProgress = true
+    };
+    
     public static UIState CreateClearedState() => new()
     {
         ScanEnabled = true,

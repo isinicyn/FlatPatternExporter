@@ -697,9 +697,6 @@ public partial class FlatPatternExporterMainWindow : Window
             return false;
         }
 
-
-        SetUIState(UIState.Exporting);
-
         return true;
     }
 
@@ -712,28 +709,48 @@ public partial class FlatPatternExporterMainWindow : Window
         var validation = ValidateDocumentOrShowError();
         if (validation == null) return;
 
+        // Настройка UI для подготовки быстрого экспорта
+        InitializeOperation(UIState.PreparingQuickExport, ref _isExporting);
+
         // Подготовка контекста экспорта (без требования предварительного сканирования и без отображения прогресса)
         var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: false, showProgress: false);
-        if (context == null) return;
+        if (context == null) 
+        {
+            // Восстанавливаем состояние при ошибке
+            SetUIState(UIState.CreateAfterOperationState(false, false, "Ошибка подготовки экспорта"));
+            _isExporting = false;
+            return;
+        }
 
-        // Настройка UI для быстрого экспорта
-        InitializeOperation(UIState.Exporting, ref _isExporting);
-        var stopwatch = Stopwatch.StartNew();
-
-        // Создаем временный список PartData для экспорта с полными данными
+        // Создаем временный список PartData для экспорта с полными данными (это тоже длительная операция)
         var tempPartsDataList = new List<PartData>();
         var itemCounter = 1;
+        var totalParts = context.SheetMetalParts.Count;
         
         foreach (var part in context.SheetMetalParts)
         {
-            var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++, loadThumbnail: false);
+            // Обновляем прогресс каждые 5 деталей или на важных моментах
+            if (itemCounter % 5 == 1 || itemCounter == totalParts)
+            {
+                var progressState = UIState.PreparingQuickExport;
+                progressState.ProgressText = $"Подготовка данных деталей ({itemCounter}/{totalParts})...";
+                SetUIState(progressState);
+                await Task.Delay(1); // Минимальная задержка для обновления UI
+            }
+            
+            var partData = await GetPartDataAsync(part.Key, part.Value * context.Multiplier, itemCounter++, loadThumbnail: false);
             if (partData != null)
             {
-                partData.SetQuantityInternal(partData.OriginalQuantity * context.Multiplier);
+                // Не вызываем SetQuantityInternal повторно - количество уже установлено правильно в GetPartDataAsync
                 partData.IsMultiplied = context.Multiplier > 1;
                 tempPartsDataList.Add(partData);
             }
         }
+
+        // Переключаемся в состояние экспорта когда РЕАЛЬНО начинается экспорт файлов
+        SetUIState(UIState.Exporting);
+        
+        var stopwatch = Stopwatch.StartNew();
 
         // Выполнение экспорта через централизованную обработку ошибок
         context.GenerateThumbnails = false;
