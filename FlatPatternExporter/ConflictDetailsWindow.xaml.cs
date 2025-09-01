@@ -84,6 +84,14 @@ public partial class ConflictDetailsWindow
         }
     }
 
+    private void DataGrid_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is DataGrid dataGrid)
+        {
+            dataGrid.UnselectAll();
+        }
+    }
+
     // Обработчик кнопки "ОК"
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
