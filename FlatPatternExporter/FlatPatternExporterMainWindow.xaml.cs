@@ -176,23 +176,22 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private static Dictionary<string, string> InitializeColumnTemplates()
     {
-        var templates = new Dictionary<string, string>
-        {
-            ["Обр."] = "ProcessingStatusTemplate",
-            ["Изобр. детали"] = "PartImageTemplate",
-            ["Изобр. развертки"] = "DxfImageTemplate",
-            ["ID"] = "IDWithFlatPatternIndicatorTemplate",
-            ["Кол."] = "EditableQuantityTemplate"
-        };
+        var templates = new Dictionary<string, string>();
 
-        // Автоматически добавляем шаблоны для всех редактируемых свойств из централизованного реестра
-        foreach (var property in PropertyManager.GetEditableProperties())
+        // Автоматически добавляем шаблоны для всех свойств из централизованного реестра
+        foreach (var definition in PropertyMetadataRegistry.Properties.Values)
         {
-            // Получаем метаданные свойства из централизованного реестра
-            if (PropertyMetadataRegistry.Properties.TryGetValue(property, out var definition))
+            var columnName = definition.ColumnHeader.Length > 0 ? definition.ColumnHeader : definition.DisplayName;
+            
+            // Используем уникальный шаблон, если он задан
+            if (!string.IsNullOrEmpty(definition.ColumnTemplate))
             {
-                var columnName = definition.ColumnHeader.Length > 0 ? definition.ColumnHeader : definition.DisplayName;
-                templates[columnName] = $"{property}WithExpressionTemplate";
+                templates[columnName] = definition.ColumnTemplate;
+            }
+            // Для редактируемых свойств без уникального шаблона используем WithExpressionTemplate
+            else if (definition.IsEditable)
+            {
+                templates[columnName] = $"{definition.InternalName}WithExpressionTemplate";
             }
         }
 

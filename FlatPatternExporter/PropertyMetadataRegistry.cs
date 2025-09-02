@@ -23,6 +23,7 @@ public static class PropertyMetadataRegistry
         public bool RequiresRounding { get; init; }
         public int RoundingDecimals { get; init; } = 2;
         public Dictionary<string, string>? ValueMappings { get; init; }
+        public string? ColumnTemplate { get; init; }
     }
 
     /// <summary>
@@ -47,7 +48,8 @@ public static class PropertyMetadataRegistry
             DisplayName = "Статус обработки",
             ColumnHeader = "Обр.",
             Category = "Системные",
-            Type = PropertyType.System
+            Type = PropertyType.System,
+            ColumnTemplate = "ProcessingStatusTemplate"
         },
         ["Item"] = new PropertyDefinition
         {
@@ -55,7 +57,8 @@ public static class PropertyMetadataRegistry
             DisplayName = "Нумерация",
             ColumnHeader = "ID",
             Category = "Системные",
-            Type = PropertyType.System
+            Type = PropertyType.System,
+            ColumnTemplate = "IDWithFlatPatternIndicatorTemplate"
         },
         ["Quantity"] = new PropertyDefinition
         {
@@ -63,7 +66,8 @@ public static class PropertyMetadataRegistry
             DisplayName = "Количество",
             ColumnHeader = "Кол.",
             Category = "Количество",
-            Type = PropertyType.System
+            Type = PropertyType.System,
+            ColumnTemplate = "EditableQuantityTemplate"
         },
         
         // ===== Свойства документа (не iProperty) =====
@@ -107,7 +111,8 @@ public static class PropertyMetadataRegistry
             DisplayName = "Изображение детали",
             ColumnHeader = "Изобр. детали",
             Category = "Документ",
-            Type = PropertyType.Document
+            Type = PropertyType.Document,
+            ColumnTemplate = "PartImageTemplate"
         },
         ["DxfPreview"] = new PropertyDefinition
         {
@@ -115,7 +120,8 @@ public static class PropertyMetadataRegistry
             DisplayName = "Изображение развертки",
             ColumnHeader = "Изобр. развертки",
             Category = "Обработка",
-            Type = PropertyType.Document
+            Type = PropertyType.Document,
+            ColumnTemplate = "DxfImageTemplate"
         },
 
         // ===== Summary Information =====
