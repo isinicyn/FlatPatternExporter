@@ -24,53 +24,23 @@ public partial class FlatPatternExporterMainWindow : Window
     /// </summary>
     private void ReadAllPropertiesFromPart(PartDocument partDoc, PartData partData, PropertyManager mgr)
     {
-        // КАТЕГОРИЯ 2: Свойства документа (не iProperty)
         partData.FileName = mgr.GetFileName();
         partData.FullFileName = mgr.GetFullFileName();
         partData.ModelState = mgr.GetModelState();
         partData.Thickness = mgr.GetThickness();
         partData.HasFlatPattern = mgr.HasFlatPattern();
 
-        // Всегда обязательные свойства (независимо от наличия колонок)
-        partData.PartNumber = mgr.GetMappedProperty("PartNumber");
-        partData.Description = mgr.GetMappedProperty("Description");
-        partData.Material = mgr.GetMappedProperty("Material");
-        
         // Устанавливаем состояния выражений для всех редактируемых свойств
         SetExpressionStatesForAllProperties(partData, mgr);
 
-        // КАТЕГОРИЯ 4: Расширенные iProperty (загружаем все)
-        partData.Author = mgr.GetMappedProperty("Author");
-        partData.Revision = mgr.GetMappedProperty("Revision");
-        partData.Title = mgr.GetMappedProperty("Title");
-        partData.Subject = mgr.GetMappedProperty("Subject");
-        partData.Keywords = mgr.GetMappedProperty("Keywords");
-        partData.Comments = mgr.GetMappedProperty("Comments");
-        partData.Category = mgr.GetMappedProperty("Category");
-        partData.Manager = mgr.GetMappedProperty("Manager");
-        partData.Company = mgr.GetMappedProperty("Company");
-        partData.Project = mgr.GetMappedProperty("Project");
-        partData.StockNumber = mgr.GetMappedProperty("StockNumber");
-        partData.CreationTime = mgr.GetMappedProperty("CreationTime");
-        partData.CostCenter = mgr.GetMappedProperty("CostCenter");
-        partData.CheckedBy = mgr.GetMappedProperty("CheckedBy");
-        partData.EngApprovedBy = mgr.GetMappedProperty("EngApprovedBy");
-        partData.UserStatus = mgr.GetMappedProperty("UserStatus");
-        partData.CatalogWebLink = mgr.GetMappedProperty("CatalogWebLink");
-        partData.Vendor = mgr.GetMappedProperty("Vendor");
-        partData.MfgApprovedBy = mgr.GetMappedProperty("MfgApprovedBy");
-        partData.DesignStatus = mgr.GetMappedProperty("DesignStatus");
-        partData.Designer = mgr.GetMappedProperty("Designer");
-        partData.Engineer = mgr.GetMappedProperty("Engineer");
-        partData.Authority = mgr.GetMappedProperty("Authority");
-        partData.Mass = mgr.GetMappedProperty("Mass");
-        partData.SurfaceArea = mgr.GetMappedProperty("SurfaceArea");
-        partData.Volume = mgr.GetMappedProperty("Volume");
-        partData.SheetMetalRule = mgr.GetMappedProperty("SheetMetalRule");
-        partData.FlatPatternWidth = mgr.GetMappedProperty("FlatPatternWidth");
-        partData.FlatPatternLength = mgr.GetMappedProperty("FlatPatternLength");
-        partData.FlatPatternArea = mgr.GetMappedProperty("FlatPatternArea");
-        partData.Appearance = mgr.GetMappedProperty("Appearance");
+        // Автоматически заполняем все свойства типа IProperty из реестра
+        foreach (var property in PropertyMetadataRegistry.Properties.Values
+                     .Where(p => p.Type == PropertyMetadataRegistry.PropertyType.IProperty))
+        {
+            var value = mgr.GetMappedProperty(property.InternalName);
+            var propInfo = typeof(PartData).GetProperty(property.InternalName);
+            propInfo?.SetValue(partData, value);
+        }
     }
 
     // Перегрузка для сборок - открывает документ по partNumber
@@ -89,26 +59,21 @@ public partial class FlatPatternExporterMainWindow : Window
         // Создаем новый объект PartData
         var partData = new PartData
         {
-            // КАТЕГОРИЯ 1: Системные свойства приложения
             Item = itemNumber,
             
-            // КАТЕГОРИЯ 6: Свойства количества и состояния
             OriginalQuantity = quantity
         };
 
         // Создаем единый экземпляр PropertyManager для всех операций
         var mgr = new PropertyManager((Document)partDoc);
         
-        // КАТЕГОРИЯ 2-4: Чтение всех свойств документа и iProperty
         ReadAllPropertiesFromPart(partDoc, partData, mgr);
 
-        // КАТЕГОРИЯ 5: Получаем значения для пользовательских iProperty
         foreach (var userDefinedProperty in _userDefinedPropertiesList)
         {
             partData.UserDefinedProperties[userDefinedProperty] = mgr.GetMappedProperty(userDefinedProperty);
         }
 
-        // КАТЕГОРИЯ 2: Дополнительные свойства документа (изображения)
         if (loadThumbnail)
         {
             partData.Preview = await GetThumbnailAsync(partDoc);
