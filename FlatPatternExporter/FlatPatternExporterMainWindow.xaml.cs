@@ -185,7 +185,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             ["Кол."] = "EditableQuantityTemplate"
         };
 
-        // Маппинг свойств на их русские названия колонок
+        // Маппинг свойств на их названия колонок
         var propertyToColumnName = new Dictionary<string, string>
         {
             ["Author"] = "Автор",

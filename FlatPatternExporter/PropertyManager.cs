@@ -10,145 +10,62 @@ namespace FlatPatternExporter;
 /// </summary>
 public class PropertyManager
 {
-        private readonly Document _document;
-        public static readonly string SheetMetalSubType = "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}";
-
-        /// <summary>
-        /// Список редактируемых свойств, которые могут быть выражениями
-        /// </summary>
-    private static readonly HashSet<string> EditableProperties =
-    [
-            // Design Tracking Properties
-            "Authority", "CatalogWebLink", "CheckedBy", "CostCenter", "Description", 
-            "Designer", "DesignStatus", "Engineer", "EngApprovedBy", "MfgApprovedBy", 
-            "PartNumber", "Project", "StockNumber", "UserStatus", "Vendor",
-            
-            // Summary Information  
-            "Author", "Comments", "Keywords", "Revision", "Subject", "Title",
-            
-            // Document Summary Information
-        "Category", "Company", "Manager"
-    ];
-
-        /// <summary>
-        /// Маппинг внутренних имен свойств на соответствующие наборы и имена в Inventor
-        /// </summary>
-        private static readonly Dictionary<string, (string SetName, string InventorName)> PropertyMapping = new()
-        {
-            // Summary Information
-            { "Author", ("Summary Information", "Author") },
-            { "Revision", ("Summary Information", "Revision Number") },
-            { "Title", ("Summary Information", "Title") },
-            { "Subject", ("Summary Information", "Subject") },
-            { "Keywords", ("Summary Information", "Keywords") },
-            { "Comments", ("Summary Information", "Comments") },
-
-            // Document Summary Information
-            { "Category", ("Document Summary Information", "Category") },
-            { "Manager", ("Document Summary Information", "Manager") },
-            { "Company", ("Document Summary Information", "Company") },
-
-            // Design Tracking Properties
-            { "PartNumber", ("Design Tracking Properties", "Part Number") },
-            { "Description", ("Design Tracking Properties", "Description") },
-            { "Material", ("Design Tracking Properties", "Material") },
-            { "Project", ("Design Tracking Properties", "Project") },
-            { "StockNumber", ("Design Tracking Properties", "Stock Number") },
-            { "CreationTime", ("Design Tracking Properties", "Creation Time") },
-            { "CostCenter", ("Design Tracking Properties", "Cost Center") },
-            { "CheckedBy", ("Design Tracking Properties", "Checked By") },
-            { "EngApprovedBy", ("Design Tracking Properties", "Engr Approved By") },
-            { "UserStatus", ("Design Tracking Properties", "User Status") },
-            { "CatalogWebLink", ("Design Tracking Properties", "Catalog Web Link") },
-            { "Vendor", ("Design Tracking Properties", "Vendor") },
-            { "MfgApprovedBy", ("Design Tracking Properties", "Mfg Approved By") },
-            { "DesignStatus", ("Design Tracking Properties", "Design Status") },
-            { "Designer", ("Design Tracking Properties", "Designer") },
-            { "Engineer", ("Design Tracking Properties", "Engineer") },
-            { "Authority", ("Design Tracking Properties", "Authority") },
-            { "Mass", ("Design Tracking Properties", "Mass") },
-            { "SurfaceArea", ("Design Tracking Properties", "SurfaceArea") },
-            { "Volume", ("Design Tracking Properties", "Volume") },
-            { "SheetMetalRule", ("Design Tracking Properties", "Sheet Metal Rule") },
-            { "FlatPatternWidth", ("Design Tracking Properties", "Flat Pattern Width") },
-            { "FlatPatternLength", ("Design Tracking Properties", "Flat Pattern Length") },
-            { "FlatPatternArea", ("Design Tracking Properties", "Flat Pattern Area") },
-            { "Appearance", ("Design Tracking Properties", "Appearance") }
-        };
-
-        /// <summary>
-        /// Словарь сопоставлений значений свойств для преобразования внутренних значений в читаемые
-        /// </summary>
-    private static readonly Dictionary<string, Dictionary<string, string>> ValueMappings = new()
-    {
-        ["DesignStatus"] = new()
-        {
-            ["1"] = "Разработка",
-            ["2"] = "Утверждение",
-            ["3"] = "Завершен"
-        }
-    };
-
-        /// <summary>
-        /// Свойства, которые требуют округления до двух знаков после запятой
-        /// </summary>
-    private static readonly HashSet<string> NumericPropertiesForRounding =
-    [
-            "FlatPatternLength",
-            "FlatPatternWidth", 
-            "FlatPatternArea",
-            "Mass",
-            "Volume",
-        "SurfaceArea"
-    ];
+    private readonly Document _document;
+    public static readonly string SheetMetalSubType = "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}";
 
         public PropertyManager(Document document)
         {
             _document = document ?? throw new ArgumentNullException(nameof(document));
         }
 
-        /// <summary>
-        /// Получает объект свойства по внутреннему имени с использованием маппинга или из пользовательских свойств.
-        /// </summary>
-        private Inventor.Property? GetPropertyObject(string ourName)
+    /// <summary>
+    /// Получает маппинг для Inventor Property
+    /// </summary>
+    private static (string SetName, string InventorName) GetInventorMapping(string internalName)
+    {
+        if (PropertyMetadataRegistry.Properties.TryGetValue(internalName, out var def))
         {
-            string setName;
-            string inventorName;
-
-        if (PropertyMapping.TryGetValue(ourName, out var mapping))
-        {
-            setName = mapping.SetName;
-            inventorName = mapping.InventorName;
-        }
-        else
-        {
-            setName = "Inventor User Defined Properties";
-            inventorName = ourName;
-        }
-
-            try
+            if (def.Type == PropertyMetadataRegistry.PropertyType.IProperty)
             {
-                var propSet = _document.PropertySets[setName];
-                return propSet[inventorName];
+                return (def.PropertySetName!, def.InventorPropertyName!);
             }
-            catch (Exception ex)
-            {
+        }
+        
+        // Если свойство не найдено в реестре, считаем его пользовательским
+        // Пользовательские свойства хранятся в "Inventor User Defined Properties" с тем же именем
+        return ("Inventor User Defined Properties", internalName);
+    }
+
+    /// <summary>
+    /// Получает объект свойства по внутреннему имени с использованием централизованной системы метаданных.
+    /// </summary>
+    private Inventor.Property? GetPropertyObject(string ourName)
+    {
+        var (setName, inventorName) = GetInventorMapping(ourName);
+
+        try
+        {
+            var propSet = _document.PropertySets[setName];
+            return propSet[inventorName];
+        }
+        catch (Exception ex)
+        {
             Debug.WriteLine($"Ошибка доступа к свойству '{ourName}': {ex.Message}");
-                return null;
-            }
+            return null;
         }
+    }
 
-        /// <summary>
-        /// Получает значение или выражение свойства по внутреннему имени.
-        /// </summary>
-        /// <param name="ourName">Внутреннее имя свойства.</param>
-        /// <param name="getExpression">Если true, возвращает выражение; иначе - значение.</param>
-        public string GetMappedProperty(string ourName, bool getExpression = false)
-        {
-            var prop = GetPropertyObject(ourName);
-            if (prop == null) return "";
+    /// <summary>
+    /// Получает значение или выражение свойства по внутреннему имени.
+    /// </summary>
+    /// <param name="ourName">Внутреннее имя свойства.</param>
+    /// <param name="getExpression">Если true, возвращает выражение; иначе - значение.</param>
+    public string GetMappedProperty(string ourName, bool getExpression = false)
+    {
+        var prop = GetPropertyObject(ourName);
+        if (prop == null) return "";
 
-            string result;
+        string result;
         if (getExpression)
         {
             result = prop.Expression ?? "";
@@ -157,29 +74,30 @@ public class PropertyManager
         {
             result = prop.Value?.ToString() ?? "";
 
-            // Округляем числовые значения
-            if (NumericPropertiesForRounding.Contains(ourName) && double.TryParse(result, out var numericValue))
+            // Получаем метаданные свойства
+            PropertyMetadataRegistry.PropertyDefinition? definition = null;
+            if (PropertyMetadataRegistry.Properties.TryGetValue(ourName, out var def))
             {
-                result = Math.Round(numericValue, 2).ToString("F2");
+                definition = def;
             }
-
-            // Применяем сопоставления значений
-            if (ValueMappings.TryGetValue(ourName, out var mappings) && mappings.TryGetValue(result, out var mappedValue))
+            if (definition != null)
             {
-                result = mappedValue;
-            }
-            }
+                // Округляем числовые значения
+                if (definition.RequiresRounding && double.TryParse(result, out var numericValue))
+                {
+                    result = Math.Round(numericValue, definition.RoundingDecimals).ToString($"F{definition.RoundingDecimals}");
+                }
 
-            return result;
+                // Применяем сопоставления значений
+                if (definition.ValueMappings != null && definition.ValueMappings.TryGetValue(result, out var mappedValue))
+                {
+                    result = mappedValue;
+                }
+            }
         }
 
-        /// <summary>
-        /// Получает выражение свойства по внутреннему имени с использованием маппинга
-        /// </summary>
-        public string GetMappedPropertyExpression(string ourName)
-        {
-            return GetMappedProperty(ourName, getExpression: true);
-        }
+        return result;
+    }        
 
         /// <summary>
         /// Проверяет, является ли свойство expression-ом по внутреннему имени.
@@ -280,27 +198,33 @@ public class PropertyManager
             }
         }
 
-        /// <summary>
-        /// Получает толщину листового металла (только для деталей из листового металла)
-        /// </summary>
-        public double GetThickness()
+    /// <summary>
+    /// Получает толщину листового металла (только для деталей из листового металла)
+    /// </summary>
+    public double GetThickness()
+    {
+        try
         {
-            try
+            if (_document is PartDocument partDoc && partDoc.SubType == SheetMetalSubType)
             {
-                if (_document is PartDocument partDoc && partDoc.SubType == SheetMetalSubType)
+                var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
+                var thicknessParam = smCompDef.Thickness;
+                PropertyMetadataRegistry.PropertyDefinition? definition = null;
+                if (PropertyMetadataRegistry.Properties.TryGetValue("Thickness", out var def))
                 {
-                    var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
-                    var thicknessParam = smCompDef.Thickness;
-                    return Math.Round((double)thicknessParam.Value * 10, 1); // Переводим в мм и округляем до одной десятой
+                    definition = def;
                 }
-                return 0.0;
+                var decimals = definition?.RoundingDecimals ?? 1;
+                return Math.Round((double)thicknessParam.Value * 10, decimals); // Переводим в мм и округляем
             }
-            catch (Exception ex)
-            {
-            Debug.WriteLine($"Ошибка получения толщины: {ex.Message}");
-                return 0.0;
-            }
+            return 0.0;
         }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Ошибка получения толщины: {ex.Message}");
+            return 0.0;
+        }
+    }
 
         /// <summary>
         /// Проверяет, имеет ли деталь развертку (только для деталей из листового металла)
@@ -351,113 +275,39 @@ public class PropertyManager
             }
         }
 
-        /// <summary>
-        /// Получает список предустановленных свойств iProperty на основе PropertyMapping
-        /// </summary>
-        public static ObservableCollection<PresetIProperty> GetPresetProperties()
+    /// <summary>
+    /// Получает список предустановленных свойств iProperty из централизованной системы метаданных
+    /// </summary>
+    public static ObservableCollection<PresetIProperty> GetPresetProperties()
+    {
+        var presetProperties = new ObservableCollection<PresetIProperty>();
+
+        foreach (var prop in PropertyMetadataRegistry.Properties.Values.OrderBy(p => p.Category).ThenBy(p => p.DisplayName))
         {
-        ObservableCollection<PresetIProperty> presetProperties =
-        [
-                // Системные свойства приложения
-                new() { ColumnHeader = "Обр.", ListDisplayName = "Статус обработки", InventorPropertyName = "ProcessingStatus", Category = "Системные" },
-                new() { ColumnHeader = "ID", ListDisplayName = "Нумерация", InventorPropertyName = "Item", Category = "Системные" },
-
-                // Свойства документа (не iProperty)
-                new() { ColumnHeader = "Имя файла", ListDisplayName = "Имя файла", InventorPropertyName = "FileName", Category = "Документ" },
-                new() { ColumnHeader = "Полное имя файла", ListDisplayName = "Полное имя файла", InventorPropertyName = "FullFileName", Category = "Документ" },
-                new() { ColumnHeader = "Состояние модели", ListDisplayName = "Состояние модели", InventorPropertyName = "ModelState", Category = "Документ" },
-                new() { ColumnHeader = "Толщина", ListDisplayName = "Толщина", InventorPropertyName = "Thickness", Category = "Документ" },
-                new() { ColumnHeader = "Изобр. детали", ListDisplayName = "Изображение детали", InventorPropertyName = "Preview", Category = "Документ" },
-
-                // Количество и обработка
-                new() { ColumnHeader = "Кол.", ListDisplayName = "Количество", InventorPropertyName = "Quantity", Category = "Количество" },
-            new() { ColumnHeader = "Изобр. развертки", ListDisplayName = "Изображение развертки", InventorPropertyName = "DxfPreview", Category = "Обработка" }
-        ];
-
-            // Автоматическое добавление свойств из PropertyMapping
-            foreach (var mapping in PropertyMapping)
+            presetProperties.Add(new PresetIProperty
             {
-            var category = mapping.Value.SetName switch
-                {
-                    "Summary Information" => "Summary Information",
-                    "Document Summary Information" => "Document Summary Information", 
-                    "Design Tracking Properties" => "Design Tracking Properties",
-                    _ => "Прочие"
-            };
-
-            var columnHeader = GetDisplayNameForProperty(mapping.Key);
-            var listDisplayName = GetDisplayNameForProperty(mapping.Key);
-                
-            presetProperties.Add(new() 
-                { 
-                    ColumnHeader = columnHeader,        // Заголовок колонки в DataGrid
-                    ListDisplayName = listDisplayName, // Отображение в списке выбора
-                    InventorPropertyName = mapping.Key, // Ключ для PropertyMapping
-                    Category = category 
+                ColumnHeader = prop.ColumnHeader.Length > 0 ? prop.ColumnHeader : prop.DisplayName,
+                ListDisplayName = prop.DisplayName,
+                InventorPropertyName = prop.InternalName,
+                Category = prop.Category
             });
-            }
-
-            return presetProperties;
         }
 
-    /// <summary>
-    /// Проверяет, является ли свойство редактируемым (может быть выражением)
-    /// </summary>
-    public static bool IsEditableProperty(string propertyName)
-    {
-        return EditableProperties.Contains(propertyName);
+        return presetProperties;
     }
 
+
     /// <summary>
-    /// Возвращает коллекцию всех редактируемых свойств
+    /// Возвращает коллекцию всех редактируемых свойств из реестра
     /// </summary>
     public static IEnumerable<string> GetEditableProperties()
     {
-        return EditableProperties;
+        // Возвращаем только известные редактируемые свойства из реестра
+        // Пользовательские свойства не включаются, так как они добавляются динамически
+        return PropertyMetadataRegistry.Properties.Values
+            .Where(p => p.IsEditable)
+            .Select(p => p.InternalName);
     }
 
-        /// <summary>
-        /// Получает русское отображаемое имя для свойства
-        /// </summary>
-        private static string GetDisplayNameForProperty(string propertyKey)
-        {
-            return propertyKey switch
-            {
-                "PartNumber" => "Обозначение",
-                "Description" => "Наименование", 
-                "Material" => "Материал",
-                "Author" => "Автор",
-                "Revision" => "Ревизия",
-                "Title" => "Название",
-                "Subject" => "Тема",
-                "Keywords" => "Ключевые слова",
-                "Comments" => "Примечание",
-                "Category" => "Категория",
-                "Manager" => "Менеджер",
-                "Company" => "Компания",
-                "Project" => "Проект",
-                "StockNumber" => "Инвентарный номер",
-                "CreationTime" => "Время создания",
-                "CostCenter" => "Сметчик",
-                "CheckedBy" => "Проверил",
-                "EngApprovedBy" => "Нормоконтроль",
-                "UserStatus" => "Статус",
-                "CatalogWebLink" => "Веб-ссылка",
-                "Vendor" => "Поставщик",
-                "MfgApprovedBy" => "Утвердил",
-                "DesignStatus" => "Статус разработки",
-                "Designer" => "Проектировщик",
-                "Engineer" => "Инженер",
-                "Authority" => "Нач. отдела",
-                "Mass" => "Масса",
-                "SurfaceArea" => "Площадь поверхности",
-                "Volume" => "Объем",
-                "SheetMetalRule" => "Правило ЛМ",
-                "FlatPatternWidth" => "Ширина развертки",
-                "FlatPatternLength" => "Длина развертки",
-                "FlatPatternArea" => "Площадь развертки",
-                "Appearance" => "Отделка",
-                _ => propertyKey
-        };
-    }
+
 }
