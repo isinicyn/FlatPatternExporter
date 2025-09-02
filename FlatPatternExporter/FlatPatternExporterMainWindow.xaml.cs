@@ -185,40 +185,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             ["Кол."] = "EditableQuantityTemplate"
         };
 
-        // Маппинг свойств на их названия колонок
-        var propertyToColumnName = new Dictionary<string, string>
-        {
-            ["Author"] = "Автор",
-            ["Revision"] = "Ревизия",
-            ["Title"] = "Название",
-            ["Subject"] = "Тема",
-            ["Keywords"] = "Ключевые слова",
-            ["Comments"] = "Примечание",
-            ["Category"] = "Категория",
-            ["Manager"] = "Менеджер",
-            ["Company"] = "Компания",
-            ["PartNumber"] = "Обозначение",
-            ["Description"] = "Наименование",
-            ["Project"] = "Проект",
-            ["StockNumber"] = "Инвентарный номер",
-            ["CostCenter"] = "Сметчик",
-            ["CheckedBy"] = "Проверил",
-            ["EngApprovedBy"] = "Нормоконтроль",
-            ["UserStatus"] = "Статус",
-            ["CatalogWebLink"] = "Веб-ссылка",
-            ["Vendor"] = "Поставщик",
-            ["MfgApprovedBy"] = "Утвердил",
-            ["DesignStatus"] = "Статус разработки",
-            ["Designer"] = "Проектировщик",
-            ["Engineer"] = "Инженер",
-            ["Authority"] = "Нач. отдела"
-        };
-
-        // Автоматически добавляем шаблоны для всех редактируемых свойств
+        // Автоматически добавляем шаблоны для всех редактируемых свойств из централизованного реестра
         foreach (var property in PropertyManager.GetEditableProperties())
         {
-            if (propertyToColumnName.TryGetValue(property, out var columnName))
+            // Получаем метаданные свойства из централизованного реестра
+            if (PropertyMetadataRegistry.Properties.TryGetValue(property, out var definition))
             {
+                var columnName = definition.ColumnHeader.Length > 0 ? definition.ColumnHeader : definition.DisplayName;
                 templates[columnName] = $"{property}WithExpressionTemplate";
             }
         }
