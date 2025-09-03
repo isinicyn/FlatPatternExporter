@@ -25,6 +25,7 @@ public static class PropertyMetadataRegistry
         public Dictionary<string, string>? ValueMappings { get; init; }
         public string? ColumnTemplate { get; init; }
         public bool IsSortable { get; init; } = true;
+        public bool IsSearchable { get; init; } = true;
     }
 
     /// <summary>
@@ -59,7 +60,8 @@ public static class PropertyMetadataRegistry
             ColumnHeader = "ID",
             Category = "Системные",
             Type = PropertyType.System,
-            ColumnTemplate = "IDWithFlatPatternIndicatorTemplate"
+            ColumnTemplate = "IDWithFlatPatternIndicatorTemplate",
+            IsSearchable = false
         },
         ["Quantity"] = new PropertyDefinition
         {
@@ -114,7 +116,8 @@ public static class PropertyMetadataRegistry
             Category = "Документ",
             Type = PropertyType.Document,
             ColumnTemplate = "PartImageTemplate",
-            IsSortable = false
+            IsSortable = false,
+            IsSearchable = false
         },
         ["DxfPreview"] = new PropertyDefinition
         {
@@ -124,7 +127,8 @@ public static class PropertyMetadataRegistry
             Category = "Обработка",
             Type = PropertyType.Document,
             ColumnTemplate = "DxfImageTemplate",
-            IsSortable = false
+            IsSortable = false,
+            IsSearchable = false
         },
 
         // ===== Summary Information =====
