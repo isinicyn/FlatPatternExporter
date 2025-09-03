@@ -988,60 +988,65 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 return;
             }
 
+            var addedProperties = PresetIProperties.Where(p => p.IsAdded).ToList();
             var matches = false;
 
-            // Получаем список видимых колонок и их привязок
-            foreach (var column in PartsDataGrid.Columns)
+            // Обновляем состояние IsAdded перед фильтрацией (только при первом элементе)
+            if (partData.PartNumber == _partsData.FirstOrDefault()?.PartNumber)
             {
-                string propertyName = "";
-                
-                // Получаем имя свойства из колонки
-                if (column is DataGridBoundColumn boundColumn)
+                foreach (var property in PresetIProperties)
                 {
-                    if (boundColumn.Binding is Binding binding)
-                    {
-                        propertyName = binding.Path.Path;
-                    }
+                    property.IsAdded = PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.ColumnHeader);
                 }
-                else if (column is DataGridTemplateColumn templateColumn)
-                {
-                    // Для шаблонных колонок используем SortMemberPath как индикатор свойства
-                    propertyName = templateColumn.SortMemberPath ?? "";
-                }
+                addedProperties = PresetIProperties.Where(p => p.IsAdded).ToList();
+            }
 
-                if (string.IsNullOrEmpty(propertyName))
-                    continue;
+            // Проходим по добавленным свойствам из коллекции PresetIProperties
+            foreach (var property in addedProperties)
+            {
+                var propertyName = property.InventorPropertyName;
 
-                // Проверяем, можно ли искать по этому свойству
+                // Проверяем, можно ли искать по этому свойству (только для зарегистрированных свойств)
                 if (PropertyMetadataRegistry.Properties.TryGetValue(propertyName, out var metadata))
                 {
                     if (!metadata.IsSearchable)
                         continue;
-                }
-
-                // Получаем значение свойства через рефлексию
-                var propInfo = typeof(PartData).GetProperty(propertyName);
-                if (propInfo != null)
-                {
-                    var value = propInfo.GetValue(partData);
-                    if (value != null)
+                        
+                    // Получаем значение зарегистрированного свойства через рефлексию
+                    var propInfo = typeof(PartData).GetProperty(propertyName);
+                    if (propInfo != null)
                     {
-                        var stringValue = value.ToString()?.ToLower();
-                        if (!string.IsNullOrEmpty(stringValue) && stringValue.Contains(_actualSearchText))
+                        var value = propInfo.GetValue(partData);
+                        if (value != null)
                         {
-                            matches = true;
-                            break;
+                            var stringValue = value.ToString()?.ToLower();
+                            if (!string.IsNullOrEmpty(stringValue) && stringValue.Contains(_actualSearchText))
+                            {
+                                matches = true;
+                                break;
+                            }
                         }
                     }
                 }
-                // Проверка пользовательских свойств
-                else if (partData.UserDefinedProperties.ContainsKey(propertyName))
+            }
+
+            // Отдельно проходим по всем пользовательским свойствам, которые есть в колонках DataGrid
+            if (!matches)
+            {
+                foreach (var userProperty in _userDefinedPropertiesList)
                 {
-                    var userValue = partData.UserDefinedProperties[propertyName].ToLower();
-                    if (userValue.Contains(_actualSearchText))
+                    // Проверяем, есть ли колонка для этого пользовательского свойства
+                    if (PartsDataGrid.Columns.Any(c => c.Header.ToString() == userProperty))
                     {
-                        matches = true;
-                        break;
+                        if (partData.UserDefinedProperties.ContainsKey(userProperty))
+                        {
+                            var userValue = partData.UserDefinedProperties[userProperty].ToLower();
+                            if (userValue.Contains(_actualSearchText))
+                            {
+                                matches = true;
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -1053,8 +1058,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             e.Accepted = false;
         }
     }
-
-
 
     public void AddIPropertyColumn(PresetIProperty iProperty)
     {
