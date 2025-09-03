@@ -992,9 +992,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                           partData.Description?.ToLower().Contains(_actualSearchText) == true ||
                           partData.ModelState?.ToLower().Contains(_actualSearchText) == true ||
                           partData.Material?.ToLower().Contains(_actualSearchText) == true ||
-                          (partData.Thickness.ToString("F1", System.Globalization.CultureInfo.InvariantCulture).ToLower().Contains(_actualSearchText) == true ||
-                           partData.Thickness.ToString("F1", System.Globalization.CultureInfo.CurrentCulture).ToLower().Contains(_actualSearchText) == true ||
-                           partData.Thickness.ToString("F0").ToLower().Contains(_actualSearchText) == true) ||
+                          partData.Thickness.ToString().Contains(_actualSearchText) ||
                           partData.Quantity.ToString().Contains(_actualSearchText);
 
             // Проверка на пользовательские свойства
