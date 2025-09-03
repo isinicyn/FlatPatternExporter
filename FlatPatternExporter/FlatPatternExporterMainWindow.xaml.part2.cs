@@ -1415,12 +1415,13 @@ public partial class FlatPatternExporterMainWindow : Window
     /// <summary>
     /// Централизованный метод для создания текстовых колонок DataGrid
     /// </summary>
-    private DataGridTextColumn CreateTextColumn(string header, string bindingPath)
+    private DataGridTextColumn CreateTextColumn(string header, string bindingPath, bool isSortable = true)
     {
         return new DataGridTextColumn
         {
             Header = header,
             Binding = new Binding(bindingPath),
+            SortMemberPath = isSortable ? bindingPath : null,
             ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style,
             IsReadOnly = true
         };

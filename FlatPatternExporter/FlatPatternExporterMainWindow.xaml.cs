@@ -1022,6 +1022,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (PartsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.ColumnHeader))
             return;
 
+        // Получаем метаданные свойства для проверки возможности сортировки
+        var isSortable = true;
+        if (PropertyMetadataRegistry.Properties.TryGetValue(iProperty.InventorPropertyName, out var propertyDef))
+        {
+            isSortable = propertyDef.IsSortable;
+        }
+
         DataGridColumn column;
 
         // Проверка колонок с шаблонами
@@ -1031,6 +1038,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 Header = iProperty.ColumnHeader,
                 CellTemplate = FindResource(templateName) as DataTemplate,
+                SortMemberPath = isSortable ? iProperty.InventorPropertyName : null,
                 IsReadOnly = !templateName.StartsWith("Editable")
             };
 
@@ -1039,7 +1047,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         else
         {
             // Создаем обычную текстовую колонку через централизованный метод
-            column = CreateTextColumn(iProperty.ColumnHeader, iProperty.InventorPropertyName);
+            column = CreateTextColumn(iProperty.ColumnHeader, iProperty.InventorPropertyName, isSortable);
         }
 
         // Добавляем колонку в конец

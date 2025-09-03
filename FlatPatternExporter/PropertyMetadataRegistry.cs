@@ -24,6 +24,7 @@ public static class PropertyMetadataRegistry
         public int RoundingDecimals { get; init; } = 2;
         public Dictionary<string, string>? ValueMappings { get; init; }
         public string? ColumnTemplate { get; init; }
+        public bool IsSortable { get; init; } = true;
     }
 
     /// <summary>
@@ -112,7 +113,8 @@ public static class PropertyMetadataRegistry
             ColumnHeader = "Изобр. детали",
             Category = "Документ",
             Type = PropertyType.Document,
-            ColumnTemplate = "PartImageTemplate"
+            ColumnTemplate = "PartImageTemplate",
+            IsSortable = false
         },
         ["DxfPreview"] = new PropertyDefinition
         {
@@ -121,7 +123,8 @@ public static class PropertyMetadataRegistry
             ColumnHeader = "Изобр. развертки",
             Category = "Обработка",
             Type = PropertyType.Document,
-            ColumnTemplate = "DxfImageTemplate"
+            ColumnTemplate = "DxfImageTemplate",
+            IsSortable = false
         },
 
         // ===== Summary Information =====
