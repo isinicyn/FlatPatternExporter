@@ -988,21 +988,63 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 return;
             }
 
-            var matches = partData.PartNumber?.ToLower().Contains(_actualSearchText) == true ||
-                          partData.Description?.ToLower().Contains(_actualSearchText) == true ||
-                          partData.ModelState?.ToLower().Contains(_actualSearchText) == true ||
-                          partData.Material?.ToLower().Contains(_actualSearchText) == true ||
-                          partData.Thickness.ToString().Contains(_actualSearchText) ||
-                          partData.Quantity.ToString().Contains(_actualSearchText);
+            var matches = false;
 
-            // Проверка на пользовательские свойства
-            if (!matches)
-                foreach (var property in partData.UserDefinedProperties)
-                    if (property.Value.ToLower().Contains(_actualSearchText))
+            // Получаем список видимых колонок и их привязок
+            foreach (var column in PartsDataGrid.Columns)
+            {
+                string propertyName = "";
+                
+                // Получаем имя свойства из колонки
+                if (column is DataGridBoundColumn boundColumn)
+                {
+                    if (boundColumn.Binding is Binding binding)
+                    {
+                        propertyName = binding.Path.Path;
+                    }
+                }
+                else if (column is DataGridTemplateColumn templateColumn)
+                {
+                    // Для шаблонных колонок используем SortMemberPath как индикатор свойства
+                    propertyName = templateColumn.SortMemberPath ?? "";
+                }
+
+                if (string.IsNullOrEmpty(propertyName))
+                    continue;
+
+                // Проверяем, можно ли искать по этому свойству
+                if (PropertyMetadataRegistry.Properties.TryGetValue(propertyName, out var metadata))
+                {
+                    if (!metadata.IsSearchable)
+                        continue;
+                }
+
+                // Получаем значение свойства через рефлексию
+                var propInfo = typeof(PartData).GetProperty(propertyName);
+                if (propInfo != null)
+                {
+                    var value = propInfo.GetValue(partData);
+                    if (value != null)
+                    {
+                        var stringValue = value.ToString()?.ToLower();
+                        if (!string.IsNullOrEmpty(stringValue) && stringValue.Contains(_actualSearchText))
+                        {
+                            matches = true;
+                            break;
+                        }
+                    }
+                }
+                // Проверка пользовательских свойств
+                else if (partData.UserDefinedProperties.ContainsKey(propertyName))
+                {
+                    var userValue = partData.UserDefinedProperties[propertyName].ToLower();
+                    if (userValue.Contains(_actualSearchText))
                     {
                         matches = true;
                         break;
                     }
+                }
+            }
 
             e.Accepted = matches;
         }
