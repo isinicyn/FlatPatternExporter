@@ -978,83 +978,54 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
     private void PartsData_Filter(object sender, FilterEventArgs e)
     {
-        if (e.Item is PartData partData)
+        if (e.Item is not PartData partData)
         {
-            if (string.IsNullOrEmpty(_actualSearchText))
+            e.Accepted = false;
+            return;
+        }
+
+        if (string.IsNullOrEmpty(_actualSearchText))
+        {
+            e.Accepted = true;
+            return;
+        }
+
+        // Проходим по всем видимым колонкам DataGrid
+        foreach (var column in PartsDataGrid.Columns)
+        {
+            var columnHeader = column.Header.ToString();
+            if (string.IsNullOrEmpty(columnHeader)) continue;
+
+            // Ищем по стандартным свойствам
+            var metadata = PropertyMetadataRegistry.Properties.Values
+                .FirstOrDefault(p => p.ColumnHeader == columnHeader);
+            
+            if (metadata != null && !metadata.IsSearchable) continue;
+
+            string? searchValue = null;
+
+            // Получаем значение из стандартного свойства
+            if (metadata != null)
+            {
+                var propInfo = typeof(PartData).GetProperty(metadata.InternalName);
+                searchValue = propInfo?.GetValue(partData)?.ToString();
+            }
+            // Получаем значение из пользовательского свойства
+            else if (partData.UserDefinedProperties.ContainsKey(columnHeader))
+            {
+                searchValue = partData.UserDefinedProperties[columnHeader];
+            }
+
+            // Проверяем совпадение
+            if (!string.IsNullOrEmpty(searchValue) && 
+                searchValue.ToLower().Contains(_actualSearchText))
             {
                 e.Accepted = true;
                 return;
             }
-
-            var addedProperties = PresetIProperties.Where(p => p.IsAdded).ToList();
-            var matches = false;
-
-            // Обновляем состояние IsAdded перед фильтрацией (только при первом элементе)
-            if (partData.PartNumber == _partsData.FirstOrDefault()?.PartNumber)
-            {
-                foreach (var property in PresetIProperties)
-                {
-                    property.IsAdded = PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.ColumnHeader);
-                }
-                addedProperties = PresetIProperties.Where(p => p.IsAdded).ToList();
-            }
-
-            // Проходим по добавленным свойствам из коллекции PresetIProperties
-            foreach (var property in addedProperties)
-            {
-                var propertyName = property.InventorPropertyName;
-
-                // Проверяем, можно ли искать по этому свойству (только для зарегистрированных свойств)
-                if (PropertyMetadataRegistry.Properties.TryGetValue(propertyName, out var metadata))
-                {
-                    if (!metadata.IsSearchable)
-                        continue;
-                        
-                    // Получаем значение зарегистрированного свойства через рефлексию
-                    var propInfo = typeof(PartData).GetProperty(propertyName);
-                    if (propInfo != null)
-                    {
-                        var value = propInfo.GetValue(partData);
-                        if (value != null)
-                        {
-                            var stringValue = value.ToString()?.ToLower();
-                            if (!string.IsNullOrEmpty(stringValue) && stringValue.Contains(_actualSearchText))
-                            {
-                                matches = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Отдельно проходим по всем пользовательским свойствам, которые есть в колонках DataGrid
-            if (!matches)
-            {
-                foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties.Select(p => p.InternalName))
-                {
-                    // Проверяем, есть ли колонка для этого пользовательского свойства
-                    if (PartsDataGrid.Columns.Any(c => c.Header.ToString() == userProperty))
-                    {
-                        if (partData.UserDefinedProperties.ContainsKey(userProperty))
-                        {
-                            var userValue = partData.UserDefinedProperties[userProperty].ToLower();
-                            if (userValue.Contains(_actualSearchText))
-                            {
-                                matches = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            e.Accepted = matches;
         }
-        else
-        {
-            e.Accepted = false;
-        }
+
+        e.Accepted = false;
     }
 
     public void AddIPropertyColumn(PresetIProperty iProperty)
