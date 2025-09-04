@@ -138,8 +138,8 @@ public partial class SelectIPropertyWindow : Window
         {
             foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
             {
-                // Проверяем, нет ли уже этого свойства в основной коллекции
-                if (!PresetIProperties.Any(p => p.InventorPropertyName == userProperty.InternalName))
+                // Проверяем, нет ли уже этого свойства в основной коллекции по ColumnHeader
+                if (!PresetIProperties.Any(p => p.ColumnHeader == userProperty.ColumnHeader))
                 {
                     var presetProperty = new PresetIProperty
                     {
