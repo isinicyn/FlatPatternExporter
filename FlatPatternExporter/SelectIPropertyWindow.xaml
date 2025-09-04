@@ -12,7 +12,7 @@
     <Window.Resources>
         <!-- CollectionViewSource для группировки по категориям -->
         <CollectionViewSource x:Key="GroupedProperties"
-                              Source="{Binding AvailableProperties}">
+                              Source="{Binding PresetIProperties}">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="Category" />
             </CollectionViewSource.GroupDescriptions>

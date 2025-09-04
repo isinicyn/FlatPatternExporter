@@ -10,70 +10,34 @@ namespace FlatPatternExporter;
 public partial class SelectIPropertyWindow : Window
 {
     private readonly FlatPatternExporterMainWindow _mainWindow; // Поле для хранения ссылки на MainWindow
-    private readonly ObservableCollection<PresetIProperty> _presetIProperties;
-    private bool _isUpdatingAvailableProperties; // Flag to prevent premature closure
 
         public SelectIPropertyWindow(ObservableCollection<PresetIProperty> presetIProperties, FlatPatternExporterMainWindow mainWindow)
         {
             InitializeComponent();
 
-            _presetIProperties = presetIProperties;
+            PresetIProperties = presetIProperties;
             _mainWindow = mainWindow; // Сохраняем ссылку на MainWindow
 
-        // Инициализируем AvailableProperties со всеми свойствами
-        AvailableProperties = new ObservableCollection<PresetIProperty>(_presetIProperties);
         DataContext = this;
         SelectedProperties = [];
 
             // Инициализируем пользовательские свойства из PropertyMetadataRegistry
             InitializeUserDefinedProperties();
 
-            // Подписка на событие изменения коллекции AvailableProperties
-            AvailableProperties.CollectionChanged += AvailableProperties_CollectionChanged;
-
-            // Подписка на событие изменения коллекции PresetIProperties
-            _presetIProperties.CollectionChanged += PresetIProperties_CollectionChanged;
-            
             // Инициализируем состояние IsAdded для уже добавленных колонок
-            UpdateAvailableProperties();
+            UpdatePropertyStates();
         }
 
-    public ObservableCollection<PresetIProperty> AvailableProperties { get; set; }
+    public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
     public List<PresetIProperty> SelectedProperties { get; }
 
-        // Обработчик события изменения коллекции AvailableProperties
-        private void AvailableProperties_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        // Обновление состояния IsAdded для всех свойств
+        public void UpdatePropertyStates()
         {
-            if (!_isUpdatingAvailableProperties && AvailableProperties.Count == 0)
+            // Обновляем состояние IsAdded для всех свойств
+            foreach (var property in PresetIProperties)
             {
-            // Закрываем окно без предупреждения
-            Close();
-            }
-        }
-
-        // Обработчик события изменения коллекции PresetIProperties
-        private void PresetIProperties_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            // Обновляем список AvailableProperties при изменении коллекции PresetIProperties
-            UpdateAvailableProperties();
-        }
-
-        // Обновление списка доступных свойств
-        public void UpdateAvailableProperties()
-        {
-            try
-            {
-                _isUpdatingAvailableProperties = true;
-                
-                // Обновляем состояние IsAdded для всех свойств
-                foreach (var property in AvailableProperties)
-                {
-                    property.IsAdded = _mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.ColumnHeader);
-                }
-            }
-            finally
-            {
-                _isUpdatingAvailableProperties = false;
+                property.IsAdded = _mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.ColumnHeader);
             }
         }
 
@@ -127,7 +91,7 @@ public partial class SelectIPropertyWindow : Window
                 // Добавляем в реестр пользовательских свойств
                 PropertyMetadataRegistry.AddUserDefinedProperty(userDefinedPropertyName);
 
-                // Создаем PresetIProperty и добавляем в AvailableProperties
+                // Создаем PresetIProperty и добавляем в основную коллекцию
                 var newUserProperty = new PresetIProperty
                 {
                     ColumnHeader = userDefinedPropertyName,
@@ -137,7 +101,7 @@ public partial class SelectIPropertyWindow : Window
                     IsAdded = true // Сразу помечаем как добавленное
                 };
                 
-                AvailableProperties.Add(newUserProperty);
+                PresetIProperties.Add(newUserProperty);
 
                 // Отключаем интерфейс Inventor на время операции
                 _mainWindow.SetInventorUserInterfaceState(true);
@@ -164,8 +128,8 @@ public partial class SelectIPropertyWindow : Window
         {
             foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
             {
-                // Проверяем, нет ли уже этого свойства в AvailableProperties
-                if (!AvailableProperties.Any(p => p.InventorPropertyName == userProperty.InternalName))
+                // Проверяем, нет ли уже этого свойства в основной коллекции
+                if (!PresetIProperties.Any(p => p.InventorPropertyName == userProperty.InternalName))
                 {
                     var presetProperty = new PresetIProperty
                     {
@@ -175,7 +139,7 @@ public partial class SelectIPropertyWindow : Window
                         Category = userProperty.Category
                     };
 
-                    AvailableProperties.Add(presetProperty);
+                    PresetIProperties.Add(presetProperty);
                 }
             }
         }
@@ -197,12 +161,8 @@ public partial class SelectIPropertyWindow : Window
                     {
                         PropertyMetadataRegistry.RemoveUserDefinedProperty(property.InventorPropertyName);
                         
-                        // Удаляем из AvailableProperties
-                        var availableProperty = AvailableProperties.FirstOrDefault(p => p.InventorPropertyName == property.InventorPropertyName);
-                        if (availableProperty != null)
-                        {
-                            AvailableProperties.Remove(availableProperty);
-                        }
+                        // Удаляем из основной коллекции
+                        PresetIProperties.Remove(property);
                     }
                     
                     // Обновляем состояние IsAdded

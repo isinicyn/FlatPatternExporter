@@ -1094,10 +1094,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Добавляем колонку в конец
         PartsDataGrid.Columns.Add(column);
 
-        // Обновляем список доступных свойств
+        // Обновляем состояние свойств в окне выбора
         var selectIPropertyWindow =
             System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
-        selectIPropertyWindow?.UpdateAvailableProperties();
+        selectIPropertyWindow?.UpdatePropertyStates();
 
         // Дозаполняем данные для новой колонки
         _ = FillPropertyDataAsync(iProperty.InventorPropertyName);
@@ -1194,10 +1194,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 // Удаляем кастомное свойство из списка и данных деталей
                 RemoveUserDefinedIPropertyColumn(columnName);
 
-                // Обновляем список доступных свойств, если это кастомное свойство
+                // Обновляем состояние свойств в окне выбора
                 var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>()
                     .FirstOrDefault();
-                selectIPropertyWindow?.UpdateAvailableProperties();
+                selectIPropertyWindow?.UpdatePropertyStates();
             }
         }
 
