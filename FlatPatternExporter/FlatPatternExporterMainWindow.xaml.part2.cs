@@ -69,9 +69,10 @@ public partial class FlatPatternExporterMainWindow : Window
         
         ReadAllPropertiesFromPart(partDoc, partData, mgr);
 
-        foreach (var userDefinedProperty in PropertyMetadataRegistry.UserDefinedProperties.Select(p => p.InternalName))
+        foreach (var userDefinedProperty in PropertyMetadataRegistry.UserDefinedProperties)
         {
-            partData.UserDefinedProperties[userDefinedProperty] = mgr.GetMappedProperty(userDefinedProperty);
+            var value = mgr.GetMappedProperty(userDefinedProperty.InternalName);
+            partData.UserDefinedProperties[userDefinedProperty.ColumnHeader] = value;
         }
 
         if (loadThumbnail)
@@ -1377,6 +1378,10 @@ public partial class FlatPatternExporterMainWindow : Window
         }
 
         // Для User Defined Properties загружаем данные из файлов
+        // Ищем пользовательское свойство по InternalName
+        var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == propertyName);
+        var columnHeader = userProperty?.ColumnHeader ?? propertyName;
+
         foreach (var partData in _partsData)
         {
             var partDoc = GetCachedPartDocument(partData.PartNumber) ?? OpenPartDocument(partData.PartNumber);
@@ -1384,26 +1389,30 @@ public partial class FlatPatternExporterMainWindow : Window
             {
                 var mgr = new PropertyManager((Document)partDoc);
                 var value = mgr.GetMappedProperty(propertyName) ?? "";
-                partData.AddUserDefinedProperty(propertyName, value);
+                partData.AddUserDefinedProperty(columnHeader, value);
             }
 
             await Task.Delay(10);
         }
     }
 
-    private void RemoveUserDefinedIPropertyColumn(string propertyName)
+    private void RemoveUserDefinedIPropertyColumn(string columnHeaderName)
     {
-        // Удаление столбца из DataGrid
-        var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header as string == propertyName);
+        // Удаление столбца из DataGrid по заголовку
+        var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header as string == columnHeaderName);
         if (columnToRemove != null) PartsDataGrid.Columns.Remove(columnToRemove);
 
         // Удаление всех данных, связанных с этим User Defined Property
         foreach (var partData in _partsData)
-            if (partData.UserDefinedProperties.ContainsKey(propertyName))
-                partData.RemoveUserDefinedProperty(propertyName);
+            if (partData.UserDefinedProperties.ContainsKey(columnHeaderName))
+                partData.RemoveUserDefinedProperty(columnHeaderName);
 
-        // Удаляем из централизованного реестра
-        PropertyMetadataRegistry.RemoveUserDefinedProperty(propertyName);
+        // Ищем пользовательское свойство по ColumnHeader для удаления из реестра
+        var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeaderName);
+        if (userProperty != null)
+        {
+            PropertyMetadataRegistry.RemoveUserDefinedProperty(userProperty.InternalName);
+        }
     }
 
     /// <summary>
@@ -1423,21 +1432,26 @@ public partial class FlatPatternExporterMainWindow : Window
 
     public void AddUserDefinedIPropertyColumn(string propertyName)
     {
-        // Проверяем, существует ли уже колонка с таким именем или заголовком
-        if (PartsDataGrid.Columns.Any(c => c.Header as string == propertyName))
+        // Ищем пользовательское свойство в реестре по оригинальному имени
+        var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InventorPropertyName == propertyName);
+        var columnHeader = userProperty?.ColumnHeader ?? $"(Пользов.) {propertyName}";
+        var internalName = userProperty?.InternalName ?? $"UDP_{propertyName}";
+
+        // Проверяем, существует ли уже колонка с таким заголовком
+        if (PartsDataGrid.Columns.Any(c => c.Header as string == columnHeader))
         {
-            MessageBox.Show($"Столбец с именем '{propertyName}' уже существует.", "Предупреждение", MessageBoxButton.OK,
+            MessageBox.Show($"Столбец с именем '{columnHeader}' уже существует.", "Предупреждение", MessageBoxButton.OK,
                 MessageBoxImage.Warning);
             return;
         }
 
         // Создаем текстовую колонку через централизованный метод
-        var column = CreateTextColumn(propertyName, $"UserDefinedProperties[{propertyName}]");
+        var column = CreateTextColumn(columnHeader, $"UserDefinedProperties[{columnHeader}]");
 
         PartsDataGrid.Columns.Add(column);
 
         // Дозаполняем данные для новой колонки (асинхронно)
-        _ = FillPropertyDataAsync(propertyName);
+        _ = FillPropertyDataAsync(internalName);
     }
 
     private void AboutButton_Click(object sender, RoutedEventArgs e)

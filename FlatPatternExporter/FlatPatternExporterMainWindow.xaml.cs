@@ -1010,7 +1010,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 var propInfo = typeof(PartData).GetProperty(metadata.InternalName);
                 searchValue = propInfo?.GetValue(partData)?.ToString();
             }
-            // Получаем значение из пользовательского свойства
+            // Получаем значение из пользовательского свойства  
             else if (partData.UserDefinedProperties.ContainsKey(columnHeader))
             {
                 searchValue = partData.UserDefinedProperties[columnHeader];

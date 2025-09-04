@@ -533,9 +533,9 @@ public static class PropertyMetadataRegistry
     {
         return new PropertyDefinition
         {
-            InternalName = propertyName,
+            InternalName = $"UDP_{propertyName}",
             DisplayName = propertyName,
-            ColumnHeader = propertyName,
+            ColumnHeader = $"(Пользов.) {propertyName}",
             Category = "Пользовательские свойства",
             Type = PropertyType.UserDefined,
             PropertySetName = "User Defined Properties",
@@ -549,7 +549,8 @@ public static class PropertyMetadataRegistry
     /// </summary>
     public static void AddUserDefinedProperty(string propertyName)
     {
-        if (UserDefinedProperties.Any(p => p.InternalName == propertyName))
+        var internalName = $"UDP_{propertyName}";
+        if (UserDefinedProperties.Any(p => p.InternalName == internalName))
             return;
 
         var userProperty = CreateUserDefinedPropertyDefinition(propertyName);
@@ -557,11 +558,11 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Удаляет пользовательское свойство из реестра
+    /// Удаляет пользовательское свойство из реестра по InternalName
     /// </summary>
-    public static void RemoveUserDefinedProperty(string propertyName)
+    public static void RemoveUserDefinedProperty(string internalName)
     {
-        var property = UserDefinedProperties.FirstOrDefault(p => p.InternalName == propertyName);
+        var property = UserDefinedProperties.FirstOrDefault(p => p.InternalName == internalName);
         if (property != null)
         {
             UserDefinedProperties.Remove(property);

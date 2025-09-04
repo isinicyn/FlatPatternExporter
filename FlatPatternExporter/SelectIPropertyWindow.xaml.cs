@@ -73,53 +73,63 @@ public partial class SelectIPropertyWindow : Window
             
             if (!string.IsNullOrWhiteSpace(userDefinedPropertyName))
             {
-                // Проверяем, не добавлено ли уже это свойство
-                if (PropertyMetadataRegistry.UserDefinedProperties.Any(p => p.InternalName == userDefinedPropertyName))
+                // Генерируем internal name и column header с префиксами
+                var internalName = $"UDP_{userDefinedPropertyName}";
+                var columnHeader = $"(Пользов.) {userDefinedPropertyName}";
+
+                // Проверяем, не добавлено ли уже это свойство по InternalName
+                if (PropertyMetadataRegistry.UserDefinedProperties.Any(p => p.InternalName == internalName))
                 {
-                MessageBox.Show($"Свойство '{userDefinedPropertyName}' уже добавлено.", "Предупреждение",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Свойство '{userDefinedPropertyName}' уже добавлено.", "Предупреждение",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-            if (_mainWindow.PartsDataGrid.Columns.Any(c => c.Header as string == userDefinedPropertyName))
+                // Проверяем, нет ли уже столбца с таким заголовком
+                if (_mainWindow.PartsDataGrid.Columns.Any(c => c.Header as string == columnHeader))
                 {
-                MessageBox.Show($"Столбец с именем '{userDefinedPropertyName}' уже существует.", "Предупреждение",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Столбец с именем '{columnHeader}' уже существует.", "Предупреждение",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 // Добавляем в реестр пользовательских свойств
                 PropertyMetadataRegistry.AddUserDefinedProperty(userDefinedPropertyName);
 
-                // Создаем PresetIProperty и добавляем в основную коллекцию
-                var newUserProperty = new PresetIProperty
+                // Получаем созданное определение свойства
+                var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == internalName);
+                if (userProperty != null)
                 {
-                    ColumnHeader = userDefinedPropertyName,
-                    ListDisplayName = userDefinedPropertyName,
-                    InventorPropertyName = userDefinedPropertyName,
-                    Category = "Пользовательские свойства",
-                    IsAdded = true // Сразу помечаем как добавленное
-                };
-                
-                PresetIProperties.Add(newUserProperty);
+                    // Создаем PresetIProperty и добавляем в основную коллекцию
+                    var newUserProperty = new PresetIProperty
+                    {
+                        ColumnHeader = userProperty.ColumnHeader,
+                        ListDisplayName = userProperty.DisplayName,
+                        InventorPropertyName = userProperty.InventorPropertyName ?? userDefinedPropertyName,
+                        Category = userProperty.Category,
+                        IsAdded = true // Сразу помечаем как добавленное
+                    };
+                    
+                    PresetIProperties.Add(newUserProperty);
 
-                // Отключаем интерфейс Inventor на время операции
-                _mainWindow.SetInventorUserInterfaceState(true);
+                    // Отключаем интерфейс Inventor на время операции
+                    _mainWindow.SetInventorUserInterfaceState(true);
 
-                try
-                {
-                    // Создаем колонку (данные заполнятся автоматически)
-                    _mainWindow.AddUserDefinedIPropertyColumn(userDefinedPropertyName);
+                    try
+                    {
+                        // Создаем колонку (данные заполнятся автоматически)
+                        _mainWindow.AddUserDefinedIPropertyColumn(userDefinedPropertyName);
+                    }
+                    finally
+                    {
+                        _mainWindow.SetInventorUserInterfaceState(false);
+                    }
                 }
-                finally
-                {
-                    _mainWindow.SetInventorUserInterfaceState(false);
-                }
 
-            // Очищаем текстовое поле
-            UserDefinedPropertyTextBox.Text = "";
+                // Очищаем текстовое поле
+                UserDefinedPropertyTextBox.Text = "";
+            }
         }
-    }
 
         /// <summary>
         /// Инициализирует пользовательские свойства из PropertyMetadataRegistry
@@ -146,7 +156,7 @@ public partial class SelectIPropertyWindow : Window
 
         private void RemovePropertyButton_Click(object sender, RoutedEventArgs e)
         {
-        if (sender is Button button && button.Tag is PresetIProperty property)
+            if (sender is Button button && button.Tag is PresetIProperty property)
             {
                 // Находим колонку по заголовку
                 var columnToRemove = _mainWindow.PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == property.ColumnHeader);
@@ -155,11 +165,13 @@ public partial class SelectIPropertyWindow : Window
                     // Удаляем колонку из DataGrid
                     _mainWindow.PartsDataGrid.Columns.Remove(columnToRemove);
                     
-                    // Если это пользовательское свойство, удаляем его из реестра, списка и AvailableProperties
-                    var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == property.InventorPropertyName);
+                    // Проверяем, является ли это пользовательским свойством
+                    var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => 
+                        p.ColumnHeader == property.ColumnHeader || p.InventorPropertyName == property.InventorPropertyName);
                     if (userProperty != null)
                     {
-                        PropertyMetadataRegistry.RemoveUserDefinedProperty(property.InventorPropertyName);
+                        // Удаляем из реестра по InternalName
+                        PropertyMetadataRegistry.RemoveUserDefinedProperty(userProperty.InternalName);
                         
                         // Удаляем из основной коллекции
                         PresetIProperties.Remove(property);

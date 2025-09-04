@@ -152,7 +152,7 @@ public static class SettingsManager
         return new ApplicationSettings
         {
             ColumnOrder = [..columnsInDisplayOrder],
-            UserDefinedProperties = [..PropertyMetadataRegistry.UserDefinedProperties.Select(p => p.InternalName)],
+            UserDefinedProperties = [..PropertyMetadataRegistry.UserDefinedProperties.Select(p => p.InventorPropertyName)],
             
             ExcludeReferenceParts = window.ExcludeReferenceParts,
             ExcludePurchasedParts = window.ExcludePurchasedParts,
@@ -255,7 +255,13 @@ public static class SettingsManager
             }
             else
             {
-                window.AddUserDefinedIPropertyColumn(columnName);
+                // Проверяем, есть ли это свойство среди пользовательских по ColumnHeader
+                var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnName);
+                if (userProperty != null)
+                {
+                    window.AddUserDefinedIPropertyColumn(userProperty.InventorPropertyName ?? columnName);
+                }
+                // Если пользовательское свойство не найдено в реестре, пропускаем его
             }
         }
 

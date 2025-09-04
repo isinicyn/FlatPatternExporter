@@ -23,6 +23,7 @@ public class PropertyManager
     /// </summary>
     private static (string SetName, string InventorName) GetInventorMapping(string internalName)
     {
+        // Сначала проверяем стандартные свойства
         if (PropertyMetadataRegistry.Properties.TryGetValue(internalName, out var def))
         {
             if (def.Type == PropertyMetadataRegistry.PropertyType.IProperty)
@@ -31,16 +32,22 @@ public class PropertyManager
             }
         }
         
-        // Проверяем пользовательские свойства
+        // Проверяем пользовательские свойства по InternalName с префиксом
         var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == internalName);
         if (userProperty != null)
         {
             return (userProperty.PropertySetName!, userProperty.InventorPropertyName!);
         }
         
-        // Если свойство не найдено в реестре, считаем его пользовательским
-        // Пользовательские свойства хранятся в "User Defined Properties" с тем же именем
-        return ("User Defined Properties", internalName);
+        // Если это UDP_ префикс, но свойство не найдено в реестре, извлекаем оригинальное имя
+        if (internalName.StartsWith("UDP_"))
+        {
+            var originalName = internalName.Substring(4); // Убираем "UDP_"
+            return ("User Defined Properties", originalName);
+        }
+        
+        // Если свойство не найдено - это ошибка в коде
+        throw new ArgumentException($"Неизвестное свойство: {internalName}");
     }
 
     /// <summary>
