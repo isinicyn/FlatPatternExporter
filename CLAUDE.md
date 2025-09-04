@@ -106,7 +106,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `MarshalCore` - Основная функциональность COM interop  
 - `DxfGenerator` - Генератор и обработка DXF файлов
 - `IPictureDispConverter` - Конвертер изображений
-- `SettingsManager` - Система сохранения и загрузки настроек пользователя в XML
+- `SettingsManager` - Система сохранения и загрузки настроек пользователя в JSON
 - `PropertyManager` - Управление пользовательскими свойствами iProperty
 - `PropertyMetadataRegistry` - Централизованная система метаданных свойств документов Inventor
 - `TextWithFxIndicator` - Компонент с FX индикатором для текстовых полей
@@ -201,9 +201,9 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Поддержка фонового режима обработки
 
 ### Система настроек пользователя
-- Автоматическое сохранение настроек в XML файл при закрытии приложения
+- Автоматическое сохранение настроек в JSON файл при закрытии приложения
 - Восстановление пользовательских колонок и параметров при запуске
-- Расположение файла настроек: `%APPDATA%\FlatPatternExporter\settings.xml`
+- Расположение файла настроек: `%APPDATA%\FlatPatternExporter\settings.json`
 - Сохранение всех свойств iProperty без зависимости от видимых колонок UI
 
 ### Архитектура UI - Система привязки данных
