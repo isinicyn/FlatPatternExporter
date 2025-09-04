@@ -69,10 +69,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly TokenService _tokenService = new();
     
     // Данные и коллекции
-    private readonly ObservableCollection<PartData> _partsData = new();
+    private readonly ObservableCollection<PartData> _partsData = [];
     private readonly CollectionViewSource _partsDataView;
-    public readonly List<string> _userDefinedPropertiesList = new();
-    public List<string> UserDefinedPropertiesList => _userDefinedPropertiesList;
     private List<PartData> _conflictingParts = new();
     private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = new();
     private readonly ConcurrentDictionary<string, List<PartConflictInfo>> _partNumberTracker = new();
@@ -1033,7 +1031,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Отдельно проходим по всем пользовательским свойствам, которые есть в колонках DataGrid
             if (!matches)
             {
-                foreach (var userProperty in _userDefinedPropertiesList)
+                foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties.Select(p => p.InternalName))
                 {
                     // Проверяем, есть ли колонка для этого пользовательского свойства
                     if (PartsDataGrid.Columns.Any(c => c.Header.ToString() == userProperty))
@@ -1942,7 +1940,7 @@ public class PartData : INotifyPropertyChanged
     public string Appearance { get; set; } = string.Empty;
 
     // === КАТЕГОРИЯ 5: ПОЛЬЗОВАТЕЛЬСКИЕ IPROPERTIES ===
-    // Динамически добавляемые пользователем свойства из "Inventor User Defined Properties"
+    // Динамически добавляемые пользователем свойства из "User Defined Properties"
     private Dictionary<string, string> userDefinedProperties = new();
 
     // === КАТЕГОРИЯ 6: СВОЙСТВА КОЛИЧЕСТВА И СОСТОЯНИЯ ===

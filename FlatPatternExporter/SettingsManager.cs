@@ -152,7 +152,7 @@ public static class SettingsManager
         return new ApplicationSettings
         {
             ColumnOrder = [..columnsInDisplayOrder],
-            UserDefinedProperties = [..window.UserDefinedPropertiesList],
+            UserDefinedProperties = [..PropertyMetadataRegistry.UserDefinedProperties.Select(p => p.InternalName)],
             
             ExcludeReferenceParts = window.ExcludeReferenceParts,
             ExcludePurchasedParts = window.ExcludePurchasedParts,
@@ -239,8 +239,12 @@ public static class SettingsManager
                 .FirstOrDefault(p => p.Name == settings.SelectedTemplatePresetName);
         }
 
-        window.UserDefinedPropertiesList.Clear();
-        settings.UserDefinedProperties.ForEach(window.UserDefinedPropertiesList.Add);
+        // Очищаем и восстанавливаем пользовательские свойства через реестр
+        PropertyMetadataRegistry.UserDefinedProperties.Clear();
+        foreach (var userProperty in settings.UserDefinedProperties)
+        {
+            PropertyMetadataRegistry.AddUserDefinedProperty(userProperty);
+        }
 
         foreach (var columnName in settings.ColumnOrder)
         {

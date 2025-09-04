@@ -31,9 +31,16 @@ public class PropertyManager
             }
         }
         
+        // Проверяем пользовательские свойства
+        var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == internalName);
+        if (userProperty != null)
+        {
+            return (userProperty.PropertySetName!, userProperty.InventorPropertyName!);
+        }
+        
         // Если свойство не найдено в реестре, считаем его пользовательским
-        // Пользовательские свойства хранятся в "Inventor User Defined Properties" с тем же именем
-        return ("Inventor User Defined Properties", internalName);
+        // Пользовательские свойства хранятся в "User Defined Properties" с тем же именем
+        return ("User Defined Properties", internalName);
     }
 
     /// <summary>
@@ -282,6 +289,7 @@ public class PropertyManager
     {
         var presetProperties = new ObservableCollection<PresetIProperty>();
 
+        // Добавляем стандартные свойства
         foreach (var prop in PropertyMetadataRegistry.Properties.Values.OrderBy(p => p.Category).ThenBy(p => p.DisplayName))
         {
             presetProperties.Add(new PresetIProperty
@@ -290,6 +298,18 @@ public class PropertyManager
                 ListDisplayName = prop.DisplayName,
                 InventorPropertyName = prop.InternalName,
                 Category = prop.Category
+            });
+        }
+
+        // Добавляем пользовательские свойства
+        foreach (var userProp in PropertyMetadataRegistry.UserDefinedProperties.OrderBy(p => p.DisplayName))
+        {
+            presetProperties.Add(new PresetIProperty
+            {
+                ColumnHeader = userProp.ColumnHeader.Length > 0 ? userProp.ColumnHeader : userProp.DisplayName,
+                ListDisplayName = userProp.DisplayName,
+                InventorPropertyName = userProp.InternalName,
+                Category = userProp.Category
             });
         }
 

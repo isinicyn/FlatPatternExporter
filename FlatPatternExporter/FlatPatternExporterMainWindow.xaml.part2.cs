@@ -69,7 +69,7 @@ public partial class FlatPatternExporterMainWindow : Window
         
         ReadAllPropertiesFromPart(partDoc, partData, mgr);
 
-        foreach (var userDefinedProperty in _userDefinedPropertiesList)
+        foreach (var userDefinedProperty in PropertyMetadataRegistry.UserDefinedProperties.Select(p => p.InternalName))
         {
             partData.UserDefinedProperties[userDefinedProperty] = mgr.GetMappedProperty(userDefinedProperty);
         }
@@ -1367,22 +1367,16 @@ public partial class FlatPatternExporterMainWindow : Window
         if (_partsData.Count == 0)
             return;
 
-        // Проверяем, является ли это стандартным свойством (уже загружено в ReadAllPropertiesFromPart)
-        var propInfo = typeof(PartData).GetProperty(propertyName);
-        var isStandardProperty = propInfo != null && propInfo.PropertyType == typeof(string);
+        // Проверяем, является ли это стандартным свойством через реестр
+        var isStandardProperty = PropertyMetadataRegistry.Properties.ContainsKey(propertyName);
 
-        // Если это стандартное свойство, то оно уже загружено - просто уведомляем UI
+        // Если это стандартное свойство, то оно уже загружено - данные готовы
         if (isStandardProperty)
         {
-            foreach (var partData in _partsData)
-            {
-                partData.OnPropertyChanged(propertyName);
-                await Task.Delay(10);
-            }
             return;
         }
 
-        // Для кастомных свойств загружаем данные из файлов
+        // Для User Defined Properties загружаем данные из файлов
         foreach (var partData in _partsData)
         {
             var partDoc = GetCachedPartDocument(partData.PartNumber) ?? OpenPartDocument(partData.PartNumber);
@@ -1408,8 +1402,8 @@ public partial class FlatPatternExporterMainWindow : Window
             if (partData.UserDefinedProperties.ContainsKey(propertyName))
                 partData.RemoveUserDefinedProperty(propertyName);
 
-        // Обновляем список доступных свойств
-        _userDefinedPropertiesList.Remove(propertyName);
+        // Удаляем из централизованного реестра
+        PropertyMetadataRegistry.RemoveUserDefinedProperty(propertyName);
     }
 
     /// <summary>

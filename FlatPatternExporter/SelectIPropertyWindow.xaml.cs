@@ -25,6 +25,9 @@ public partial class SelectIPropertyWindow : Window
         DataContext = this;
         SelectedProperties = [];
 
+            // Инициализируем пользовательские свойства из PropertyMetadataRegistry
+            InitializeUserDefinedProperties();
+
             // Подписка на событие изменения коллекции AvailableProperties
             AvailableProperties.CollectionChanged += AvailableProperties_CollectionChanged;
 
@@ -107,7 +110,7 @@ public partial class SelectIPropertyWindow : Window
             if (!string.IsNullOrWhiteSpace(userDefinedPropertyName))
             {
                 // Проверяем, не добавлено ли уже это свойство
-                if (_mainWindow._userDefinedPropertiesList.Contains(userDefinedPropertyName))
+                if (PropertyMetadataRegistry.UserDefinedProperties.Any(p => p.InternalName == userDefinedPropertyName))
                 {
                 MessageBox.Show($"Свойство '{userDefinedPropertyName}' уже добавлено.", "Предупреждение",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -121,8 +124,20 @@ public partial class SelectIPropertyWindow : Window
                     return;
                 }
 
-                // Добавляем в список user defined properties
-                _mainWindow._userDefinedPropertiesList.Add(userDefinedPropertyName);
+                // Добавляем в реестр пользовательских свойств
+                PropertyMetadataRegistry.AddUserDefinedProperty(userDefinedPropertyName);
+
+                // Создаем PresetIProperty и добавляем в AvailableProperties
+                var newUserProperty = new PresetIProperty
+                {
+                    ColumnHeader = userDefinedPropertyName,
+                    ListDisplayName = userDefinedPropertyName,
+                    InventorPropertyName = userDefinedPropertyName,
+                    Category = "Пользовательские свойства",
+                    IsAdded = true // Сразу помечаем как добавленное
+                };
+                
+                AvailableProperties.Add(newUserProperty);
 
                 // Отключаем интерфейс Inventor на время операции
                 _mainWindow.SetInventorUserInterfaceState(true);
@@ -142,6 +157,29 @@ public partial class SelectIPropertyWindow : Window
         }
     }
 
+        /// <summary>
+        /// Инициализирует пользовательские свойства из PropertyMetadataRegistry
+        /// </summary>
+        private void InitializeUserDefinedProperties()
+        {
+            foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
+            {
+                // Проверяем, нет ли уже этого свойства в AvailableProperties
+                if (!AvailableProperties.Any(p => p.InventorPropertyName == userProperty.InternalName))
+                {
+                    var presetProperty = new PresetIProperty
+                    {
+                        ColumnHeader = userProperty.ColumnHeader,
+                        ListDisplayName = userProperty.DisplayName,
+                        InventorPropertyName = userProperty.InternalName,
+                        Category = userProperty.Category
+                    };
+
+                    AvailableProperties.Add(presetProperty);
+                }
+            }
+        }
+
         private void RemovePropertyButton_Click(object sender, RoutedEventArgs e)
         {
         if (sender is Button button && button.Tag is PresetIProperty property)
@@ -152,6 +190,20 @@ public partial class SelectIPropertyWindow : Window
                 {
                     // Удаляем колонку из DataGrid
                     _mainWindow.PartsDataGrid.Columns.Remove(columnToRemove);
+                    
+                    // Если это пользовательское свойство, удаляем его из реестра, списка и AvailableProperties
+                    var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == property.InventorPropertyName);
+                    if (userProperty != null)
+                    {
+                        PropertyMetadataRegistry.RemoveUserDefinedProperty(property.InventorPropertyName);
+                        
+                        // Удаляем из AvailableProperties
+                        var availableProperty = AvailableProperties.FirstOrDefault(p => p.InventorPropertyName == property.InventorPropertyName);
+                        if (availableProperty != null)
+                        {
+                            AvailableProperties.Remove(availableProperty);
+                        }
+                    }
                     
                     // Обновляем состояние IsAdded
                     property.IsAdded = false;

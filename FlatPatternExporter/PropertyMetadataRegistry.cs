@@ -35,7 +35,8 @@ public static class PropertyMetadataRegistry
     {
         IProperty,        // Стандартное свойство Inventor
         Document,         // Свойство документа (не iProperty)
-        System           // Системное свойство приложения
+        System,          // Системное свойство приложения
+        UserDefined      // Пользовательское свойство iProperty
     }
 
     /// <summary>
@@ -519,5 +520,52 @@ public static class PropertyMetadataRegistry
             InventorPropertyName = "Appearance"
         }
     };
+
+    /// <summary>
+    /// Коллекция пользовательских свойств
+    /// </summary>
+    public static readonly ObservableCollection<PropertyDefinition> UserDefinedProperties = [];
+
+    /// <summary>
+    /// Создает определение пользовательского свойства
+    /// </summary>
+    public static PropertyDefinition CreateUserDefinedPropertyDefinition(string propertyName)
+    {
+        return new PropertyDefinition
+        {
+            InternalName = propertyName,
+            DisplayName = propertyName,
+            ColumnHeader = propertyName,
+            Category = "Пользовательские свойства",
+            Type = PropertyType.UserDefined,
+            PropertySetName = "User Defined Properties",
+            InventorPropertyName = propertyName,
+            IsEditable = true
+        };
+    }
+
+    /// <summary>
+    /// Добавляет пользовательское свойство в реестр
+    /// </summary>
+    public static void AddUserDefinedProperty(string propertyName)
+    {
+        if (UserDefinedProperties.Any(p => p.InternalName == propertyName))
+            return;
+
+        var userProperty = CreateUserDefinedPropertyDefinition(propertyName);
+        UserDefinedProperties.Add(userProperty);
+    }
+
+    /// <summary>
+    /// Удаляет пользовательское свойство из реестра
+    /// </summary>
+    public static void RemoveUserDefinedProperty(string propertyName)
+    {
+        var property = UserDefinedProperties.FirstOrDefault(p => p.InternalName == propertyName);
+        if (property != null)
+        {
+            UserDefinedProperties.Remove(property);
+        }
+    }
 
 }
