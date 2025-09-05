@@ -32,9 +32,17 @@ FlatPatternExporter/
     │   ├── DataGridStyles.xaml
     │   └── GeneralStyles.xaml
     │
+    ├── Converters/                     # WPF конвертеры
+    │   ├── ColorToBrushConverter.cs            # Конвертация названия цвета в SolidColorBrush
+    │   ├── LineTypeToGeometryConverter.cs      # Визуализация типов линий в LayerSettings
+    │   ├── EnumToBooleanConverter.cs           # Универсальная привязка enum к RadioButton
+    │   ├── DynamicPropertyValueConverter.cs    # Извлечение значений свойств по имени пути
+    │   ├── PropertyExpressionByNameConverter.cs # Определение видимости fx индикатора
+    │   ├── ObjectToBooleanConverter.cs         # Проверка объекта на null для IsEnabled
+    │   └── IPictureDispConverter.cs            # Преобразование IPictureDisp в System.Drawing.Image
+    │
     ├── MarshalCore.cs                  # COM interop
     ├── DxfGenerator.cs                 # Генератор DXF
-    ├── IPictureDispConverter.cs        # Конвертер изображений
     ├── PropertyManager.cs              # Управление свойствами
     ├── PropertyMetadataRegistry.cs     # Централизованная система метаданных свойств
     ├── SettingsManager.cs              # Настройки пользователя

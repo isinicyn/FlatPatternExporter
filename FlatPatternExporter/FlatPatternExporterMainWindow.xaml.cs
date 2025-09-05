@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using FlatPatternExporter.Converters;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
@@ -2162,97 +2163,6 @@ public class ScanProgress
     public int TotalItems { get; set; }
     public string CurrentOperation { get; set; } = string.Empty;
     public string CurrentItem { get; set; } = string.Empty;
-}
-
-// Конвертер для работы с enum в RadioButton
-public class EnumToBooleanConverter : IValueConverter
-{
-    public static readonly EnumToBooleanConverter Instance = new();
-
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (value == null || parameter == null)
-            return false;
-
-        // Универсальный подход для любых enum
-        var valueType = value.GetType();
-        if (valueType.IsEnum && Enum.TryParse(valueType, parameter.ToString(), out var parameterValue))
-        {
-            return value.Equals(parameterValue);
-        }
-
-        return false;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (value is bool boolValue && boolValue && parameter != null && targetType.IsEnum)
-        {
-            if (Enum.TryParse(targetType, parameter.ToString(), out var result))
-            {
-                return result;
-            }
-        }
-
-        return Binding.DoNothing;
-    }
-}
-
-public class DynamicPropertyValueConverter : IMultiValueConverter
-{
-    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (values is [PartData partData, string propPath])
-        {
-            // Пользовательские свойства через индексатор
-            if (propPath.StartsWith("UserDefinedProperties["))
-            {
-                var key = propPath.Substring("UserDefinedProperties[".Length).TrimEnd(']');
-                return partData.UserDefinedProperties.TryGetValue(key, out var v) ? v : string.Empty;
-            }
-            // Отражение по имени свойства
-            var pi = typeof(PartData).GetProperty(propPath);
-            return pi?.GetValue(partData)?.ToString() ?? string.Empty;
-        }
-        return string.Empty;
-    }
-
-    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-    {
-        return Array.Empty<object>();
-    }
-}
-
-public class PropertyExpressionByNameConverter : IMultiValueConverter
-{
-    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (values is [PartData partData, _, string propPath])
-        {
-            return partData.IsPropertyExpression(propPath) ? Visibility.Visible : Visibility.Collapsed;
-        }
-        return Visibility.Collapsed;
-    }
-
-    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-    {
-        return Array.Empty<object>();
-    }
-}
-
-public class ObjectToBooleanConverter : IValueConverter
-{
-    public static readonly ObjectToBooleanConverter Instance = new();
-
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return value != null;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return Binding.DoNothing;
-    }
 }
 
 public class TemplatePreset

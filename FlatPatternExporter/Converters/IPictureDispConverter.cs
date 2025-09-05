@@ -1,5 +1,7 @@
 ﻿using stdole;
 
+namespace FlatPatternExporter.Converters;
+
 public class IPictureDispConverter : AxHost
 {
     private IPictureDispConverter() : base("")

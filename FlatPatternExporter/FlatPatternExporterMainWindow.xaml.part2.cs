@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using FlatPatternExporter.Converters;
 using Inventor;
 using Binding = System.Windows.Data.Binding;
 using File = System.IO.File;

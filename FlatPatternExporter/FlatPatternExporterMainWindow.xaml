@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"        
         xmlns:local="clr-namespace:FlatPatternExporter"
+        xmlns:converters="clr-namespace:FlatPatternExporter.Converters"
         PreviewMouseLeftButtonDown="MainWindow_PreviewMouseLeftButtonDown"
         Title="FPEx"
         MinHeight="600" MinWidth="1745"
@@ -81,8 +82,8 @@
 
                                 <!-- Метод сканирования -->
                                 <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                    <RadioButton x:Name="TraverseRadioButton" Content="По структуре сборки" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <RadioButton x:Name="BomRadioButton" Content="По спецификации" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <RadioButton x:Name="TraverseRadioButton" Content="По структуре сборки" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <RadioButton x:Name="BomRadioButton" Content="По спецификации" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                 </StackPanel>
 
                                 <!-- Вертикальный разделитель -->
@@ -165,11 +166,11 @@
 
                                 <!-- Левая колонка -->
                                 <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0" VerticalAlignment="Top">
-                                    <RadioButton x:Name="ChooseFolderRadioButton" Content="Указать папку перед экспортом" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ChooseFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <RadioButton x:Name="ComponentFolderRadioButton" Content="Папка компонента" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ComponentFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <RadioButton x:Name="PartFolderRadioButton" Content="В папке детали" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=PartFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <RadioButton x:Name="ProjectFolderRadioButton" Content="Папка проекта" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=ProjectFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <RadioButton x:Name="FixedFolderRadioButton" Content="Фиксированная папка" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static local:EnumToBooleanConverter.Instance}, ConverterParameter=FixedFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <RadioButton x:Name="ChooseFolderRadioButton" Content="Указать папку перед экспортом" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=ChooseFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <RadioButton x:Name="ComponentFolderRadioButton" Content="Папка компонента" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=ComponentFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <RadioButton x:Name="PartFolderRadioButton" Content="В папке детали" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=PartFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <RadioButton x:Name="ProjectFolderRadioButton" Content="Папка проекта" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=ProjectFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <RadioButton x:Name="FixedFolderRadioButton" Content="Фиксированная папка" GroupName="ExportFolderOptions" IsChecked="{Binding SelectedExportFolder, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=FixedFolder, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                 </StackPanel>
 
                                 <!-- Вертикальный разделитель -->
@@ -327,7 +328,7 @@
                                     Content="Удалить"
                                     Click="DeletePresetButton_Click"
                                     Style="{StaticResource PresetDeleteButtonStyle}"
-                                    IsEnabled="{Binding SelectedTemplatePreset, Converter={x:Static local:ObjectToBooleanConverter.Instance}}"
+                                    IsEnabled="{Binding SelectedTemplatePreset, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
                                     ToolTip="Удалить выбранный пресет"/>
                             </StackPanel>
                         </StackPanel>
