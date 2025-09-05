@@ -1852,26 +1852,17 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
 public class PartData : INotifyPropertyChanged
 {
-    // === КАТЕГОРИЯ 1: СИСТЕМНЫЕ СВОЙСТВА ПРИЛОЖЕНИЯ ===
-    // Свойства, используемые только внутри приложения для управления таблицей
     private int item;
 
-    // === КАТЕГОРИЯ 2: СВОЙСТВА ДОКУМЕНТА (НЕ IPROPERTY) ===
-    // Базовые свойства файла документа, считываемые напрямую из API Inventor
-    public string FileName { get; set; } = string.Empty; // Path.GetFileNameWithoutExtension()
-    public string FullFileName { get; set; } = string.Empty; // partDoc.FullFileName
-    public string ModelState { get; set; } = string.Empty; // partDoc.ModelStateName
-    public BitmapImage? Preview { get; set; } // apprenticeDoc.Thumbnail
-    public bool HasFlatPattern { get; set; } = false; // smCompDef.HasFlatPattern
-
-
-    // === КАТЕГОРИЯ 2/4: ОБЯЗАТЕЛЬНЫЕ СВОЙСТВА БЕЗ УВЕДОМЛЕНИЙ ===
-    // Свойства, которые устанавливаются только при создании объекта
+    public string FileName { get; set; } = string.Empty;
+    public string FullFileName { get; set; } = string.Empty;
+    public string ModelState { get; set; } = string.Empty;
+    public BitmapImage? Preview { get; set; }
+    public bool HasFlatPattern { get; set; } = false;
     public string Material { get; set; } = string.Empty;
     public double Thickness { get; set; } = 0.0;
-
-    // === КАТЕГОРИЯ 4: РАСШИРЕННЫЕ IPROPERTIES ===
-    // Опциональные iProperty из различных наборов свойств
+    public string PartNumber { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
     public string Author { get; set; } = string.Empty;
     public string Revision { get; set; } = string.Empty;
     public string Project { get; set; } = string.Empty;
@@ -1904,12 +1895,8 @@ public class PartData : INotifyPropertyChanged
     public string FlatPatternArea { get; set; } = string.Empty;
     public string Appearance { get; set; } = string.Empty;
 
-    // === КАТЕГОРИЯ 5: ПОЛЬЗОВАТЕЛЬСКИЕ IPROPERTIES ===
-    // Динамически добавляемые пользователем свойства из "User Defined Properties"
     private Dictionary<string, string> userDefinedProperties = new();
 
-    // === КАТЕГОРИЯ 6: СВОЙСТВА КОЛИЧЕСТВА И СОСТОЯНИЯ ===
-    // Свойства для управления количеством и состоянием обработки
     private int quantity;
     public int OriginalQuantity { get; set; }
     
@@ -1935,8 +1922,6 @@ public class PartData : INotifyPropertyChanged
         } 
     }
 
-    // === КАТЕГОРИЯ 7: СВОЙСТВА СОСТОЯНИЯ ОБРАБОТКИ ===
-    // Свойства, устанавливаемые во время экспорта и обработки
     private BitmapImage? dxfPreview;
     public BitmapImage? DxfPreview 
     { 
@@ -1965,8 +1950,6 @@ public class PartData : INotifyPropertyChanged
         } 
     }
 
-    // === СВОЙСТВА С УВЕДОМЛЕНИЯМИ ===
-
     public Dictionary<string, string> UserDefinedProperties
     {
         get => userDefinedProperties;
@@ -1977,8 +1960,6 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-
-    // Порядковый номер элемента
     public int Item
     {
         get => item;
@@ -1989,25 +1970,7 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    // КАТЕГОРИЯ 2/4: Обязательные свойства с уведомлениями (изменяются программно)
-    private string partNumber = string.Empty;
-    private string description = string.Empty;
-    
-    // Состояния выражений для редактируемых свойств
     private readonly Dictionary<string, bool> _isExpressionFlags = new();
-
-    public string PartNumber
-    {
-        get => partNumber;
-        set
-        {
-            if (partNumber != value)
-            {
-                partNumber = value;
-                OnPropertyChanged();
-            }
-        }
-    }
 
     /// <summary>
     /// Проверяет, является ли указанное свойство выражением
@@ -2032,23 +1995,6 @@ public class PartData : INotifyPropertyChanged
     }
 
 
-
-    public string Description
-    {
-        get => description;
-        set
-        {
-            if (description != value)
-            {
-                description = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-
-
-    // КАТЕГОРИЯ 6: Свойства количества и состояния с уведомлениями
     public int Quantity
     {
         get => quantity;
