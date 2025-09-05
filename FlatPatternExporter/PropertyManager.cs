@@ -13,10 +13,10 @@ public class PropertyManager
     private readonly Document _document;
     public static readonly string SheetMetalSubType = "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}";
 
-        public PropertyManager(Document document)
-        {
-            _document = document ?? throw new ArgumentNullException(nameof(document));
-        }
+    public PropertyManager(Document document)
+    {
+        _document = document ?? throw new ArgumentNullException(nameof(document));
+    }
 
     /// <summary>
     /// Получает маппинг для Inventor Property
@@ -111,106 +111,106 @@ public class PropertyManager
         }
 
         return result;
-    }        
+    }
 
-        /// <summary>
-        /// Проверяет, является ли свойство expression-ом по внутреннему имени.
-        /// </summary>
-        public bool IsMappedPropertyExpression(string ourName)
+    /// <summary>
+    /// Проверяет, является ли свойство expression-ом по внутреннему имени.
+    /// </summary>
+    public bool IsMappedPropertyExpression(string ourName)
+    {
+        var prop = GetPropertyObject(ourName);
+        if (prop == null) return false;
+
+        return !string.IsNullOrEmpty(prop.Expression) && prop.Expression.StartsWith("=");
+    }
+
+    /// <summary>
+    /// Устанавливает значение свойства по внутреннему имени.
+    /// </summary>
+    public void SetMappedProperty(string ourName, object value)
+    {
+        var prop = GetPropertyObject(ourName);
+        if (prop == null) return;
+
+        try
         {
-            var prop = GetPropertyObject(ourName);
-            if (prop == null) return false;
-
-            return !string.IsNullOrEmpty(prop.Expression) && prop.Expression.StartsWith("=");
+            prop.Value = value;
         }
-
-        /// <summary>
-        /// Устанавливает значение свойства по внутреннему имени.
-        /// </summary>
-        public void SetMappedProperty(string ourName, object value)
+        catch (Exception ex)
         {
-            var prop = GetPropertyObject(ourName);
-            if (prop == null) return;
-
-            try
-            {
-                prop.Value = value;
-            }
-            catch (Exception ex)
-            {
             Debug.WriteLine($"Ошибка установки значения свойства '{ourName}': {ex.Message}");
             System.Windows.MessageBox.Show($"Не удалось обновить свойство '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
+    }
 
-        /// <summary>
-        /// Устанавливает выражение свойства по внутреннему имени.
-        /// </summary>
-        public void SetMappedPropertyExpression(string ourName, string expression)
+    /// <summary>
+    /// Устанавливает выражение свойства по внутреннему имени.
+    /// </summary>
+    public void SetMappedPropertyExpression(string ourName, string expression)
+    {
+        var prop = GetPropertyObject(ourName);
+        if (prop == null) return;
+
+        try
         {
-            var prop = GetPropertyObject(ourName);
-            if (prop == null) return;
-
-            try
-            {
-                prop.Expression = expression;
-            }
-            catch (Exception ex)
-            {
+            prop.Expression = expression;
+        }
+        catch (Exception ex)
+        {
             Debug.WriteLine($"Ошибка установки выражения свойства '{ourName}': {ex.Message}");
             System.Windows.MessageBox.Show($"Не удалось обновить выражение свойства '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
+    }
 
-        // === Методы для работы с не-iProperty свойствами ===
+    // === Методы для работы с не-iProperty свойствами ===
 
-        /// <summary>
-        /// Получает имя файла без расширения
-        /// </summary>
-        public string GetFileName()
+    /// <summary>
+    /// Получает имя файла без расширения
+    /// </summary>
+    public string GetFileName()
+    {
+        try
         {
-            try
-            {
-                return System.IO.Path.GetFileNameWithoutExtension(_document.FullFileName);
-            }
-            catch (Exception ex)
-            {
+            return System.IO.Path.GetFileNameWithoutExtension(_document.FullFileName);
+        }
+        catch (Exception ex)
+        {
             Debug.WriteLine($"Ошибка получения имени файла: {ex.Message}");
             return "";
-            }
         }
+    }
 
-        /// <summary>
-        /// Получает полный путь к файлу
-        /// </summary>
-        public string GetFullFileName()
+    /// <summary>
+    /// Получает полный путь к файлу
+    /// </summary>
+    public string GetFullFileName()
+    {
+        try
         {
-            try
-            {
-                return _document.FullFileName;
-            }
-            catch (Exception ex)
-            {
+            return _document.FullFileName;
+        }
+        catch (Exception ex)
+        {
             Debug.WriteLine($"Ошибка получения полного пути к файлу: {ex.Message}");
             return "";
-            }
         }
+    }
 
-        /// <summary>
-        /// Получает имя состояния модели
-        /// </summary>
-        public string GetModelState()
+    /// <summary>
+    /// Получает имя состояния модели
+    /// </summary>
+    public string GetModelState()
+    {
+        try
         {
-            try
-            {
             return _document.ModelStateName ?? "";
-            }
-            catch (Exception ex)
-            {
+        }
+        catch (Exception ex)
+        {
             Debug.WriteLine($"Ошибка получения состояния модели: {ex.Message}");
             return "";
-            }
         }
+    }
 
     /// <summary>
     /// Получает толщину листового металла (только для деталей из листового металла)
@@ -237,54 +237,54 @@ public class PropertyManager
         }
     }
 
-        /// <summary>
-        /// Проверяет, имеет ли деталь развертку (только для деталей из листового металла)
-        /// </summary>
-        public bool HasFlatPattern()
+    /// <summary>
+    /// Проверяет, имеет ли деталь развертку (только для деталей из листового металла)
+    /// </summary>
+    public bool HasFlatPattern()
+    {
+        try
         {
-            try
+            if (_document is PartDocument partDoc && partDoc.SubType == SheetMetalSubType)
             {
-                if (_document is PartDocument partDoc && partDoc.SubType == SheetMetalSubType)
-                {
-                    var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
-                    return smCompDef.HasFlatPattern;
-                }
-                return false;
+                var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
+                return smCompDef.HasFlatPattern;
             }
-            catch (Exception ex)
-            {
+            return false;
+        }
+        catch (Exception ex)
+        {
             Debug.WriteLine($"Ошибка проверки наличия развертки: {ex.Message}");
-                return false;
-            }
+            return false;
         }
+    }
 
-        /// <summary>
-        /// Проверяет, является ли состояние модели документа основным (kPrimaryModelStateType = 118017)
-        /// </summary>
-        public bool IsPrimaryModelState()
+    /// <summary>
+    /// Проверяет, является ли состояние модели документа основным (kPrimaryModelStateType = 118017)
+    /// </summary>
+    public bool IsPrimaryModelState()
+    {
+        try
         {
-            try
+            // Получаем активное состояние модели из ComponentDefinition
+            if (_document is PartDocument partDoc)
             {
-                // Получаем активное состояние модели из ComponentDefinition
-                if (_document is PartDocument partDoc)
-                {
-                    var activeModelState = partDoc.ComponentDefinition.ModelStates.ActiveModelState;
-                    return activeModelState.ModelStateType == ModelStateTypeEnum.kPrimaryModelStateType;
-                }
-                else if (_document is AssemblyDocument asmDoc)
-                {
-                    var activeModelState = asmDoc.ComponentDefinition.ModelStates.ActiveModelState;
-                    return activeModelState.ModelStateType == ModelStateTypeEnum.kPrimaryModelStateType;
-                }
-                
-                return true; // Для других типов документов считаем основным состоянием
+                var activeModelState = partDoc.ComponentDefinition.ModelStates.ActiveModelState;
+                return activeModelState.ModelStateType == ModelStateTypeEnum.kPrimaryModelStateType;
             }
-            catch (Exception ex)
+            else if (_document is AssemblyDocument asmDoc)
             {
-            Debug.WriteLine($"Ошибка проверки типа состояния модели: {ex.Message}");
-                return true; // По умолчанию считаем основным состоянием
+                var activeModelState = asmDoc.ComponentDefinition.ModelStates.ActiveModelState;
+                return activeModelState.ModelStateType == ModelStateTypeEnum.kPrimaryModelStateType;
             }
+            
+            return true; // Для других типов документов считаем основным состоянием
         }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Ошибка проверки типа состояния модели: {ex.Message}");
+            return true; // По умолчанию считаем основным состоянием
+        }
+    }
 
     /// <summary>
     /// Получает список предустановленных свойств iProperty из централизованной системы метаданных
@@ -320,7 +320,6 @@ public class PropertyManager
         return presetProperties;
     }
 
-
     /// <summary>
     /// Возвращает коллекцию всех редактируемых свойств из реестра
     /// </summary>
@@ -332,6 +331,4 @@ public class PropertyManager
             .Where(p => p.IsEditable)
             .Select(p => p.InternalName);
     }
-
-
 }
