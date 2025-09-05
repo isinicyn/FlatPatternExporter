@@ -90,10 +90,23 @@ public partial class FlatPatternExporterMainWindow : Window
     /// </summary>
     private void SetExpressionStatesForAllProperties(PartData partData, PropertyManager mgr)
     {
-        foreach (var property in PropertyManager.GetEditableProperties())
+        partData.BeginExpressionBatch();
+        try
         {
-            var isExpression = mgr.IsMappedPropertyExpression(property);
-            partData.SetPropertyExpressionState(property, isExpression);
+            foreach (var property in PropertyManager.GetEditableProperties())
+            {
+                var isExpression = mgr.IsMappedPropertyExpression(property);
+                partData.SetPropertyExpressionState(property, isExpression);
+            }
+            foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
+            {
+                var isExpression = mgr.IsMappedPropertyExpression(userProperty.InternalName);
+                partData.SetPropertyExpressionState($"UserDefinedProperties[{userProperty.ColumnHeader}]", isExpression);
+            }
+        }
+        finally
+        {
+            partData.EndExpressionBatch();
         }
     }
 
@@ -1368,7 +1381,7 @@ public partial class FlatPatternExporterMainWindow : Window
         _tokenService.UpdatePreviewWithSelectedData(selectedPart);
     }
 
-    public async Task FillPropertyDataAsync(string propertyName)
+    public void FillPropertyData(string propertyName)
     {
         // Если нет данных для заполнения, выходим
         if (_partsData.Count == 0)
@@ -1396,9 +1409,11 @@ public partial class FlatPatternExporterMainWindow : Window
                 var mgr = new PropertyManager((Document)partDoc);
                 var value = mgr.GetMappedProperty(propertyName) ?? "";
                 partData.AddUserDefinedProperty(columnHeader, value);
+                
+                // Устанавливаем состояние выражения для User Defined свойства
+                var isExpression = mgr.IsMappedPropertyExpression(propertyName);
+                partData.SetPropertyExpressionState($"UserDefinedProperties[{columnHeader}]", isExpression);
             }
-
-            await Task.Delay(10);
         }
     }
 
@@ -1436,6 +1451,14 @@ public partial class FlatPatternExporterMainWindow : Window
         };
     }
 
+    private Style CreateCellTagStyle(string propertyPath)
+    {
+        var baseStyle = PartsDataGrid.FindResource("DataGridCellStyle") as Style;
+        var style = baseStyle != null ? new Style(typeof(DataGridCell), baseStyle) : new Style(typeof(DataGridCell));
+        style.Setters.Add(new Setter(FrameworkElement.TagProperty, propertyPath));
+        return style;
+    }
+
     public void AddUserDefinedIPropertyColumn(string propertyName)
     {
         // Ищем пользовательское свойство в реестре по оригинальному имени
@@ -1451,13 +1474,28 @@ public partial class FlatPatternExporterMainWindow : Window
             return;
         }
 
-        // Создаем текстовую колонку через централизованный метод
-        var column = CreateTextColumn(columnHeader, $"UserDefinedProperties[{columnHeader}]");
+        // Инициализируем пустые значения для всех существующих строк, чтобы избежать KeyNotFoundException
+        foreach (var partData in _partsData)
+        {
+            partData.AddUserDefinedProperty(columnHeader, "");
+        }
+
+        // Создаем колонку с универсальным шаблоном и передаем путь через Tag
+        var template = FindResource("EditableWithFxTemplate") as DataTemplate ?? throw new ResourceReferenceKeyNotFoundException("EditableWithFxTemplate не найден", "EditableWithFxTemplate");
+        var column = new DataGridTemplateColumn
+        {
+            Header = columnHeader,
+            CellTemplate = template,
+            SortMemberPath = $"UserDefinedProperties[{columnHeader}]",
+            IsReadOnly = false
+        };
+
+        column.CellStyle = CreateCellTagStyle($"UserDefinedProperties[{columnHeader}]");
 
         PartsDataGrid.Columns.Add(column);
 
-        // Дозаполняем данные для новой колонки (асинхронно)
-        _ = FillPropertyDataAsync(internalName);
+        // Дозаполняем данные для новой колонки
+        FillPropertyData(internalName);
     }
 
     private void AboutButton_Click(object sender, RoutedEventArgs e)

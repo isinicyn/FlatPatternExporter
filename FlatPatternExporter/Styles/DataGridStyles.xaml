@@ -1,35 +1,11 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:local="clr-namespace:FlatPatternExporter">
-    
-    <local:PropertyExpressionConverter x:Key="PropertyExpressionConverter" />
-
+    <local:PropertyExpressionByNameConverter x:Key="PropertyExpressionByNameConverter" />
+    <local:DynamicPropertyValueConverter x:Key="DynamicPropertyValueConverter" />
 
     <!-- Базовые стили для ячеек -->
-    
-    <!-- Базовый стиль для индикатора выражения fx -->
-    <Style x:Key="BaseExpressionIndicatorStyle" TargetType="TextBlock">
-        <Setter Property="Text" Value="fx"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Right"/>
-        <Setter Property="Margin" Value="{StaticResource RightSmallMarginThickness}"/>
-        <Setter Property="FontStyle" Value="Italic"/>
-        <Setter Property="FontSize" Value="{StaticResource SmallFontSize}"/>
-        <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
-        <Setter Property="ToolTip" Value="Значение задано выражением (Expression)"/>
-        <Setter Property="Visibility" Value="Collapsed"/>
-    </Style>
-
-    <!-- Универсальный стиль индикатора выражения fx.
-         Привяжите булев флаг к Tag у TextBlock. -->
-    <Style x:Key="FxIndicatorByTagStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseExpressionIndicatorStyle}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
-                <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
 
 
     <!-- Базовый стиль для всех текстовых ячеек -->
@@ -45,6 +21,41 @@
     <Style x:Key="CenteredCellStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseCellStyle}"/>
 
     <!-- Шаблоны данных -->
+    
+    <!-- Универсальный шаблон: текст + индикатор выражения (fx). Путь к свойству берется из Tag ячейки -->
+    <DataTemplate x:Key="EditableWithFxTemplate">
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TextBlock VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Style="{StaticResource CenteredCellStyle}"
+                       TextTrimming="CharacterEllipsis"
+                       Margin="{StaticResource RightSmallMarginThickness}">
+                <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource DynamicPropertyValueConverter}">
+                        <Binding/>
+                        <Binding RelativeSource="{RelativeSource AncestorType=DataGridCell}" Path="Tag"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+
+            <TextBlock Text="fx"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Right"
+                       Margin="{StaticResource RightSmallMarginThickness}"
+                       FontStyle="Italic"
+                       FontSize="{StaticResource SmallFontSize}"
+                       Foreground="{DynamicResource TextMutedBrush}"
+                       ToolTip="Значение задано выражением (Expression)">
+                <TextBlock.Visibility>
+                    <MultiBinding Converter="{StaticResource PropertyExpressionByNameConverter}">
+                        <Binding/>
+                        <Binding Path="ExpressionStateVersion"/>
+                        <Binding RelativeSource="{RelativeSource AncestorType=DataGridCell}" Path="Tag"/>
+                    </MultiBinding>
+                </TextBlock.Visibility>
+            </TextBlock>
+        </Grid>
+    </DataTemplate>
     
     <!-- Шаблон для колонки "Изобр. детали" -->
     <DataTemplate x:Key="PartImageTemplate">
@@ -317,3 +328,4 @@
         </Setter>
     </Style>
 </ResourceDictionary>
+

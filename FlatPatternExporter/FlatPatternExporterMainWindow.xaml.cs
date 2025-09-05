@@ -196,30 +196,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         return templates;
     }
 
-    /// <summary>
-    /// Создает DataTemplate для редактируемого свойства с индикатором выражения
-    /// </summary>
-    private DataTemplate CreateEditablePropertyTemplate(string propertyName)
-    {
-        var template = new DataTemplate();
-        
-        var factory = new FrameworkElementFactory(typeof(TextWithFxIndicator));
-        
-        // Привязка к значению свойства
-        var textBinding = new Binding(propertyName);
-        factory.SetBinding(TextWithFxIndicator.TextProperty, textBinding);
-        
-        // Привязка к состоянию выражения через конвертер
-        var expressionBinding = new Binding
-        {
-            Converter = PropertyExpressionConverter.Instance,
-            ConverterParameter = propertyName
-        };
-        factory.SetBinding(TextWithFxIndicator.IsExpressionProperty, expressionBinding);
-        
-        template.VisualTree = factory;
-        return template;
-    }
 
 
     public FlatPatternExporterMainWindow()
@@ -1076,7 +1052,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Если это редактируемое свойство с fx индикатором - создаем динамически
             if (templateName.EndsWith("WithExpressionTemplate"))
             {
-                template = CreateEditablePropertyTemplate(iProperty.InventorPropertyName);
+                template = FindResource("EditableWithFxTemplate") as DataTemplate ?? throw new ResourceReferenceKeyNotFoundException("EditableWithFxTemplate не найден", "EditableWithFxTemplate");
             }
             else
             {
@@ -1091,6 +1067,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 SortMemberPath = isSortable ? iProperty.InventorPropertyName : null,
                 IsReadOnly = !templateName.StartsWith("Editable")
             };
+
+            // Передаём путь свойства через Tag ячейки для универсального шаблона
+            if (templateName.EndsWith("WithExpressionTemplate"))
+            {
+                templateColumn.CellStyle = CreateCellTagStyle(iProperty.InventorPropertyName);
+            }
 
             column = templateColumn;
         }
@@ -1109,7 +1091,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         selectIPropertyWindow?.UpdatePropertyStates();
 
         // Дозаполняем данные для новой колонки
-        _ = FillPropertyDataAsync(iProperty.InventorPropertyName);
+        FillPropertyData(iProperty.InventorPropertyName);
     }
 
     private void PartsDataGrid_ColumnReordering(object? sender, DataGridColumnReorderingEventArgs e)
@@ -2009,6 +1991,38 @@ public class PartData : INotifyPropertyChanged
     }
 
     private readonly Dictionary<string, bool> _isExpressionFlags = [];
+    private int _expressionStateVersion;
+    private bool _suppressExpressionVersion;
+    private bool _expressionStateChangedWhileSuppressed;
+
+    public int ExpressionStateVersion
+    {
+        get => _expressionStateVersion;
+        private set
+        {
+            if (_expressionStateVersion != value)
+            {
+                _expressionStateVersion = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public void BeginExpressionBatch()
+    {
+        _suppressExpressionVersion = true;
+        _expressionStateChangedWhileSuppressed = false;
+    }
+
+    public void EndExpressionBatch()
+    {
+        _suppressExpressionVersion = false;
+        if (_expressionStateChangedWhileSuppressed)
+        {
+            _expressionStateChangedWhileSuppressed = false;
+            ExpressionStateVersion++;
+        }
+    }
 
     /// <summary>
     /// Проверяет, является ли указанное свойство выражением
@@ -2023,10 +2037,17 @@ public class PartData : INotifyPropertyChanged
     {
         var oldValue = IsPropertyExpression(propertyName);
         _isExpressionFlags[propertyName] = isExpression;
-        
+
         if (oldValue != isExpression)
         {
-            OnPropertyChanged($"{propertyName}IsExpression");
+            if (_suppressExpressionVersion)
+            {
+                _expressionStateChangedWhileSuppressed = true;
+            }
+            else
+            {
+                ExpressionStateVersion++;
+            }
         }
     }
 
@@ -2177,23 +2198,45 @@ public class EnumToBooleanConverter : IValueConverter
     }
 }
 
-public class PropertyExpressionConverter : IValueConverter
+public class DynamicPropertyValueConverter : IMultiValueConverter
 {
-    public static readonly PropertyExpressionConverter Instance = new();
-
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is PartData partData && parameter is string propertyName)
+        if (values is [PartData partData, string propPath])
         {
-            return partData.IsPropertyExpression(propertyName);
+            // Пользовательские свойства через индексатор
+            if (propPath.StartsWith("UserDefinedProperties["))
+            {
+                var key = propPath.Substring("UserDefinedProperties[".Length).TrimEnd(']');
+                return partData.UserDefinedProperties.TryGetValue(key, out var v) ? v : string.Empty;
+            }
+            // Отражение по имени свойства
+            var pi = typeof(PartData).GetProperty(propPath);
+            return pi?.GetValue(partData)?.ToString() ?? string.Empty;
         }
-
-        return false;
+        return string.Empty;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
     {
-        return Binding.DoNothing;
+        return Array.Empty<object>();
+    }
+}
+
+public class PropertyExpressionByNameConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values is [PartData partData, _, string propPath])
+        {
+            return partData.IsPropertyExpression(propPath) ? Visibility.Visible : Visibility.Collapsed;
+        }
+        return Visibility.Collapsed;
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        return Array.Empty<object>();
     }
 }
 

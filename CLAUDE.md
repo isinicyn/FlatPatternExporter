@@ -25,7 +25,6 @@ FlatPatternExporter/
     ├── SelectIPropertyWindow.xaml(.cs) # Окно выбора свойств
     │
     ├── LayerSettingControl.xaml(.cs)   # Элемент управления слоями
-    ├── TextWithFxIndicator.xaml(.cs)   # Компонент с FX индикатором
     │
     ├── Styles/                         # XAML стили
     │   ├── ColorResources.xaml
@@ -215,7 +214,15 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 
 **Универсальные конвертеры:**
 - `EnumToBooleanConverter` - универсальный конвертер для привязки enum к RadioButton
+- `DynamicPropertyValueConverter` - извлечение значений свойств по имени пути
+- `PropertyExpressionByNameConverter` - определение видимости fx индикатора по состоянию выражения
 - Поддерживает любые enum через рефлексию и `Enum.TryParse`
+
+**Система fx индикатора для редактируемых свойств:**
+- Универсальный шаблон `EditableWithFxTemplate` для отображения текста с fx индикатором
+- Система версионирования состояний выражений через `ExpressionStateVersion` 
+- Пакетная обработка изменений состояний выражений через `BeginExpressionBatch`/`EndExpressionBatch`
+- Передача пути свойства через `Tag` ячейки DataGrid для универсального связывания
 
 **Система свойств с INotifyPropertyChanged:**
 - CheckBox используют двустороннюю привязку данных (`TwoWay` binding)
