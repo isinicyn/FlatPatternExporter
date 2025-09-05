@@ -1184,6 +1184,9 @@ public partial class FlatPatternExporterMainWindow : Window
 
         // Обнуляем информацию о документе
         UpdateDocumentInfo("", null);
+        
+        // Обновляем TokenService для отображения placeholder'ов
+        _tokenService.UpdatePartsData(_partsData);
 
         // Отключаем кнопку "Конфликты" и очищаем список конфликтов
         ClearConflictData();
@@ -1213,6 +1216,9 @@ public partial class FlatPatternExporterMainWindow : Window
             }
             else
             {
+                // Обновляем TokenService после удаления строк
+                _tokenService.UpdatePartsData(_partsData);
+                
                 var deletionState = UIState.CreateAfterOperationState(_partsData.Count > 0, false, $"Удалено {selectedItems.Count} строк(и)");
                 SetUIState(deletionState);
             }
