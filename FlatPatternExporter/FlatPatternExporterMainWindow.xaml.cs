@@ -1718,22 +1718,16 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void InitializeAvailableTokens()
     {
-        AvailableTokens = new ObservableCollection<string>
+        AvailableTokens = new ObservableCollection<string>();
+        
+        // Получаем все токенизируемые свойства из централизованного реестра
+        var availableTokens = PropertyMetadataRegistry.GetAvailableTokens();
+        
+        // Добавляем токены в ObservableCollection для UI
+        foreach (var token in availableTokens.OrderBy(t => t.Value))
         {
-            "PartNumber",
-            "Quantity",
-            "Material",
-            "Thickness",
-            "Description",
-            "ModelState",
-            "Author",
-            "Revision",
-            "Project",
-            "Mass",
-            "FlatPatternWidth",
-            "FlatPatternLength",
-            "FlatPatternArea"
-        };
+            AvailableTokens.Add(token.Key);
+        }
     }
 
     /// <summary>

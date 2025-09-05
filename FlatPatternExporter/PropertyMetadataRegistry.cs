@@ -26,6 +26,11 @@ public static class PropertyMetadataRegistry
         public string? ColumnTemplate { get; init; }
         public bool IsSortable { get; init; } = true;
         public bool IsSearchable { get; init; } = true;
+        public bool IsTokenizable { get; init; } = false;
+        
+        // Вычисляемые свойства
+        public string TokenName => IsTokenizable ? InternalName : "";
+        public string PlaceholderValue => IsTokenizable ? $"{{{InternalName}}}" : "";
     }
 
     /// <summary>
@@ -71,7 +76,8 @@ public static class PropertyMetadataRegistry
             ColumnHeader = "Кол.",
             Category = "Количество",
             Type = PropertyType.System,
-            ColumnTemplate = "EditableQuantityTemplate"
+            ColumnTemplate = "EditableQuantityTemplate",
+            IsTokenizable = true
         },
         
         // ===== Свойства документа (не iProperty) =====
@@ -97,7 +103,8 @@ public static class PropertyMetadataRegistry
             DisplayName = "Состояние модели",
             ColumnHeader = "Состояние модели",
             Category = "Документ",
-            Type = PropertyType.Document
+            Type = PropertyType.Document,
+            IsTokenizable = true
         },
         ["Thickness"] = new PropertyDefinition
         {
@@ -107,7 +114,8 @@ public static class PropertyMetadataRegistry
             Category = "Документ",
             Type = PropertyType.Document,
             RequiresRounding = true,
-            RoundingDecimals = 1
+            RoundingDecimals = 1,
+            IsTokenizable = true
         },
         ["Preview"] = new PropertyDefinition
         {
@@ -142,7 +150,8 @@ public static class PropertyMetadataRegistry
             Type = PropertyType.IProperty,
             PropertySetName = "Summary Information",
             InventorPropertyName = "Author",
-            IsEditable = true
+            IsEditable = true,
+            IsTokenizable = true
         },
         ["Revision"] = new PropertyDefinition
         {
@@ -153,7 +162,8 @@ public static class PropertyMetadataRegistry
             Type = PropertyType.IProperty,
             PropertySetName = "Summary Information",
             InventorPropertyName = "Revision Number",
-            IsEditable = true
+            IsEditable = true,
+            IsTokenizable = true
         },
         ["Title"] = new PropertyDefinition
         {
@@ -245,7 +255,8 @@ public static class PropertyMetadataRegistry
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Part Number",
-            IsEditable = true
+            IsEditable = true,
+            IsTokenizable = true
         },
         ["Description"] = new PropertyDefinition
         {
@@ -256,7 +267,8 @@ public static class PropertyMetadataRegistry
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Description",
-            IsEditable = true
+            IsEditable = true,
+            IsTokenizable = true
         },
         ["Material"] = new PropertyDefinition
         {
@@ -266,7 +278,8 @@ public static class PropertyMetadataRegistry
             Category = "Материал и отделка",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
-            InventorPropertyName = "Material"
+            InventorPropertyName = "Material",
+            IsTokenizable = true
         },
         ["Project"] = new PropertyDefinition
         {
@@ -277,7 +290,8 @@ public static class PropertyMetadataRegistry
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Project",
-            IsEditable = true
+            IsEditable = true,
+            IsTokenizable = true
         },
         ["StockNumber"] = new PropertyDefinition
         {
@@ -437,7 +451,8 @@ public static class PropertyMetadataRegistry
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Mass",
             RequiresRounding = true,
-            RoundingDecimals = 2
+            RoundingDecimals = 2,
+            IsTokenizable = true
         },
         ["SurfaceArea"] = new PropertyDefinition
         {
@@ -483,7 +498,8 @@ public static class PropertyMetadataRegistry
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Flat Pattern Width",
             RequiresRounding = true,
-            RoundingDecimals = 2
+            RoundingDecimals = 2,
+            IsTokenizable = true
         },
         ["FlatPatternLength"] = new PropertyDefinition
         {
@@ -495,7 +511,8 @@ public static class PropertyMetadataRegistry
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Flat Pattern Length",
             RequiresRounding = true,
-            RoundingDecimals = 2
+            RoundingDecimals = 2,
+            IsTokenizable = true
         },
         ["FlatPatternArea"] = new PropertyDefinition
         {
@@ -507,7 +524,8 @@ public static class PropertyMetadataRegistry
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Flat Pattern Area",
             RequiresRounding = true,
-            RoundingDecimals = 2
+            RoundingDecimals = 2,
+            IsTokenizable = true
         },
         ["Appearance"] = new PropertyDefinition
         {
@@ -567,6 +585,33 @@ public static class PropertyMetadataRegistry
         {
             UserDefinedProperties.Remove(property);
         }
+    }
+
+    /// <summary>
+    /// Получает все свойства, которые могут использоваться как токены
+    /// </summary>
+    public static IEnumerable<PropertyDefinition> GetTokenizableProperties()
+    {
+        return Properties.Values.Where(p => p.IsTokenizable);
+    }
+
+    /// <summary>
+    /// Получает список всех токенизируемых свойств
+    /// </summary>
+    public static Dictionary<string, string> GetAvailableTokens()
+    {
+        var tokens = new Dictionary<string, string>();
+        
+        foreach (var prop in GetTokenizableProperties())
+        {
+            var tokenName = prop.TokenName;
+            if (!string.IsNullOrEmpty(tokenName))
+            {
+                tokens[tokenName] = prop.DisplayName;
+            }
+        }
+        
+        return tokens;
     }
 
 }

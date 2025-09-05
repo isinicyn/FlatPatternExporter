@@ -34,31 +34,52 @@ public class TokenService : INotifyPropertyChanged
     public TokenService()
     {
         _partsData = new List<PartData>();
-        _tokenResolvers = new Dictionary<string, Func<PartData, string>>
-        {
-            ["PartNumber"] = partData => partData.PartNumber ?? string.Empty,
-            ["Quantity"] = partData => partData.Quantity.ToString(),
-            ["Material"] = partData => partData.Material ?? string.Empty,
-            ["Thickness"] = partData => partData.Thickness.ToString("F1"),
-            ["Description"] = partData => partData.Description ?? string.Empty,
-            ["ModelState"] = partData => partData.ModelState ?? string.Empty,
-            ["Author"] = partData => partData.Author ?? string.Empty,
-            ["Revision"] = partData => partData.Revision ?? string.Empty,
-            ["Project"] = partData => partData.Project ?? string.Empty,
-            ["Mass"] = partData => partData.Mass ?? string.Empty,
-            ["FlatPatternWidth"] = partData => partData.FlatPatternWidth ?? string.Empty,
-            ["FlatPatternLength"] = partData => partData.FlatPatternLength ?? string.Empty,
-            ["FlatPatternArea"] = partData => partData.FlatPatternArea ?? string.Empty,
-        };
+        _tokenResolvers = BuildTokenResolvers();
     }
 
-    public string ResolveTemplate(string template, PartData partData)
+    private Dictionary<string, Func<PartData, string>> BuildTokenResolvers()
     {
-        if (string.IsNullOrEmpty(template) || partData == null)
+        var resolvers = new Dictionary<string, Func<PartData, string>>();
+        var partDataType = typeof(PartData);
+        
+        foreach (var prop in PropertyMetadataRegistry.GetTokenizableProperties())
+        {
+            var tokenName = prop.TokenName;
+            if (string.IsNullOrEmpty(tokenName)) continue;
+            
+            // Находим свойство в PartData
+            var property = partDataType.GetProperty(prop.InternalName);
+            if (property == null || !property.CanRead) continue;
+            
+            // Создаем резолвер
+            resolvers[tokenName] = partData =>
+            {
+                var value = property.GetValue(partData);
+                if (value == null) return "";
+                
+                // Используем стандартное форматирование
+                if (prop.RequiresRounding && value is double dValue)
+                {
+                    return dValue.ToString($"F{prop.RoundingDecimals}");
+                }
+                
+                return value.ToString() ?? "";
+            };
+        }
+        
+        return resolvers;
+    }
+
+    public string ResolveTemplate(string template, PartData? partData)
+    {
+        if (string.IsNullOrEmpty(template))
             return string.Empty;
 
         var tokenCache = new Dictionary<string, string>();
         var result = template;
+        
+        // Если нет данных детали, возвращаем шаблон с placeholder'ами
+        bool usePlaceholders = partData == null || string.IsNullOrEmpty(partData.PartNumber);
 
         // Обрабатываем обычные токены
         result = TokenRegex.Replace(result, match =>
@@ -67,9 +88,16 @@ public class TokenService : INotifyPropertyChanged
             
             if (!tokenCache.TryGetValue(token, out var value))
             {
-                if (_tokenResolvers.TryGetValue(token, out var resolver))
+                if (usePlaceholders)
                 {
-                    value = resolver(partData);
+                    // Если нет данных, возвращаем placeholder
+                    var prop = PropertyMetadataRegistry.Properties.Values
+                        .FirstOrDefault(p => p.IsTokenizable && p.TokenName == token);
+                    value = prop?.PlaceholderValue ?? $"{{{token}}}";
+                }
+                else if (_tokenResolvers.TryGetValue(token, out var resolver))
+                {
+                    value = resolver(partData!);
                     tokenCache[token] = value;
                 }
                 else
@@ -105,11 +133,8 @@ public class TokenService : INotifyPropertyChanged
     }
 
 
-    public string PreviewTemplate(string template, PartData sampleData)
+    public string PreviewTemplate(string template, PartData? sampleData)
     {
-        if (sampleData == null)
-            return "Нет данных для предпросмотра";
-
         try
         {
             return ResolveTemplate(template, sampleData);
@@ -149,7 +174,7 @@ public class TokenService : INotifyPropertyChanged
         return ($"{preview}.dxf", true);
     }
 
-    public PartData CreateSamplePartData(IList<PartData> partsData, PartData? selectedData = null)
+    public PartData? CreateSamplePartData(IList<PartData> partsData, PartData? selectedData = null)
     {
         // Используем выбранную деталь, если она передана
         if (selectedData != null)
@@ -163,21 +188,8 @@ public class TokenService : INotifyPropertyChanged
             return partsData[0];
         }
 
-        // Иначе возвращаем placeholder данные
-        return new PartData
-        {
-            PartNumber = "{PartNumber}",
-            Material = "{Material}",
-            Description = "{Description}",
-            ModelState = "{ModelState}",
-            Author = "{Author}",
-            Revision = "{Revision}",
-            Project = "{Project}",
-            Mass = "{Mass}",
-            FlatPatternWidth = "{FlatPatternWidth}",
-            FlatPatternLength = "{FlatPatternLength}",
-            FlatPatternArea = "{FlatPatternArea}"
-        };
+        // Иначе возвращаем null для отображения placeholder'ов
+        return null;
     }
 
     private string SanitizeFileName(string fileName)
