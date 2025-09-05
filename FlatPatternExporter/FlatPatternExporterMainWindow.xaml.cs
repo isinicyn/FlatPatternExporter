@@ -186,7 +186,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 templates[columnName] = definition.ColumnTemplate;
             }
-            // Для редактируемых свойств без уникального шаблона используем WithExpressionTemplate
+            // Для редактируемых свойств без уникального шаблона создаем шаблон с FX индикатором
             else if (definition.IsEditable)
             {
                 templates[columnName] = $"{definition.InternalName}WithExpressionTemplate";
@@ -194,6 +194,31 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
 
         return templates;
+    }
+
+    /// <summary>
+    /// Создает DataTemplate для редактируемого свойства с индикатором выражения
+    /// </summary>
+    private DataTemplate CreateEditablePropertyTemplate(string propertyName)
+    {
+        var template = new DataTemplate();
+        
+        var factory = new FrameworkElementFactory(typeof(TextWithFxIndicator));
+        
+        // Привязка к значению свойства
+        var textBinding = new Binding(propertyName);
+        factory.SetBinding(TextWithFxIndicator.TextProperty, textBinding);
+        
+        // Привязка к состоянию выражения через конвертер
+        var expressionBinding = new Binding
+        {
+            Converter = PropertyExpressionConverter.Instance,
+            ConverterParameter = propertyName
+        };
+        factory.SetBinding(TextWithFxIndicator.IsExpressionProperty, expressionBinding);
+        
+        template.VisualTree = factory;
+        return template;
     }
 
 
@@ -1046,10 +1071,23 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Проверка колонок с шаблонами
         if (ColumnTemplates.TryGetValue(iProperty.ColumnHeader, out var templateName))
         {
+            DataTemplate template;
+            
+            // Если это редактируемое свойство с fx индикатором - создаем динамически
+            if (templateName.EndsWith("WithExpressionTemplate"))
+            {
+                template = CreateEditablePropertyTemplate(iProperty.InventorPropertyName);
+            }
+            else
+            {
+                // Для остальных шаблонов ищем в ресурсах
+                template = FindResource(templateName) as DataTemplate ?? throw new ResourceReferenceKeyNotFoundException($"Шаблон {templateName} не найден", templateName);
+            }
+            
             var templateColumn = new DataGridTemplateColumn
             {
                 Header = iProperty.ColumnHeader,
-                CellTemplate = FindResource(templateName) as DataTemplate,
+                CellTemplate = template,
                 SortMemberPath = isSortable ? iProperty.InventorPropertyName : null,
                 IsReadOnly = !templateName.StartsWith("Editable")
             };
