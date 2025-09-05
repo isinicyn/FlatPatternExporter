@@ -117,6 +117,16 @@ public static class PropertyMetadataRegistry
             RoundingDecimals = 1,
             IsTokenizable = true
         },
+        ["HasFlatPattern"] = new PropertyDefinition
+        {
+            InternalName = "HasFlatPattern",
+            DisplayName = "Наличие развертки",
+            ColumnHeader = "Развертка",
+            Category = "Документ",
+            Type = PropertyType.Document,
+            IsSortable = true,
+            IsSearchable = false
+        },
         ["Preview"] = new PropertyDefinition
         {
             InternalName = "Preview",
