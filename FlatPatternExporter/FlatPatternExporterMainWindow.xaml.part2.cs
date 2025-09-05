@@ -1442,10 +1442,19 @@ public partial class FlatPatternExporterMainWindow : Window
     /// </summary>
     private DataGridTextColumn CreateTextColumn(string header, string bindingPath, bool isSortable = true)
     {
+        var binding = new Binding(bindingPath);
+        
+        if (PropertyMetadataRegistry.Properties.TryGetValue(bindingPath, out var propertyDef) && 
+            propertyDef.RequiresRounding)
+        {
+            var formatString = $"F{propertyDef.RoundingDecimals}";
+            binding.StringFormat = formatString;
+        }
+        
         return new DataGridTextColumn
         {
             Header = header,
-            Binding = new Binding(bindingPath),
+            Binding = binding,
             SortMemberPath = isSortable ? bindingPath : null,
             ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style,
             IsReadOnly = true
