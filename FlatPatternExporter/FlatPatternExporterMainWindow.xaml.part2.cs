@@ -28,8 +28,8 @@ public partial class FlatPatternExporterMainWindow : Window
         partData.FileName = mgr.GetFileName();
         partData.FullFileName = mgr.GetFullFileName();
         partData.ModelState = mgr.GetModelState();
-        partData.Thickness = mgr.GetThickness();
         partData.HasFlatPattern = mgr.HasFlatPattern();
+        partData.Thickness = mgr.GetThickness();
 
         // Устанавливаем состояния выражений для всех редактируемых свойств
         SetExpressionStatesForAllProperties(partData, mgr);
@@ -40,7 +40,11 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             var value = mgr.GetMappedProperty(property.InternalName);
             var propInfo = typeof(PartData).GetProperty(property.InternalName);
-            propInfo?.SetValue(partData, value);
+            
+            if (propInfo != null && !string.IsNullOrEmpty(value))
+            {
+                propInfo.SetValue(partData, value);
+            }
         }
     }
 
@@ -896,7 +900,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 if (!Directory.Exists(materialDir)) Directory.CreateDirectory(materialDir);
 
                 var thicknessDir = OrganizeByThickness
-                    ? Path.Combine(materialDir, thickness.ToString("F1"))
+                    ? Path.Combine(materialDir, thickness)
                     : materialDir;
                 if (!Directory.Exists(thicknessDir)) Directory.CreateDirectory(thicknessDir);
 
@@ -1443,13 +1447,6 @@ public partial class FlatPatternExporterMainWindow : Window
     private DataGridTextColumn CreateTextColumn(string header, string bindingPath, bool isSortable = true)
     {
         var binding = new Binding(bindingPath);
-        
-        if (PropertyMetadataRegistry.Properties.TryGetValue(bindingPath, out var propertyDef) && 
-            propertyDef.RequiresRounding)
-        {
-            var formatString = $"F{propertyDef.RoundingDecimals}";
-            binding.StringFormat = formatString;
-        }
         
         return new DataGridTextColumn
         {

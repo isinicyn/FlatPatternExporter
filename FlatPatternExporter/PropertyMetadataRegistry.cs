@@ -624,4 +624,21 @@ public static class PropertyMetadataRegistry
         return tokens;
     }
 
+    /// <summary>
+    /// Централизованное форматирование числовых значений согласно метаданным
+    /// </summary>
+    public static string FormatValue(string propertyName, object? value)
+    {
+        if (value == null) return "";
+
+        if (Properties.TryGetValue(propertyName, out var propertyDef) && 
+            propertyDef.RequiresRounding && 
+            value is double dValue)
+        {
+            return Math.Round(dValue, propertyDef.RoundingDecimals).ToString($"F{propertyDef.RoundingDecimals}");
+        }
+
+        return value.ToString() ?? "";
+    }
+
 }

@@ -96,10 +96,10 @@ public class PropertyManager
             }
             if (definition != null)
             {
-                // Округляем числовые значения
+                // Применяем округление для числовых значений через централизованный метод
                 if (definition.RequiresRounding && double.TryParse(result, out var numericValue))
                 {
-                    result = Math.Round(numericValue, definition.RoundingDecimals).ToString($"F{definition.RoundingDecimals}");
+                    result = PropertyMetadataRegistry.FormatValue(ourName, numericValue);
                 }
 
                 // Применяем сопоставления значений
@@ -215,7 +215,7 @@ public class PropertyManager
     /// <summary>
     /// Получает толщину листового металла (только для деталей из листового металла)
     /// </summary>
-    public double GetThickness()
+    public string GetThickness()
     {
         try
         {
@@ -223,20 +223,17 @@ public class PropertyManager
             {
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
                 var thicknessParam = smCompDef.Thickness;
-                PropertyMetadataRegistry.PropertyDefinition? definition = null;
-                if (PropertyMetadataRegistry.Properties.TryGetValue("Thickness", out var def))
-                {
-                    definition = def;
-                }
-                var decimals = definition?.RoundingDecimals ?? 1;
-                return Math.Round((double)thicknessParam.Value * 10, decimals); // Переводим в мм и округляем
+                var thicknessValue = (double)thicknessParam.Value * 10; // Переводим в мм
+                
+                // Используем централизованное форматирование
+                return PropertyMetadataRegistry.FormatValue("Thickness", thicknessValue);
             }
-            return 0.0;
+            return "0.0";
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Ошибка получения толщины: {ex.Message}");
-            return 0.0;
+            return "0.0";
         }
     }
 

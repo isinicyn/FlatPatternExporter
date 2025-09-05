@@ -55,15 +55,7 @@ public class TokenService : INotifyPropertyChanged
             resolvers[tokenName] = partData =>
             {
                 var value = property.GetValue(partData);
-                if (value == null) return "";
-                
-                // Используем стандартное форматирование
-                if (prop.RequiresRounding && value is double dValue)
-                {
-                    return dValue.ToString($"F{prop.RoundingDecimals}");
-                }
-                
-                return value.ToString() ?? "";
+                return PropertyMetadataRegistry.FormatValue(prop.InternalName, value);
             };
         }
         

@@ -1881,7 +1881,7 @@ public class PartData : INotifyPropertyChanged
     public BitmapImage? Preview { get; set; }
     public bool HasFlatPattern { get; set; }
     public string Material { get; set; } = "";
-    public double Thickness { get; set; }
+    public string Thickness { get; set; } = "";
     public string PartNumber { get; set; } = "";
     public string Description { get; set; } = "";
     public string Author { get; set; } = "";
