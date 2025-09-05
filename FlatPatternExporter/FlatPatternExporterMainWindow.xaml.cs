@@ -1854,48 +1854,48 @@ public class PartData : INotifyPropertyChanged
 {
     private int item;
 
-    public string FileName { get; set; } = string.Empty;
-    public string FullFileName { get; set; } = string.Empty;
-    public string ModelState { get; set; } = string.Empty;
+    public string FileName { get; set; } = "";
+    public string FullFileName { get; set; } = "";
+    public string ModelState { get; set; } = "";
     public BitmapImage? Preview { get; set; }
-    public bool HasFlatPattern { get; set; } = false;
-    public string Material { get; set; } = string.Empty;
-    public double Thickness { get; set; } = 0.0;
-    public string PartNumber { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string Author { get; set; } = string.Empty;
-    public string Revision { get; set; } = string.Empty;
-    public string Project { get; set; } = string.Empty;
-    public string StockNumber { get; set; } = string.Empty;
-    public string Title { get; set; } = string.Empty;
-    public string Subject { get; set; } = string.Empty;
-    public string Keywords { get; set; } = string.Empty;
-    public string Comments { get; set; } = string.Empty;
-    public string Category { get; set; } = string.Empty;
-    public string Manager { get; set; } = string.Empty;
-    public string Company { get; set; } = string.Empty;
-    public string CreationTime { get; set; } = string.Empty;
-    public string CostCenter { get; set; } = string.Empty;
-    public string CheckedBy { get; set; } = string.Empty;
-    public string EngApprovedBy { get; set; } = string.Empty;
-    public string UserStatus { get; set; } = string.Empty;
-    public string CatalogWebLink { get; set; } = string.Empty;
-    public string Vendor { get; set; } = string.Empty;
-    public string MfgApprovedBy { get; set; } = string.Empty;
-    public string DesignStatus { get; set; } = string.Empty;
-    public string Designer { get; set; } = string.Empty;
-    public string Engineer { get; set; } = string.Empty;
-    public string Authority { get; set; } = string.Empty;
-    public string Mass { get; set; } = string.Empty;
-    public string SurfaceArea { get; set; } = string.Empty;
-    public string Volume { get; set; } = string.Empty;
-    public string SheetMetalRule { get; set; } = string.Empty;
-    public string FlatPatternWidth { get; set; } = string.Empty;
-    public string FlatPatternLength { get; set; } = string.Empty;
-    public string FlatPatternArea { get; set; } = string.Empty;
-    public string Appearance { get; set; } = string.Empty;
+    public bool HasFlatPattern { get; set; }
+    public string Material { get; set; } = "";
+    public double Thickness { get; set; }
+    public string PartNumber { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Author { get; set; } = "";
+    public string Revision { get; set; } = "";
+    public string Project { get; set; } = "";
+    public string StockNumber { get; set; } = "";
+    public string Title { get; set; } = "";
+    public string Subject { get; set; } = "";
+    public string Keywords { get; set; } = "";
+    public string Comments { get; set; } = "";
+    public string Category { get; set; } = "";
+    public string Manager { get; set; } = "";
+    public string Company { get; set; } = "";
+    public string CreationTime { get; set; } = "";
+    public string CostCenter { get; set; } = "";
+    public string CheckedBy { get; set; } = "";
+    public string EngApprovedBy { get; set; } = "";
+    public string UserStatus { get; set; } = "";
+    public string CatalogWebLink { get; set; } = "";
+    public string Vendor { get; set; } = "";
+    public string MfgApprovedBy { get; set; } = "";
+    public string DesignStatus { get; set; } = "";
+    public string Designer { get; set; } = "";
+    public string Engineer { get; set; } = "";
+    public string Authority { get; set; } = "";
+    public string Mass { get; set; } = "";
+    public string SurfaceArea { get; set; } = "";
+    public string Volume { get; set; } = "";
+    public string SheetMetalRule { get; set; } = "";
+    public string FlatPatternWidth { get; set; } = "";
+    public string FlatPatternLength { get; set; } = "";
+    public string FlatPatternArea { get; set; } = "";
+    public string Appearance { get; set; } = "";
 
-    private Dictionary<string, string> userDefinedProperties = new();
+    private Dictionary<string, string> userDefinedProperties = [];
 
     private int quantity;
     public int OriginalQuantity { get; set; }
@@ -1970,15 +1970,13 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    private readonly Dictionary<string, bool> _isExpressionFlags = new();
+    private readonly Dictionary<string, bool> _isExpressionFlags = [];
 
     /// <summary>
     /// Проверяет, является ли указанное свойство выражением
     /// </summary>
-    public bool IsPropertyExpression(string propertyName)
-    {
-        return _isExpressionFlags.TryGetValue(propertyName, out var isExpression) && isExpression;
-    }
+    public bool IsPropertyExpression(string propertyName) => 
+        _isExpressionFlags.TryGetValue(propertyName, out var isExpression) && isExpression;
 
     /// <summary>
     /// Устанавливает состояние выражения для свойства
@@ -2029,25 +2027,17 @@ public class PartData : INotifyPropertyChanged
     // Реализация интерфейса INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public void OnPropertyChanged([CallerMemberName] string? name = null)
-    {
+    public void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
 
     // Методы для работы с пользовательскими свойствами
     public void AddUserDefinedProperty(string propertyName, string propertyValue)
     {
-        if (UserDefinedProperties.ContainsKey(propertyName))
-            UserDefinedProperties[propertyName] = propertyValue;
-        else
-            UserDefinedProperties.Add(propertyName, propertyValue);
-
+        UserDefinedProperties[propertyName] = propertyValue;
         OnPropertyChanged(nameof(UserDefinedProperties));
     }
-    public void RemoveUserDefinedProperty(string propertyName)
-    {
+    public void RemoveUserDefinedProperty(string propertyName) => 
         userDefinedProperties.Remove(propertyName);
-    }
 
 }
 
