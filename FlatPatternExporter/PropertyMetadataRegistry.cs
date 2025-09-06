@@ -546,6 +546,28 @@ public static class PropertyMetadataRegistry
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Appearance"
+        },
+        ["Density"] = new PropertyDefinition
+        {
+            InternalName = "Density",
+            DisplayName = "Плотность",
+            ColumnHeader = "Плотность",
+            Category = "Физические свойства",
+            Type = PropertyType.IProperty,
+            PropertySetName = "Design Tracking Properties",
+            InventorPropertyName = "Density",
+            RequiresRounding = true,
+            RoundingDecimals = 4
+        },
+        ["LastUpdatedWith"] = new PropertyDefinition
+        {
+            InternalName = "LastUpdatedWith",
+            DisplayName = "Версия Inventor",
+            ColumnHeader = "Версия Inventor",
+            Category = "Техническая документация",
+            Type = PropertyType.IProperty,
+            PropertySetName = "Design Tracking Properties",
+            InventorPropertyName = "Last Updated With"
         }
     };
 

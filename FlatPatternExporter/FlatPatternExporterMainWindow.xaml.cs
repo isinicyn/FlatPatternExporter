@@ -1915,6 +1915,8 @@ public class PartData : INotifyPropertyChanged
     public string FlatPatternLength { get; set; } = "";
     public string FlatPatternArea { get; set; } = "";
     public string Appearance { get; set; } = "";
+    public string Density { get; set; } = "";
+    public string LastUpdatedWith { get; set; } = "";
 
     private Dictionary<string, string> userDefinedProperties = [];
 
