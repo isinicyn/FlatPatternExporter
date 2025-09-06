@@ -245,7 +245,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
 
         // Инициализация предустановленных колонок на основе PropertyMapping
-        PresetIProperties = PropertyManager.GetPresetProperties();
+        PresetIProperties = PropertyMetadataRegistry.GetPresetProperties();
 
         // Устанавливаем DataContext для текущего окна
         DataContext = this;

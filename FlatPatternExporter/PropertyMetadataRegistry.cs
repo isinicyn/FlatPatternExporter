@@ -706,4 +706,50 @@ public static class PropertyMetadataRegistry
         return IsUserDefinedProperty(internalName) ? internalName.Substring(4) : internalName;
     }
 
+    /// <summary>
+    /// Получает список предустановленных свойств iProperty из централизованной системы метаданных
+    /// </summary>
+    public static ObservableCollection<PresetIProperty> GetPresetProperties()
+    {
+        var presetProperties = new ObservableCollection<PresetIProperty>();
+
+        // Добавляем стандартные свойства
+        foreach (var prop in Properties.Values.OrderBy(p => p.Category).ThenBy(p => p.DisplayName))
+        {
+            presetProperties.Add(new PresetIProperty
+            {
+                ColumnHeader = prop.ColumnHeader.Length > 0 ? prop.ColumnHeader : prop.DisplayName,
+                ListDisplayName = prop.DisplayName,
+                InventorPropertyName = prop.InternalName,
+                Category = prop.Category
+            });
+        }
+
+        // Добавляем пользовательские свойства
+        foreach (var userProp in UserDefinedProperties.OrderBy(p => p.DisplayName))
+        {
+            presetProperties.Add(new PresetIProperty
+            {
+                ColumnHeader = userProp.ColumnHeader.Length > 0 ? userProp.ColumnHeader : userProp.DisplayName,
+                ListDisplayName = userProp.DisplayName,
+                InventorPropertyName = userProp.InternalName,
+                Category = userProp.Category
+            });
+        }
+
+        return presetProperties;
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию всех редактируемых свойств из реестра
+    /// </summary>
+    public static IEnumerable<string> GetEditableProperties()
+    {
+        // Возвращаем только известные редактируемые свойства из реестра
+        // Пользовательские свойства не включаются, так как они добавляются динамически
+        return Properties.Values
+            .Where(p => p.IsEditable)
+            .Select(p => p.InternalName);
+    }
+
 }

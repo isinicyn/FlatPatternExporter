@@ -99,7 +99,7 @@ public partial class FlatPatternExporterMainWindow : Window
         partData.BeginExpressionBatch();
         try
         {
-            foreach (var property in PropertyManager.GetEditableProperties())
+            foreach (var property in PropertyMetadataRegistry.GetEditableProperties())
             {
                 var isExpression = mgr.IsMappedPropertyExpression(property);
                 partData.SetPropertyExpressionState(property, isExpression);
