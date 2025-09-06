@@ -112,7 +112,8 @@ public partial class SelectIPropertyWindow : Window
                         ListDisplayName = userProperty.DisplayName,
                         InventorPropertyName = userProperty.InventorPropertyName ?? userDefinedPropertyName,
                         Category = userProperty.Category,
-                        IsAdded = false // Не помечаем как добавленное, так как колонка не создается
+                        IsAdded = false, // Не помечаем как добавленное, так как колонка не создается
+                        IsUserDefined = true // Помечаем как пользовательское свойство
                     };
                     
                     PresetIProperties.Add(newUserProperty);
@@ -138,7 +139,8 @@ public partial class SelectIPropertyWindow : Window
                         ColumnHeader = userProperty.ColumnHeader,
                         ListDisplayName = userProperty.DisplayName,
                         InventorPropertyName = userProperty.InternalName,
-                        Category = userProperty.Category
+                        Category = userProperty.Category,
+                        IsUserDefined = true
                     };
 
                     PresetIProperties.Add(presetProperty);
@@ -150,11 +152,7 @@ public partial class SelectIPropertyWindow : Window
         {
             if (sender is Button button && button.Tag is PresetIProperty property)
             {
-                // Проверяем, является ли это пользовательским свойством
-                var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(property.ColumnHeader);
-                bool isUserDefined = !string.IsNullOrEmpty(internalName) && PropertyMetadataRegistry.IsUserDefinedProperty(internalName);
-                
-                if (isUserDefined)
+                if (property.IsUserDefined)
                 {
                     // Для пользовательских свойств показываем контекстное меню
                     button.ContextMenu.PlacementTarget = button;

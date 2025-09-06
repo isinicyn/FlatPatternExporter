@@ -102,7 +102,12 @@
                                         <Style TargetType="Button" BasedOn="{StaticResource ResetButtonStyle}">
                                             <Setter Property="Visibility" Value="Collapsed"/>
                                             <Style.Triggers>
+                                                <!-- Показываем кнопку для добавленных колонок -->
                                                 <DataTrigger Binding="{Binding IsAdded}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                                <!-- Показываем кнопку для пользовательских свойств всегда -->
+                                                <DataTrigger Binding="{Binding IsUserDefined}" Value="True">
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -112,8 +117,18 @@
                                         <ContextMenu>
                                             <MenuItem Header="Удалить только колонку" 
                                                      Click="RemoveColumnOnlyMenuItem_Click" 
-                                                     Tag="{Binding}"/>
-                                            <MenuItem Header="Удалить колонку и свойство" 
+                                                     Tag="{Binding}">
+                                                <MenuItem.Style>
+                                                    <Style TargetType="MenuItem">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsAdded}" Value="False">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </MenuItem.Style>
+                                            </MenuItem>
+                                            <MenuItem Header="Удалить свойство из реестра" 
                                                      Click="RemoveColumnAndPropertyMenuItem_Click" 
                                                      Tag="{Binding}"/>
                                         </ContextMenu>

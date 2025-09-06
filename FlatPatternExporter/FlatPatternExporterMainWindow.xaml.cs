@@ -2153,6 +2153,7 @@ public class PresetIProperty : INotifyPropertyChanged
     public string ListDisplayName { get; set; } = string.Empty; // Отображение в списке выбора свойств (например, "Обозначение")
     public string InventorPropertyName { get; set; } = string.Empty; // Соответствующее имя свойства iProperty в Inventor (например, "PartNumber")
     public string Category { get; set; } = string.Empty; // Категория свойства для группировки
+    public bool IsUserDefined { get; set; } = false; // Является ли это пользовательским свойством
 
     private bool _isAdded;
     public bool IsAdded
