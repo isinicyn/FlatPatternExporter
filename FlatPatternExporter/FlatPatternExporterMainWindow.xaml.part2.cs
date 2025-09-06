@@ -1494,7 +1494,8 @@ public partial class FlatPatternExporterMainWindow : Window
             Header = columnHeader,
             CellTemplate = template,
             SortMemberPath = $"UserDefinedProperties[{columnHeader}]",
-            IsReadOnly = false
+            IsReadOnly = false,
+            ClipboardContentBinding = new Binding($"UserDefinedProperties[{columnHeader}]")
         };
 
         column.CellStyle = CreateCellTagStyle($"UserDefinedProperties[{columnHeader}]");

@@ -1066,7 +1066,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 Header = iProperty.ColumnHeader,
                 CellTemplate = template,
                 SortMemberPath = isSortable ? iProperty.InventorPropertyName : null,
-                IsReadOnly = !templateName.StartsWith("Editable")
+                IsReadOnly = !templateName.StartsWith("Editable"),
+                ClipboardContentBinding = new Binding(iProperty.InventorPropertyName)
             };
 
             // Передаём путь свойства через Tag ячейки для универсального шаблона

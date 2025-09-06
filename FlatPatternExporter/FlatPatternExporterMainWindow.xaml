@@ -569,6 +569,7 @@
                       HorizontalGridLinesBrush="{StaticResource GridLinesBrush}"
                       VerticalGridLinesBrush="{StaticResource GridLinesBrush}"
                       SelectionMode="Extended"
+                      ClipboardCopyMode="IncludeHeader"
                       AlternationCount="2"
                       EnableRowVirtualization="False"
                       SelectionChanged="PartsDataGrid_SelectionChanged"
