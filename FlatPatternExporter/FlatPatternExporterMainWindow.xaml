@@ -346,6 +346,7 @@
                                 <TextBlock Text="Доступные свойства:" Style="{StaticResource SectionHeaderTextStyle}"/>
                                     <ListBox x:Name="AvailableTokensListBox" 
                                          ItemsSource="{Binding AvailableTokens}" 
+                                         DisplayMemberPath="DisplayName"
                                          Style="{StaticResource TokenListBoxStyle}"
                                          MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="{StaticResource LargeElementHeight}" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
 

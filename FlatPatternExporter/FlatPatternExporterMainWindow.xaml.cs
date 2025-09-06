@@ -13,7 +13,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using FlatPatternExporter.Converters;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
@@ -304,7 +303,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
     public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = new();
     public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = new();
-    public ObservableCollection<string> AvailableTokens { get; set; } = new();
+    public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> AvailableTokens { get; set; } = new();
     public ObservableCollection<TemplatePreset> TemplatePresets { get; set; } = new();
 
     private TemplatePreset? _selectedTemplatePreset;
@@ -1740,15 +1739,15 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void InitializeAvailableTokens()
     {
-        AvailableTokens = new ObservableCollection<string>();
+        AvailableTokens = new ObservableCollection<PropertyMetadataRegistry.PropertyDefinition>();
         
         // Получаем все токенизируемые свойства из централизованного реестра
-        var availableTokens = PropertyMetadataRegistry.GetAvailableTokens();
+        var tokenizableProperties = PropertyMetadataRegistry.GetTokenizableProperties();
         
-        // Добавляем токены в ObservableCollection для UI
-        foreach (var token in availableTokens.OrderBy(t => t.Value))
+        // Добавляем свойства в ObservableCollection для UI
+        foreach (var property in tokenizableProperties.OrderBy(p => p.DisplayName))
         {
-            AvailableTokens.Add(token.Key);
+            AvailableTokens.Add(property);
         }
     }
 
@@ -1865,9 +1864,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private void AvailableTokensListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         var listBox = sender as System.Windows.Controls.ListBox;
-        if (listBox?.SelectedItem is string selectedToken)
+        if (listBox?.SelectedItem is PropertyMetadataRegistry.PropertyDefinition selectedProperty)
         {
-            TokenService?.AddToken($"{{{selectedToken}}}");
+            TokenService?.AddToken($"{{{selectedProperty.InternalName}}}");
         }
     }
 }
@@ -2055,19 +2054,18 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-
     public int Quantity
     {
         get => quantity;
         set
         {
-            System.Diagnostics.Debug.WriteLine($"PartData.Quantity setter: PartNumber={PartNumber}, OldValue={quantity}, NewValue={value}, IsOverridden={IsOverridden}");
+            Debug.WriteLine($"PartData.Quantity setter: PartNumber={PartNumber}, OldValue={quantity}, NewValue={value}, IsOverridden={IsOverridden}");
             if (value > 0 && quantity != value)
             {
                 quantity = value;
                 IsOverridden = value != OriginalQuantity;
                 IsMultiplied = false;
-                System.Diagnostics.Debug.WriteLine($"PartData.Quantity setter: Setting IsOverridden={IsOverridden} for {PartNumber}");
+                Debug.WriteLine($"PartData.Quantity setter: Setting IsOverridden={IsOverridden} for {PartNumber}");
                 OnPropertyChanged();
             }
             else if (value > 0)
@@ -2080,12 +2078,10 @@ public class PartData : INotifyPropertyChanged
 
     internal void SetQuantityInternal(int value)
     {
-        System.Diagnostics.Debug.WriteLine($"PartData.SetQuantityInternal: PartNumber={PartNumber}, OldValue={quantity}, NewValue={value}");
+        Debug.WriteLine($"PartData.SetQuantityInternal: PartNumber={PartNumber}, OldValue={quantity}, NewValue={value}");
         quantity = value;
         OnPropertyChanged(nameof(Quantity));
     }
-
-
 
     // Реализация интерфейса INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;

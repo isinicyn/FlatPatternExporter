@@ -423,7 +423,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
                     <Border x:Name="TokenBorder" Style="{StaticResource TokenBlockStyle}">
-                        <TextBlock Text="{Binding}" Style="{StaticResource TokenTextStyle}"/>
+                        <TextBlock Text="{Binding DisplayName}" Style="{StaticResource TokenTextStyle}"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">

@@ -14,6 +14,15 @@ public class TokenElement
     public int EndIndex { get; set; }
     public Border? VisualElement { get; set; }
     public bool IsCustomText { get; set; } = false;
+
+    public string GetDisplayName()
+    {
+        if (IsCustomText) return Name;
+        
+        var property = PropertyMetadataRegistry.Properties.Values
+            .FirstOrDefault(p => p.IsTokenizable && p.InternalName == Name);
+        return property?.DisplayName ?? Name;
+    }
 }
 
 public class TokenService : INotifyPropertyChanged
@@ -319,7 +328,7 @@ public class TokenService : INotifyPropertyChanged
 
         var textBlock = new TextBlock
         {
-            Text = tokenElement.IsCustomText ? $"{tokenElement.Name}" : tokenElement.Name,
+            Text = tokenElement.GetDisplayName(),
             Style = _tokenContainer.FindResource("TokenTextStyle") as Style
         };
 

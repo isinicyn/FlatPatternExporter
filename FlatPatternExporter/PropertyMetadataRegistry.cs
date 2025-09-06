@@ -30,7 +30,7 @@ public static class PropertyMetadataRegistry
         
         // Вычисляемые свойства
         public string TokenName => IsTokenizable ? InternalName : "";
-        public string PlaceholderValue => IsTokenizable ? $"{{{InternalName}}}" : "";
+        public string PlaceholderValue => IsTokenizable ? $"{{{DisplayName}}}" : "";
     }
 
     /// <summary>
