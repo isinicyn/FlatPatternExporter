@@ -19,9 +19,17 @@ public class TokenElement
     {
         if (IsCustomText) return Name;
         
+        // Сначала ищем в предопределенных свойствах
         var property = PropertyMetadataRegistry.Properties.Values
-            .FirstOrDefault(p => p.IsTokenizable && p.InternalName == Name);
-        return property?.DisplayName ?? Name;
+            .FirstOrDefault(p => p.IsTokenizable && p.TokenName == Name);
+        if (property != null) return property.DisplayName;
+        
+        // Затем ищем в пользовательских свойствах (TokenName содержит префикс UDP_)
+        var userProperty = PropertyMetadataRegistry.UserDefinedProperties
+            .FirstOrDefault(p => p.IsTokenizable && p.TokenName == Name);
+        if (userProperty != null) return userProperty.DisplayName;
+        
+        return Name;
     }
 }
 
@@ -29,7 +37,7 @@ public class TokenService : INotifyPropertyChanged
 {
     private static readonly Regex TokenRegex = new(@"\{(\w+)\}", RegexOptions.Compiled);
     private static readonly Regex CustomTextRegex = new(@"\{CUSTOM:([^}]+)\}", RegexOptions.Compiled);
-    private readonly Dictionary<string, Func<PartData, string>> _tokenResolvers;
+    private Dictionary<string, Func<PartData, string>> _tokenResolvers;
     private IList<PartData> _partsData;
     private List<TokenElement> _tokenElements = new();
     private WrapPanel? _tokenContainer;
@@ -44,6 +52,21 @@ public class TokenService : INotifyPropertyChanged
     {
         _partsData = new List<PartData>();
         _tokenResolvers = BuildTokenResolvers();
+        
+        // Подписываемся на изменения в коллекции пользовательских свойств
+        PropertyMetadataRegistry.UserDefinedProperties.CollectionChanged += (s, e) =>
+        {
+            RefreshTokenResolvers();
+        };
+    }
+    
+    /// <summary>
+    /// Обновляет резолверы токенов при изменении пользовательских свойств
+    /// </summary>
+    public void RefreshTokenResolvers()
+    {
+        _tokenResolvers = BuildTokenResolvers();
+        UpdatePreview();
     }
 
     private Dictionary<string, Func<PartData, string>> BuildTokenResolvers()
@@ -56,16 +79,34 @@ public class TokenService : INotifyPropertyChanged
             var tokenName = prop.TokenName;
             if (string.IsNullOrEmpty(tokenName)) continue;
             
-            // Находим свойство в PartData
-            var property = partDataType.GetProperty(prop.InternalName);
-            if (property == null || !property.CanRead) continue;
-            
-            // Создаем резолвер
-            resolvers[tokenName] = partData =>
+            // Для User Defined Properties используем другой подход
+            if (prop.Type == PropertyMetadataRegistry.PropertyType.UserDefined)
             {
-                var value = property.GetValue(partData);
-                return PropertyMetadataRegistry.FormatValue(prop.InternalName, value);
-            };
+                // User Defined Properties хранятся в словаре UserDefinedProperties
+                // TokenName содержит префикс UDP_ для уникальности
+                resolvers[tokenName] = partData =>
+                {
+                    if (partData.UserDefinedProperties != null && 
+                        partData.UserDefinedProperties.TryGetValue(prop.InventorPropertyName!, out var value))
+                    {
+                        return value?.ToString() ?? "";
+                    }
+                    return "";
+                };
+            }
+            else
+            {
+                // Находим свойство в PartData
+                var property = partDataType.GetProperty(prop.InternalName);
+                if (property == null || !property.CanRead) continue;
+                
+                // Создаем резолвер
+                resolvers[tokenName] = partData =>
+                {
+                    var value = property.GetValue(partData);
+                    return PropertyMetadataRegistry.FormatValue(prop.InternalName, value);
+                };
+            }
         }
         
         return resolvers;

@@ -304,6 +304,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = new();
     public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = new();
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> AvailableTokens { get; set; } = new();
+    public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> UserDefinedTokens { get; set; } = new();
     public ObservableCollection<TemplatePreset> TemplatePresets { get; set; } = new();
 
     private TemplatePreset? _selectedTemplatePreset;
@@ -1011,10 +1012,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 var propInfo = typeof(PartData).GetProperty(metadata.InternalName);
                 searchValue = propInfo?.GetValue(partData)?.ToString();
             }
-            // Получаем значение из пользовательского свойства  
-            else if (partData.UserDefinedProperties.ContainsKey(columnHeader))
+            // Получаем значение из пользовательского свойства
+            // Находим User Defined Property по ColumnHeader
+            var userProp = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeader);
+            if (userProp != null && partData.UserDefinedProperties.ContainsKey(userProp.InventorPropertyName!))
             {
-                searchValue = partData.UserDefinedProperties[columnHeader];
+                searchValue = partData.UserDefinedProperties[userProp.InventorPropertyName!];
             }
 
             // Проверяем совпадение
@@ -1728,14 +1731,39 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private void InitializeAvailableTokens()
     {
         AvailableTokens = new ObservableCollection<PropertyMetadataRegistry.PropertyDefinition>();
+        UserDefinedTokens = new ObservableCollection<PropertyMetadataRegistry.PropertyDefinition>();
+        
+        RefreshAvailableTokens();
+        
+        // Подписываемся на изменения в коллекции пользовательских свойств
+        PropertyMetadataRegistry.UserDefinedProperties.CollectionChanged += (s, e) =>
+        {
+            RefreshAvailableTokens();
+        };
+    }
+    
+    private void RefreshAvailableTokens()
+    {
+        AvailableTokens.Clear();
+        UserDefinedTokens.Clear();
         
         // Получаем все токенизируемые свойства из централизованного реестра
         var tokenizableProperties = PropertyMetadataRegistry.GetTokenizableProperties();
         
-        // Добавляем свойства в ObservableCollection для UI
-        foreach (var property in tokenizableProperties.OrderBy(p => p.DisplayName))
+        // Разделяем на стандартные и пользовательские свойства
+        var standardProperties = tokenizableProperties.Where(p => p.Type != PropertyMetadataRegistry.PropertyType.UserDefined).OrderBy(p => p.DisplayName);
+        var userDefinedProperties = tokenizableProperties.Where(p => p.Type == PropertyMetadataRegistry.PropertyType.UserDefined).OrderBy(p => p.DisplayName);
+        
+        // Добавляем стандартные свойства
+        foreach (var property in standardProperties)
         {
             AvailableTokens.Add(property);
+        }
+        
+        // Добавляем пользовательские свойства
+        foreach (var property in userDefinedProperties)
+        {
+            UserDefinedTokens.Add(property);
         }
     }
 
@@ -1849,12 +1877,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    private void AvailableTokensListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private void TokenListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         var listBox = sender as System.Windows.Controls.ListBox;
         if (listBox?.SelectedItem is PropertyMetadataRegistry.PropertyDefinition selectedProperty)
         {
-            TokenService?.AddToken($"{{{selectedProperty.InternalName}}}");
+            TokenService?.AddToken($"{{{selectedProperty.TokenName}}}");
         }
     }
 }

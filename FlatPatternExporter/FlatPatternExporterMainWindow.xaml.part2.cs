@@ -77,7 +77,8 @@ public partial class FlatPatternExporterMainWindow : Window
         foreach (var userDefinedProperty in PropertyMetadataRegistry.UserDefinedProperties)
         {
             var value = mgr.GetMappedProperty(userDefinedProperty.InternalName);
-            partData.UserDefinedProperties[userDefinedProperty.ColumnHeader] = value;
+            // Используем InventorPropertyName как ключ для совместимости с TokenService
+            partData.UserDefinedProperties[userDefinedProperty.InventorPropertyName!] = value;
         }
 
         if (loadThumbnail)
@@ -106,7 +107,7 @@ public partial class FlatPatternExporterMainWindow : Window
             foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
             {
                 var isExpression = mgr.IsMappedPropertyExpression(userProperty.InternalName);
-                partData.SetPropertyExpressionState($"UserDefinedProperties[{userProperty.ColumnHeader}]", isExpression);
+                partData.SetPropertyExpressionState($"UserDefinedProperties[{userProperty.InventorPropertyName}]", isExpression);
             }
         }
         finally
@@ -1417,7 +1418,12 @@ public partial class FlatPatternExporterMainWindow : Window
                 
                 // Устанавливаем состояние выражения для User Defined свойства
                 var isExpression = mgr.IsMappedPropertyExpression(propertyName);
-                partData.SetPropertyExpressionState($"UserDefinedProperties[{columnHeader}]", isExpression);
+                // Находим InventorPropertyName для этого columnHeader
+                var userProp = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeader);
+                if (userProp != null)
+                {
+                    partData.SetPropertyExpressionState($"UserDefinedProperties[{userProp.InventorPropertyName}]", isExpression);
+                }
             }
         }
     }
@@ -1425,9 +1431,14 @@ public partial class FlatPatternExporterMainWindow : Window
     private void RemoveUserDefinedIPropertyColumn(string columnHeaderName)
     {
         // Удаление всех данных, связанных с этим User Defined Property
-        foreach (var partData in _partsData)
-            if (partData.UserDefinedProperties.ContainsKey(columnHeaderName))
-                partData.RemoveUserDefinedProperty(columnHeaderName);
+        // Находим InventorPropertyName для этого columnHeader
+        var userProp = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeaderName);
+        if (userProp != null)
+        {
+            foreach (var partData in _partsData)
+                if (partData.UserDefinedProperties.ContainsKey(userProp.InventorPropertyName!))
+                    partData.RemoveUserDefinedProperty(userProp.InventorPropertyName!);
+        }
 
         // Ищем пользовательское свойство по ColumnHeader для удаления из реестра
         var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeaderName);
@@ -1440,9 +1451,14 @@ public partial class FlatPatternExporterMainWindow : Window
     private void RemoveUserDefinedIPropertyData(string columnHeaderName)
     {
         // Удаление только данных UDP из PartData (без удаления из реестра)
-        foreach (var partData in _partsData)
-            if (partData.UserDefinedProperties.ContainsKey(columnHeaderName))
-                partData.RemoveUserDefinedProperty(columnHeaderName);
+        // Находим InventorPropertyName для этого columnHeader
+        var userProp = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeaderName);
+        if (userProp != null)
+        {
+            foreach (var partData in _partsData)
+                if (partData.UserDefinedProperties.ContainsKey(userProp.InventorPropertyName!))
+                    partData.RemoveUserDefinedProperty(userProp.InventorPropertyName!);
+        }
     }
     
     /// <summary>
@@ -1531,12 +1547,12 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             Header = columnHeader,
             CellTemplate = template,
-            SortMemberPath = $"UserDefinedProperties[{columnHeader}]",
+            SortMemberPath = $"UserDefinedProperties[{propertyName}]",
             IsReadOnly = false,
-            ClipboardContentBinding = new Binding($"UserDefinedProperties[{columnHeader}]")
+            ClipboardContentBinding = new Binding($"UserDefinedProperties[{propertyName}]")
         };
 
-        column.CellStyle = CreateCellTagStyle($"UserDefinedProperties[{columnHeader}]");
+        column.CellStyle = CreateCellTagStyle($"UserDefinedProperties[{propertyName}]");
 
         PartsDataGrid.Columns.Add(column);
 

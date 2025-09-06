@@ -343,12 +343,19 @@
                             <!-- Левая колонка: Источники данных -->
                             <GroupBox Grid.Column="0" Header="Источники данных" Margin="{StaticResource RightSmallMarginThickness}">
                                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
-                                <TextBlock Text="Доступные свойства:" Style="{StaticResource SectionHeaderTextStyle}"/>
+                                <TextBlock Text="Стандартные свойства:" Style="{StaticResource SectionHeaderTextStyle}"/>
                                     <ListBox x:Name="AvailableTokensListBox" 
                                          ItemsSource="{Binding AvailableTokens}" 
                                          DisplayMemberPath="DisplayName"
                                          Style="{StaticResource TokenListBoxStyle}"
-                                         MouseDoubleClick="AvailableTokensListBox_MouseDoubleClick" MinHeight="{StaticResource LargeElementHeight}" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
+                                         MouseDoubleClick="TokenListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
+                                
+                                <TextBlock Text="Пользовательские свойства:" Style="{StaticResource SectionHeaderTextStyle}"/>
+                                    <ListBox x:Name="UserDefinedTokensListBox" 
+                                         ItemsSource="{Binding UserDefinedTokens}" 
+                                         DisplayMemberPath="DisplayName"
+                                         Style="{StaticResource TokenListBoxStyle}"
+                                         MouseDoubleClick="TokenListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
 
                                     <!-- Поле для ввода произвольного текста -->
                                     <TextBlock Text="Произвольный текст:" Style="{StaticResource SectionHeaderTextStyle}"/>

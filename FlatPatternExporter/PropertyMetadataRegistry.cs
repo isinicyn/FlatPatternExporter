@@ -29,6 +29,7 @@ public static class PropertyMetadataRegistry
         public bool IsTokenizable { get; init; } = false;
         
         // Вычисляемые свойства
+        // TokenName для UDP содержит префикс для уникальности (UDP_Author != Author)
         public string TokenName => IsTokenizable ? InternalName : "";
         public string PlaceholderValue => IsTokenizable ? $"{{{DisplayName}}}" : "";
     }
@@ -590,7 +591,8 @@ public static class PropertyMetadataRegistry
             Type = PropertyType.UserDefined,
             PropertySetName = "User Defined Properties",
             InventorPropertyName = propertyName,
-            IsEditable = true
+            IsEditable = true,
+            IsTokenizable = true
         };
     }
 
@@ -624,7 +626,8 @@ public static class PropertyMetadataRegistry
     /// </summary>
     public static IEnumerable<PropertyDefinition> GetTokenizableProperties()
     {
-        return Properties.Values.Where(p => p.IsTokenizable);
+        return Properties.Values.Where(p => p.IsTokenizable)
+            .Concat(UserDefinedProperties.Where(p => p.IsTokenizable));
     }
 
     /// <summary>
