@@ -26,6 +26,7 @@ public record ApplicationSettings
     public const string DefaultSplineTolerance = "0.01";
     
     public List<string> ColumnOrder { get; init; } = [];
+    public List<string> UserDefinedProperties { get; init; } = [];
     
     public bool ExcludeReferenceParts { get; init; } = true;
     public bool ExcludePurchasedParts { get; init; } = true;
@@ -151,9 +152,15 @@ public static class SettingsManager
             })
             .ToList();
 
+        var userDefinedProperties = PropertyMetadataRegistry.UserDefinedProperties
+            .Select(p => p.InventorPropertyName ?? "")
+            .Where(name => !string.IsNullOrEmpty(name))
+            .ToList();
+
         return new ApplicationSettings
         {
             ColumnOrder = [..columnsInDisplayOrder],
+            UserDefinedProperties = userDefinedProperties,
             
             ExcludeReferenceParts = window.ExcludeReferenceParts,
             ExcludePurchasedParts = window.ExcludePurchasedParts,
@@ -248,16 +255,13 @@ public static class SettingsManager
 
         PropertyMetadataRegistry.UserDefinedProperties.Clear();
         
-        var userDefinedPropertyNames = settings.ColumnOrder
-            .Where(PropertyMetadataRegistry.IsUserDefinedProperty)
-            .Select(PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName)
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Distinct()
-            .ToList();
-            
-        foreach (var userProperty in userDefinedPropertyNames)
+        // Загружаем UDP из сохраненного списка
+        foreach (var userProperty in settings.UserDefinedProperties)
         {
-            PropertyMetadataRegistry.AddUserDefinedProperty(userProperty);
+            if (!string.IsNullOrWhiteSpace(userProperty))
+            {
+                PropertyMetadataRegistry.AddUserDefinedProperty(userProperty);
+            }
         }
 
         var presetLookup = window.PresetIProperties.ToLookup(p => PropertyMetadataRegistry.GetInternalNameByColumnHeader(p.ColumnHeader));

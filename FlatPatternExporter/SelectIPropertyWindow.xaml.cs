@@ -49,8 +49,22 @@ public partial class SelectIPropertyWindow : Window
                 // Проверяем, есть ли уже такая колонка
                 if (!_mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == selectedProperty.ColumnHeader))
                 {
-                    // Добавляем колонку в DataGrid
-                    _mainWindow.AddIPropertyColumn(selectedProperty);
+                    // Проверяем, является ли это UDP свойством
+                    var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(selectedProperty.ColumnHeader);
+                    if (!string.IsNullOrEmpty(internalName) && PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
+                    {
+                        // Извлекаем имя свойства из внутреннего имени
+                        var propertyName = PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(internalName);
+                        if (!string.IsNullOrEmpty(propertyName))
+                        {
+                            _mainWindow.AddUserDefinedIPropertyColumn(propertyName);
+                        }
+                    }
+                    else
+                    {
+                        // Обычное свойство
+                        _mainWindow.AddIPropertyColumn(selectedProperty);
+                    }
                     
                     // Обновляем состояние IsAdded
                     selectedProperty.IsAdded = true;
@@ -84,14 +98,6 @@ public partial class SelectIPropertyWindow : Window
                     return;
                 }
 
-                // Проверяем, нет ли уже столбца с таким заголовком
-                if (_mainWindow.PartsDataGrid.Columns.Any(c => c.Header as string == columnHeader))
-                {
-                    MessageBox.Show($"Столбец с именем '{columnHeader}' уже существует.", "Предупреждение",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
                 // Добавляем в реестр пользовательских свойств
                 PropertyMetadataRegistry.AddUserDefinedProperty(userDefinedPropertyName);
 
@@ -106,23 +112,10 @@ public partial class SelectIPropertyWindow : Window
                         ListDisplayName = userProperty.DisplayName,
                         InventorPropertyName = userProperty.InventorPropertyName ?? userDefinedPropertyName,
                         Category = userProperty.Category,
-                        IsAdded = true // Сразу помечаем как добавленное
+                        IsAdded = false // Не помечаем как добавленное, так как колонка не создается
                     };
                     
                     PresetIProperties.Add(newUserProperty);
-
-                    // Отключаем интерфейс Inventor на время операции
-                    _mainWindow.SetInventorUserInterfaceState(true);
-
-                    try
-                    {
-                        // Создаем колонку (данные заполнятся автоматически)
-                        _mainWindow.AddUserDefinedIPropertyColumn(userDefinedPropertyName);
-                    }
-                    finally
-                    {
-                        _mainWindow.SetInventorUserInterfaceState(false);
-                    }
                 }
 
                 // Очищаем текстовое поле
@@ -157,28 +150,50 @@ public partial class SelectIPropertyWindow : Window
         {
             if (sender is Button button && button.Tag is PresetIProperty property)
             {
-                // Находим колонку по заголовку
-                var columnToRemove = _mainWindow.PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == property.ColumnHeader);
-                if (columnToRemove != null)
+                // Проверяем, является ли это пользовательским свойством
+                var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(property.ColumnHeader);
+                bool isUserDefined = !string.IsNullOrEmpty(internalName) && PropertyMetadataRegistry.IsUserDefinedProperty(internalName);
+                
+                if (isUserDefined)
                 {
-                    // Удаляем колонку из DataGrid
-                    _mainWindow.PartsDataGrid.Columns.Remove(columnToRemove);
-                    
-                    // Проверяем, является ли это пользовательским свойством
-                    var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => 
-                        p.ColumnHeader == property.ColumnHeader || p.InventorPropertyName == property.InventorPropertyName);
-                    if (userProperty != null)
-                    {
-                        // Удаляем из реестра по InternalName
-                        PropertyMetadataRegistry.RemoveUserDefinedProperty(userProperty.InternalName);
-                        
-                        // Удаляем из основной коллекции
-                        PresetIProperties.Remove(property);
-                    }
-                    
-                    // Обновляем состояние IsAdded
-                    property.IsAdded = false;
+                    // Для пользовательских свойств показываем контекстное меню
+                    button.ContextMenu.PlacementTarget = button;
+                    button.ContextMenu.IsOpen = true;
+                }
+                else
+                {
+                    // Для обычных свойств просто удаляем колонку
+                    RemoveColumn(property);
                 }
             }
+        }
+        
+        private void RemoveColumnOnlyMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Tag is PresetIProperty property)
+            {
+                // Удаляем только колонку, данные UDP остаются
+                _mainWindow.RemoveDataGridColumn(property.ColumnHeader, removeDataOnly: true);
+                property.IsAdded = false;
+            }
+        }
+        
+        private void RemoveColumnAndPropertyMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Tag is PresetIProperty property)
+            {
+                // Полное удаление колонки и UDP свойства
+                _mainWindow.RemoveDataGridColumn(property.ColumnHeader, removeDataOnly: false);
+                
+                // Удаляем из основной коллекции
+                PresetIProperties.Remove(property);
+            }
+        }
+        
+        private void RemoveColumn(PresetIProperty property)
+        {
+            // Удаляем только колонку для обычных свойств
+            _mainWindow.RemoveDataGridColumn(property.ColumnHeader, removeDataOnly: true);
+            property.IsAdded = false;
         }
 }

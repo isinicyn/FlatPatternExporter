@@ -1177,20 +1177,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var columnName = _reorderingColumn.Header.ToString();
             if (string.IsNullOrEmpty(columnName)) return;
 
-            // Убираем колонку из DataGrid
-            var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == columnName);
-            if (columnToRemove != null)
-            {
-                PartsDataGrid.Columns.Remove(columnToRemove);
-
-                // Удаляем кастомное свойство из списка и данных деталей
-                RemoveUserDefinedIPropertyColumn(columnName);
-
-                // Обновляем состояние свойств в окне выбора
-                var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>()
-                    .FirstOrDefault();
-                selectIPropertyWindow?.UpdatePropertyStates();
-            }
+            // Используем централизованный метод с removeDataOnly=true для Adorner
+            RemoveDataGridColumn(columnName, removeDataOnly: true);
         }
 
         _reorderingColumn = null;

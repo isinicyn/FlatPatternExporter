@@ -1424,10 +1424,6 @@ public partial class FlatPatternExporterMainWindow : Window
 
     private void RemoveUserDefinedIPropertyColumn(string columnHeaderName)
     {
-        // Удаление столбца из DataGrid по заголовку
-        var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header as string == columnHeaderName);
-        if (columnToRemove != null) PartsDataGrid.Columns.Remove(columnToRemove);
-
         // Удаление всех данных, связанных с этим User Defined Property
         foreach (var partData in _partsData)
             if (partData.UserDefinedProperties.ContainsKey(columnHeaderName))
@@ -1439,6 +1435,48 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             PropertyMetadataRegistry.RemoveUserDefinedProperty(userProperty.InternalName);
         }
+    }
+    
+    private void RemoveUserDefinedIPropertyData(string columnHeaderName)
+    {
+        // Удаление только данных UDP из PartData (без удаления из реестра)
+        foreach (var partData in _partsData)
+            if (partData.UserDefinedProperties.ContainsKey(columnHeaderName))
+                partData.RemoveUserDefinedProperty(columnHeaderName);
+    }
+    
+    /// <summary>
+    /// Централизованный метод для удаления колонки из DataGrid
+    /// </summary>
+    public void RemoveDataGridColumn(string columnHeaderName, bool removeDataOnly = false)
+    {
+        // Удаляем колонку из DataGrid
+        var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == columnHeaderName);
+        if (columnToRemove != null)
+        {
+            PartsDataGrid.Columns.Remove(columnToRemove);
+        }
+
+        // Проверяем, является ли это UDP свойством
+        var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(columnHeaderName);
+        if (!string.IsNullOrEmpty(internalName) && PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
+        {
+            if (removeDataOnly)
+            {
+                // Только удаляем данные UDP (для Adorner)
+                RemoveUserDefinedIPropertyData(columnHeaderName);
+            }
+            else
+            {
+                // Полное удаление UDP (для SelectIPropertyWindow)
+                RemoveUserDefinedIPropertyColumn(columnHeaderName);
+            }
+        }
+
+        // Обновляем состояние свойств в окне выбора
+        var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>()
+            .FirstOrDefault();
+        selectIPropertyWindow?.UpdatePropertyStates();
     }
 
     /// <summary>

@@ -108,6 +108,16 @@
                                             </Style.Triggers>
                                         </Style>
                                     </Button.Style>
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Удалить только колонку" 
+                                                     Click="RemoveColumnOnlyMenuItem_Click" 
+                                                     Tag="{Binding}"/>
+                                            <MenuItem Header="Удалить колонку и свойство" 
+                                                     Click="RemoveColumnAndPropertyMenuItem_Click" 
+                                                     Tag="{Binding}"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
                                 </Button>
                             </Grid>
                         </Border>
