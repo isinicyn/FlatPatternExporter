@@ -26,7 +26,6 @@ public record ApplicationSettings
     public const string DefaultSplineTolerance = "0.01";
     
     public List<string> ColumnOrder { get; init; } = [];
-    public List<string> UserDefinedProperties { get; init; } = [];
     
     public bool ExcludeReferenceParts { get; init; } = true;
     public bool ExcludePurchasedParts { get; init; } = true;
@@ -124,9 +123,12 @@ public static class SettingsManager
     public static ApplicationSettings CreateSettingsFromMainWindow(FlatPatternExporterMainWindow window)
     {
         var columnsInDisplayOrder = window.PartsDataGrid.Columns
-            .Where(c => c.Header is string headerValue && !string.IsNullOrEmpty(headerValue))
+            .Where(c => c.Header is string { Length: > 0 })
             .OrderBy(c => c.DisplayIndex)
             .Select(c => (string)c.Header)
+            .Select(columnHeader => PropertyMetadataRegistry.GetInternalNameByColumnHeader(columnHeader))
+            .Where(internalName => !string.IsNullOrEmpty(internalName))
+            .Cast<string>()
             .ToList();
 
         var templatePresets = window.TemplatePresets
@@ -152,7 +154,6 @@ public static class SettingsManager
         return new ApplicationSettings
         {
             ColumnOrder = [..columnsInDisplayOrder],
-            UserDefinedProperties = [..PropertyMetadataRegistry.UserDefinedProperties.Select(p => p.InventorPropertyName)],
             
             ExcludeReferenceParts = window.ExcludeReferenceParts,
             ExcludePurchasedParts = window.ExcludePurchasedParts,
@@ -191,6 +192,12 @@ public static class SettingsManager
 
     public static void ApplySettingsToMainWindow(ApplicationSettings settings, FlatPatternExporterMainWindow window)
     {
+        if (settings.ColumnOrder.Count == 0)
+        {
+            Debug.WriteLine("Warning: No columns to restore from settings");
+            return;
+        }
+
         window.ExcludeReferenceParts = settings.ExcludeReferenceParts;
         window.ExcludePurchasedParts = settings.ExcludePurchasedParts;
         window.ExcludePhantomParts = settings.ExcludePhantomParts;
@@ -233,41 +240,64 @@ public static class SettingsManager
             });
         }
         
-        if (!string.IsNullOrEmpty(settings.SelectedTemplatePresetName))
+        if (settings.SelectedTemplatePresetName is { Length: > 0 })
         {
             window.SelectedTemplatePreset = window.TemplatePresets
                 .FirstOrDefault(p => p.Name == settings.SelectedTemplatePresetName);
         }
 
-        // Очищаем и восстанавливаем пользовательские свойства через реестр
         PropertyMetadataRegistry.UserDefinedProperties.Clear();
-        foreach (var userProperty in settings.UserDefinedProperties)
+        
+        var userDefinedPropertyNames = settings.ColumnOrder
+            .Where(PropertyMetadataRegistry.IsUserDefinedProperty)
+            .Select(PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct()
+            .ToList();
+            
+        foreach (var userProperty in userDefinedPropertyNames)
         {
             PropertyMetadataRegistry.AddUserDefinedProperty(userProperty);
         }
 
-        foreach (var columnName in settings.ColumnOrder)
+        var presetLookup = window.PresetIProperties.ToLookup(p => PropertyMetadataRegistry.GetInternalNameByColumnHeader(p.ColumnHeader));
+
+        var restoredColumns = 0;
+        foreach (var internalName in settings.ColumnOrder.Where(name => !string.IsNullOrWhiteSpace(name)))
         {
-            var presetProperty = window.PresetIProperties.FirstOrDefault(p => p.ColumnHeader == columnName);
-            if (presetProperty is not null)
+            var propertyDef = PropertyMetadataRegistry.GetPropertyByInternalName(internalName);
+            if (propertyDef == null)
             {
-                window.AddIPropertyColumn(presetProperty);
+                Debug.WriteLine($"Warning: Property '{internalName}' not found in registry");
+                continue;
+            }
+
+            if (PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
+            {
+                window.AddUserDefinedIPropertyColumn(propertyDef.InventorPropertyName ?? internalName);
+                restoredColumns++;
             }
             else
             {
-                // Проверяем, есть ли это свойство среди пользовательских по ColumnHeader
-                var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnName);
-                if (userProperty != null)
+                var presetProperty = presetLookup[internalName].FirstOrDefault();
+                if (presetProperty is not null)
                 {
-                    window.AddUserDefinedIPropertyColumn(userProperty.InventorPropertyName ?? columnName);
+                    window.AddIPropertyColumn(presetProperty);
+                    restoredColumns++;
                 }
-                // Если пользовательское свойство не найдено в реестре, пропускаем его
+                else
+                {
+                    Debug.WriteLine($"Warning: Preset property '{internalName}' not found in PresetIProperties");
+                }
             }
         }
 
+        Debug.WriteLine($"Restored {restoredColumns} columns out of {settings.ColumnOrder.Count} from settings");
+
+        var layerSettingsLookup = window.LayerSettings.ToLookup(ls => ls.DisplayName);
         foreach (var settingData in settings.LayerSettings)
         {
-            var layerSetting = window.LayerSettings.FirstOrDefault(ls => ls.DisplayName == settingData.DisplayName);
+            var layerSetting = layerSettingsLookup[settingData.DisplayName].FirstOrDefault();
             if (layerSetting is not null)
             {
                 layerSetting.IsChecked = settingData.IsChecked;

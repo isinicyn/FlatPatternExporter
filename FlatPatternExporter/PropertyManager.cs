@@ -33,16 +33,16 @@ public class PropertyManager
         }
         
         // Проверяем пользовательские свойства по InternalName с префиксом
-        var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == internalName);
-        if (userProperty != null)
+        var userProperty = PropertyMetadataRegistry.GetPropertyByInternalName(internalName);
+        if (userProperty != null && userProperty.Type == PropertyMetadataRegistry.PropertyType.UserDefined)
         {
             return (userProperty.PropertySetName!, userProperty.InventorPropertyName!);
         }
         
         // Если это UDP_ префикс, но свойство не найдено в реестре, извлекаем оригинальное имя
-        if (internalName.StartsWith("UDP_"))
+        if (PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
         {
-            var originalName = internalName.Substring(4); // Убираем "UDP_"
+            var originalName = PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(internalName);
             return ("User Defined Properties", originalName);
         }
         
@@ -53,7 +53,7 @@ public class PropertyManager
     /// <summary>
     /// Получает объект свойства по внутреннему имени с использованием централизованной системы метаданных.
     /// </summary>
-    private Inventor.Property? GetPropertyObject(string ourName)
+    private Property? GetPropertyObject(string ourName)
     {
         var (setName, inventorName) = GetInventorMapping(ourName);
 

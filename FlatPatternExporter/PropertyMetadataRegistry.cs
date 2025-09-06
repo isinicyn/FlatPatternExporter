@@ -663,4 +663,44 @@ public static class PropertyMetadataRegistry
         return value.ToString() ?? "";
     }
 
+    /// <summary>
+    /// Получает InternalName по ColumnHeader из всех доступных свойств
+    /// </summary>
+    public static string? GetInternalNameByColumnHeader(string columnHeader)
+    {
+        var presetProperty = Properties.Values.FirstOrDefault(p => p.ColumnHeader == columnHeader);
+        if (presetProperty != null)
+            return presetProperty.InternalName;
+
+        var userProperty = UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeader);
+        return userProperty?.InternalName;
+    }
+
+    /// <summary>
+    /// Получает PropertyDefinition по InternalName из всех доступных свойств
+    /// </summary>
+    public static PropertyDefinition? GetPropertyByInternalName(string internalName)
+    {
+        if (Properties.TryGetValue(internalName, out var presetProperty))
+            return presetProperty;
+
+        return UserDefinedProperties.FirstOrDefault(p => p.InternalName == internalName);
+    }
+
+    /// <summary>
+    /// Проверяет, является ли InternalName пользовательским свойством
+    /// </summary>
+    public static bool IsUserDefinedProperty(string internalName)
+    {
+        return internalName.StartsWith("UDP_");
+    }
+
+    /// <summary>
+    /// Извлекает Inventor имя из InternalName пользовательского свойства
+    /// </summary>
+    public static string GetInventorNameFromUserDefinedInternalName(string internalName)
+    {
+        return IsUserDefinedProperty(internalName) ? internalName.Substring(4) : internalName;
+    }
+
 }
