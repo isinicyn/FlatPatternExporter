@@ -2,196 +2,295 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Button = System.Windows.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter;
 public partial class SelectIPropertyWindow : Window
 {
-    private readonly FlatPatternExporterMainWindow _mainWindow; // Поле для хранения ссылки на MainWindow
+    private readonly FlatPatternExporterMainWindow _mainWindow;
+    private readonly ObservableCollection<PresetIProperty> _allProperties;
+    private string _searchFilter = "";
+    private string _categoryFilter = "";
+    private bool _isInitialized = false;
 
-        public SelectIPropertyWindow(ObservableCollection<PresetIProperty> presetIProperties, FlatPatternExporterMainWindow mainWindow)
-        {
-            InitializeComponent();
+    public SelectIPropertyWindow(ObservableCollection<PresetIProperty> presetIProperties, FlatPatternExporterMainWindow mainWindow)
+    {
+        InitializeComponent();
 
-            PresetIProperties = presetIProperties;
-            _mainWindow = mainWindow; // Сохраняем ссылку на MainWindow
-
+        _mainWindow = mainWindow;
+        _allProperties = presetIProperties;
+        
+        StandardProperties = [];
+        UserDefinedProperties = [];
+        
         DataContext = this;
-        SelectedProperties = [];
+        
+        InitializeProperties();
+        InitializeFilters();
+        UpdatePropertyStates();
+        
+        _isInitialized = true;
+    }
 
-            // Инициализируем пользовательские свойства из PropertyMetadataRegistry
-            InitializeUserDefinedProperties();
+    public ObservableCollection<PresetIProperty> StandardProperties { get; set; }
+    public ObservableCollection<PresetIProperty> UserDefinedProperties { get; set; }
 
-            // Инициализируем состояние IsAdded для уже добавленных колонок
-            UpdatePropertyStates();
-        }
-
-    public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
-    public List<PresetIProperty> SelectedProperties { get; }
-
-        // Обновление состояния IsAdded для всех свойств
-        public void UpdatePropertyStates()
+    private void InitializeProperties()
+    {
+        foreach (var property in _allProperties)
         {
-            // Обновляем состояние IsAdded для всех свойств
-            foreach (var property in PresetIProperties)
+            if (property.IsUserDefined)
             {
-                property.IsAdded = _mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.ColumnHeader);
+                UserDefinedProperties.Add(property);
             }
-        }
-
-
-
-        private void iPropertyListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (IPropertyListBox.SelectedItem is PresetIProperty selectedProperty)
+            else
             {
-                // Проверяем, есть ли уже такая колонка
-                if (!_mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == selectedProperty.ColumnHeader))
-                {
-                    // Проверяем, является ли это UDP свойством
-                    var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(selectedProperty.ColumnHeader);
-                    if (!string.IsNullOrEmpty(internalName) && PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
-                    {
-                        // Извлекаем имя свойства из внутреннего имени
-                        var propertyName = PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(internalName);
-                        if (!string.IsNullOrEmpty(propertyName))
-                        {
-                            _mainWindow.AddUserDefinedIPropertyColumn(propertyName);
-                        }
-                    }
-                    else
-                    {
-                        // Обычное свойство
-                        _mainWindow.AddIPropertyColumn(selectedProperty);
-                    }
-                    
-                    // Обновляем состояние IsAdded
-                    selectedProperty.IsAdded = true;
-                }
-            }
-        }
-
-
-
-        private void UserDefinedPropertyTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            // Активируем кнопку '+' только если текстовое поле не пустое
-            AddUserDefinedPropertyButton.IsEnabled = !string.IsNullOrWhiteSpace(UserDefinedPropertyTextBox.Text);
-        }
-
-        private void AddUserDefinedPropertyButton_Click(object sender, RoutedEventArgs e)
-        {
-            string userDefinedPropertyName = UserDefinedPropertyTextBox.Text;
-            
-            if (!string.IsNullOrWhiteSpace(userDefinedPropertyName))
-            {
-                // Генерируем internal name и column header с префиксами
-                var internalName = $"UDP_{userDefinedPropertyName}";
-                var columnHeader = $"(Пользов.) {userDefinedPropertyName}";
-
-                // Проверяем, не добавлено ли уже это свойство по InternalName
-                if (PropertyMetadataRegistry.UserDefinedProperties.Any(p => p.InternalName == internalName))
-                {
-                    MessageBox.Show($"Свойство '{userDefinedPropertyName}' уже добавлено.", "Предупреждение",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                // Добавляем в реестр пользовательских свойств
-                PropertyMetadataRegistry.AddUserDefinedProperty(userDefinedPropertyName);
-
-                // Получаем созданное определение свойства
-                var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == internalName);
-                if (userProperty != null)
-                {
-                    // Создаем PresetIProperty и добавляем в основную коллекцию
-                    var newUserProperty = new PresetIProperty
-                    {
-                        ColumnHeader = userProperty.ColumnHeader,
-                        ListDisplayName = userProperty.DisplayName,
-                        InventorPropertyName = userProperty.InventorPropertyName ?? userDefinedPropertyName,
-                        Category = userProperty.Category,
-                        IsAdded = false, // Не помечаем как добавленное, так как колонка не создается
-                        IsUserDefined = true // Помечаем как пользовательское свойство
-                    };
-                    
-                    PresetIProperties.Add(newUserProperty);
-                }
-
-                // Очищаем текстовое поле
-                UserDefinedPropertyTextBox.Text = "";
-            }
-        }
-
-        /// <summary>
-        /// Инициализирует пользовательские свойства из PropertyMetadataRegistry
-        /// </summary>
-        private void InitializeUserDefinedProperties()
-        {
-            foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
-            {
-                // Проверяем, нет ли уже этого свойства в основной коллекции по ColumnHeader
-                if (!PresetIProperties.Any(p => p.ColumnHeader == userProperty.ColumnHeader))
-                {
-                    var presetProperty = new PresetIProperty
-                    {
-                        ColumnHeader = userProperty.ColumnHeader,
-                        ListDisplayName = userProperty.DisplayName,
-                        InventorPropertyName = userProperty.InternalName,
-                        Category = userProperty.Category,
-                        IsUserDefined = true
-                    };
-
-                    PresetIProperties.Add(presetProperty);
-                }
-            }
-        }
-
-        private void RemovePropertyButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button button && button.Tag is PresetIProperty property)
-            {
-                if (property.IsUserDefined)
-                {
-                    // Для пользовательских свойств показываем контекстное меню
-                    button.ContextMenu.PlacementTarget = button;
-                    button.ContextMenu.IsOpen = true;
-                }
-                else
-                {
-                    // Для обычных свойств просто удаляем колонку
-                    RemoveColumn(property);
-                }
+                StandardProperties.Add(property);
             }
         }
         
-        private void RemoveColumnOnlyMenuItem_Click(object sender, RoutedEventArgs e)
+        InitializeUserDefinedPropertiesFromRegistry();
+    }
+
+    private void InitializeUserDefinedPropertiesFromRegistry()
+    {
+        foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
         {
-            if (sender is MenuItem menuItem && menuItem.Tag is PresetIProperty property)
+            if (!UserDefinedProperties.Any(p => p.ColumnHeader == userProperty.ColumnHeader))
             {
-                // Удаляем только колонку, данные UDP остаются
-                _mainWindow.RemoveDataGridColumn(property.ColumnHeader, removeDataOnly: true);
-                property.IsAdded = false;
+                var presetProperty = new PresetIProperty
+                {
+                    ColumnHeader = userProperty.ColumnHeader,
+                    ListDisplayName = userProperty.DisplayName,
+                    InventorPropertyName = userProperty.InternalName,
+                    Category = userProperty.Category,
+                    IsUserDefined = true
+                };
+
+                UserDefinedProperties.Add(presetProperty);
             }
         }
-        
-        private void RemoveColumnAndPropertyMenuItem_Click(object sender, RoutedEventArgs e)
+    }
+
+    private void InitializeFilters()
+    {
+        var categories = StandardProperties.Select(p => p.Category).Distinct().OrderBy(c => c);
+        foreach (var category in categories)
         {
-            if (sender is MenuItem menuItem && menuItem.Tag is PresetIProperty property)
+            CategoryFilter.Items.Add(new ComboBoxItem { Content = category });
+        }
+    }
+
+    public void UpdatePropertyStates()
+    {
+        foreach (var property in StandardProperties.Concat(UserDefinedProperties))
+        {
+            property.IsAdded = _mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.ColumnHeader);
+        }
+    }
+
+
+    private void StandardSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        _searchFilter = StandardSearchBox.Text;
+        ApplyFilters();
+    }
+
+    private void CategoryFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_isInitialized) return;
+        
+        if (CategoryFilter.SelectedIndex == 0)
+        {
+            _categoryFilter = "";
+        }
+        else if (CategoryFilter.SelectedItem is ComboBoxItem item)
+        {
+            _categoryFilter = item.Content?.ToString() ?? "";
+        }
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        var view = CollectionViewSource.GetDefaultView(StandardPropertiesListBox.ItemsSource);
+        if (view != null)
+        {
+            view.Filter = item =>
             {
-                // Полное удаление колонки и UDP свойства
+                if (item is PresetIProperty property)
+                {
+                    bool matchesSearch = string.IsNullOrEmpty(_searchFilter) || 
+                                        property.ListDisplayName.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase);
+                    bool matchesCategory = string.IsNullOrEmpty(_categoryFilter) || 
+                                          property.Category == _categoryFilter;
+                    return matchesSearch && matchesCategory;
+                }
+                return true;
+            };
+        }
+    }
+
+    private void StandardPropertiesListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (StandardPropertiesListBox.SelectedItem is PresetIProperty selectedProperty && !selectedProperty.IsAdded)
+        {
+            AddPropertyToGrid(selectedProperty);
+        }
+    }
+
+    private void UserPropertiesListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (UserPropertiesListBox.SelectedItem is PresetIProperty selectedProperty && !selectedProperty.IsAdded)
+        {
+            AddUserPropertyToGrid(selectedProperty);
+        }
+    }
+
+    private void AddPropertyButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is PresetIProperty property)
+        {
+            AddPropertyToGrid(property);
+        }
+    }
+
+    private void RemovePropertyButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is PresetIProperty property)
+        {
+            RemovePropertyFromGrid(property);
+        }
+    }
+
+    private void AddUserPropertyButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is PresetIProperty property)
+        {
+            AddUserPropertyToGrid(property);
+        }
+    }
+
+    private void RemoveUserPropertyButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is PresetIProperty property)
+        {
+            RemovePropertyFromGrid(property);
+        }
+    }
+
+    private void DeleteUserPropertyButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is PresetIProperty property)
+        {
+            var result = MessageBox.Show(
+                $"Вы уверены, что хотите удалить свойство '{property.ListDisplayName}' из реестра? Это действие нельзя отменить.",
+                "Подтверждение удаления",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+                
+            if (result == MessageBoxResult.Yes)
+            {
                 _mainWindow.RemoveDataGridColumn(property.ColumnHeader, removeDataOnly: false);
                 
-                // Удаляем из основной коллекции
-                PresetIProperties.Remove(property);
+                var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(property.ColumnHeader);
+                if (!string.IsNullOrEmpty(internalName))
+                {
+                    PropertyMetadataRegistry.RemoveUserDefinedProperty(internalName);
+                }
+                
+                UserDefinedProperties.Remove(property);
             }
         }
-        
-        private void RemoveColumn(PresetIProperty property)
+    }
+
+    private void AddPropertyToGrid(PresetIProperty property)
+    {
+        if (!property.IsAdded)
         {
-            // Удаляем только колонку для обычных свойств
-            _mainWindow.RemoveDataGridColumn(property.ColumnHeader, removeDataOnly: true);
-            property.IsAdded = false;
+            _mainWindow.AddIPropertyColumn(property);
+            property.IsAdded = true;
         }
+    }
+
+    private void AddUserPropertyToGrid(PresetIProperty property)
+    {
+        if (!property.IsAdded)
+        {
+            var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(property.ColumnHeader);
+            if (!string.IsNullOrEmpty(internalName) && PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
+            {
+                var propertyName = PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(internalName);
+                if (!string.IsNullOrEmpty(propertyName))
+                {
+                    _mainWindow.AddUserDefinedIPropertyColumn(propertyName);
+                }
+            }
+            property.IsAdded = true;
+        }
+    }
+
+    private void RemovePropertyFromGrid(PresetIProperty property)
+    {
+        _mainWindow.RemoveDataGridColumn(property.ColumnHeader, removeDataOnly: true);
+        property.IsAdded = false;
+    }
+
+    private void UserDefinedPropertyTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        AddUserDefinedPropertyButton.IsEnabled = !string.IsNullOrWhiteSpace(UserDefinedPropertyTextBox.Text);
+    }
+
+    private void UserDefinedPropertyTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter && AddUserDefinedPropertyButton.IsEnabled)
+        {
+            AddUserDefinedPropertyButton_Click(AddUserDefinedPropertyButton, new RoutedEventArgs());
+        }
+    }
+
+    private void AddUserDefinedPropertyButton_Click(object sender, RoutedEventArgs e)
+    {
+        string userDefinedPropertyName = UserDefinedPropertyTextBox.Text.Trim();
+        
+        if (!string.IsNullOrWhiteSpace(userDefinedPropertyName))
+        {
+            var internalName = $"UDP_{userDefinedPropertyName}";
+            var columnHeader = $"(Пользов.) {userDefinedPropertyName}";
+
+            if (PropertyMetadataRegistry.UserDefinedProperties.Any(p => p.InternalName == internalName))
+            {
+                MessageBox.Show($"Свойство '{userDefinedPropertyName}' уже добавлено.", "Предупреждение",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            PropertyMetadataRegistry.AddUserDefinedProperty(userDefinedPropertyName);
+
+            var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == internalName);
+            if (userProperty != null)
+            {
+                var newUserProperty = new PresetIProperty
+                {
+                    ColumnHeader = userProperty.ColumnHeader,
+                    ListDisplayName = userProperty.DisplayName,
+                    InventorPropertyName = userProperty.InventorPropertyName ?? userDefinedPropertyName,
+                    Category = userProperty.Category,
+                    IsAdded = false,
+                    IsUserDefined = true
+                };
+                
+                UserDefinedProperties.Add(newUserProperty);
+            }
+
+            UserDefinedPropertyTextBox.Text = "";
+        }
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }

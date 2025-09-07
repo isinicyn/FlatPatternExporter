@@ -823,9 +823,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var selectIPropertyWindow =
             new SelectIPropertyWindow(PresetIProperties, this); // Передаем `this` как ссылку на MainWindow
         selectIPropertyWindow.ShowDialog();
-
-        // После закрытия окна добавляем выбранные свойства
-        foreach (var property in selectIPropertyWindow.SelectedProperties) AddIPropertyColumn(property);
     }
 
     private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

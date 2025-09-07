@@ -6,190 +6,405 @@
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:local="clr-namespace:FlatPatternExporter"
     mc:Ignorable="av" x:Class="FlatPatternExporter.SelectIPropertyWindow"
-    Title="Выбор свойства"
+    Title="Управление свойствами"
     ResizeMode="CanResize" 
-    WindowStartupLocation="CenterScreen" MinWidth="270" MaxWidth="270" VerticalAlignment="Top" MinHeight="500" Height="500">
+    WindowStartupLocation="CenterScreen" 
+    MinWidth="400"
+    MinHeight="450" Width="560">
+    
     <Window.Resources>
-        <!-- CollectionViewSource для группировки по категориям -->
-        <CollectionViewSource x:Key="GroupedProperties"
-                              Source="{Binding PresetIProperties}">
+        <!-- CollectionViewSource для стандартных свойств с группировкой -->
+        <CollectionViewSource x:Key="StandardPropertiesSource"
+                              Source="{Binding StandardProperties}">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="Category" />
             </CollectionViewSource.GroupDescriptions>
             <CollectionViewSource.SortDescriptions>
-                <!-- Сначала сортируем по категории, затем по DisplayName -->
                 <scm:SortDescription PropertyName="Category" Direction="Ascending" />
                 <scm:SortDescription PropertyName="ListDisplayName" Direction="Ascending" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
+
+        <!-- CollectionViewSource для пользовательских свойств -->
+        <CollectionViewSource x:Key="UserPropertiesSource"
+                              Source="{Binding UserDefinedProperties}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="ListDisplayName" Direction="Ascending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+
+        <!-- Стиль для элементов свойств -->
+        <Style x:Key="PropertyItemContainerStyle" TargetType="ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="ItemBorder"
+                                Background="{StaticResource BackgroundPrimaryBrush}"
+                                BorderBrush="{StaticResource BorderLightBrush}"
+                                BorderThickness="1"
+                                Padding="8,6">
+                            <ContentPresenter/>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAdded}" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource SelectionBackgroundBrush}"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource BorderTertiaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
-        <!-- Основное содержимое -->
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-            <ListBox x:Name="IPropertyListBox" 
-                     Grid.Row="0"
-                     ItemsSource="{Binding Source={StaticResource GroupedProperties}}" 
-                     SelectionMode="Single" 
-                     MouseDoubleClick="iPropertyListBox_MouseDoubleClick"
-                     Background="{DynamicResource TransparentBrush}"
-                     BorderThickness="{StaticResource StandardBorderThicknessValue}" av:ItemsSource="{av:SampleData ItemCount=5}"
-                     ItemContainerStyle="{StaticResource CustomListBoxItemStyle}" Margin="{StaticResource SmallMarginThickness}">
+        <!-- Заголовок и общая информация -->
+        <Border Grid.Row="0" 
+                Background="{StaticResource BackgroundSecondaryBrush}"
+                BorderBrush="{StaticResource BorderLightBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="15,10">
+            <StackPanel>
+                <TextBlock Text="Управление свойствами колонок" 
+                           Style="{StaticResource SectionHeaderTextStyle}"
+                           FontSize="14"
+                           Margin="0"/>
+                <TextBlock Text="Дважды щелкните по свойству для добавления в таблицу или используйте кнопки действий"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,5,0,0" TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+        </Border>
 
-
-                <!-- Стиль для группировки -->
-                <ListBox.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.ContainerStyle>
-                            <Style TargetType="{x:Type GroupItem}">
-                            </Style>
-                        </GroupStyle.ContainerStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate>
-                                <Border Background="{StaticResource BorderLightBrush}" 
-                                        BorderBrush="{StaticResource BorderDarkBrush}" 
-                                        BorderThickness="{StaticResource StandardBorderThicknessValue}"
-                                        Margin="{StaticResource GroupHeaderBorderMarginThickness}"
-                                        Padding="{StaticResource SmallRectPaddingThickness}">
-                                    <TextBlock Text="{Binding Name}" 
-                                               Style="{StaticResource BaseTextBlockStyle}"
-                                               FontWeight="Bold" 
-                                               FontSize="{StaticResource StandardFontSize}" 
-                                               Foreground="{StaticResource TextTertiaryBrush}"/>
-                                </Border>
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                    </GroupStyle>
-                </ListBox.GroupStyle>
-
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border x:Name="ItemBorder"
-                                        Background="{StaticResource SelectionBackgroundBrush}" 
-                                        BorderBrush="{StaticResource BorderTertiaryBrush}" 
-                                        BorderThickness="{StaticResource StandardBorderThicknessValue}"
-                                        Padding="{StaticResource HorizontalSmallPaddingThickness}"
-                                        Margin="{StaticResource TinyMarginThickness}"
-                                        SnapsToDevicePixels="True" 
-                                         Height="{StaticResource LargeElementHeight}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Grid.Column="0"
-                                           Text="{Binding ListDisplayName}" 
-                                           Style="{StaticResource SectionHeaderTextStyle}"
-                                           HorizontalAlignment="Left" 
-                                           VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis"
-                                           ToolTip="{Binding ListDisplayName}"
-                                           Margin="{StaticResource HorizontalTinyVerticalHairlineMarginThickness}"/>
-
-                                <Button Grid.Column="1"
-                                        x:Name="RemovePropertyButton"
-                                        ToolTip="Удалить колонку"
-                                        Margin="{StaticResource HorizontalTinyMarginThickness}"
-                                        Click="RemovePropertyButton_Click"
-                                        Tag="{Binding}">
-                                    <Button.Style>
-                                        <Style TargetType="Button" BasedOn="{StaticResource ResetButtonStyle}">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <!-- Показываем кнопку для добавленных колонок -->
-                                                <DataTrigger Binding="{Binding IsAdded}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                                <!-- Показываем кнопку для пользовательских свойств всегда -->
-                                                <DataTrigger Binding="{Binding IsUserDefined}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                    <Button.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="Удалить только колонку" 
-                                                     Click="RemoveColumnOnlyMenuItem_Click" 
-                                                     Tag="{Binding}">
-                                                <MenuItem.Style>
-                                                    <Style TargetType="MenuItem">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsAdded}" Value="False">
-                                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </MenuItem.Style>
-                                            </MenuItem>
-                                            <MenuItem Header="Удалить свойство из реестра" 
-                                                     Click="RemoveColumnAndPropertyMenuItem_Click" 
-                                                     Tag="{Binding}"/>
-                                        </ContextMenu>
-                                    </Button.ContextMenu>
-                                </Button>
-                            </Grid>
-                        </Border>
-                        <DataTemplate.Triggers>
-                            <!-- Триггер для наведения мыши -->
-                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
-                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
-                                <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1"/>
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-
-            <!-- Поле для добавления custom property -->
-            <Border Grid.Row="1" Background="{StaticResource BackgroundQuaternaryBrush}" BorderThickness="{StaticResource StandardBorderThicknessValue}" Margin="{StaticResource SmallMarginThickness}">
-                <Border.BorderBrush>
-                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
-                </Border.BorderBrush>
-                <Grid Margin="{StaticResource SmallMarginThickness}">
+        <!-- Основное содержимое с вкладками -->
+        <TabControl Grid.Row="1" Margin="10">
+            <!-- Вкладка стандартных свойств -->
+            <TabItem Header="Стандартные свойства">
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Панель поиска и фильтров -->
+                    <Border Grid.Row="0" 
+                            Background="{StaticResource BackgroundQuaternaryBrush}"
+                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderThickness="1"
+                            Margin="0,0,0,5"
+                            Padding="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBox x:Name="StandardSearchBox" 
+                                     Grid.Column="0"
+                                     Style="{StaticResource BaseTextBoxStyle}"
+                                     Tag="Поиск по названию..."
+                                     TextChanged="StandardSearchBox_TextChanged">
+                                <TextBox.Template>
+                                    <ControlTemplate TargetType="TextBox">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}">
+                                            <Grid>
+                                                <TextBlock x:Name="Placeholder"
+                                                           Text="{TemplateBinding Tag}"
+                                                           Foreground="{StaticResource TextMutedBrush}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="5,0"
+                                                           Visibility="Collapsed"/>
+                                                <ScrollViewer x:Name="PART_ContentHost" 
+                                                              VerticalAlignment="Center"
+                                                              Margin="3,0"/>
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </TextBox.Template>
+                            </TextBox>
+                            
+                            <ComboBox x:Name="CategoryFilter" 
+                                      Grid.Column="1"
+                                      Width="150"
+                                      Margin="5,0,0,0"
+                                      Style="{StaticResource BaseComboBoxStyle}"
+                                      SelectedIndex="0"
+                                      SelectionChanged="CategoryFilter_SelectionChanged">
+                                <ComboBoxItem>Все категории</ComboBoxItem>
+                            </ComboBox>
+                        </Grid>
+                    </Border>
+
+                    <!-- Список стандартных свойств -->
+                    <ListBox x:Name="StandardPropertiesListBox"
+                             Grid.Row="1"
+                             ItemsSource="{Binding Source={StaticResource StandardPropertiesSource}}"
+                             ItemContainerStyle="{StaticResource PropertyItemContainerStyle}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             BorderBrush="{StaticResource BorderLightBrush}"
+                             MouseDoubleClick="StandardPropertiesListBox_MouseDoubleClick">
+                        
+                        <!-- Группировка по категориям -->
+                        <ListBox.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{StaticResource BackgroundTertiaryBrush}"
+                                                BorderBrush="{StaticResource BorderSecondaryBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Margin="0,5,0,2"
+                                                Padding="8,4">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextTertiaryBrush}"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ListBox.GroupStyle>
+                        
+                        <!-- Шаблон элемента -->
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding ListDisplayName}"
+                                               VerticalAlignment="Center"/>
+                                    
+                                    <!-- Кнопки действий -->
+                                    <StackPanel Grid.Column="1" 
+                                                Orientation="Horizontal">
+                                        <Button x:Name="AddPropertyButton"
+                                                ToolTip="Добавить колонку"
+                                                Width="24" Height="24"
+                                                Margin="2,0"
+                                                Click="AddPropertyButton_Click"
+                                                Tag="{Binding}">
+                                            <Path Style="{StaticResource AddIconStyle}" 
+                                                  Width="12" Height="12"/>
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAdded}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        
+                                        <Button x:Name="RemovePropertyButton"
+                                                ToolTip="Удалить колонку"
+                                                Width="24" Height="24"
+                                                Margin="2,0"
+                                                Click="RemovePropertyButton_Click"
+                                                Tag="{Binding}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource ResetButtonStyle}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAdded}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </TabItem>
+
+            <!-- Вкладка пользовательских свойств -->
+            <TabItem Header="Пользовательские свойства">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Заголовок раздела -->
-                    <TextBlock Grid.Row="0"
-                               Text="Пользовательское свойство"
-                               Style="{StaticResource BaseTextBlockStyle}"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource TextTertiaryBrush}"
-                               Margin="{StaticResource LeftTinyBottomSmallMarginThickness}"/>
+                    <!-- Панель добавления нового свойства -->
+                    <Border Grid.Row="0"
+                            Background="{StaticResource BackgroundQuaternaryBrush}"
+                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderThickness="1"
+                            Margin="0,0,0,5"
+                            Padding="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0"
+                                       Text="Новое свойство:"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            
+                            <TextBox x:Name="UserDefinedPropertyTextBox"
+                                     Grid.Column="1"
+                                     Style="{StaticResource BaseTextBoxStyle}"
+                                     TextChanged="UserDefinedPropertyTextBox_TextChanged"
+                                     KeyDown="UserDefinedPropertyTextBox_KeyDown"/>
+                            
+                            <Button x:Name="AddUserDefinedPropertyButton"
+                                    Grid.Column="2"
+                                    Content="Добавить"
+                                    Width="80"
+                                    Margin="5,0,0,0"
+                                    Style="{StaticResource BaseButtonStyle}"
+                                    IsEnabled="False"
+                                    Click="AddUserDefinedPropertyButton_Click"/>
+                        </Grid>
+                    </Border>
 
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- Список пользовательских свойств -->
+                    <ListBox x:Name="UserPropertiesListBox"
+                             Grid.Row="1"
+                             ItemsSource="{Binding Source={StaticResource UserPropertiesSource}}"
+                             ItemContainerStyle="{StaticResource PropertyItemContainerStyle}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             BorderBrush="{StaticResource BorderLightBrush}"
+                             MouseDoubleClick="UserPropertiesListBox_MouseDoubleClick">
+                        
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding ListDisplayName}"
+                                               VerticalAlignment="Center"/>
+                                    
+                                    <!-- Кнопки действий -->
+                                    <StackPanel Grid.Column="1" 
+                                                Orientation="Horizontal">
+                                        <Button ToolTip="Добавить колонку"
+                                                Width="24" Height="24"
+                                                Margin="2,0"
+                                                Click="AddUserPropertyButton_Click"
+                                                Tag="{Binding}">
+                                            <Path Style="{StaticResource AddIconStyle}" 
+                                                  Width="12" Height="12"/>
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAdded}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        
+                                        <Button ToolTip="Удалить колонку"
+                                                Width="24" Height="24"
+                                                Margin="2,0"
+                                                Click="RemoveUserPropertyButton_Click"
+                                                Tag="{Binding}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource ResetButtonStyle}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAdded}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        
+                                        <Button ToolTip="Удалить из реестра"
+                                                Width="24" Height="24"
+                                                Margin="2,0"
+                                                Style="{StaticResource ResetButtonStyle}"
+                                                Click="DeleteUserPropertyButton_Click"
+                                                Tag="{Binding}">
+                                            <Path Style="{StaticResource DeleteFromRegistryIconStyle}" 
+                                                  Width="12" Height="12"/>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
 
-                        <TextBox x:Name="UserDefinedPropertyTextBox" 
-                             Grid.Column="0"
-                             Style="{StaticResource BaseTextBoxStyle}"
-                             BorderBrush="{StaticResource BorderTertiaryBrush}"
-                             TextChanged="UserDefinedPropertyTextBox_TextChanged"/>
-
-                        <Button x:Name="AddUserDefinedPropertyButton"
-                            Grid.Column="1"
-                            Width="{StaticResource StandardElementHeight}"
-                            Style="{StaticResource BaseButtonStyle}"
-                            IsEnabled="False"
-                            Click="AddUserDefinedPropertyButton_Click">
-                            <Path Style="{StaticResource AddIconStyle}" 
-                              Width="12" Height="12"/>
-                        </Button>
-                    </Grid>
+                    <!-- Информационная панель -->
+                    <Border Grid.Row="2"
+                            Background="{StaticResource BackgroundQuaternaryBrush}"
+                            BorderBrush="{StaticResource BorderLightBrush}"
+                            BorderThickness="1"
+                            Margin="0,5,0,0"
+                            Padding="10">
+                        <TextBlock TextWrapping="Wrap"
+                                   Foreground="{StaticResource TextMutedBrush}">
+                            <Run Text="ℹ"/>
+                            <Run Text="Пользовательские свойства читаются из Inventor User Defined Properties."/>
+                            <Run Text="Удаление из реестра полностью удаляет свойство из системы."/>
+                        </TextBlock>
+                    </Border>
                 </Grid>
-            </Border>
-        </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- Нижняя панель с кнопками -->
+        <Border Grid.Row="2" 
+                Style="{StaticResource DialogBottomBarStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Кнопка закрытия -->
+                <Button Grid.Column="1"
+                        Content="Закрыть"
+                        Width="100"
+                        Style="{StaticResource BaseButtonStyle}"
+                        Click="CloseButton_Click"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

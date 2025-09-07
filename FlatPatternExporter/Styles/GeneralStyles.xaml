@@ -276,6 +276,21 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    
+    <!-- Стиль для иконки удаления из реестра -->
+    <Style x:Key="DeleteFromRegistryIconStyle" TargetType="Path">
+        <Setter Property="Data" Value="{StaticResource DeleteFromRegistryIconGeometry}"/>
+        <Setter Property="Fill" Value="{DynamicResource ErrorBrush}"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsEnabled}" Value="False">
+                <Setter Property="Fill" Value="{DynamicResource TextDisabledBrush}"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 
     <!-- Стиль для элементов ListBox без стандартной подсветки -->
     <Style x:Key="CustomListBoxItemStyle" TargetType="ListBoxItem">
