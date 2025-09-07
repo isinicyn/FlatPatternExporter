@@ -14,5 +14,8 @@
     
     <!-- SVG иконка удаления из реестра -->
     <Geometry x:Key="DeleteFromRegistryIconGeometry">M24 30H4a2.002 2.002 0 0 1-2-2v-6a2.002 2.002 0 0 1 2-2h20a2.002 2.002 0 0 1 2 2v6a2.002 2.002 0 0 1-2 2zM4 22h-.002L4 28h20v-6zM30 3.41L28.59 2L25 5.59L21.41 2L20 3.41L23.59 7L20 10.59L21.41 12L25 8.41L28.59 12L30 10.59L26.41 7L30 3.41z M4 14V8h14V6H4a2.002 2.002 0 0 0-2 2v6a2.002 2.002 0 0 0 2 2h22v-2Z</Geometry>
+    
+    <!-- SVG иконка закрытия/удаления (крестик) -->
+    <Geometry x:Key="CloseIconGeometry">M18 6 6 18M6 6l12 12</Geometry>
 
 </ResourceDictionary>

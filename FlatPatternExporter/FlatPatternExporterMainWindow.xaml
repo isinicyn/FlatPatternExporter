@@ -190,7 +190,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Button x:Name="SelectFixedFolderButton" Grid.Column="0" Content="..." Width="30" Click="SelectFixedFolderButton_Click" Style="{StaticResource BaseButtonStyle}" Margin="{StaticResource LeftTinyRightStandardMarginThickness}" />
+                                    <Button x:Name="SelectFixedFolderButton" Grid.Column="0" Content="..." Width="{StaticResource SmallButtonWidth}" Click="SelectFixedFolderButton_Click" Style="{StaticResource BaseButtonStyle}" Margin="{StaticResource LeftTinyRightStandardMarginThickness}" />
                     <Border Grid.Column="1" Background="{StaticResource BackgroundSecondaryBrush}" 
                         BorderBrush="{StaticResource BorderPrimaryBrush}" 
                         BorderThickness="{StaticResource StandardBorderThicknessValue}" 
@@ -508,8 +508,6 @@
                                 Style="{StaticResource BaseActionButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <Path Style="{StaticResource AddIconStyle}"
-                                      Width="12" 
-                                      Height="12" 
                                       Margin="{StaticResource RightTinyPlusMarginThickness}"/>
                                 <TextBlock Text="Свойство" 
                                            VerticalAlignment="Center" 
@@ -631,8 +629,8 @@
                             Style="{StaticResource OverlayButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <Path Style="{StaticResource AddIconStyle}"
-                                  Width="14" 
-                                  Height="14" 
+                                  Width="{StaticResource MediumIconSize}" 
+                                  Height="{StaticResource MediumIconSize}" 
                                   Margin="{StaticResource RightSmallPlusMarginThickness}"/>
                                 <TextBlock Text="Добавить колонки" 
                                        VerticalAlignment="Center" 

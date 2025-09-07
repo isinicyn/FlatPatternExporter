@@ -26,7 +26,7 @@
                                 Margin="{StaticResource SmallMarginThickness}" 
                                 Click="CopyVersionToClipboard_Click" 
                                 ToolTip="Копировать версию" HorizontalAlignment="Right">
-                            <Viewbox Width="16" Height="16">
+                            <Viewbox Width="{StaticResource StandardIconSize}" Height="{StaticResource StandardIconSize}">
                                 <Path Data="{StaticResource CopyIconGeometry}" 
                                       Stroke="{DynamicResource TextSecondaryBrush}" 
                                       StrokeThickness="1.5" Stretch="Fill"/>
