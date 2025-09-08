@@ -1,4 +1,4 @@
-﻿<Window x:Class="FlatPatternExporter.AboutWindow"
+<Window x:Class="FlatPatternExporter.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="О программе FPEx" 
@@ -22,15 +22,11 @@
                         <TextBlock x:Name="VersionTextBlock" 
                                    Text="Версия программы: 1.0.0" 
                                    Style="{StaticResource BaseTextBlockStyle}"/>
-                        <Button Width="{StaticResource LargeElementHeight}" Height="{StaticResource LargeElementHeight}" 
+                        <Button Style="{StaticResource CopyIconButton}" 
                                 Margin="{StaticResource SmallMarginThickness}" 
                                 Click="CopyVersionToClipboard_Click" 
                                 ToolTip="Копировать версию" HorizontalAlignment="Right">
-                            <Viewbox Width="{StaticResource StandardIconSize}" Height="{StaticResource StandardIconSize}">
-                                <Path Data="{StaticResource CopyIconGeometry}" 
-                                      Stroke="{DynamicResource TextSecondaryBrush}" 
-                                      StrokeThickness="1.5" Stretch="Fill"/>
-                            </Viewbox>
+                            
                         </Button>
                     </DockPanel>
 
@@ -66,3 +62,4 @@
         </Border>
     </Grid>
 </Window>
+

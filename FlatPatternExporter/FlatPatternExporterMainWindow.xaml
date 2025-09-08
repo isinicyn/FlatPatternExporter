@@ -27,7 +27,7 @@
             <!-- Элементы управления по левому краю -->
             <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
                 <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareProgressButtonStyle}" Tag="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" RenderTransformOrigin="0,0"/>
-                <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareProgressButtonStyle}"/>
+                <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareButtonStyle}"/>
                 <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Style="{StaticResource LargeSquareProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Зажмите CTRL что бы начать экспорт без предварителього сканирования" Margin="{StaticResource RightStandardMarginThickness}"/>
 
 
@@ -190,7 +190,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Button x:Name="SelectFixedFolderButton" Grid.Column="0" Content="..." Width="{StaticResource SmallButtonWidth}" Click="SelectFixedFolderButton_Click" Style="{StaticResource BaseButtonStyle}" Margin="{StaticResource LeftTinyRightStandardMarginThickness}" />
+                                    <Button x:Name="SelectFixedFolderButton" Grid.Column="0" Content="..." Width="{StaticResource SmallButtonWidth}" Click="SelectFixedFolderButton_Click" Style="{StaticResource InteractiveActionButtonStyle}" Margin="{StaticResource LeftTinyRightStandardMarginThickness}" />
                     <Border Grid.Column="1" Background="{StaticResource BackgroundSecondaryBrush}" 
                         BorderBrush="{StaticResource BorderPrimaryBrush}" 
                         BorderThickness="{StaticResource StandardBorderThicknessValue}" 
@@ -367,7 +367,7 @@
                                              ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
                                         <Button x:Name="AddCustomTextButton"
                                             Content="Добавить"
-                                            Style="{StaticResource BaseActionButtonStyle}"
+                                            Style="{StaticResource InteractiveActionButtonStyle}"
                                             Margin="{StaticResource SmallMarginThickness}"
                                             Click="AddCustomTextButton_Click"
                                             ToolTip="Добавить введенный текст как кастомный токен"/>
@@ -493,9 +493,8 @@
                         <Border Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
                             <Button x:Name="ClearSearchButton" 
                                 Click="ClearSearchButton_Click" 
-                                Style="{StaticResource DestructiveIconButtonStyle}"
+                                Style="{StaticResource CloseIconButton}"
                                 IsEnabled="False">
-                                <Path Style="{StaticResource CloseIconStyle}"/>
                             </Button>
                         </Border>
                     </StackPanel>
@@ -507,7 +506,7 @@
                         <!-- Кнопка добавления свойства -->
                             <Button x:Name="AddPresetIPropertyButton" Click="AddPresetIPropertyButton_Click" 
                                 Margin="{StaticResource RightStandardMarginThickness}" 
-                                Style="{StaticResource BaseActionButtonStyle}">
+                                Style="{StaticResource InteractiveActionButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <Path Style="{StaticResource AddIconStyle}"
                                       Margin="{StaticResource RightTinyPlusMarginThickness}"/>
@@ -521,7 +520,7 @@
                             <Button Name="ConflictFilesButton" 
                                 IsEnabled="False" 
                                 Click="ConflictFilesButton_Click" 
-                                Style="{StaticResource ToolbarWarningButtonStyle}" 
+                                Style="{StaticResource WarningButtonStyle}" 
                                 Margin="{StaticResource RightStandardMarginThickness}">
                             <Button.Content>
                                 <TextBlock Text="Конфликты" 
@@ -543,21 +542,20 @@
                                     Content="▲" 
                                     ToolTip="Увеличить на 1"
                                     Click="IncrementMultiplierButton_Click"
-                                    Style="{StaticResource SpinnerButtonStyle}"/>
+                                    Style="{StaticResource SpinnerButtonStyle}" Margin="0"/>
                                 <Button x:Name="DecrementMultiplierButton" 
                                     Content="▼" 
                                     ToolTip="Уменьшить на 1"
                                     Click="DecrementMultiplierButton_Click"
-                                    Style="{StaticResource SpinnerButtonStyle}"/>
+                                    Style="{StaticResource SpinnerButtonStyle}" Margin="0"/>
                             </StackPanel>
                         </StackPanel>
                         <Border Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
                             <Button x:Name="ClearMultiplierButton" 
                                 Click="ClearMultiplierButton_Click" 
-                                Style="{StaticResource DestructiveIconButtonStyle}" 
+                                Style="{StaticResource CloseIconButton}" 
                                 ToolTip="Сбросить множитель на 1"
                                 IsEnabled="False">
-                                <Path Style="{StaticResource CloseIconStyle}"/>
                             </Button>
                         </Border>
                     </StackPanel>

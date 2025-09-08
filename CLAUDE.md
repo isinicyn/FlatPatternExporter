@@ -29,6 +29,7 @@ FlatPatternExporter/
     ├── Styles/                         # XAML стили
     │   ├── ColorResources.xaml
     │   ├── IconResources.xaml
+    │   ├── ButtonStyles.xaml
     │   ├── DataGridStyles.xaml
     │   └── GeneralStyles.xaml
     │
@@ -106,6 +107,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 **Стили и ресурсы**:
 - `ColorResources.xaml` - Централизованные цветовые ресурсы приложения
 - `IconResources.xaml` - Централизованные SVG иконки и геометрия
+- `ButtonStyles.xaml` - Специализированные стили кнопок с иконками
 - `DataGridStyles.xaml` - Стили для DataGrid элементов
 - `GeneralStyles.xaml` - Общие стили приложения
 

@@ -8,6 +8,7 @@
                 <ResourceDictionary Source="Styles/ColorResources.xaml"/>
                 <ResourceDictionary Source="Styles/IconResources.xaml"/>
                 <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
+                <ResourceDictionary Source="Styles/ButtonStyles.xaml"/>
                 <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
@@ -30,7 +31,7 @@
             </Style>
 
             <!-- Имплицитные базовые стили для унификации элементов -->
-            <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}"/>
+            <Style TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}"/>
             <Style TargetType="TextBox" BasedOn="{StaticResource BaseTextBoxStyle}"/>
             <Style TargetType="ComboBox" BasedOn="{StaticResource BaseComboBoxStyle}"/>
             <Style TargetType="CheckBox" BasedOn="{StaticResource BaseCheckBoxStyle}"/>

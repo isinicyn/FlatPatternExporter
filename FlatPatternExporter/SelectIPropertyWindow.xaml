@@ -174,9 +174,8 @@
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="AddPropertyButton_Click"
                                                     Tag="{Binding}">
-                                                <Path Style="{StaticResource AddIconStyle}"/>
                                                 <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource PositiveIconButtonStyle}">
+                                                    <Style TargetType="Button" BasedOn="{StaticResource AddIconButton}">
                                                         <Setter Property="Visibility" Value="Visible"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsAdded}" Value="True">
@@ -192,9 +191,8 @@
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="RemovePropertyButton_Click"
                                                     Tag="{Binding}">
-                                                <Path Style="{StaticResource CloseIconStyle}"/>
                                                 <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource DestructiveIconButtonStyle}">
+                                                    <Style TargetType="Button" BasedOn="{StaticResource CloseIconButton}">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsAdded}" Value="True">
@@ -266,7 +264,7 @@
                                     Content="Добавить"
                                     MinWidth="{StaticResource StandardButtonMinWidth}"
                                     Margin="{StaticResource LeftSmallMarginThickness}"
-                                    Style="{StaticResource BaseButtonStyle}"
+                                    Style="{StaticResource InteractiveActionButtonStyle}"
                                     IsEnabled="False"
                                     Click="AddUserDefinedPropertyButton_Click"/>
                         </Grid>
@@ -309,9 +307,8 @@
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="AddUserPropertyButton_Click"
                                                     Tag="{Binding}">
-                                                <Path Style="{StaticResource AddIconStyle}"/>
                                                 <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource PositiveIconButtonStyle}">
+                                                    <Style TargetType="Button" BasedOn="{StaticResource AddIconButton}">
                                                         <Setter Property="Visibility" Value="Visible"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsAdded}" Value="True">
@@ -326,9 +323,8 @@
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="RemoveUserPropertyButton_Click"
                                                     Tag="{Binding}">
-                                                <Path Style="{StaticResource CloseIconStyle}"/>
                                                 <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource DestructiveIconButtonStyle}">
+                                                    <Style TargetType="Button" BasedOn="{StaticResource CloseIconButton}">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsAdded}" Value="True">
@@ -341,11 +337,9 @@
                                             
                                             <Button ToolTip="Удалить из реестра"
                                                     Margin="{StaticResource TinyMarginThickness}"
-                                                    Style="{StaticResource DestructiveIconButtonStyle}"
+                                                    Style="{StaticResource DeleteFromRegistryIconButton}"
                                                     Click="DeleteUserPropertyButton_Click"
-                                                    Tag="{Binding}">
-                                                <Path Style="{StaticResource DeleteFromRegistryIconStyle}"/>
-                                            </Button>
+                                                    Tag="{Binding}"/>
                                         </StackPanel>
                                     </Grid>
                                     <Border.Style>
@@ -398,7 +392,7 @@
                 <Button Grid.Column="1"
                         Content="Закрыть"
                         MinWidth="{StaticResource StandardButtonMinWidth}"
-                        Style="{StaticResource BaseButtonStyle}"
+                        Style="{StaticResource InteractiveActionButtonStyle}"
                         Click="CloseButton_Click"/>
             </Grid>
         </Border>

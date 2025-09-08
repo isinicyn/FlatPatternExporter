@@ -80,9 +80,8 @@
         <Button Click="ResetButton_Click"
                 CommandParameter="{Binding}"
                 IsEnabled="{Binding CanReset}"
-                Style="{StaticResource DestructiveIconButtonStyle}"
+                Style="{StaticResource CloseIconButton}"
                 Margin="{StaticResource LeftSmallMarginThickness}">
-            <Path Style="{StaticResource CloseIconStyle}"/>
         </Button>
     </StackPanel>
 </UserControl>
