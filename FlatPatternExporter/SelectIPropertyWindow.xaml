@@ -79,10 +79,17 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             
                             <Grid Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
                                 <TextBox x:Name="StandardSearchBox" 
+                                         Grid.Column="0"
                                          Style="{StaticResource BaseTextBoxStyle}"
                                          TextChanged="StandardSearchBox_TextChanged"/>
                                 <TextBlock Text="Поиск по названию..." 
@@ -101,10 +108,18 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
+                                
+                                <Border Grid.Column="1" Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
+                                    <Button x:Name="ClearStandardSearchButton" 
+                                        Click="ClearStandardSearchButton_Click" 
+                                        Style="{StaticResource CloseIconButton}"
+                                        IsEnabled="False">
+                                    </Button>
+                                </Border>
                             </Grid>
                             
                             <ComboBox x:Name="CategoryFilter" 
-                                      Grid.Column="1"
+                                      Grid.Column="2"
                                       Width="150"
                                       Margin="{StaticResource LeftSmallMarginThickness}"
                                       Style="{StaticResource BaseComboBoxStyle}"

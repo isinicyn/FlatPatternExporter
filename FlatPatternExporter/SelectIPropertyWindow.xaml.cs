@@ -95,7 +95,15 @@ public partial class SelectIPropertyWindow : Window
     private void StandardSearchBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         _searchFilter = StandardSearchBox.Text;
+        ClearStandardSearchButton.IsEnabled = !string.IsNullOrEmpty(_searchFilter);
         ApplyFilters();
+    }
+
+    private void ClearStandardSearchButton_Click(object sender, RoutedEventArgs e)
+    {
+        StandardSearchBox.Text = string.Empty;
+        ClearStandardSearchButton.IsEnabled = false;
+        StandardSearchBox.Focus();
     }
 
     private void CategoryFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
