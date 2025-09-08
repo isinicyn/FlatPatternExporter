@@ -83,11 +83,10 @@ public class TokenService : INotifyPropertyChanged
             if (prop.Type == PropertyMetadataRegistry.PropertyType.UserDefined)
             {
                 // User Defined Properties хранятся в словаре UserDefinedProperties
-                // TokenName содержит префикс UDP_ для уникальности
                 resolvers[tokenName] = partData =>
                 {
                     if (partData.UserDefinedProperties != null && 
-                        partData.UserDefinedProperties.TryGetValue(prop.InventorPropertyName!, out var value))
+                        partData.UserDefinedProperties.TryGetValue(prop.ColumnHeader, out var value))
                     {
                         return value?.ToString() ?? "";
                     }
@@ -134,6 +133,8 @@ public class TokenService : INotifyPropertyChanged
                 {
                     // Если нет данных, возвращаем placeholder
                     var prop = PropertyMetadataRegistry.Properties.Values
+                        .FirstOrDefault(p => p.IsTokenizable && p.TokenName == token) ??
+                        PropertyMetadataRegistry.UserDefinedProperties
                         .FirstOrDefault(p => p.IsTokenizable && p.TokenName == token);
                     value = prop?.PlaceholderValue ?? $"{{{token}}}";
                 }

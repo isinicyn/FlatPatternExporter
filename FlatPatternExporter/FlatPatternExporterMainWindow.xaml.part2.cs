@@ -77,8 +77,8 @@ public partial class FlatPatternExporterMainWindow : Window
         foreach (var userDefinedProperty in PropertyMetadataRegistry.UserDefinedProperties)
         {
             var value = mgr.GetMappedProperty(userDefinedProperty.InternalName);
-            // Используем InventorPropertyName как ключ для совместимости с TokenService
-            partData.UserDefinedProperties[userDefinedProperty.InventorPropertyName!] = value;
+            // Используем ColumnHeader как ключ для совместимости с биндингами DataGrid
+            partData.UserDefinedProperties[userDefinedProperty.ColumnHeader] = value;
         }
 
         if (loadThumbnail)
@@ -107,7 +107,7 @@ public partial class FlatPatternExporterMainWindow : Window
             foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
             {
                 var isExpression = mgr.IsMappedPropertyExpression(userProperty.InternalName);
-                partData.SetPropertyExpressionState($"UserDefinedProperties[{userProperty.InventorPropertyName}]", isExpression);
+                partData.SetPropertyExpressionState($"UserDefinedProperties[{userProperty.ColumnHeader}]", isExpression);
             }
         }
         finally
@@ -1403,7 +1403,6 @@ public partial class FlatPatternExporterMainWindow : Window
         }
 
         // Для User Defined Properties загружаем данные из файлов
-        // Ищем пользовательское свойство по InternalName
         var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == propertyName);
         var columnHeader = userProperty?.ColumnHeader ?? propertyName;
 
@@ -1418,12 +1417,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 
                 // Устанавливаем состояние выражения для User Defined свойства
                 var isExpression = mgr.IsMappedPropertyExpression(propertyName);
-                // Находим InventorPropertyName для этого columnHeader
-                var userProp = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeader);
-                if (userProp != null)
-                {
-                    partData.SetPropertyExpressionState($"UserDefinedProperties[{userProp.InventorPropertyName}]", isExpression);
-                }
+                partData.SetPropertyExpressionState($"UserDefinedProperties[{columnHeader}]", isExpression);
             }
         }
     }
@@ -1525,7 +1519,6 @@ public partial class FlatPatternExporterMainWindow : Window
         // Ищем пользовательское свойство в реестре по оригинальному имени
         var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InventorPropertyName == propertyName);
         var columnHeader = userProperty?.ColumnHeader ?? $"(Пользов.) {propertyName}";
-        var internalName = userProperty?.InternalName ?? $"UDP_{propertyName}";
 
         // Проверяем, существует ли уже колонка с таким заголовком
         if (PartsDataGrid.Columns.Any(c => c.Header as string == columnHeader))
@@ -1547,17 +1540,17 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             Header = columnHeader,
             CellTemplate = template,
-            SortMemberPath = $"UserDefinedProperties[{propertyName}]",
+            SortMemberPath = $"UserDefinedProperties[{columnHeader}]",
             IsReadOnly = false,
-            ClipboardContentBinding = new Binding($"UserDefinedProperties[{propertyName}]")
+            ClipboardContentBinding = new Binding($"UserDefinedProperties[{columnHeader}]")
         };
 
-        column.CellStyle = CreateCellTagStyle($"UserDefinedProperties[{propertyName}]");
+        column.CellStyle = CreateCellTagStyle($"UserDefinedProperties[{columnHeader}]");
 
         PartsDataGrid.Columns.Add(column);
 
         // Дозаполняем данные для новой колонки
-        FillPropertyData(internalName);
+        FillPropertyData(userProperty?.InternalName ?? $"UDP_{propertyName}");
     }
 
     private void AboutButton_Click(object sender, RoutedEventArgs e)
