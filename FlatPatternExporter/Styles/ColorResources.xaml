@@ -17,7 +17,7 @@
     <SolidColorBrush x:Key="TextTransparentMutedBrush" Color="#808E8E8E"/>
 
     <!-- Границы и разделители -->
-    <SolidColorBrush x:Key="BorderPrimaryBrush" Color="#D6D6D6"/>
+    <SolidColorBrush x:Key="BorderPrimaryBrush" Color="#C8C8C8"/>
     <SolidColorBrush x:Key="BorderSecondaryBrush" Color="#D0D0D0"/>
     <SolidColorBrush x:Key="BorderTertiaryBrush" Color="#C0C0C0"/>
     <SolidColorBrush x:Key="BorderLightBrush" Color="#E0E0E0"/>

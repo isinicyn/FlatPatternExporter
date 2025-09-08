@@ -377,7 +377,7 @@
     <!-- Стиль для кнопки с прогресс-баром -->
     <Style x:Key="BaseProgressButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource TextDisabledBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Template">
             <Setter.Value>

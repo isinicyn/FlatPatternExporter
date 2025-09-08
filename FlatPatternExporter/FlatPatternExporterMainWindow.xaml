@@ -509,7 +509,7 @@
                                 Style="{StaticResource InteractiveActionButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <Path Style="{StaticResource AddIconStyle}"
-                                      Margin="{StaticResource RightTinyPlusMarginThickness}"/>
+                                      Margin="{StaticResource RightTinyPlusMarginThickness}" SnapsToDevicePixels="True"/>
                                 <TextBlock Text="Свойство" 
                                            VerticalAlignment="Center" 
                                            Foreground="{StaticResource TextSecondaryBrush}"/>
