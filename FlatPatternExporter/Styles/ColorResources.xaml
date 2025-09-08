@@ -44,6 +44,8 @@
     <SolidColorBrush x:Key="TokenBackgroundBrush" Color="#F8F8F8"/>
     <SolidColorBrush x:Key="TokenCustomBackgroundBrush" Color="#F0F8FF"/>
     <SolidColorBrush x:Key="TokenCustomBorderBrush" Color="#4682B4"/>
+    <SolidColorBrush x:Key="TokenUserDefinedBackgroundBrush" Color="#FFF8E1"/>
+    <SolidColorBrush x:Key="TokenUserDefinedBorderBrush" Color="#FF8F00"/>
     <SolidColorBrush x:Key="PreviewValidBackgroundBrush" Color="#F5FDF5"/>
     <SolidColorBrush x:Key="PreviewValidBorderBrush" Color="#C8E6C9"/>
     <SolidColorBrush x:Key="PreviewWarningBackgroundBrush" Color="#FFFCF5"/>

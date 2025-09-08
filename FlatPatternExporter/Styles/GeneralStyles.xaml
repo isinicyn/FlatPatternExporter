@@ -297,6 +297,11 @@
                 <Setter Property="Background" Value="{DynamicResource TokenCustomBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource TokenCustomBorderBrush}"/>
             </DataTrigger>
+            <!-- Стиль для пользовательских свойств -->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="UserDefined">
+                <Setter Property="Background" Value="{DynamicResource TokenUserDefinedBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource TokenUserDefinedBorderBrush}"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 

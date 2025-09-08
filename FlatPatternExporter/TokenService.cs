@@ -14,6 +14,8 @@ public class TokenElement
     public int EndIndex { get; set; }
     public Border? VisualElement { get; set; }
     public bool IsCustomText { get; set; } = false;
+    
+    public bool IsUserDefined => !IsCustomText && PropertyMetadataRegistry.IsUserDefinedProperty(Name);
 
     public string GetDisplayName()
     {
@@ -365,7 +367,7 @@ public class TokenService : INotifyPropertyChanged
         var border = new Border
         {
             Style = _tokenContainer.FindResource("TokenBlockStyle") as Style,
-            Tag = tokenElement.IsCustomText ? "CustomText" : null
+            Tag = tokenElement.IsCustomText ? "CustomText" : (tokenElement.IsUserDefined ? "UserDefined" : null)
         };
 
         var textBlock = new TextBlock
