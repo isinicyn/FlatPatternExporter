@@ -30,6 +30,8 @@
     <sys:Double x:Key="LargeSquareButtonSize">75</sys:Double>
     <sys:Double x:Key="SpinnerButtonWidth">20</sys:Double>
     <sys:Double x:Key="SpinnerButtonHeight">12</sys:Double>
+    <sys:Double x:Key="IconButtonSize">24</sys:Double>
+    <Thickness x:Key="IconButtonPadding">4</Thickness>
 
     <!-- Стандартные отступы для элементов -->
     <Thickness x:Key="StandardMarginThickness">6</Thickness>
@@ -179,6 +181,25 @@
         </Border>
     </ControlTemplate>
 
+    <!-- Базовые шаблоны для кнопок с иконками -->
+    
+    <!-- Универсальный шаблон кнопки с иконкой (только структура, без триггеров) -->
+    <ControlTemplate x:Key="IconButtonTemplate" TargetType="Button">
+        <Border x:Name="Border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Width="{StaticResource IconButtonSize}"
+                Height="{StaticResource IconButtonSize}">
+            <Viewbox Margin="{StaticResource IconButtonPadding}"
+                     Stretch="Uniform">
+                <ContentPresenter Content="{TemplateBinding Content}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+            </Viewbox>
+        </Border>
+    </ControlTemplate>
+    
     <!-- Базовые стили элементов управления -->
 
     <!-- Базовый стиль для всех элементов -->
@@ -273,20 +294,77 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Базовые стили кнопок с иконками -->
+    
+    <!-- Базовый стиль для всех кнопок с иконками -->
+    <Style x:Key="BaseIconButtonStyle" TargetType="Button">
+        <Setter Property="Template" Value="{StaticResource IconButtonTemplate}"/>
+        <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+                <Setter Property="Opacity" Value="0.5"/>
+                <Setter Property="Cursor" Value="Arrow"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <!-- Стиль для обычных кнопок с иконками (добавление и т.д.) -->
+    <Style x:Key="NeutralIconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseIconButtonStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderTertiaryBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderDarkBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <!-- Стиль для деструктивных кнопок с иконками (удаление, сброс) -->
+    <Style x:Key="DestructiveIconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseIconButtonStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource RedLightBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource RedLightBorderBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource RedMediumBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource RedMediumBorderBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <!-- Стиль для позитивных кнопок с иконками (подтверждение, успех) -->
+    <Style x:Key="PositiveIconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseIconButtonStyle}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource GreenLightBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource GreenLightBorderBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource GreenMediumBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource GreenMediumBorderBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
     <!-- Централизованный стиль для иконки добавления -->
     <Style x:Key="AddIconStyle" TargetType="Path">
         <Setter Property="Data" Value="{StaticResource AddIconGeometry}"/>
         <Setter Property="Stroke" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="StrokeThickness" Value="2"/>
         <Setter Property="Stretch" Value="Uniform"/>
-        <Setter Property="Width" Value="{StaticResource SmallIconSize}"/>
-        <Setter Property="Height" Value="{StaticResource SmallIconSize}"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsEnabled}" Value="False">
                 <Setter Property="Stroke" Value="{DynamicResource TextDisabledBrush}"/>
-                <Setter Property="Opacity" Value="0.5"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -296,14 +374,9 @@
         <Setter Property="Data" Value="{StaticResource DeleteFromRegistryIconGeometry}"/>
         <Setter Property="Fill" Value="{DynamicResource ErrorBrush}"/>
         <Setter Property="Stretch" Value="Uniform"/>
-        <Setter Property="Width" Value="{StaticResource SmallIconSize}"/>
-        <Setter Property="Height" Value="{StaticResource SmallIconSize}"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsEnabled}" Value="False">
                 <Setter Property="Fill" Value="{DynamicResource TextDisabledBrush}"/>
-                <Setter Property="Opacity" Value="0.5"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -314,14 +387,9 @@
         <Setter Property="Stroke" Value="{DynamicResource ErrorBrush}"/>
         <Setter Property="StrokeThickness" Value="1.5"/>
         <Setter Property="Stretch" Value="Uniform"/>
-        <Setter Property="Width" Value="{StaticResource SmallIconSize}"/>
-        <Setter Property="Height" Value="{StaticResource SmallIconSize}"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsEnabled}" Value="False">
                 <Setter Property="Stroke" Value="{DynamicResource TextDisabledBrush}"/>
-                <Setter Property="Opacity" Value="0.5"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -673,53 +741,6 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Базовый стиль для всех деструктивных кнопок (удаление, сброс) -->
-    <Style x:Key="BaseDestructiveButtonStyle" TargetType="Button">
-        <Setter Property="Width" Value="{StaticResource StandardElementHeight}"/>
-        <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-        <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Template" Value="{StaticResource BaseInteractiveButtonTemplate}"/>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource RedLightBackgroundBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource RedLightBorderBrush}"/>
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{DynamicResource RedMediumBackgroundBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource RedMediumBorderBrush}"/>
-            </Trigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
-                <Setter Property="Cursor" Value="Arrow"/>
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <!-- Стиль для кнопок сброса с встроенной иконкой крестика -->
-    <Style x:Key="ResetButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseDestructiveButtonStyle}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            Padding="{TemplateBinding Padding}">
-                        <Path Style="{StaticResource CloseIconStyle}"/>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!-- Стиль для деструктивных кнопок с кастомным содержимым -->
-    <Style x:Key="DestructiveIconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseDestructiveButtonStyle}">
-        <!-- Наследует все от BaseDestructiveButtonStyle, включая стандартный Template -->
-    </Style>
 
     <!-- Простой стиль для TreeView -->
     <Style x:Key="ConflictTreeViewStyle" TargetType="TreeView">

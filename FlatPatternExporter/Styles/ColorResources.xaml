@@ -55,6 +55,12 @@
     <SolidColorBrush x:Key="RedLightBorderBrush" Color="#FF9999"/>
     <SolidColorBrush x:Key="RedMediumBorderBrush" Color="#FF6666"/>
 
+    <!-- Фоны для оттенков зеленого (успех, подтверждение) -->
+    <SolidColorBrush x:Key="GreenLightBackgroundBrush" Color="#E6FFE6"/>
+    <SolidColorBrush x:Key="GreenMediumBackgroundBrush" Color="#CCFFCC"/>
+    <SolidColorBrush x:Key="GreenLightBorderBrush" Color="#99CC99"/>
+    <SolidColorBrush x:Key="GreenMediumBorderBrush" Color="#66AA66"/>
+
     <!-- Прозрачные цвета -->
     <SolidColorBrush x:Key="TransparentBrush" Color="Transparent"/>
     <SolidColorBrush x:Key="ProgressBarBrush" Color="#FFE1E1E1"/>

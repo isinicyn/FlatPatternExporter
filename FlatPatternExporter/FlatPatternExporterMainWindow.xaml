@@ -493,8 +493,10 @@
                         <Border Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
                             <Button x:Name="ClearSearchButton" 
                                 Click="ClearSearchButton_Click" 
-                                Style="{StaticResource ResetButtonStyle}"
-                                IsEnabled="False"/>
+                                Style="{StaticResource DestructiveIconButtonStyle}"
+                                IsEnabled="False">
+                                <Path Style="{StaticResource CloseIconStyle}"/>
+                            </Button>
                         </Border>
                     </StackPanel>
 
@@ -552,9 +554,11 @@
                         <Border Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
                             <Button x:Name="ClearMultiplierButton" 
                                 Click="ClearMultiplierButton_Click" 
-                                Style="{StaticResource ResetButtonStyle}" 
+                                Style="{StaticResource DestructiveIconButtonStyle}" 
                                 ToolTip="Сбросить множитель на 1"
-                                IsEnabled="False"/>
+                                IsEnabled="False">
+                                <Path Style="{StaticResource CloseIconStyle}"/>
+                            </Button>
                         </Border>
                     </StackPanel>
                 </Grid>

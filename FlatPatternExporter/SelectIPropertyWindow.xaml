@@ -171,14 +171,12 @@
                                                     Orientation="Horizontal">
                                             <Button x:Name="AddPropertyButton"
                                                     ToolTip="Добавить колонку"
-                                                    Width="{StaticResource StandardElementHeight}" 
-                                                    Height="{StaticResource StandardElementHeight}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="AddPropertyButton_Click"
                                                     Tag="{Binding}">
                                                 <Path Style="{StaticResource AddIconStyle}"/>
                                                 <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+                                                    <Style TargetType="Button" BasedOn="{StaticResource PositiveIconButtonStyle}">
                                                         <Setter Property="Visibility" Value="Visible"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsAdded}" Value="True">
@@ -191,13 +189,12 @@
                                             
                                             <Button x:Name="RemovePropertyButton"
                                                     ToolTip="Удалить колонку"
-                                                    Width="{StaticResource StandardElementHeight}" 
-                                                    Height="{StaticResource StandardElementHeight}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="RemovePropertyButton_Click"
                                                     Tag="{Binding}">
+                                                <Path Style="{StaticResource CloseIconStyle}"/>
                                                 <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource ResetButtonStyle}">
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DestructiveIconButtonStyle}">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsAdded}" Value="True">
@@ -309,14 +306,12 @@
                                         <StackPanel Grid.Column="1" 
                                                     Orientation="Horizontal">
                                             <Button ToolTip="Добавить колонку"
-                                                    Width="{StaticResource StandardElementHeight}" 
-                                                    Height="{StaticResource StandardElementHeight}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="AddUserPropertyButton_Click"
                                                     Tag="{Binding}">
                                                 <Path Style="{StaticResource AddIconStyle}"/>
                                                 <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+                                                    <Style TargetType="Button" BasedOn="{StaticResource PositiveIconButtonStyle}">
                                                         <Setter Property="Visibility" Value="Visible"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsAdded}" Value="True">
@@ -328,13 +323,12 @@
                                             </Button>
                                             
                                             <Button ToolTip="Удалить колонку"
-                                                    Width="{StaticResource StandardElementHeight}" 
-                                                    Height="{StaticResource StandardElementHeight}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="RemoveUserPropertyButton_Click"
                                                     Tag="{Binding}">
+                                                <Path Style="{StaticResource CloseIconStyle}"/>
                                                 <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource ResetButtonStyle}">
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DestructiveIconButtonStyle}">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsAdded}" Value="True">
@@ -346,8 +340,6 @@
                                             </Button>
                                             
                                             <Button ToolTip="Удалить из реестра"
-                                                    Width="{StaticResource StandardElementHeight}" 
-                                                    Height="{StaticResource StandardElementHeight}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Style="{StaticResource DestructiveIconButtonStyle}"
                                                     Click="DeleteUserPropertyButton_Click"
