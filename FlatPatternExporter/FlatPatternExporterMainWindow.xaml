@@ -278,15 +278,23 @@
 
                         <Grid Grid.Row="1" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*" MinWidth="350"/>
+                                <ColumnDefinition Width="250" MinWidth="250"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="1*" MinWidth="350"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="1*" MinWidth="400"/>
                             </Grid.ColumnDefinitions>
 
-                            <!-- Левая колонка: Источники данных -->
-                            <GroupBox Grid.Column="0" Header="Источники данных" Margin="{StaticResource RightSmallMarginThickness}">
+                            <!-- Левая колонка: Менеджер пресетов -->
+                            <local:TemplatePresetManagerControl Grid.Column="0" 
+                                                              PresetManager="{Binding PresetManager}" 
+                                                              TokenService="{Binding TokenService}"
+                                                              Margin="{StaticResource RightSmallMarginThickness}"/>
+
+                            <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
+
+                            <!-- Средняя колонка: Источники данных -->
+                            <GroupBox Grid.Column="2" Header="Источники данных" Margin="{StaticResource HorizontalSmallMarginThickness}">
                                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                                 <TextBlock Text="Стандартные свойства:" Style="{StaticResource SectionHeaderTextStyle}"/>
                                     <ListBox x:Name="AvailableTokensListBox" 
@@ -336,14 +344,6 @@
                                     </WrapPanel>
                                 </StackPanel>
                             </GroupBox>
-
-                            <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
-
-                            <!-- Средняя колонка: Менеджер пресетов -->
-                            <local:TemplatePresetManagerControl Grid.Column="2" 
-                                                              PresetManager="{Binding PresetManager}" 
-                                                              TokenService="{Binding TokenService}"
-                                                              Margin="{StaticResource HorizontalSmallMarginThickness}"/>
 
                             <GridSplitter Grid.Column="3" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
 
