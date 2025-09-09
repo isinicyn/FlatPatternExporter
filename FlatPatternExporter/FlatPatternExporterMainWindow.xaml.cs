@@ -886,34 +886,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    private void TemplatePresetsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (SelectedTemplatePreset != null && !string.IsNullOrEmpty(SelectedTemplatePreset.Template))
-        {
-            TokenService.FileNameTemplate = SelectedTemplatePreset.Template;
-        }
-    }
-
-    private void SavePresetInlineButton_Click(object sender, RoutedEventArgs e)
-    {
-        var currentTemplate = TokenService.FileNameTemplate;
-        if (string.IsNullOrEmpty(currentTemplate))
-        {
-            MessageBox.Show("Шаблон не может быть пустым.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        string presetName = PresetNameTextBox.Text.Trim();
-        if (PresetManager.SavePreset(presetName, currentTemplate))
-        {
-            PresetNameTextBox.Text = "";
-        }
-    }
-
-    private void DeletePresetButton_Click(object sender, RoutedEventArgs e)
-    {
-        PresetManager.DeleteSelectedPreset();
-    }
 
     private void CustomTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {

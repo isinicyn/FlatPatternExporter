@@ -274,70 +274,15 @@
                                 </TextBlock.ToolTip>
                         </TextBlock>
 
-                            <!-- Управление пресетами -->
-                            <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
-                                <TextBlock Text="Пресеты:" VerticalAlignment="Center" Margin="{StaticResource RightSmallMarginThickness}" FontWeight="SemiBold"/>
-                                <Grid>
-                                    <ComboBox x:Name="TemplatePresetsComboBox" 
-                                          Width="150"
-                                          ItemsSource="{Binding PresetManager.TemplatePresets}"
-                                          DisplayMemberPath="Name"
-                                          SelectedItem="{Binding SelectedTemplatePreset, Mode=TwoWay}"
-                                          SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
-                                          ToolTip="Выберите сохраненный пресет шаблона">
-                                        <ComboBox.Style>
-                                            <Style TargetType="ComboBox" BasedOn="{StaticResource PresetComboBoxStyle}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource Self}}" Value="False">
-                                                        <Setter Property="IsEnabled" Value="False" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ComboBox.Style>
-                                    </ComboBox>
-                                    <TextBlock Text="Нет пресетов" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="{StaticResource LeftSmallMarginThickness}" Foreground="{StaticResource TextDisabledBrush}">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding HasItems, ElementName=TemplatePresetsComboBox}" Value="False">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <TextBlock Text="Выберите пресет" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="{StaticResource LeftSmallMarginThickness}" Foreground="{StaticResource TextDisabledBrush}">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                <Style.Triggers>
-                                                    <MultiDataTrigger>
-                                                        <MultiDataTrigger.Conditions>
-                                                            <Condition Binding="{Binding HasItems, ElementName=TemplatePresetsComboBox}" Value="True"/>
-                                                            <Condition Binding="{Binding SelectedItem, ElementName=TemplatePresetsComboBox}" Value="{x:Null}"/>
-                                                        </MultiDataTrigger.Conditions>
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </MultiDataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </Grid>
-                                <Button x:Name="DeletePresetButton"
-                                    Content="Удалить"
-                                    Click="DeletePresetButton_Click"
-                                    Style="{StaticResource PresetDeleteButtonStyle}"
-                                    IsEnabled="{Binding SelectedTemplatePreset, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
-                                    ToolTip="Удалить выбранный пресет"/>
-                            </StackPanel>
                         </StackPanel>
 
                         <Grid Grid.Row="1" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="1*" MinWidth="350"/>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="2*" MinWidth="400"/>
+                                <ColumnDefinition Width="1*" MinWidth="350"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1*" MinWidth="400"/>
                             </Grid.ColumnDefinitions>
 
                             <!-- Левая колонка: Источники данных -->
@@ -394,8 +339,16 @@
 
                             <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
 
+                            <!-- Средняя колонка: Менеджер пресетов -->
+                            <local:TemplatePresetManagerControl Grid.Column="2" 
+                                                              PresetManager="{Binding PresetManager}" 
+                                                              TokenService="{Binding TokenService}"
+                                                              Margin="{StaticResource HorizontalSmallMarginThickness}"/>
+
+                            <GridSplitter Grid.Column="3" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
+
                             <!-- Правая колонка: Шаблон и предпросмотр -->
-                            <GroupBox Grid.Column="2" Header="Шаблон и предпросмотр" Margin="{StaticResource LeftSmallMarginThickness}">
+                            <GroupBox Grid.Column="4" Header="Шаблон и предпросмотр" Margin="{StaticResource LeftSmallMarginThickness}">
                                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                                     <TextBlock Text="Шаблон имени файла:" Style="{StaticResource SectionHeaderTextStyle}"/>
                                     <Border x:Name="FileNameTemplateTokenBox"
@@ -409,18 +362,6 @@
                                                    VerticalAlignment="Center"/>
                                     </Border>
 
-                                    <!-- Сохранение пресета -->
-                                    <TextBlock Text="Сохранить как пресет:" Style="{StaticResource SectionHeaderTextStyle}"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBox x:Name="PresetNameTextBox" 
-                                             Style="{StaticResource FileNameInputTextBoxStyle}"
-                                             ToolTip="Введите имя для нового пресета"/>
-                                        <Button x:Name="SavePresetInlineButton"
-                                            Content="Сохранить"
-                                            Click="SavePresetInlineButton_Click"
-                                            Style="{StaticResource FileNameActionButtonStyle}"
-                                            ToolTip="Сохранить текущий шаблон как пресет"/>
-                                    </StackPanel>
 
                                     <!-- Предпросмотр результата -->
                                     <TextBlock Text="Предпросмотр:" Style="{StaticResource SectionHeaderTextStyle}"/>
