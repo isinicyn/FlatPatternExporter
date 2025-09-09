@@ -280,7 +280,7 @@
                                 <Grid>
                                     <ComboBox x:Name="TemplatePresetsComboBox" 
                                           Width="150"
-                                          ItemsSource="{Binding TemplatePresets}"
+                                          ItemsSource="{Binding PresetManager.TemplatePresets}"
                                           DisplayMemberPath="Name"
                                           SelectedItem="{Binding SelectedTemplatePreset, Mode=TwoWay}"
                                           SelectionChanged="TemplatePresetsComboBox_SelectionChanged"

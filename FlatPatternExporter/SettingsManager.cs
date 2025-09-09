@@ -59,7 +59,7 @@ public record ApplicationSettings
     public string FileNameTemplate { get; init; } = "{PartNumber}";
     
     public List<TemplatePresetData> TemplatePresets { get; init; } = [];
-    public string SelectedTemplatePresetName { get; init; } = "";
+    public int SelectedTemplatePresetIndex { get; init; } = -1;
     
     public List<LayerSettingData> LayerSettings { get; init; } = [];
     
@@ -132,13 +132,7 @@ public static class SettingsManager
             .Cast<string>()
             .ToList();
 
-        var templatePresets = window.TemplatePresets
-            .Select(preset => new TemplatePresetData
-            {
-                Name = preset.Name,
-                Template = preset.Template
-            })
-            .ToList();
+        var templatePresets = window.PresetManager.GetPresetData().ToList();
 
         var layerSettings = window.LayerSettings
             .Where(ls => ls.HasChanges())
@@ -190,7 +184,7 @@ public static class SettingsManager
             FileNameTemplate = window.TokenService.FileNameTemplate,
             
             TemplatePresets = templatePresets,
-            SelectedTemplatePresetName = window.SelectedTemplatePreset?.Name ?? "",
+            SelectedTemplatePresetIndex = window.PresetManager.GetSelectedPresetIndex(),
             
             LayerSettings = layerSettings,
             IsExpanded = window.SettingsExpander?.IsExpanded ?? false
@@ -237,21 +231,7 @@ public static class SettingsManager
         if (window.SettingsExpander is not null)
             window.SettingsExpander.IsExpanded = settings.IsExpanded;
         
-        window.TemplatePresets.Clear();
-        foreach (var presetData in settings.TemplatePresets)
-        {
-            window.TemplatePresets.Add(new TemplatePreset
-            {
-                Name = presetData.Name,
-                Template = presetData.Template
-            });
-        }
-        
-        if (settings.SelectedTemplatePresetName is { Length: > 0 })
-        {
-            window.SelectedTemplatePreset = window.TemplatePresets
-                .FirstOrDefault(p => p.Name == settings.SelectedTemplatePresetName);
-        }
+        window.PresetManager.LoadPresets(settings.TemplatePresets, settings.SelectedTemplatePresetIndex);
 
         PropertyMetadataRegistry.UserDefinedProperties.Clear();
         

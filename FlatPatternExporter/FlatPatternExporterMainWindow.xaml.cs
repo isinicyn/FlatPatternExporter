@@ -305,17 +305,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = new();
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> AvailableTokens { get; set; } = new();
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> UserDefinedTokens { get; set; } = new();
-    public ObservableCollection<TemplatePreset> TemplatePresets { get; set; } = new();
-
-    private TemplatePreset? _selectedTemplatePreset;
+    public TemplatePresetManager PresetManager { get; } = new();
+    
     public TemplatePreset? SelectedTemplatePreset
     {
-        get => _selectedTemplatePreset;
-        set
-        {
-            _selectedTemplatePreset = value;
-            OnPropertyChanged();
-        }
+        get => PresetManager.SelectedTemplatePreset;
+        set => PresetManager.SelectedTemplatePreset = value;
     }
 
     // Публичные свойства для привязки данных CheckBox
@@ -908,58 +903,16 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             return;
         }
 
-        var presetName = PresetNameTextBox.Text.Trim();
-        if (string.IsNullOrWhiteSpace(presetName))
+        string presetName = PresetNameTextBox.Text.Trim();
+        if (PresetManager.SavePreset(presetName, currentTemplate))
         {
-            MessageBox.Show("Введите имя пресета.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        // Проверяем, не существует ли уже пресет с таким именем
-        var existingPreset = TemplatePresets.FirstOrDefault(p => p.Name == presetName);
-        if (existingPreset != null)
-        {
-            var result = MessageBox.Show(
-                $"Пресет с именем '{presetName}' уже существует. Заменить?", 
-                "Подтверждение", 
-                MessageBoxButton.YesNo, 
-                MessageBoxImage.Question);
-            
-            if (result == MessageBoxResult.Yes)
-            {
-                existingPreset.Template = currentTemplate;
-                PresetNameTextBox.Text = "";
-            }
-        }
-        else
-        {
-            var newPreset = new TemplatePreset
-            {
-                Name = presetName,
-                Template = currentTemplate
-            };
-            TemplatePresets.Add(newPreset);
-            SelectedTemplatePreset = newPreset;
             PresetNameTextBox.Text = "";
         }
     }
 
     private void DeletePresetButton_Click(object sender, RoutedEventArgs e)
     {
-        if (SelectedTemplatePreset == null)
-            return;
-
-        var result = MessageBox.Show(
-            $"Удалить пресет '{SelectedTemplatePreset.Name}'?", 
-            "Подтверждение удаления", 
-            MessageBoxButton.YesNo, 
-            MessageBoxImage.Question);
-
-        if (result == MessageBoxResult.Yes)
-        {
-            TemplatePresets.Remove(SelectedTemplatePreset);
-            SelectedTemplatePreset = null;
-        }
+        PresetManager.DeleteSelectedPreset();
     }
 
     private void CustomTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -2178,13 +2131,6 @@ public class ScanProgress
     public string CurrentItem { get; set; } = string.Empty;
 }
 
-public class TemplatePreset
-{
-    public string Name { get; set; } = string.Empty;
-    public string Template { get; set; } = string.Empty;
-    
-    public override string ToString() => Name;
-}
 
 // Структура для детальной информации о конфликтах обозначений
 public class PartConflictInfo
