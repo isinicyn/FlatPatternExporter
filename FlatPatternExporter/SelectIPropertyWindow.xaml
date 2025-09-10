@@ -226,9 +226,9 @@
                                                     <Setter Property="Background" Value="{StaticResource SelectionBackgroundBrush}"/>
                                                     <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
                                                 </DataTrigger>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="BorderBrush" Value="{StaticResource BorderTertiaryBrush}"/>
-                                                </Trigger>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
@@ -364,9 +364,9 @@
                                                     <Setter Property="Background" Value="{StaticResource SelectionBackgroundBrush}"/>
                                                     <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
                                                 </DataTrigger>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="BorderBrush" Value="{StaticResource BorderTertiaryBrush}"/>
-                                                </Trigger>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </Border.Style>
