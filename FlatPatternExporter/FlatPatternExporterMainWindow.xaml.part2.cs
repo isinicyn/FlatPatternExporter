@@ -1016,11 +1016,11 @@ public partial class FlatPatternExporterMainWindow : Window
                         // Оптимизация DXF если включена настройка и версия не R12
                         if (OptimizeDxf && exportSuccess)
                         {
-                            var selectedVersion = AcadVersions[SelectedAcadVersionIndex].Value;
-                            // Не оптимизируем файлы R12, так как netDxf не поддерживает эту версию
-                            if (selectedVersion != "R12")
+                            AcadVersionType selectedEnumVersion = AcadVersionType.V2000;
+                            Dispatcher.Invoke(() => { selectedEnumVersion = SelectedAcadVersion; });
+                            if (AcadVersionMapping.SupportsOptimization(selectedEnumVersion))
                             {
-                                DxfOptimizer.OptimizeDxfFile(filePath, selectedVersion);
+                                DxfOptimizer.OptimizeDxfFile(filePath, selectedEnumVersion);
                             }
                         }
                     }
@@ -1034,14 +1034,9 @@ public partial class FlatPatternExporterMainWindow : Window
                 BitmapImage? dxfPreview = null;
                 if (generateThumbnails)
                 {
-                    var selectedVersion = "";
-                    Dispatcher.Invoke(() => 
-                    {
-                        selectedVersion = AcadVersions[SelectedAcadVersionIndex].Value;
-                    });
-                    
-                    // Не создаваем миниатюры для R12, так как netDxf не поддерживает эту версию
-                    if (selectedVersion != "R12")
+                    AcadVersionType selectedEnumVersion = AcadVersionType.V2000;
+                    Dispatcher.Invoke(() => { selectedEnumVersion = SelectedAcadVersion; });
+                    if (AcadVersionMapping.SupportsOptimization(selectedEnumVersion))
                     {
                         dxfPreview = GenerateDxfThumbnail(thicknessDir, partNumber);
                     }

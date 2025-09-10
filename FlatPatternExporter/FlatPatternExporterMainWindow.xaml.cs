@@ -64,40 +64,25 @@ public enum AcadVersionType
 public class AcadVersionItem
 {
     public string DisplayName { get; set; } = string.Empty;
-    public string Value { get; set; } = string.Empty;
-    
+    public AcadVersionType Value { get; set; }
     public override string ToString() => DisplayName;
 }
 
-public class SplineReplacementItem  
+public class SplineReplacementItem
 {
     public string DisplayName { get; set; } = string.Empty;
-    public string Value { get; set; } = string.Empty;
-    
+    public SplineReplacementType Value { get; set; }
     public override string ToString() => DisplayName;
 }
 
 public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
     // Статические методы для отображения enum значений
-    public static string GetAcadVersionDisplayName(AcadVersionType version) => version switch
-    {
-        AcadVersionType.V2018 => "2018",
-        AcadVersionType.V2013 => "2013", 
-        AcadVersionType.V2010 => "2010",
-        AcadVersionType.V2007 => "2007",
-        AcadVersionType.V2004 => "2004",
-        AcadVersionType.V2000 => "2000",
-        AcadVersionType.R12 => "R12",
-        _ => "2000"
-    };
+    public static string GetAcadVersionDisplayName(AcadVersionType version)
+        => AcadVersionMapping.GetDisplayName(version);
     
-    public static string GetSplineTypeDisplayName(SplineReplacementType type) => type switch
-    {
-        SplineReplacementType.Lines => "Линии",
-        SplineReplacementType.Arcs => "Дуги",
-        _ => "Линии"
-    };
+    public static string GetSplineTypeDisplayName(SplineReplacementType type)
+        => SplineReplacementMapping.GetDisplayName(type);
     
 
     // Inventor API
@@ -182,8 +167,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     
     // Настройки экспорта DXF
     private bool _enableSplineReplacement = false;
-    private int _selectedSplineReplacementIndex = 0;
-    private int _selectedAcadVersionIndex = 5; // 2000 по умолчанию
+    private SplineReplacementType _selectedSplineReplacement = SplineReplacementType.Lines;
+    private AcadVersionType _selectedAcadVersion = AcadVersionType.V2000; // 2000 по умолчанию
     private bool _mergeProfilesIntoPolyline = true;
     private bool _rebaseGeometry = true;
     private bool _trimCenterlines = false;
@@ -457,38 +442,38 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    public int SelectedSplineReplacementIndex
+    public SplineReplacementType SelectedSplineReplacement
     {
-        get => _selectedSplineReplacementIndex;
+        get => _selectedSplineReplacement;
         set
         {
-            if (_selectedSplineReplacementIndex != value)
+            if (_selectedSplineReplacement != value)
             {
-                _selectedSplineReplacementIndex = value;
+                _selectedSplineReplacement = value;
                 OnPropertyChanged();
             }
         }
     }
 
-    public int SelectedAcadVersionIndex
+    public AcadVersionType SelectedAcadVersion
     {
-        get => _selectedAcadVersionIndex;
+        get => _selectedAcadVersion;
         set
         {
-            if (_selectedAcadVersionIndex != value)
+            if (_selectedAcadVersion != value)
             {
-                _selectedAcadVersionIndex = value;
+                _selectedAcadVersion = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsOptimizeDxfEnabled));
-                
-                // Автоматически отключаем оптимизацию для R12
-                if (AcadVersions.Count > value && AcadVersions[value].Value == "R12")
+
+                if (!AcadVersionMapping.SupportsOptimization(_selectedAcadVersion))
                 {
                     OptimizeDxf = false;
-                    // Показываем сообщение только если приложение уже инициализировано
                     if (!_isInitializing)
                     {
-                        MessageBox.Show("Для версии R12 отключены оптимизация DXF и генерация миниатюр.\n\nДанная версия не поддерживается используемой библиотекой.", 
+                        var ver = AcadVersionMapping.GetDisplayName(_selectedAcadVersion);
+                        MessageBox.Show(
+                            $"Для версии {ver} отключены оптимизация DXF и генерация миниатюр.\n\nДанная версия не поддерживается используемой библиотекой.",
                             "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
@@ -595,9 +580,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public TokenService TokenService => _tokenService;
 
     // Вычисляемое свойство для доступности оптимизации DXF
-    public bool IsOptimizeDxfEnabled => 
-        AcadVersions.Count > SelectedAcadVersionIndex && 
-        AcadVersions[SelectedAcadVersionIndex].Value != "R12";
+    public bool IsOptimizeDxfEnabled => AcadVersionMapping.SupportsOptimization(SelectedAcadVersion);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -1322,23 +1305,18 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         var sb = new StringBuilder();
 
-        var selectedAcadVersion = (AcadVersionItem)AcadVersionComboBox.SelectedItem;
-        sb.Append($"AcadVersion={selectedAcadVersion?.Value ?? "2000"}");
+        sb.Append($"AcadVersion={AcadVersionMapping.GetTranslatorCode(SelectedAcadVersion)}");
 
         if (EnableSplineReplacement)
         {
             var splineTolerance = SplineToleranceTextBox.Text;
 
-            // Получаем текущий разделитель дробной части из системных настроек
             var decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-
-            // Заменяем разделитель на актуальный
             splineTolerance = splineTolerance.Replace('.', decimalSeparator).Replace(',', decimalSeparator);
 
-            var selectedSplineType = (SplineReplacementItem)SplineReplacementComboBox.SelectedItem;
-            if (selectedSplineType?.Value == "0") // Линии
+            if (SelectedSplineReplacement == SplineReplacementType.Lines)
                 sb.Append($"&SimplifySplines=True&SplineTolerance={splineTolerance}");
-            else if (selectedSplineType?.Value == "1") // Дуги
+            else if (SelectedSplineReplacement == SplineReplacementType.Arcs)
                 sb.Append($"&SimplifySplines=True&SimplifyAsTangentArcs=True&SplineTolerance={splineTolerance}");
         }
         else
@@ -1676,11 +1654,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         AcadVersions = new ObservableCollection<AcadVersionItem>(
             Enum.GetValues<AcadVersionType>()
-            .Select(version => new AcadVersionItem 
-            { 
-                DisplayName = GetAcadVersionDisplayName(version), 
-                Value = GetAcadVersionDisplayName(version)
-            })
+                .Select(version => new AcadVersionItem
+                {
+                    DisplayName = GetAcadVersionDisplayName(version),
+                    Value = version
+                })
         );
     }
 
@@ -1688,11 +1666,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         SplineReplacementTypes = new ObservableCollection<SplineReplacementItem>(
             Enum.GetValues<SplineReplacementType>()
-            .Select(type => new SplineReplacementItem 
-            { 
-                DisplayName = GetSplineTypeDisplayName(type), 
-                Value = ((int)type).ToString()
-            })
+                .Select(type => new SplineReplacementItem
+                {
+                    DisplayName = GetSplineTypeDisplayName(type),
+                    Value = type
+                })
         );
     }
 

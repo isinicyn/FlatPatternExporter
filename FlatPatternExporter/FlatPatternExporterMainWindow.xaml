@@ -117,7 +117,7 @@
                                                   ItemsSource="{Binding AcadVersions}"
                                                   DisplayMemberPath="DisplayName"
                                                   SelectedValuePath="Value"
-                                                  SelectedIndex="{Binding SelectedAcadVersionIndex, Mode=TwoWay}"/>
+                                                  SelectedValue="{Binding SelectedAcadVersion, Mode=TwoWay}"/>
                                     </StackPanel>
                                     <CheckBox x:Name="MergeProfilesIntoPolylineCheckBox" Content="Объеденить контуры с полилиниями" IsChecked="{Binding MergeProfilesIntoPolyline, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                     <CheckBox x:Name="RebaseGeometryCheckBox" Content="Переместить геометрию в первый квадрант" IsChecked="{Binding RebaseGeometry, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
@@ -141,8 +141,8 @@
                                                   Margin="{StaticResource LeftTinyMarginThickness}"
                                                   ItemsSource="{Binding SplineReplacementTypes}"
                                                   DisplayMemberPath="DisplayName"
-                                                  SelectedValuePath="Index"
-                                                  SelectedIndex="{Binding SelectedSplineReplacementIndex, Mode=TwoWay}"/>
+                                                  SelectedValuePath="Value"
+                                                  SelectedValue="{Binding SelectedSplineReplacement, Mode=TwoWay}"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Margin="{StaticResource BottomSmallMarginThickness}">
                                         <Label Content="Допуск (мм):" VerticalAlignment="Center" Padding="{StaticResource LabelInlinePaddingThickness}"/>

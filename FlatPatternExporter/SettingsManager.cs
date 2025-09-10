@@ -208,7 +208,7 @@ public static class SettingsManager
             
             DxfExport = new DxfExportSettings
             {
-                SelectedAcadVersion = (AcadVersionType)window.SelectedAcadVersionIndex,
+                SelectedAcadVersion = window.SelectedAcadVersion,
                 MergeProfilesIntoPolyline = window.MergeProfilesIntoPolyline,
                 RebaseGeometry = window.RebaseGeometry,
                 TrimCenterlines = window.TrimCenterlines,
@@ -218,7 +218,7 @@ public static class SettingsManager
             Spline = new SplineSettings
             {
                 EnableSplineReplacement = window.EnableSplineReplacement,
-                SelectedSplineReplacement = (SplineReplacementType)window.SelectedSplineReplacementIndex,
+                SelectedSplineReplacement = window.SelectedSplineReplacement,
                 SplineTolerance = window.SplineToleranceTextBox?.Text ?? SplineSettings.DefaultSplineTolerance
             },
             
@@ -268,7 +268,7 @@ public static class SettingsManager
         window.SelectedProcessingMethod = settings.SelectedProcessingMethod;
         
         // DXF export settings
-        window.SelectedAcadVersionIndex = (int)settings.DxfExport.SelectedAcadVersion;
+        window.SelectedAcadVersion = settings.DxfExport.SelectedAcadVersion;
         window.MergeProfilesIntoPolyline = settings.DxfExport.MergeProfilesIntoPolyline;
         window.RebaseGeometry = settings.DxfExport.RebaseGeometry;
         window.TrimCenterlines = settings.DxfExport.TrimCenterlines;
@@ -276,7 +276,7 @@ public static class SettingsManager
         
         // Spline settings
         window.EnableSplineReplacement = settings.Spline.EnableSplineReplacement;
-        window.SelectedSplineReplacementIndex = (int)settings.Spline.SelectedSplineReplacement;
+        window.SelectedSplineReplacement = settings.Spline.SelectedSplineReplacement;
         if (window.SplineToleranceTextBox is not null)
             window.SplineToleranceTextBox.Text = settings.Spline.SplineTolerance;
         
