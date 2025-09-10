@@ -21,49 +21,79 @@ public record TemplatePresetData
     public string Template { get; init; } = "";
 }
 
-public record ApplicationSettings
+public record InterfaceSettings
 {
-    public const string DefaultSplineTolerance = "0.01";
-    
     public List<string> ColumnOrder { get; init; } = [];
     public List<string> UserDefinedProperties { get; init; } = [];
-    
+    public bool IsExpanded { get; init; }
+}
+
+public record ComponentFilterSettings
+{
     public bool ExcludeReferenceParts { get; init; } = true;
     public bool ExcludePurchasedParts { get; init; } = true;
     public bool ExcludePhantomParts { get; init; } = true;
     public bool IncludeLibraryComponents { get; init; }
-    
+}
+
+public record OrganizationSettings
+{
     public bool OrganizeByMaterial { get; init; }
     public bool OrganizeByThickness { get; init; }
-    
-    public bool EnableSplineReplacement { get; init; }
-    public int SelectedSplineReplacementIndex { get; init; } = 0;
-    public string SplineTolerance { get; init; } = DefaultSplineTolerance;
-    public int SelectedAcadVersionIndex { get; init; } = 5;
+}
+
+public record DxfExportSettings
+{
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public AcadVersionType SelectedAcadVersion { get; init; } = AcadVersionType.V2000;
     public bool MergeProfilesIntoPolyline { get; init; } = true;
     public bool RebaseGeometry { get; init; } = true;
     public bool TrimCenterlines { get; init; }
+    public bool OptimizeDxf { get; init; }
+}
+
+public record SplineSettings
+{
+    public const string DefaultSplineTolerance = "0.01";
     
+    public bool EnableSplineReplacement { get; init; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public SplineReplacementType SelectedSplineReplacement { get; init; } = SplineReplacementType.Lines;
+    public string SplineTolerance { get; init; } = DefaultSplineTolerance;
+}
+
+public record ExportFolderSettings
+{
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ExportFolderType SelectedExportFolder { get; init; } = ExportFolderType.ChooseFolder;
     public bool EnableSubfolder { get; init; }
     public string SubfolderName { get; init; } = "";
     public string FixedFolderPath { get; init; } = "";
+}
+
+public record FileNameSettings
+{
+    public bool EnableFileNameConstructor { get; init; }
+    public string FileNameTemplate { get; init; } = "{PartNumber}";
+    public List<TemplatePresetData> TemplatePresets { get; init; } = [];
+    public int SelectedTemplatePresetIndex { get; init; } = -1;
+}
+
+public record ApplicationSettings
+{
+    public InterfaceSettings Interface { get; init; } = new();
+    public ComponentFilterSettings ComponentFilter { get; init; } = new();
+    public OrganizationSettings Organization { get; init; } = new();
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ProcessingMethod SelectedProcessingMethod { get; init; } = ProcessingMethod.BOM;
     
-    public bool OptimizeDxf { get; init; }
-    
-    public bool EnableFileNameConstructor { get; init; }
-    public string FileNameTemplate { get; init; } = "{PartNumber}";
-    
-    public List<TemplatePresetData> TemplatePresets { get; init; } = [];
-    public int SelectedTemplatePresetIndex { get; init; } = -1;
+    public DxfExportSettings DxfExport { get; init; } = new();
+    public SplineSettings Spline { get; init; } = new();
+    public ExportFolderSettings ExportFolder { get; init; } = new();
+    public FileNameSettings FileName { get; init; } = new();
     
     public List<LayerSettingData> LayerSettings { get; init; } = [];
-    
-    public bool IsExpanded { get; init; }
 }
 
 public static class SettingsManager
@@ -153,90 +183,119 @@ public static class SettingsManager
 
         return new ApplicationSettings
         {
-            ColumnOrder = [..columnsInDisplayOrder],
-            UserDefinedProperties = userDefinedProperties,
+            Interface = new InterfaceSettings
+            {
+                ColumnOrder = [..columnsInDisplayOrder],
+                UserDefinedProperties = userDefinedProperties,
+                IsExpanded = window.SettingsExpander?.IsExpanded ?? false
+            },
             
-            ExcludeReferenceParts = window.ExcludeReferenceParts,
-            ExcludePurchasedParts = window.ExcludePurchasedParts,
-            ExcludePhantomParts = window.ExcludePhantomParts,
-            IncludeLibraryComponents = window.IncludeLibraryComponents,
+            ComponentFilter = new ComponentFilterSettings
+            {
+                ExcludeReferenceParts = window.ExcludeReferenceParts,
+                ExcludePurchasedParts = window.ExcludePurchasedParts,
+                ExcludePhantomParts = window.ExcludePhantomParts,
+                IncludeLibraryComponents = window.IncludeLibraryComponents
+            },
             
-            OrganizeByMaterial = window.OrganizeByMaterial,
-            OrganizeByThickness = window.OrganizeByThickness,
-            
-            EnableSplineReplacement = window.EnableSplineReplacement,
-            SelectedSplineReplacementIndex = window.SelectedSplineReplacementIndex,
-            SplineTolerance = window.SplineToleranceTextBox?.Text ?? ApplicationSettings.DefaultSplineTolerance,
-            SelectedAcadVersionIndex = window.SelectedAcadVersionIndex,
-            MergeProfilesIntoPolyline = window.MergeProfilesIntoPolyline,
-            RebaseGeometry = window.RebaseGeometry,
-            TrimCenterlines = window.TrimCenterlines,
-            
-            SelectedExportFolder = window.SelectedExportFolder,
-            EnableSubfolder = window.EnableSubfolder,
-            SubfolderName = window.SubfolderNameTextBox?.Text ?? "",
-            FixedFolderPath = window.FixedFolderPath,
+            Organization = new OrganizationSettings
+            {
+                OrganizeByMaterial = window.OrganizeByMaterial,
+                OrganizeByThickness = window.OrganizeByThickness
+            },
             
             SelectedProcessingMethod = window.SelectedProcessingMethod,
-            OptimizeDxf = window.OptimizeDxf,
             
-            EnableFileNameConstructor = window.EnableFileNameConstructor,
-            FileNameTemplate = window.TokenService.FileNameTemplate,
+            DxfExport = new DxfExportSettings
+            {
+                SelectedAcadVersion = (AcadVersionType)window.SelectedAcadVersionIndex,
+                MergeProfilesIntoPolyline = window.MergeProfilesIntoPolyline,
+                RebaseGeometry = window.RebaseGeometry,
+                TrimCenterlines = window.TrimCenterlines,
+                OptimizeDxf = window.OptimizeDxf
+            },
             
-            TemplatePresets = templatePresets,
-            SelectedTemplatePresetIndex = window.PresetManager.GetSelectedPresetIndex(),
+            Spline = new SplineSettings
+            {
+                EnableSplineReplacement = window.EnableSplineReplacement,
+                SelectedSplineReplacement = (SplineReplacementType)window.SelectedSplineReplacementIndex,
+                SplineTolerance = window.SplineToleranceTextBox?.Text ?? SplineSettings.DefaultSplineTolerance
+            },
             
-            LayerSettings = layerSettings,
-            IsExpanded = window.SettingsExpander?.IsExpanded ?? false
+            ExportFolder = new ExportFolderSettings
+            {
+                SelectedExportFolder = window.SelectedExportFolder,
+                EnableSubfolder = window.EnableSubfolder,
+                SubfolderName = window.SubfolderNameTextBox?.Text ?? "",
+                FixedFolderPath = window.FixedFolderPath
+            },
+            
+            FileName = new FileNameSettings
+            {
+                EnableFileNameConstructor = window.EnableFileNameConstructor,
+                FileNameTemplate = window.TokenService.FileNameTemplate,
+                TemplatePresets = templatePresets,
+                SelectedTemplatePresetIndex = window.PresetManager.GetSelectedPresetIndex()
+            },
+            
+            LayerSettings = layerSettings
         };
     }
 
     public static void ApplySettingsToMainWindow(ApplicationSettings settings, FlatPatternExporterMainWindow window)
     {
-        if (settings.ColumnOrder.Count == 0)
+        if (settings.Interface.ColumnOrder.Count == 0)
         {
             Debug.WriteLine("Warning: No columns to restore from settings");
             return;
         }
 
-        window.ExcludeReferenceParts = settings.ExcludeReferenceParts;
-        window.ExcludePurchasedParts = settings.ExcludePurchasedParts;
-        window.ExcludePhantomParts = settings.ExcludePhantomParts;
-        window.IncludeLibraryComponents = settings.IncludeLibraryComponents;
-        
-        window.OrganizeByMaterial = settings.OrganizeByMaterial;
-        window.OrganizeByThickness = settings.OrganizeByThickness;
-        
-        window.EnableSplineReplacement = settings.EnableSplineReplacement;
-        window.SelectedSplineReplacementIndex = settings.SelectedSplineReplacementIndex;
-        if (window.SplineToleranceTextBox is not null)
-            window.SplineToleranceTextBox.Text = settings.SplineTolerance;
-        window.SelectedAcadVersionIndex = settings.SelectedAcadVersionIndex;
-        window.MergeProfilesIntoPolyline = settings.MergeProfilesIntoPolyline;
-        window.RebaseGeometry = settings.RebaseGeometry;
-        window.TrimCenterlines = settings.TrimCenterlines;
-        
-        window.SelectedExportFolder = settings.SelectedExportFolder;
-        window.EnableSubfolder = settings.EnableSubfolder;
-        if (window.SubfolderNameTextBox is not null)
-            window.SubfolderNameTextBox.Text = settings.SubfolderName;
-        window.FixedFolderPath = settings.FixedFolderPath;
-        
-        window.SelectedProcessingMethod = settings.SelectedProcessingMethod;
-        window.OptimizeDxf = settings.OptimizeDxf;
-        
-        window.EnableFileNameConstructor = settings.EnableFileNameConstructor;
-        window.TokenService.FileNameTemplate = settings.FileNameTemplate;
-        
+        // Interface settings
         if (window.SettingsExpander is not null)
-            window.SettingsExpander.IsExpanded = settings.IsExpanded;
+            window.SettingsExpander.IsExpanded = settings.Interface.IsExpanded;
+
+        // Component filter settings
+        window.ExcludeReferenceParts = settings.ComponentFilter.ExcludeReferenceParts;
+        window.ExcludePurchasedParts = settings.ComponentFilter.ExcludePurchasedParts;
+        window.ExcludePhantomParts = settings.ComponentFilter.ExcludePhantomParts;
+        window.IncludeLibraryComponents = settings.ComponentFilter.IncludeLibraryComponents;
         
-        window.PresetManager.LoadPresets(settings.TemplatePresets, settings.SelectedTemplatePresetIndex);
+        // Organization settings
+        window.OrganizeByMaterial = settings.Organization.OrganizeByMaterial;
+        window.OrganizeByThickness = settings.Organization.OrganizeByThickness;
+        
+        // Processing method
+        window.SelectedProcessingMethod = settings.SelectedProcessingMethod;
+        
+        // DXF export settings
+        window.SelectedAcadVersionIndex = (int)settings.DxfExport.SelectedAcadVersion;
+        window.MergeProfilesIntoPolyline = settings.DxfExport.MergeProfilesIntoPolyline;
+        window.RebaseGeometry = settings.DxfExport.RebaseGeometry;
+        window.TrimCenterlines = settings.DxfExport.TrimCenterlines;
+        window.OptimizeDxf = settings.DxfExport.OptimizeDxf;
+        
+        // Spline settings
+        window.EnableSplineReplacement = settings.Spline.EnableSplineReplacement;
+        window.SelectedSplineReplacementIndex = (int)settings.Spline.SelectedSplineReplacement;
+        if (window.SplineToleranceTextBox is not null)
+            window.SplineToleranceTextBox.Text = settings.Spline.SplineTolerance;
+        
+        // Export folder settings
+        window.SelectedExportFolder = settings.ExportFolder.SelectedExportFolder;
+        window.EnableSubfolder = settings.ExportFolder.EnableSubfolder;
+        if (window.SubfolderNameTextBox is not null)
+            window.SubfolderNameTextBox.Text = settings.ExportFolder.SubfolderName;
+        window.FixedFolderPath = settings.ExportFolder.FixedFolderPath;
+        
+        // File name settings
+        window.EnableFileNameConstructor = settings.FileName.EnableFileNameConstructor;
+        window.TokenService.FileNameTemplate = settings.FileName.FileNameTemplate;
+        window.PresetManager.LoadPresets(settings.FileName.TemplatePresets, settings.FileName.SelectedTemplatePresetIndex);
 
         PropertyMetadataRegistry.UserDefinedProperties.Clear();
         
         // Загружаем UDP из сохраненного списка
-        foreach (var userProperty in settings.UserDefinedProperties)
+        foreach (var userProperty in settings.Interface.UserDefinedProperties)
         {
             if (!string.IsNullOrWhiteSpace(userProperty))
             {
@@ -247,7 +306,7 @@ public static class SettingsManager
         var presetLookup = window.PresetIProperties.ToLookup(p => PropertyMetadataRegistry.GetInternalNameByColumnHeader(p.ColumnHeader));
 
         var restoredColumns = 0;
-        foreach (var internalName in settings.ColumnOrder.Where(name => !string.IsNullOrWhiteSpace(name)))
+        foreach (var internalName in settings.Interface.ColumnOrder.Where(name => !string.IsNullOrWhiteSpace(name)))
         {
             var propertyDef = PropertyMetadataRegistry.GetPropertyByInternalName(internalName);
             if (propertyDef == null)
@@ -276,7 +335,7 @@ public static class SettingsManager
             }
         }
 
-        Debug.WriteLine($"Restored {restoredColumns} columns out of {settings.ColumnOrder.Count} from settings");
+        Debug.WriteLine($"Restored {restoredColumns} columns out of {settings.Interface.ColumnOrder.Count} from settings");
 
         var layerSettingsLookup = window.LayerSettings.ToLookup(ls => ls.DisplayName);
         foreach (var settingData in settings.LayerSettings)

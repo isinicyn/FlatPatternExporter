@@ -43,6 +43,24 @@ public enum ProcessingMethod
     BOM = 1               // Спецификация
 }
 
+public enum SplineReplacementType
+{
+    Lines = 0,            // Линии
+    Arcs = 1              // Дуги  
+}
+
+public enum AcadVersionType
+{
+    V2018 = 0,           // 2018
+    V2013 = 1,           // 2013
+    V2010 = 2,           // 2010
+    V2007 = 3,           // 2007
+    V2004 = 4,           // 2004
+    V2000 = 5,           // 2000 (по умолчанию)
+    R12 = 6              // R12
+}
+
+
 public class AcadVersionItem
 {
     public string DisplayName { get; set; } = string.Empty;
@@ -54,13 +72,34 @@ public class AcadVersionItem
 public class SplineReplacementItem  
 {
     public string DisplayName { get; set; } = string.Empty;
-    public int Index { get; set; }
+    public string Value { get; set; } = string.Empty;
     
     public override string ToString() => DisplayName;
 }
 
 public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
+    // Статические методы для отображения enum значений
+    public static string GetAcadVersionDisplayName(AcadVersionType version) => version switch
+    {
+        AcadVersionType.V2018 => "2018",
+        AcadVersionType.V2013 => "2013", 
+        AcadVersionType.V2010 => "2010",
+        AcadVersionType.V2007 => "2007",
+        AcadVersionType.V2004 => "2004",
+        AcadVersionType.V2000 => "2000",
+        AcadVersionType.R12 => "R12",
+        _ => "2000"
+    };
+    
+    public static string GetSplineTypeDisplayName(SplineReplacementType type) => type switch
+    {
+        SplineReplacementType.Lines => "Линии",
+        SplineReplacementType.Arcs => "Дуги",
+        _ => "Линии"
+    };
+    
+
     // Inventor API
     public Inventor.Application? _thisApplication;
     private Document? _lastScannedDocument;
@@ -1297,9 +1336,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             splineTolerance = splineTolerance.Replace('.', decimalSeparator).Replace(',', decimalSeparator);
 
             var selectedSplineType = (SplineReplacementItem)SplineReplacementComboBox.SelectedItem;
-            if (selectedSplineType?.Index == 0) // Линии
+            if (selectedSplineType?.Value == "0") // Линии
                 sb.Append($"&SimplifySplines=True&SplineTolerance={splineTolerance}");
-            else if (selectedSplineType?.Index == 1) // Дуги
+            else if (selectedSplineType?.Value == "1") // Дуги
                 sb.Append($"&SimplifySplines=True&SimplifyAsTangentArcs=True&SplineTolerance={splineTolerance}");
         }
         else
@@ -1636,18 +1675,25 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private void InitializeAcadVersions()
     {
         AcadVersions = new ObservableCollection<AcadVersionItem>(
-            new[] { "2018", "2013", "2010", "2007", "2004", "2000", "R12" }
-            .Select(v => new AcadVersionItem { DisplayName = v, Value = v })
+            Enum.GetValues<AcadVersionType>()
+            .Select(version => new AcadVersionItem 
+            { 
+                DisplayName = GetAcadVersionDisplayName(version), 
+                Value = GetAcadVersionDisplayName(version)
+            })
         );
     }
 
     private void InitializeSplineReplacementTypes()
     {
-        SplineReplacementTypes = new ObservableCollection<SplineReplacementItem>
-        {
-            new() { DisplayName = "Линии", Index = 0 },
-            new() { DisplayName = "Дуги", Index = 1 }
-        };
+        SplineReplacementTypes = new ObservableCollection<SplineReplacementItem>(
+            Enum.GetValues<SplineReplacementType>()
+            .Select(type => new SplineReplacementItem 
+            { 
+                DisplayName = GetSplineTypeDisplayName(type), 
+                Value = ((int)type).ToString()
+            })
+        );
     }
 
     private void InitializeAvailableTokens()
