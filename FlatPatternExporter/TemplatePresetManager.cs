@@ -6,12 +6,43 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter;
 
-public class TemplatePreset
+public class TemplatePreset : INotifyPropertyChanged
 {
-    public string Name { get; set; } = string.Empty;
-    public string Template { get; set; } = string.Empty;
+    private string _name = string.Empty;
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if (_name != value)
+            {
+                _name = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private string _template = string.Empty;
+    public string Template
+    {
+        get => _template;
+        set
+        {
+            if (_template != value)
+            {
+                _template = value;
+                OnPropertyChanged();
+            }
+        }
+    }
     
     public override string ToString() => Name;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
 
 public class TemplatePresetManager : INotifyPropertyChanged
@@ -36,39 +67,109 @@ public class TemplatePresetManager : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public bool SavePreset(string presetName, string template)
+
+    public bool CreatePreset(string presetName, string template, out string? error)
     {
-        if (string.IsNullOrWhiteSpace(presetName))
-        {
-            MessageBox.Show("Введите имя пресета", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        error = null;
+        presetName = presetName.Trim();
+
+        if (!ValidatePresetName(presetName, null, out error))
             return false;
-        }
 
-        var existingPreset = TemplatePresets.FirstOrDefault(p => p.Name == presetName);
-        if (existingPreset != null)
-        {
-            var result = MessageBox.Show(
-                $"Пресет с именем '{presetName}' уже существует. Перезаписать?",
-                "Пресет уже существует",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                existingPreset.Template = template;
-                SelectedTemplatePreset = existingPreset;
-                return true;
-            }
-            return false;
-        }
-
-        var newPreset = new TemplatePreset
-        {
-            Name = presetName,
-            Template = template
-        };
+        var newPreset = new TemplatePreset { Name = presetName, Template = template };
         TemplatePresets.Add(newPreset);
         SelectedTemplatePreset = newPreset;
+        return true;
+    }
+
+    public bool UpdateSelectedTemplate(string template, out string? error)
+    {
+        error = null;
+        if (SelectedTemplatePreset is null)
+        {
+            error = "Не выбран пресет";
+            return false;
+        }
+
+        SelectedTemplatePreset.Template = template;
+        return true;
+    }
+
+    public bool RenameSelected(string newName, out string? error)
+    {
+        if (!ValidateSelectedPreset(out error))
+            return false;
+
+        newName = newName.Trim();
+        if (!ValidatePresetName(newName, SelectedTemplatePreset, out error))
+            return false;
+
+        SelectedTemplatePreset!.Name = newName;
+        return true;
+    }
+
+    public bool DuplicateSelected(out string? error)
+    {
+        if (!ValidateSelectedPreset(out error))
+            return false;
+
+        var baseName = SelectedTemplatePreset!.Name;
+        var newName = GenerateUniqueName($"{baseName} (копия)");
+        var duplicate = new TemplatePreset
+        {
+            Name = newName,
+            Template = SelectedTemplatePreset.Template
+        };
+        TemplatePresets.Add(duplicate);
+        SelectedTemplatePreset = duplicate;
+        return true;
+    }
+
+    private bool ValidatePresetName(string name, TemplatePreset? exclude, out string? error)
+    {
+        error = null;
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            error = "Имя пресета не может быть пустым";
+            return false;
+        }
+
+        if (TemplatePresets.Any(p => !ReferenceEquals(p, exclude) && string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase)))
+        {
+            error = "Пресет с таким именем уже существует";
+            return false;
+        }
+
+        return true;
+    }
+
+    private string GenerateUniqueName(string baseName)
+    {
+        if (!PresetNameExists(baseName))
+            return baseName;
+
+        int i = 2;
+        string candidate;
+        do
+        {
+            candidate = $"{baseName} {i++}";
+        } while (PresetNameExists(candidate));
+
+        return candidate;
+    }
+
+    private bool PresetNameExists(string name) => 
+        TemplatePresets.Any(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
+    
+    private bool ValidateSelectedPreset(out string? error)
+    {
+        error = null;
+        if (SelectedTemplatePreset is null)
+        {
+            error = "Не выбран пресет";
+            return false;
+        }
         return true;
     }
 

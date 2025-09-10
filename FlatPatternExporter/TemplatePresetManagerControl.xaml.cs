@@ -45,7 +45,7 @@ public partial class TemplatePresetManagerControl : UserControl
         {
             bool isEmpty = PresetManager.TemplatePresets.Count == 0;
             EmptyStatePanel.Visibility = isEmpty ? Visibility.Visible : Visibility.Collapsed;
-            TemplatePresetsComboBox.Visibility = isEmpty ? Visibility.Collapsed : Visibility.Visible;
+            TemplatePresetsListBox.Visibility = isEmpty ? Visibility.Collapsed : Visibility.Visible;
         }
     }
 
@@ -56,6 +56,8 @@ public partial class TemplatePresetManagerControl : UserControl
             TokenService != null)
         {
             TokenService.FileNameTemplate = PresetManager.SelectedTemplatePreset.Template;
+            PresetNameTextBox.Text = PresetManager.SelectedTemplatePreset.Name;
+            ClearNameValidation();
         }
     }
 
@@ -67,23 +69,126 @@ public partial class TemplatePresetManagerControl : UserControl
         }
     }
 
-    private void SavePresetButton_Click(object sender, RoutedEventArgs e)
+    
+
+    private void CreatePresetButton_Click(object? sender, RoutedEventArgs e)
     {
-        if (TokenService == null || PresetManager == null)
-            return;
+        if (!ValidateAndGetTemplate(out var template)) return;
 
-        var currentTemplate = TokenService.FileNameTemplate;
-        if (string.IsNullOrEmpty(currentTemplate))
+        var presetName = GetTrimmedPresetName();
+        if (!PresetManager.CreatePreset(presetName, template, out var error))
         {
-            MessageBox.Show("Шаблон не может быть пустым.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            ShowNameValidation(error);
             return;
         }
 
-        string presetName = PresetNameTextBox.Text.Trim();
-        if (PresetManager.SavePreset(presetName, currentTemplate))
+        RefreshUI();
+    }
+
+    private void SaveChangesButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (!ValidateAndGetTemplate(out var template)) return;
+        if (!HasSelectedPreset()) return;
+
+        if (PresetManager.SelectedTemplatePreset!.Template == template)
         {
-            PresetNameTextBox.Text = "";
-            UpdateEmptyState();
+            ShowMessage("Изменений не обнаружено.", MessageBoxImage.Information);
+            return;
         }
+
+        if (PresetManager.UpdateSelectedTemplate(template, out var error))
+        {
+            ClearNameValidation();
+        }
+        else if (!string.IsNullOrEmpty(error))
+        {
+            ShowMessage(error);
+        }
+    }
+
+    private bool ValidateAndGetTemplate(out string template)
+    {
+        template = "";
+        
+        if (!IsServicesReady()) 
+            return false;
+
+        template = TokenService!.FileNameTemplate;
+        if (string.IsNullOrWhiteSpace(template))
+        {
+            ShowMessage("Шаблон не может быть пустым.");
+            return false;
+        }
+
+        if (!TokenService.IsFileNameTemplateValid)
+        {
+            ShowMessage("Текущий шаблон содержит ошибки. Исправьте шаблон перед операцией.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void ShowMessage(string message, MessageBoxImage icon = MessageBoxImage.Warning)
+    {
+        MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, icon);
+    }
+
+    private void RefreshUI()
+    {
+        ClearNameValidation();
+        UpdateEmptyState();
+    }
+
+    private void RenamePresetButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (!HasSelectedPreset()) return;
+
+        var newName = GetTrimmedPresetName();
+        if (!PresetManager!.RenameSelected(newName, out var error))
+        {
+            ShowNameValidation(error);
+            return;
+        }
+
+        ClearNameValidation();
+    }
+
+    private void DuplicatePresetButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (!HasSelectedPreset()) return;
+
+        if (!PresetManager!.DuplicateSelected(out var error) && !string.IsNullOrEmpty(error))
+        {
+            ShowMessage(error);
+            return;
+        }
+
+        PresetNameTextBox.Text = PresetManager.SelectedTemplatePreset?.Name ?? "";
+        RefreshUI();
+    }
+
+    private bool HasSelectedPreset() => PresetManager?.SelectedTemplatePreset != null;
+    
+    private bool IsServicesReady() => TokenService != null && PresetManager != null;
+    
+    private string GetTrimmedPresetName() => PresetNameTextBox.Text.Trim();
+
+    private void ShowNameValidation(string? message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            ClearNameValidation();
+            return;
+        }
+
+        NameValidationTextBlock.Text = message;
+        NameValidationTextBlock.Visibility = Visibility.Visible;
+    }
+
+    private void ClearNameValidation()
+    {
+        NameValidationTextBlock.Text = string.Empty;
+        NameValidationTextBlock.Visibility = Visibility.Collapsed;
     }
 }

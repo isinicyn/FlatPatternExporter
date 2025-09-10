@@ -278,7 +278,7 @@
 
                         <Grid Grid.Row="1" IsEnabled="{Binding IsChecked, ElementName=EnableFileNameConstructorCheckBox}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="250" MinWidth="250"/>
+                                <ColumnDefinition Width="300" MinWidth="300"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="1*" MinWidth="350"/>
                                 <ColumnDefinition Width="Auto"/>

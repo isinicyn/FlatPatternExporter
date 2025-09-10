@@ -2,42 +2,15 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:FlatPatternExporter.Converters">
-    
-    <GroupBox Header="Менеджер пресетов шаблонов">
+
+    <GroupBox Header="Менеджер пресетов шаблонов" Style="{StaticResource BaseGroupBoxStyle}">
         <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
-            
-            <!-- Выбор и управление пресетами -->
+            <!-- Список пресетов и действия -->
             <TextBlock Text="Сохраненные пресеты:" Style="{StaticResource SectionHeaderTextStyle}"/>
-            <Grid Margin="{StaticResource BottomSmallMarginThickness}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <ComboBox x:Name="TemplatePresetsComboBox" 
-                          Grid.Column="0"
-                          ItemsSource="{Binding PresetManager.TemplatePresets}"
-                          DisplayMemberPath="Name"
-                          SelectedItem="{Binding PresetManager.SelectedTemplatePreset, Mode=TwoWay}"
-                          SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
-                          ToolTip="Выберите сохраненный пресет шаблона"
-                          Style="{StaticResource BaseComboBoxStyle}">
-                </ComboBox>
-                
-                <Button Grid.Column="1"
-                        x:Name="DeletePresetButton"
-                        Content="Удалить"
-                        Click="DeletePresetButton_Click"
-                        Style="{StaticResource WarningButtonStyle}"
-                        IsEnabled="{Binding PresetManager.SelectedTemplatePreset, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
-                        ToolTip="Удалить выбранный пресет"
-                        Margin="{StaticResource LeftSmallMarginThickness}"/>
-            </Grid>
-            
-            <!-- Пустое состояние -->
-            <Border x:Name="EmptyStatePanel" 
-                    Background="{StaticResource BackgroundSecondaryBrush}" 
-                    BorderBrush="{StaticResource BorderSecondaryBrush}" 
+
+            <Border x:Name="EmptyStatePanel"
+                    Background="{StaticResource BackgroundSecondaryBrush}"
+                    BorderBrush="{StaticResource BorderSecondaryBrush}"
                     BorderThickness="{StaticResource StandardBorderThicknessValue}"
                     Padding="{StaticResource StandardPaddingThickness}"
                     Margin="{StaticResource BottomSmallMarginThickness}"
@@ -46,35 +19,84 @@
                            Style="{StaticResource OverlayHintTextStyle}"
                            TextAlignment="Center"/>
             </Border>
-            
-            <!-- Сохранение нового пресета -->
-            <Separator Style="{StaticResource HorizontalSeparatorStyle}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-            
-            <TextBlock Text="Создать новый пресет:" Style="{StaticResource SectionHeaderTextStyle}"/>
+
             <Grid Margin="{StaticResource BottomSmallMarginThickness}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
-                <TextBox x:Name="PresetNameTextBox" 
+                <ListBox x:Name="TemplatePresetsListBox"
                          Grid.Column="0"
-                         Style="{StaticResource BaseTextBoxStyle}"
-                         ToolTip="Введите имя для нового пресета"/>
-                
-                <Button x:Name="SavePresetButton"
-                        Grid.Column="1"
-                        Content="Сохранить"
-                        Click="SavePresetButton_Click"
-                        Style="{StaticResource InteractiveActionButtonStyle}"
-                        ToolTip="Сохранить текущий шаблон как новый пресет"
-                        Margin="{StaticResource LeftSmallMarginThickness}"/>
+                         ItemsSource="{Binding PresetManager.TemplatePresets}"
+                         DisplayMemberPath="Name"
+                         SelectedItem="{Binding PresetManager.SelectedTemplatePreset, Mode=TwoWay}"
+                         SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         Margin="{StaticResource BottomSmallMarginThickness}"
+                         ToolTip="Выберите сохраненный пресет шаблона" MaxHeight="140"/>
+
+                <StackPanel Grid.Column="1" 
+                            Orientation="Vertical"
+                            Margin="{StaticResource LeftSmallMarginThickness}">
+                    
+                    <Button x:Name="CreatePresetButton"
+                            Content="Создать"
+                            Click="CreatePresetButton_Click"
+                            Style="{StaticResource InteractiveActionButtonStyle}"
+                            ToolTip="Создать новый пресет на основе текущего шаблона"
+                            Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+                    <Button x:Name="SaveChangesButton"
+                            Content="Сохранить"
+                            Click="SaveChangesButton_Click"
+                            Style="{StaticResource InteractiveActionButtonStyle}"
+                            IsEnabled="{Binding PresetManager.SelectedTemplatePreset, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
+                            ToolTip="Сохранить текущее содержимое шаблона в выбранный пресет"
+                            Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+                    <Button x:Name="RenamePresetButton"
+                            Content="Переименовать"
+                            Click="RenamePresetButton_Click"
+                            Style="{StaticResource InteractiveActionButtonStyle}"
+                            IsEnabled="{Binding PresetManager.SelectedTemplatePreset, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
+                            ToolTip="Переименовать выбранный пресет"
+                            Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+                    <Button x:Name="DuplicatePresetButton"
+                            Content="Дублировать"
+                            Click="DuplicatePresetButton_Click"
+                            Style="{StaticResource InteractiveActionButtonStyle}"
+                            IsEnabled="{Binding PresetManager.SelectedTemplatePreset, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
+                            ToolTip="Создать копию выбранного пресета"
+                            Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+                    <Button x:Name="DeletePresetButton"
+                            Content="Удалить"
+                            Click="DeletePresetButton_Click"
+                            Style="{StaticResource WarningButtonStyle}"
+                            IsEnabled="{Binding PresetManager.SelectedTemplatePreset, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
+                            ToolTip="Удалить выбранный пресет"
+                            Margin="{StaticResource BottomSmallMarginThickness}"/>
+                </StackPanel>
             </Grid>
-            
-            <!-- Подсказка для ввода имени -->
-            <TextBlock Text="Введите описательное имя для пресета, например: 'Стандартная деталь', 'С толщиной и материалом'"
-                       Style="{StaticResource OverlayHintTextStyle}"
-                       Opacity="0.7"/>
+
+            <Separator Style="{StaticResource HorizontalSeparatorStyle}"
+                       Margin="{StaticResource VerticalSmallMarginThickness}"/>
+
+            <!-- Поле имени пресета -->
+            <TextBlock Text="Имя пресета:" Style="{StaticResource SectionHeaderTextStyle}"/>
+            <TextBox x:Name="PresetNameTextBox"
+                     Style="{StaticResource BaseTextBoxStyle}"
+                     ToolTip="Введите имя пресета для создания или переименования"
+                     Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+            <TextBlock x:Name="NameValidationTextBlock"
+                       Foreground="{DynamicResource ErrorBrush}"
+                       FontSize="{StaticResource SmallFontSize}"
+                       TextWrapping="Wrap"
+                       Visibility="Collapsed"/>
         </StackPanel>
     </GroupBox>
 </UserControl>
