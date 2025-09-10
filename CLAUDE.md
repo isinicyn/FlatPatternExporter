@@ -25,6 +25,7 @@ FlatPatternExporter/
     ├── SelectIPropertyWindow.xaml(.cs) # Окно выбора свойств
     │
     ├── LayerSettingControl.xaml(.cs)   # Элемент управления слоями
+    ├── TemplatePresetManagerControl.xaml(.cs) # Элемент управления пресетами шаблонов
     │
     ├── Styles/                         # XAML стили
     │   ├── ColorResources.xaml
