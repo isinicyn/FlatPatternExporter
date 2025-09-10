@@ -77,14 +77,6 @@ public class SplineReplacementItem
 
 public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
-    // Статические методы для отображения enum значений
-    public static string GetAcadVersionDisplayName(AcadVersionType version)
-        => AcadVersionMapping.GetDisplayName(version);
-    
-    public static string GetSplineTypeDisplayName(SplineReplacementType type)
-        => SplineReplacementMapping.GetDisplayName(type);
-    
-
     // Inventor API
     public Inventor.Application? _thisApplication;
     private Document? _lastScannedDocument;
@@ -329,13 +321,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = new();
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> AvailableTokens { get; set; } = new();
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> UserDefinedTokens { get; set; } = new();
-    public TemplatePresetManager PresetManager { get; } = new();
-    
-    public TemplatePreset? SelectedTemplatePreset
-    {
-        get => PresetManager.SelectedTemplatePreset;
-        set => PresetManager.SelectedTemplatePreset = value;
-    }
+    public TemplatePresetManager PresetManager { get; } = new();    
 
     // Публичные свойства для привязки данных CheckBox
     public bool ExcludeReferenceParts
@@ -813,9 +799,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         return false;
     }
 
-
-
-
     protected override void OnClosed(EventArgs e)
     {
         // Отменяем активные операции и освобождаем ресурсы
@@ -834,7 +817,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         // Если были созданы дополнительные потоки, убедитесь, что они завершены
     }
-
     private void AddPresetIPropertyButton_Click(object sender, RoutedEventArgs e)
     {
         var selectIPropertyWindow =
@@ -907,7 +889,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             TokenService?.AddCustomText(symbol);
         }
     }
-
 
     private void CustomTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
@@ -1656,7 +1637,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             Enum.GetValues<AcadVersionType>()
                 .Select(version => new AcadVersionItem
                 {
-                    DisplayName = GetAcadVersionDisplayName(version),
+                    DisplayName = AcadVersionMapping.GetDisplayName(version),
                     Value = version
                 })
         );
@@ -1668,7 +1649,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             Enum.GetValues<SplineReplacementType>()
                 .Select(type => new SplineReplacementItem
                 {
-                    DisplayName = GetSplineTypeDisplayName(type),
+                    DisplayName = SplineReplacementMapping.GetDisplayName(type),
                     Value = type
                 })
         );
