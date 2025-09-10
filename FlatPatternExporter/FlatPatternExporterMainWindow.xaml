@@ -310,38 +310,49 @@
                                          Style="{StaticResource TokenListBoxStyle}"
                                          MouseDoubleClick="TokenListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
 
-                                    <!-- Поле для ввода произвольного текста -->
-                                    <TextBlock Text="Произвольный текст:" Style="{StaticResource SectionHeaderTextStyle}"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBox x:Name="CustomTextBox" 
-                                             Width="200"
-                                             Style="{StaticResource BaseTextBoxStyle}"
-                                             KeyDown="CustomTextBox_KeyDown"
-                                             ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
-                                        <Button x:Name="AddCustomTextButton"
-                                            Content="Добавить"
-                                            Style="{StaticResource InteractiveActionButtonStyle}"
-                                            Margin="{StaticResource SmallMarginThickness}"
-                                            Click="AddCustomTextButton_Click"
-                                            ToolTip="Добавить введенный текст как кастомный токен"/>
-                                    </StackPanel>
-
-                                    <!-- Панель с предустановленными символами -->
-                                    <TextBlock Text="Быстрые символы:" Style="{StaticResource SectionHeaderTextStyle}"/>
-                                    <WrapPanel Orientation="Horizontal">
-                                        <Button Content="-" Click="AddSymbolButton_Click" Tag="-" ToolTip="Тире" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="_" Click="AddSymbolButton_Click" Tag="_" ToolTip="Подчеркивание" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="." Click="AddSymbolButton_Click" Tag="." ToolTip="Точка" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="␣" Click="AddSymbolButton_Click" Tag=" " ToolTip="Пробел" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="(" Click="AddSymbolButton_Click" Tag="(" ToolTip="Открывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content=")" Click="AddSymbolButton_Click" Tag=")" ToolTip="Закрывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="[" Click="AddSymbolButton_Click" Tag="[" ToolTip="Открывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="]" Click="AddSymbolButton_Click" Tag="]" ToolTip="Закрывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="+" Click="AddSymbolButton_Click" Tag="+" ToolTip="Плюс" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="=" Click="AddSymbolButton_Click" Tag="=" ToolTip="Знак равенства" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="x" Click="AddSymbolButton_Click" Tag="x" ToolTip="x (для обозначения 'на')" Style="{StaticResource SymbolButtonStyle}"/>
-                                        <Button Content="#" Click="AddSymbolButton_Click" Tag="#" ToolTip="Решетка" Style="{StaticResource SymbolButtonStyle}"/>
-                                    </WrapPanel>
+                                    <!-- Произвольный текст и быстрые символы в одной строке -->
+                                    <TextBlock Text="Произвольный текст и символы:" Style="{StaticResource SectionHeaderTextStyle}"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <!-- Поле ввода текста и кнопка добавления -->
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                            <TextBox x:Name="CustomTextBox" 
+                                                 Width="125"
+                                                 Style="{StaticResource BaseTextBoxStyle}"
+                                                 KeyDown="CustomTextBox_KeyDown"
+                                                 ToolTip="Введите произвольный текст (тире, пробелы, текст)"/>
+                                            <Button x:Name="AddCustomTextButton"
+                                                Content="Добавить"
+                                                Style="{StaticResource InteractiveActionButtonStyle}"
+                                                Margin="{StaticResource LeftSmallMarginThickness}"
+                                                Click="AddCustomTextButton_Click"
+                                                ToolTip="Добавить введенный текст как кастомный токен"/>
+                                        </StackPanel>
+                                        
+                                        <!-- Вертикальный разделитель -->
+                                        <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="{StaticResource VerticalSeparatorCenteredMarginThickness}"/>
+                                        
+                                        <!-- Быстрые символы -->
+                                        <WrapPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Content="-" Click="AddSymbolButton_Click" Tag="-" ToolTip="Тире" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="_" Click="AddSymbolButton_Click" Tag="_" ToolTip="Подчеркивание" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="." Click="AddSymbolButton_Click" Tag="." ToolTip="Точка" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="␣" Click="AddSymbolButton_Click" Tag=" " ToolTip="Пробел" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="(" Click="AddSymbolButton_Click" Tag="(" ToolTip="Открывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content=")" Click="AddSymbolButton_Click" Tag=")" ToolTip="Закрывающая скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="[" Click="AddSymbolButton_Click" Tag="[" ToolTip="Открывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="]" Click="AddSymbolButton_Click" Tag="]" ToolTip="Закрывающая квадратная скобка" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="+" Click="AddSymbolButton_Click" Tag="+" ToolTip="Плюс" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="=" Click="AddSymbolButton_Click" Tag="=" ToolTip="Знак равенства" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="x" Click="AddSymbolButton_Click" Tag="x" ToolTip="x (для обозначения 'на')" Style="{StaticResource SymbolButtonStyle}"/>
+                                            <Button Content="#" Click="AddSymbolButton_Click" Tag="#" ToolTip="Решетка" Style="{StaticResource SymbolButtonStyle}"/>
+                                        </WrapPanel>
+                                    </Grid>
                                 </StackPanel>
                             </GroupBox>
 
