@@ -101,12 +101,19 @@ namespace FlatPatternExporter
         /// <summary>
         /// Проверяет, отличаются ли текущие настройки от значений по умолчанию
         /// </summary>
-        public bool HasChanges() =>
+        public bool HasChanges()
+        {
+            bool defaultIsChecked = DisplayName == LayerDefaults.OuterProfileLayerName;
+            return CustomName != LayerDefaults.DefaultCustomName ||
+                   SelectedColor != LayerDefaults.DefaultColor ||
+                   SelectedLineType != LayerDefaults.DefaultLineType ||
+                   IsChecked != defaultIsChecked;
+        }
+
+        public bool CanReset =>
             CustomName != LayerDefaults.DefaultCustomName ||
             SelectedColor != LayerDefaults.DefaultColor ||
             SelectedLineType != LayerDefaults.DefaultLineType;
-
-        public bool CanReset => HasChanges();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
