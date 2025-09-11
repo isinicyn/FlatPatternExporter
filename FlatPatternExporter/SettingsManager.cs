@@ -244,12 +244,6 @@ public static class SettingsManager
 
     public static void ApplySettingsToMainWindow(ApplicationSettings settings, FlatPatternExporterMainWindow window)
     {
-        if (settings.Interface.ColumnOrder.Count == 0)
-        {
-            Debug.WriteLine("Warning: No columns to restore from settings");
-            return;
-        }
-
         // Interface settings
         if (window.SettingsExpander is not null)
             window.SettingsExpander.IsExpanded = settings.Interface.IsExpanded;
@@ -303,39 +297,47 @@ public static class SettingsManager
             }
         }
 
-        var presetLookup = window.PresetIProperties.ToLookup(p => PropertyMetadataRegistry.GetInternalNameByColumnHeader(p.ColumnHeader));
-
-        var restoredColumns = 0;
-        foreach (var internalName in settings.Interface.ColumnOrder.Where(name => !string.IsNullOrWhiteSpace(name)))
+        // Восстанавливаем колонки только если есть сохраненный порядок
+        if (settings.Interface.ColumnOrder.Count > 0)
         {
-            var propertyDef = PropertyMetadataRegistry.GetPropertyByInternalName(internalName);
-            if (propertyDef == null)
-            {
-                Debug.WriteLine($"Warning: Property '{internalName}' not found in registry");
-                continue;
-            }
+            var presetLookup = window.PresetIProperties.ToLookup(p => PropertyMetadataRegistry.GetInternalNameByColumnHeader(p.ColumnHeader));
 
-            if (PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
+            var restoredColumns = 0;
+            foreach (var internalName in settings.Interface.ColumnOrder.Where(name => !string.IsNullOrWhiteSpace(name)))
             {
-                window.AddUserDefinedIPropertyColumn(propertyDef.InventorPropertyName ?? internalName);
-                restoredColumns++;
-            }
-            else
-            {
-                var presetProperty = presetLookup[internalName].FirstOrDefault();
-                if (presetProperty is not null)
+                var propertyDef = PropertyMetadataRegistry.GetPropertyByInternalName(internalName);
+                if (propertyDef == null)
                 {
-                    window.AddIPropertyColumn(presetProperty);
+                    Debug.WriteLine($"Warning: Property '{internalName}' not found in registry");
+                    continue;
+                }
+
+                if (PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
+                {
+                    window.AddUserDefinedIPropertyColumn(propertyDef.InventorPropertyName ?? internalName);
                     restoredColumns++;
                 }
                 else
                 {
-                    Debug.WriteLine($"Warning: Preset property '{internalName}' not found in PresetIProperties");
+                    var presetProperty = presetLookup[internalName].FirstOrDefault();
+                    if (presetProperty is not null)
+                    {
+                        window.AddIPropertyColumn(presetProperty);
+                        restoredColumns++;
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Warning: Preset property '{internalName}' not found in PresetIProperties");
+                    }
                 }
             }
-        }
 
-        Debug.WriteLine($"Restored {restoredColumns} columns out of {settings.Interface.ColumnOrder.Count} from settings");
+            Debug.WriteLine($"Restored {restoredColumns} columns out of {settings.Interface.ColumnOrder.Count} from settings");
+        }
+        else
+        {
+            Debug.WriteLine("Warning: No columns to restore from settings");
+        }
 
         var layerSettingsLookup = window.LayerSettings.ToLookup(ls => ls.DisplayName);
         foreach (var settingData in settings.LayerSettings)
