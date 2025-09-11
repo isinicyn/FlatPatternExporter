@@ -18,7 +18,7 @@
             <TextBox x:Name="CustomTextBox"
                      Style="{StaticResource BaseTextBoxStyle}"
                      Text="{Binding CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     IsEnabled="{Binding IsCustomNameEnabled}"
+                     IsEnabled="{Binding IsOptionsEnabled}"
                      TextChanged="CustomTextBox_TextChanged"/>
             <TextBlock Text="{Binding LayerName}"
                        Foreground="{StaticResource TextTransparentMutedBrush}"
@@ -41,7 +41,7 @@
         <ComboBox Width="90"
                   ItemsSource="{Binding DataContext.AvailableColors, RelativeSource={RelativeSource AncestorType=Window}}"
                   SelectedItem="{Binding SelectedColor, Mode=TwoWay}"
-                  IsEnabled="{Binding IsColorAndLineTypeEnabled}" VerticalContentAlignment="Center">
+                  IsEnabled="{Binding IsOptionsEnabled}" VerticalContentAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -60,7 +60,7 @@
         <ComboBox Width="120"
                   ItemsSource="{Binding DataContext.LineTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                   SelectedItem="{Binding SelectedLineType, Mode=TwoWay}"
-                  IsEnabled="{Binding IsColorAndLineTypeEnabled}"
+                  IsEnabled="{Binding IsOptionsEnabled}"
                   Margin="{StaticResource LeftSmallMarginThickness}" VerticalContentAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate>

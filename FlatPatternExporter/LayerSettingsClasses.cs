@@ -4,8 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 
-namespace FlatPatternExporter
-{
+namespace FlatPatternExporter;
     /// <summary>
     /// Константы для настроек слоев по умолчанию
     /// </summary>
@@ -34,13 +33,11 @@ namespace FlatPatternExporter
             {
                 isChecked = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(IsCustomNameEnabled));
-                OnPropertyChanged(nameof(IsColorAndLineTypeEnabled));
+                OnPropertyChanged(nameof(IsOptionsEnabled));
             }
         }
 
-        public bool IsCustomNameEnabled => IsChecked;
-        public bool IsColorAndLineTypeEnabled => IsChecked;
+        public bool IsOptionsEnabled => IsChecked;
         public bool IsEnabled => DisplayName != LayerDefaults.OuterProfileLayerName;
 
         private string customName = LayerDefaults.DefaultCustomName;
@@ -98,22 +95,21 @@ namespace FlatPatternExporter
             OnPropertyChanged(nameof(CanReset));
         }
 
+        private bool IsNotDefault() =>
+            CustomName != LayerDefaults.DefaultCustomName ||
+            SelectedColor != LayerDefaults.DefaultColor ||
+            SelectedLineType != LayerDefaults.DefaultLineType;
+
         /// <summary>
         /// Проверяет, отличаются ли текущие настройки от значений по умолчанию
         /// </summary>
         public bool HasChanges()
         {
             bool defaultIsChecked = DisplayName == LayerDefaults.OuterProfileLayerName;
-            return CustomName != LayerDefaults.DefaultCustomName ||
-                   SelectedColor != LayerDefaults.DefaultColor ||
-                   SelectedLineType != LayerDefaults.DefaultLineType ||
-                   IsChecked != defaultIsChecked;
+            return IsNotDefault() || IsChecked != defaultIsChecked;
         }
 
-        public bool CanReset =>
-            CustomName != LayerDefaults.DefaultCustomName ||
-            SelectedColor != LayerDefaults.DefaultColor ||
-            SelectedLineType != LayerDefaults.DefaultLineType;
+        public bool CanReset => IsNotDefault();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -130,40 +126,40 @@ namespace FlatPatternExporter
     {
         private static readonly Dictionary<string, string> ColorValues = new()
         {
-            { "White", "255;255;255" },
-            { "Red", "255;0;0" },
-            { "Orange", "255;81;0" },
-            { "Yellow", "234;255;0" },
-            { "Green", "55;255;0" },
-            { "Cyan", "0;195;255" },
-            { "Blue", "13;0;255" },
-            { "Purple", "255;10;169" },
-            { "DarkGray", "169;169;169" },
-            { "LightGray", "211;211;211" }
+            ["White"] = "255;255;255",
+            ["Red"] = "255;0;0",
+            ["Orange"] = "255;81;0",
+            ["Yellow"] = "234;255;0",
+            ["Green"] = "55;255;0",
+            ["Cyan"] = "0;195;255",
+            ["Blue"] = "13;0;255",
+            ["Purple"] = "255;10;169",
+            ["DarkGray"] = "169;169;169",
+            ["LightGray"] = "211;211;211"
         };
 
         private static readonly Dictionary<string, string> LineTypeValues = new()
         {
-            { "Chain", "37644" },
-            { "Continuous", "37633" },
-            { "Dash dotted", "37638" },
-            { "Dashed double dotted", "37645" },
-            { "Dashed hidden", "37641" },
-            { "Dashed", "37634" },
-            { "Dashed triple dotted", "37647" },
-            { "Default", "37648" },
-            { "Dotted", "37636" },
-            { "Double dash double dotted", "37639" },
-            { "Double dashed", "37637" },
-            { "Double dashed dotted", "37646" },
-            { "Double dash triple dotted", "37640" },
-            { "Long dash dotted", "37642" },
-            { "Long dashed double dotted", "37635" },
-            { "Long dash triple dotted", "37643" }
+            ["Chain"] = "37644",
+            ["Continuous"] = "37633",
+            ["Dash dotted"] = "37638",
+            ["Dashed double dotted"] = "37645",
+            ["Dashed hidden"] = "37641",
+            ["Dashed"] = "37634",
+            ["Dashed triple dotted"] = "37647",
+            ["Default"] = "37648",
+            ["Dotted"] = "37636",
+            ["Double dash double dotted"] = "37639",
+            ["Double dashed"] = "37637",
+            ["Double dashed dotted"] = "37646",
+            ["Double dash triple dotted"] = "37640",
+            ["Long dash dotted"] = "37642",
+            ["Long dashed double dotted"] = "37635",
+            ["Long dash triple dotted"] = "37643"
         };
 
-        private static readonly List<LayerDefinition> LayerDefinitions = new()
-        {
+        private static readonly List<LayerDefinition> LayerDefinitions =
+        [
             new("BendUpLayer", "IV_BEND"),
             new("BendDownLayer", "IV_BEND_DOWN"),
             new("ToolCenterUpLayer", "IV_TOOL_CENTER"),
@@ -180,7 +176,7 @@ namespace FlatPatternExporter
             new("TangentRollLinesLayer", "IV_ROLL_TANGENT"),
             new("RollLinesLayer", "IV_ROLL"),
             new("UnconsumedSketchConstructionLayer", "IV_UNCONSUMED_SKETCH_CONSTRUCTION")
-        };
+        ];
 
         /// <summary>
         /// Конвертирует название цвета в RGB значение
@@ -232,10 +228,10 @@ namespace FlatPatternExporter
     /// </summary>
     public static class LayerNameValidator
     {
-        private static readonly HashSet<char> InvalidCharacters = new() 
-        { 
+        private static readonly HashSet<char> InvalidCharacters = 
+        [ 
             '<', '>', '/', '\\', '"', ':', ';', '?', '*', '|', ',', '=' 
-        };
+        ];
 
         private const string ValidationMessage = 
             "Недопустимые символы в имени слоя.\nВ именах слоев не допускается употребление следующих символов:\n<>/\\\":;?*|,=";
@@ -282,4 +278,3 @@ namespace FlatPatternExporter
                 MessageBoxImage.Warning);
         }
     }
-}

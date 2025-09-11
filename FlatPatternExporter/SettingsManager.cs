@@ -10,9 +10,9 @@ public record LayerSettingData
 {
     public string DisplayName { get; init; } = "";
     public bool IsChecked { get; init; }
-    public string CustomName { get; init; } = "";
-    public string SelectedColor { get; init; } = "White";
-    public string SelectedLineType { get; init; } = "Default";
+    public string CustomName { get; init; } = LayerDefaults.DefaultCustomName;
+    public string SelectedColor { get; init; } = LayerDefaults.DefaultColor;
+    public string SelectedLineType { get; init; } = LayerDefaults.DefaultLineType;
 }
 
 public record TemplatePresetData
