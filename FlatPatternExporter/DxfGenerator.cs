@@ -1,4 +1,4 @@
-﻿using System.Drawing.Drawing2D;
+using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Text;
 using netDxf;
@@ -7,107 +7,20 @@ using FlatPatternExporter;
 
 namespace DxfGenerator;
 
-public class DxfThumbnailGenerator
+public abstract class BaseRenderer
 {
-    private const int DefaultThumbnailSize = 100;
-    private const double BoundsPadding = 0.9;
-    private const int SplineSubdivisions = 50;
-    private const double MinGeometrySize = 0.05;
-    private const double MinBoundsSize = 1.0;
-    private static readonly double[] CardinalAngles = { 0, 90, 180, 270 };
-    private static readonly Color DefaultEntityColor = Color.Black;
-
-    public (Bitmap Bitmap, string Svg) GenerateBoth(string filePath)
-    {
-        try
-        {
-            var dxf = DxfDocument.Load(filePath);
-            return (RenderDxfToBitmap(dxf), RenderDxfToSvg(dxf, DefaultThumbnailSize, DefaultThumbnailSize));
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Error loading DXF file for thumbnail generation: {ex.Message}", ex);
-        }
-    }
-
-    private Bitmap RenderDxfToBitmap(DxfDocument dxf)
-    {
-        var bitmap = new Bitmap(DefaultThumbnailSize, DefaultThumbnailSize);
-
-        using var g = Graphics.FromImage(bitmap);
-        ConfigureGraphics(g);
-
-        var entities = CollectEntities(dxf);
-        if (entities.Count == 0) return bitmap;
-
-        var bounds = CalculateBoundingBox(entities);
-        var transform = CalculateTransform(bounds, DefaultThumbnailSize, DefaultThumbnailSize);
-        var penWidth = CalculatePenWidth(bounds);
-
-        RenderEntities(g, entities, transform, penWidth);
-        
-        return bitmap;
-    }
-
-    private string RenderDxfToSvg(DxfDocument dxf, int width, int height)
-    {
-        var entities = CollectEntities(dxf);
-        if (entities.Count == 0) 
-            return CreateEmptySvg(width, height);
-
-        var bounds = CalculateBoundingBox(entities);
-        
-        // Проверим валидность границ
-        if (bounds.MinX >= bounds.MaxX || bounds.MinY >= bounds.MaxY)
-            return CreateEmptySvg(width, height);
-
-        // Вычисляем размеры исходного чертежа
-        var drawingWidth = bounds.MaxX - bounds.MinX;
-        var drawingHeight = bounds.MaxY - bounds.MinY;
-        
-        // Добавляем отступы (10% с каждой стороны)
-        var padding = Math.Max(drawingWidth, drawingHeight) * 0.1;
-        var viewMinX = bounds.MinX - padding;
-        var viewMinY = bounds.MinY - padding; 
-        var viewWidth = drawingWidth + 2 * padding;
-        var viewHeight = drawingHeight + 2 * padding;
-
-        // Вычисляем оптимальную толщину линии для хорошей видимости
-        // Используем 2.25% от размера viewport для обеспечения хорошей видимости
-        var avgDimension = (viewWidth + viewHeight) / 2;
-        var strokeWidth = avgDimension * 0.0225;
-        // Ограничиваем толщину разумными пределами (1.5% - 3.75% от размера)
-        strokeWidth = Math.Max(avgDimension * 0.015, Math.Min(avgDimension * 0.0375, strokeWidth));
-
-        var culture = CultureInfo.InvariantCulture;
-        var svg = new StringBuilder();
-        
-        svg.AppendLine($"<svg width=\"{width}\" height=\"{height}\" viewBox=\"{viewMinX.ToString("F2", culture)} {viewMinY.ToString("F2", culture)} {viewWidth.ToString("F2", culture)} {viewHeight.ToString("F2", culture)}\" xmlns=\"http://www.w3.org/2000/svg\" shape-rendering=\"geometricPrecision\">");
-        svg.AppendLine($"  <rect x=\"{viewMinX.ToString("F2", culture)}\" y=\"{viewMinY.ToString("F2", culture)}\" width=\"{viewWidth.ToString("F2", culture)}\" height=\"{viewHeight.ToString("F2", culture)}\" fill=\"white\"/>");
-        svg.AppendLine($"  <g transform=\"scale(1,-1) translate(0,{(-(viewMinY * 2 + viewHeight)).ToString("F2", culture)})\" stroke=\"#000000\" stroke-width=\"{strokeWidth.ToString("F3", culture)}\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\" shape-rendering=\"geometricPrecision\">");
-
-        foreach (var entity in entities)
-        {
-            var color = GetEntityColorHex(entity);
-            RenderEntityDirectToSvg(svg, entity, color, culture);
-        }
-
-        svg.AppendLine("  </g>");
-        svg.AppendLine("</svg>");
-
-        return svg.ToString();
-    }
-
-    private static void ConfigureGraphics(Graphics g)
-    {
-        g.Clear(Color.White);
-        g.SmoothingMode = SmoothingMode.AntiAlias;
-        g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-        g.CompositingQuality = CompositingQuality.HighQuality;
-        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-    }
-
-    private static List<EntityObject> CollectEntities(DxfDocument dxf)
+    public const int DefaultThumbnailSize = 100;
+    protected const double BoundsPadding = 0.9;
+    protected const int SplineSubdivisions = 50;
+    protected const double MinGeometrySize = 0.05;
+    protected const double MinBoundsSize = 1.0;
+    protected static readonly double[] CardinalAngles = { 0, 90, 180, 270 };
+    protected static readonly Color DefaultEntityColor = Color.Black;
+    
+    public abstract object Render(DxfDocument dxf, int width, int height);
+    public abstract object Render(List<EntityObject> entities, (double MinX, double MinY, double MaxX, double MaxY) bounds, int width, int height);
+    
+    public static List<EntityObject> CollectEntities(DxfDocument dxf)
     {
         var entities = new List<EntityObject>();
         entities.AddRange(dxf.Entities.Lines);
@@ -119,239 +32,16 @@ public class DxfThumbnailGenerator
         entities.AddRange(dxf.Entities.Ellipses);
         return entities;
     }
-
-    private (double MinX, double MinY, double MaxX, double MaxY) CalculateBoundingBox(IEnumerable<EntityObject> entities)
+    
+    public (double MinX, double MinY, double MaxX, double MaxY) CalculateBoundingBox(IEnumerable<EntityObject> entities)
     {
         double minX = double.MaxValue, minY = double.MaxValue, maxX = double.MinValue, maxY = double.MinValue;
         foreach (var entity in entities)
             UpdateBounds(entity, ref minX, ref minY, ref maxX, ref maxY);
         return (minX, minY, maxX, maxY);
     }
-
-    private (double Scale, double OffsetX, double OffsetY) CalculateTransform(
-        (double MinX, double MinY, double MaxX, double MaxY) bounds, int width, int height)
-    {
-        var rangeX = Math.Max(bounds.MaxX - bounds.MinX, MinBoundsSize);
-        var rangeY = Math.Max(bounds.MaxY - bounds.MinY, MinBoundsSize);
-        
-        var scaleX = width / rangeX;
-        var scaleY = height / rangeY;
-        var scale = Math.Min(scaleX, scaleY) * BoundsPadding;
-        
-        if (!double.IsFinite(scale) || scale <= 0)
-            scale = 1.0;
-        
-        var offsetX = (width - rangeX * scale) / 2 - bounds.MinX * scale;
-        var offsetY = (height - rangeY * scale) / 2 - bounds.MinY * scale;
-        
-        if (!double.IsFinite(offsetX)) offsetX = 0;
-        if (!double.IsFinite(offsetY)) offsetY = 0;
-        
-        return (scale, offsetX, offsetY);
-    }
-
-    private float CalculatePenWidth((double MinX, double MinY, double MaxX, double MaxY) bounds)
-    {
-        var drawingWidth = bounds.MaxX - bounds.MinX;
-        var drawingHeight = bounds.MaxY - bounds.MinY;
-        var avgDimension = (drawingWidth + drawingHeight) / 2;
-        
-        var scale = DefaultThumbnailSize / avgDimension * BoundsPadding;
-        var penWidth = (float)(avgDimension * 0.0225 * scale);
-        
-        penWidth = Math.Max((float)(avgDimension * 0.015 * scale), 
-                           Math.Min((float)(avgDimension * 0.0375 * scale), penWidth));
-        
-        return Math.Max(1f, penWidth);
-    }
-
-    private void RenderEntities(Graphics g, IEnumerable<EntityObject> entities, 
-        (double Scale, double OffsetX, double OffsetY) transform, float penWidth)
-    {
-        foreach (var entity in entities)
-        {
-            using var pen = new Pen(GetEntityColor(entity), penWidth);
-            RenderEntity(g, entity, transform, pen);
-        }
-    }
-
-    private void RenderEntity(Graphics g, EntityObject entity, 
-        (double Scale, double OffsetX, double OffsetY) transform, Pen pen)
-    {
-        switch (entity)
-        {
-            case Line line:
-                RenderLine(g, line, transform, pen);
-                break;
-            case Circle circle:
-                RenderCircle(g, circle, transform, pen);
-                break;
-            case Arc arc:
-                RenderArc(g, arc, transform, pen);
-                break;
-            case Polyline2D polyline2D:
-                RenderPolyline2D(g, polyline2D, transform, pen);
-                break;
-            case Polyline3D polyline3D:
-                RenderPolyline3D(g, polyline3D, transform, pen);
-                break;
-            case Spline spline:
-                RenderSpline(g, spline, transform, pen);
-                break;
-            case Ellipse ellipse:
-                RenderEllipse(g, ellipse, transform, pen);
-                break;
-            default:
-                if (entity.GetType().Name == "Polyline")
-                    RenderGenericPolyline(g, entity, transform, pen);
-                break;
-        }
-    }
-
-    private void RenderLine(Graphics g, Line line, (double Scale, double OffsetX, double OffsetY) transform, Pen pen)
-    {
-        try
-        {
-            var startPoint = TransformPoint(line.StartPoint, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize);
-            var endPoint = TransformPoint(line.EndPoint, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize);
-            
-            if (!IsValidPoint(startPoint) || !IsValidPoint(endPoint))
-                return;
-            
-            g.DrawLine(pen, startPoint, endPoint);
-        }
-        catch (OutOfMemoryException)
-        {
-        }
-    }
-
-    private void RenderCircle(Graphics g, Circle circle, (double Scale, double OffsetX, double OffsetY) transform, Pen pen)
-    {
-        try
-        {
-            var center = TransformPoint(circle.Center, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize);
-            var radius = (float)(circle.Radius * transform.Scale);
-            
-            if (!IsValidPoint(center) || radius < MinGeometrySize)
-                return;
-            
-            g.DrawEllipse(pen, center.X - radius, center.Y - radius, radius * 2, radius * 2);
-        }
-        catch (OutOfMemoryException)
-        {
-        }
-    }
-
-    private void RenderArc(Graphics g, Arc arc, (double Scale, double OffsetX, double OffsetY) transform, Pen pen)
-    {
-        try
-        {
-            var center = TransformPoint(arc.Center, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize);
-            var radius = (float)(arc.Radius * transform.Scale);
-            
-            if (!IsValidPoint(center) || radius < MinGeometrySize)
-                return;
-            
-            var startAngle = (float)arc.StartAngle;
-            var endAngle = (float)arc.EndAngle;
-            var sweepAngle = endAngle - startAngle;
-            if (sweepAngle < 0) sweepAngle += 360;
-            
-            g.DrawArc(pen, center.X - radius, center.Y - radius, radius * 2, radius * 2, -startAngle, -sweepAngle);
-        }
-        catch (OutOfMemoryException)
-        {
-        }
-    }
-
-    private void RenderPolyline2D(Graphics g, Polyline2D polyline2D, (double Scale, double OffsetX, double OffsetY) transform, Pen pen)
-    {
-        if (polyline2D.SmoothType == PolylineSmoothType.NoSmooth)
-            DrawPolyline2D(g, polyline2D, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize, pen);
-        else
-            DrawSplinePolyline(g, polyline2D, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize, pen);
-    }
-
-    private void RenderPolyline3D(Graphics g, Polyline3D polyline3D, (double Scale, double OffsetX, double OffsetY) transform, Pen pen)
-    {
-        if (polyline3D.SmoothType == PolylineSmoothType.NoSmooth)
-        {
-            var points = polyline3D.Vertexes.Select(v =>
-                TransformPoint(new Vector3(v.X, v.Y, v.Z), transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize)).ToArray();
-            g.DrawLines(pen, points);
-        }
-        else
-        {
-            DrawSplinePolyline(g, polyline3D, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize, pen);
-        }
-    }
-
-    private void RenderSpline(Graphics g, Spline spline, (double Scale, double OffsetX, double OffsetY) transform, Pen pen)
-    {
-        var splineVertices = InterpolateSpline(spline.ControlPoints.ToList(), spline.Degree, spline.Knots.ToList(), SplineSubdivisions);
-        if (splineVertices.Count > 1)
-        {
-            var points = splineVertices.Select(v => TransformPoint(v, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize)).ToArray();
-            g.DrawCurve(pen, points);
-        }
-    }
-
-    private void RenderEllipse(Graphics g, Ellipse ellipse, (double Scale, double OffsetX, double OffsetY) transform, Pen pen)
-    {
-        try
-        {
-            var center = TransformPoint(ellipse.Center, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize);
-            var majorAxis = (float)(ellipse.MajorAxis * transform.Scale);
-            var minorAxis = (float)(ellipse.MinorAxis * transform.Scale);
-            
-            if (!IsValidPoint(center) || majorAxis < MinGeometrySize || minorAxis < MinGeometrySize)
-                return;
-            
-            var majorAxisVector = ellipse.MajorAxis * ellipse.Normal;
-            var rotation = (float)Math.Atan2(majorAxisVector.Y, majorAxisVector.X);
-
-            g.TranslateTransform(center.X, center.Y);
-            g.RotateTransform(rotation * 180 / (float)Math.PI);
-            g.DrawEllipse(pen, -majorAxis / 2, -minorAxis / 2, majorAxis, minorAxis);
-            g.ResetTransform();
-        }
-        catch (OutOfMemoryException)
-        {
-            g.ResetTransform();
-        }
-    }
-
-    private void RenderGenericPolyline(Graphics g, EntityObject entity, (double Scale, double OffsetX, double OffsetY) transform, Pen pen)
-    {
-        var vertexes = GetPolylineVertexes(entity);
-        var smoothType = GetPolylineSmoothType(entity);
-
-        if (smoothType == PolylineSmoothType.NoSmooth)
-        {
-            for (var i = 0; i < vertexes.Count; i++)
-            {
-                var vertex = vertexes[i];
-                var nextVertex = vertexes[(i + 1) % vertexes.Count];
-                var startPoint = TransformPoint(new Vector3(vertex.X, vertex.Y, 0), transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize);
-                var endPoint = TransformPoint(new Vector3(nextVertex.X, nextVertex.Y, 0), transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize);
-                g.DrawLine(pen, startPoint, endPoint);
-            }
-        }
-        else
-        {
-            DrawSplinePolyline(g, vertexes, transform.Scale, transform.OffsetX, transform.OffsetY, DefaultThumbnailSize, pen);
-        }
-    }
-
-    private PolylineSmoothType GetPolylineSmoothType(EntityObject entity)
-    {
-        var smoothTypeProperty = entity.GetType().GetProperty("SmoothType");
-        if (smoothTypeProperty?.GetValue(entity) is PolylineSmoothType smoothType)
-            return smoothType;
-        return PolylineSmoothType.NoSmooth;
-    }
-
-    private void UpdateBounds(EntityObject entity, ref double minX, ref double minY, ref double maxX, ref double maxY)
+    
+    protected void UpdateBounds(EntityObject entity, ref double minX, ref double minY, ref double maxX, ref double maxY)
     {
         if (entity is Line line)
         {
@@ -369,7 +59,6 @@ public class DxfThumbnailGenerator
         }
         else if (entity is Arc arc)
         {
-            // Вычисляем начальную и конечную точки арки
             var startX = arc.Center.X + arc.Radius * Math.Cos(arc.StartAngle * Math.PI / 180);
             var startY = arc.Center.Y + arc.Radius * Math.Sin(arc.StartAngle * Math.PI / 180);
             var endX = arc.Center.X + arc.Radius * Math.Cos(arc.EndAngle * Math.PI / 180);
@@ -396,8 +85,7 @@ public class DxfThumbnailGenerator
         else if (entity is Polyline2D polyline2D)
         {
             foreach (var vertex in polyline2D.Vertexes)
-                UpdateBoundsForPoint(new Vector3(vertex.Position.X, vertex.Position.Y, 0), ref minX, ref minY, ref maxX,
-                    ref maxY);
+                UpdateBoundsForPoint(new Vector3(vertex.Position.X, vertex.Position.Y, 0), ref minX, ref minY, ref maxX, ref maxY);
 
             var numSegments = polyline2D.IsClosed ? polyline2D.Vertexes.Count : polyline2D.Vertexes.Count - 1;
             for (var i = 0; i < numSegments; i++)
@@ -482,8 +170,27 @@ public class DxfThumbnailGenerator
             }
         }
     }
+    
+    protected void UpdateBoundsForPoint(Vector3 point, ref double minX, ref double minY, ref double maxX, ref double maxY)
+    {
+        minX = Math.Min(minX, point.X);
+        minY = Math.Min(minY, point.Y);
+        maxX = Math.Max(maxX, point.X);
+        maxY = Math.Max(maxY, point.Y);
+    }
+    
+    protected bool IsAngleBetween(double angle, double startAngle, double endAngle)
+    {
+        angle = (angle + 360) % 360;
+        startAngle = (startAngle + 360) % 360;
+        endAngle = (endAngle + 360) % 360;
 
-    private (Vector2 center, double radius, double startAngle, double endAngle)? GetArcGeomFromBulge(
+        if (startAngle < endAngle)
+            return startAngle <= angle && angle <= endAngle;
+        return startAngle <= angle || angle <= endAngle;
+    }
+    
+    protected (Vector2 center, double radius, double startAngle, double endAngle)? GetArcGeomFromBulge(
         Polyline2DVertex startV, Polyline2DVertex endV)
     {
         var bulge = startV.Bulge;
@@ -517,48 +224,77 @@ public class DxfThumbnailGenerator
 
         return (center, radius, startAngle, endAngle);
     }
-
-    private bool IsAngleBetween(double angle, double startAngle, double endAngle)
+    
+    protected List<Vector3> GetPolylineVertexes(EntityObject polyline)
     {
-        angle = (angle + 360) % 360;
-        startAngle = (startAngle + 360) % 360;
-        endAngle = (endAngle + 360) % 360;
+        var vertexes = new List<Vector3>();
+        if (polyline.GetType().Name != "Polyline") return vertexes;
 
-        if (startAngle < endAngle)
-            return startAngle <= angle && angle <= endAngle;
-        return startAngle <= angle || angle <= endAngle;
+        var vertexesProperty = polyline.GetType().GetProperty("Vertexes");
+        if (vertexesProperty?.GetValue(polyline) is not IEnumerable<object> vertexesList) return vertexes;
+
+        foreach (var vertex in vertexesList)
+        {
+            var positionProperty = vertex.GetType().GetProperty("Position");
+            if (positionProperty?.GetValue(vertex) is Vector3 position)
+                vertexes.Add(position);
+        }
+
+        return vertexes;
+    }
+    
+    protected PolylineSmoothType GetPolylineSmoothType(EntityObject entity)
+    {
+        var smoothTypeProperty = entity.GetType().GetProperty("SmoothType");
+        if (smoothTypeProperty?.GetValue(entity) is PolylineSmoothType smoothType)
+            return smoothType;
+        return PolylineSmoothType.NoSmooth;
+    }
+    
+    protected List<Vector3> InterpolateSpline(List<Vector3> controlPoints, int degree, List<double> knotValues,
+        int subdivisions)
+    {
+        var vertices = new List<Vector3>();
+        var step = 1.0 / subdivisions;
+
+        for (var i = 0; i <= subdivisions; i++)
+        {
+            var t = i * step * (knotValues.Last() - knotValues.First()) + knotValues.First();
+            var point = DeBoor(t, degree, controlPoints, knotValues);
+            vertices.Add(point);
+        }
+
+        return vertices;
     }
 
-    private void UpdateBoundsForPoint(Vector3 point, ref double minX, ref double minY, ref double maxX, ref double maxY)
+    protected Vector3 DeBoor(double t, int degree, List<Vector3> controlPoints, List<double> knotValues)
     {
-        minX = Math.Min(minX, point.X);
-        minY = Math.Min(minY, point.Y);
-        maxX = Math.Max(maxX, point.X);
-        maxY = Math.Max(maxY, point.Y);
-    }
+        var n = controlPoints.Count;
 
-    private PointF TransformPoint(Vector3 point, double scale, double offsetX, double offsetY, int canvasHeight)
-    {
-        var x = (float)(point.X * scale + offsetX);
-        var y = canvasHeight - (float)(point.Y * scale + offsetY);
-        return new PointF(x, y);
-    }
+        var s = -1;
+        for (var i = degree; i < knotValues.Count - degree - 1; i++)
+            if (t >= knotValues[i] && t < knotValues[i + 1])
+            {
+                s = i;
+                break;
+            }
 
-    private PointF TransformPoint(Vector2 point, double scale, double offsetX, double offsetY, int canvasHeight)
-    {
-        return new PointF(
-            (float)(point.X * scale + offsetX),
-            canvasHeight - (float)(point.Y * scale + offsetY)
-        );
-    }
+        if (s == -1) return controlPoints[controlPoints.Count - 1];
 
-    private bool IsValidPoint(PointF point)
-    {
-        return float.IsFinite(point.X) && float.IsFinite(point.Y) &&
-               Math.Abs(point.X) < 10000 && Math.Abs(point.Y) < 10000;
-    }
+        var dPoints = new Vector3[degree + 1];
+        for (var j = 0; j <= degree; j++) dPoints[j] = controlPoints[s - degree + j];
 
-    private Color GetEntityColor(EntityObject entity)
+        for (var r = 1; r <= degree; r++)
+        for (var j = degree; j >= r; j--)
+        {
+            var alpha = (t - knotValues[s - degree + j]) / (knotValues[s + 1 - r + j] - knotValues[s - degree + j]);
+            dPoints[j] = (1.0 - alpha) * dPoints[j - 1] + alpha * dPoints[j];
+        }
+
+        return dPoints[degree];
+    }
+    
+    protected Color GetEntityColor(EntityObject entity)
     {
         Color color;
 
@@ -573,64 +309,265 @@ public class DxfThumbnailGenerator
 
         return color;
     }
-
-    private (PointF StartPoint, PointF EndPoint, float Radius, float StartAngle, float SweepAngle, RectangleF Rect)
-        GetArcSegmentFromBulge(Polyline2DVertex startVertex, Polyline2DVertex endVertex, double scale, double offsetX,
-            double offsetY, int canvasHeight)
+    
+    protected string GetEntityColorHex(EntityObject entity)
     {
-        var startPoint = TransformPoint(new Vector3(startVertex.Position.X, startVertex.Position.Y, 0), scale, offsetX,
-            offsetY, canvasHeight);
-        var endPoint = TransformPoint(new Vector3(endVertex.Position.X, endVertex.Position.Y, 0), scale, offsetX,
-            offsetY, canvasHeight);
+        var color = GetEntityColor(entity);
+        return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+    }
+}
 
-        var bulge = startVertex.Bulge;
-        var chordLength = Math.Sqrt(Math.Pow(endVertex.Position.X - startVertex.Position.X, 2) +
-                                    Math.Pow(endVertex.Position.Y - startVertex.Position.Y, 2));
-        var sagitta = Math.Abs(bulge) * chordLength / 2;
-        var radius = (Math.Pow(chordLength / 2, 2) + Math.Pow(sagitta, 2)) / (2 * sagitta);
+public class BitmapRenderer : BaseRenderer
+{
+    public override object Render(DxfDocument dxf, int width, int height)
+    {
+        var entities = BaseRenderer.CollectEntities(dxf);
+        if (entities.Count == 0) return new Bitmap(width, height);
 
-        var theta = 4 * Math.Atan(Math.Abs(bulge));
-        var gamma = (Math.PI - theta) / 2;
-        var phi = Math.Atan2(endVertex.Position.Y - startVertex.Position.Y,
-            endVertex.Position.X - startVertex.Position.X);
-        var centerAngle = bulge > 0 ? phi + gamma : phi - gamma;
+        var bounds = CalculateBoundingBox(entities);
+        return Render(entities, bounds, width, height);
+    }
+    
+    public override object Render(List<EntityObject> entities, (double MinX, double MinY, double MaxX, double MaxY) bounds, int width, int height)
+    {
+        var bitmap = new Bitmap(width, height);
 
-        var centerX = startVertex.Position.X + radius * Math.Cos(centerAngle);
-        var centerY = startVertex.Position.Y + radius * Math.Sin(centerAngle);
+        using var g = Graphics.FromImage(bitmap);
+        ConfigureGraphics(g);
 
-        var transformedCenter = TransformPoint(new Vector3(centerX, centerY, 0), scale, offsetX, offsetY, canvasHeight);
-        var transformedRadius = (float)(radius * scale);
+        var transform = CalculateTransform(bounds, width, height);
+        var penWidth = CalculatePenWidth(bounds, width, height);
 
-        var startAngle = Math.Atan2(startVertex.Position.Y - centerY, startVertex.Position.X - centerX);
-        var endAngle = Math.Atan2(endVertex.Position.Y - centerY, endVertex.Position.X - centerX);
-        var sweepAngle = bulge > 0 ? endAngle - startAngle : startAngle - endAngle;
-        if (sweepAngle < 0) sweepAngle += 2 * Math.PI;
-
-        startAngle = -startAngle * 180 / Math.PI;
-        sweepAngle = -sweepAngle * 180 / Math.PI;
-
-        var startAngleDeg = (float)startAngle;
-        var sweepAngleDeg = (float)sweepAngle;
-
-        if (bulge < 0) sweepAngleDeg = -sweepAngleDeg;
-
-        var rect = new RectangleF(
-            transformedCenter.X - transformedRadius,
-            transformedCenter.Y - transformedRadius,
-            2 * transformedRadius,
-            2 * transformedRadius
-        );
-
-        return (
-            startPoint,
-            endPoint,
-            transformedRadius,
-            startAngleDeg,
-            sweepAngleDeg,
-            rect
-        );
+        RenderEntities(g, entities, transform, penWidth, height);
+        
+        return bitmap;
+    }
+    
+    private static void ConfigureGraphics(Graphics g)
+    {
+        g.Clear(Color.White);
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+        g.CompositingQuality = CompositingQuality.HighQuality;
+        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+    }
+    
+    private (double Scale, double OffsetX, double OffsetY) CalculateTransform(
+        (double MinX, double MinY, double MaxX, double MaxY) bounds, int width, int height)
+    {
+        var rangeX = Math.Max(bounds.MaxX - bounds.MinX, MinBoundsSize);
+        var rangeY = Math.Max(bounds.MaxY - bounds.MinY, MinBoundsSize);
+        
+        var scaleX = width / rangeX;
+        var scaleY = height / rangeY;
+        var scale = Math.Min(scaleX, scaleY) * BoundsPadding;
+        
+        if (!double.IsFinite(scale) || scale <= 0)
+            scale = 1.0;
+        
+        var offsetX = (width - rangeX * scale) / 2 - bounds.MinX * scale;
+        var offsetY = (height - rangeY * scale) / 2 - bounds.MinY * scale;
+        
+        if (!double.IsFinite(offsetX)) offsetX = 0;
+        if (!double.IsFinite(offsetY)) offsetY = 0;
+        
+        return (scale, offsetX, offsetY);
+    }
+    
+    private float CalculatePenWidth((double MinX, double MinY, double MaxX, double MaxY) bounds, int width, int height)
+    {
+        var drawingWidth = bounds.MaxX - bounds.MinX;
+        var drawingHeight = bounds.MaxY - bounds.MinY;
+        var avgDimension = (drawingWidth + drawingHeight) / 2;
+        
+        var canvasSize = Math.Min(width, height);
+        var scale = canvasSize / avgDimension * BoundsPadding;
+        var penWidth = (float)(avgDimension * 0.0225 * scale);
+        
+        penWidth = Math.Max((float)(avgDimension * 0.015 * scale), 
+                           Math.Min((float)(avgDimension * 0.0375 * scale), penWidth));
+        
+        return Math.Max(1f, penWidth);
+    }
+    
+    private void RenderEntities(Graphics g, IEnumerable<EntityObject> entities, 
+        (double Scale, double OffsetX, double OffsetY) transform, float penWidth, int canvasHeight)
+    {
+        foreach (var entity in entities)
+        {
+            using var pen = new Pen(GetEntityColor(entity), penWidth);
+            RenderEntity(g, entity, transform, pen, canvasHeight);
+        }
     }
 
+    private void RenderEntity(Graphics g, EntityObject entity, 
+        (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    {
+        switch (entity)
+        {
+            case Line line:
+                RenderLine(g, line, transform, pen, canvasHeight);
+                break;
+            case Circle circle:
+                RenderCircle(g, circle, transform, pen, canvasHeight);
+                break;
+            case Arc arc:
+                RenderArc(g, arc, transform, pen, canvasHeight);
+                break;
+            case Polyline2D polyline2D:
+                RenderPolyline2D(g, polyline2D, transform, pen, canvasHeight);
+                break;
+            case Polyline3D polyline3D:
+                RenderPolyline3D(g, polyline3D, transform, pen, canvasHeight);
+                break;
+            case Spline spline:
+                RenderSpline(g, spline, transform, pen, canvasHeight);
+                break;
+            case Ellipse ellipse:
+                RenderEllipse(g, ellipse, transform, pen, canvasHeight);
+                break;
+            default:
+                if (entity.GetType().Name == "Polyline")
+                    RenderGenericPolyline(g, entity, transform, pen, canvasHeight);
+                break;
+        }
+    }
+
+    private void RenderLine(Graphics g, Line line, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    {
+        try
+        {
+            var startPoint = TransformPoint(line.StartPoint, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight);
+            var endPoint = TransformPoint(line.EndPoint, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight);
+            
+            if (!IsValidPoint(startPoint) || !IsValidPoint(endPoint))
+                return;
+            
+            g.DrawLine(pen, startPoint, endPoint);
+        }
+        catch (OutOfMemoryException)
+        {
+        }
+    }
+
+    private void RenderCircle(Graphics g, Circle circle, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    {
+        try
+        {
+            var center = TransformPoint(circle.Center, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight);
+            var radius = (float)(circle.Radius * transform.Scale);
+            
+            if (!IsValidPoint(center) || radius < MinGeometrySize)
+                return;
+            
+            g.DrawEllipse(pen, center.X - radius, center.Y - radius, radius * 2, radius * 2);
+        }
+        catch (OutOfMemoryException)
+        {
+        }
+    }
+
+    private void RenderArc(Graphics g, Arc arc, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    {
+        try
+        {
+            var center = TransformPoint(arc.Center, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight);
+            var radius = (float)(arc.Radius * transform.Scale);
+            
+            if (!IsValidPoint(center) || radius < MinGeometrySize)
+                return;
+            
+            var startAngle = (float)arc.StartAngle;
+            var endAngle = (float)arc.EndAngle;
+            var sweepAngle = endAngle - startAngle;
+            if (sweepAngle < 0) sweepAngle += 360;
+            
+            g.DrawArc(pen, center.X - radius, center.Y - radius, radius * 2, radius * 2, -startAngle, -sweepAngle);
+        }
+        catch (OutOfMemoryException)
+        {
+        }
+    }
+
+    private void RenderPolyline2D(Graphics g, Polyline2D polyline2D, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    {
+        if (polyline2D.SmoothType == PolylineSmoothType.NoSmooth)
+            DrawPolyline2D(g, polyline2D, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight, pen);
+        else
+            DrawSplinePolyline(g, polyline2D, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight, pen);
+    }
+
+    private void RenderPolyline3D(Graphics g, Polyline3D polyline3D, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    {
+        if (polyline3D.SmoothType == PolylineSmoothType.NoSmooth)
+        {
+            var points = polyline3D.Vertexes.Select(v =>
+                TransformPoint(new Vector3(v.X, v.Y, v.Z), transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight)).ToArray();
+            g.DrawLines(pen, points);
+        }
+        else
+        {
+            DrawSplinePolyline(g, polyline3D, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight, pen);
+        }
+    }
+
+    private void RenderSpline(Graphics g, Spline spline, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    {
+        var splineVertices = InterpolateSpline(spline.ControlPoints.ToList(), spline.Degree, spline.Knots.ToList(), SplineSubdivisions);
+        if (splineVertices.Count > 1)
+        {
+            var points = splineVertices.Select(v => TransformPoint(v, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight)).ToArray();
+            g.DrawCurve(pen, points);
+        }
+    }
+
+    private void RenderEllipse(Graphics g, Ellipse ellipse, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    {
+        try
+        {
+            var center = TransformPoint(ellipse.Center, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight);
+            var majorAxis = (float)(ellipse.MajorAxis * transform.Scale);
+            var minorAxis = (float)(ellipse.MinorAxis * transform.Scale);
+            
+            if (!IsValidPoint(center) || majorAxis < MinGeometrySize || minorAxis < MinGeometrySize)
+                return;
+            
+            var majorAxisVector = ellipse.MajorAxis * ellipse.Normal;
+            var rotation = (float)Math.Atan2(majorAxisVector.Y, majorAxisVector.X);
+
+            g.TranslateTransform(center.X, center.Y);
+            g.RotateTransform(rotation * 180 / (float)Math.PI);
+            g.DrawEllipse(pen, -majorAxis / 2, -minorAxis / 2, majorAxis, minorAxis);
+            g.ResetTransform();
+        }
+        catch (OutOfMemoryException)
+        {
+            g.ResetTransform();
+        }
+    }
+
+    private void RenderGenericPolyline(Graphics g, EntityObject entity, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    {
+        var vertexes = GetPolylineVertexes(entity);
+        var smoothType = GetPolylineSmoothType(entity);
+
+        if (smoothType == PolylineSmoothType.NoSmooth)
+        {
+            for (var i = 0; i < vertexes.Count; i++)
+            {
+                var vertex = vertexes[i];
+                var nextVertex = vertexes[(i + 1) % vertexes.Count];
+                var startPoint = TransformPoint(new Vector3(vertex.X, vertex.Y, 0), transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight);
+                var endPoint = TransformPoint(new Vector3(nextVertex.X, nextVertex.Y, 0), transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight);
+                g.DrawLine(pen, startPoint, endPoint);
+            }
+        }
+        else
+        {
+            DrawSplinePolyline(g, vertexes, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight, pen);
+        }
+    }
+    
     private void DrawPolyline2D(Graphics g, Polyline2D polyline2D, double scale, double offsetX, double offsetY,
         int canvasHeight, Pen pen)
     {
@@ -714,82 +651,143 @@ public class DxfThumbnailGenerator
         {
         }
     }
-
-    private List<Vector3> GetPolylineVertexes(EntityObject polyline)
+    
+    private (PointF StartPoint, PointF EndPoint, float Radius, float StartAngle, float SweepAngle, RectangleF Rect)
+        GetArcSegmentFromBulge(Polyline2DVertex startVertex, Polyline2DVertex endVertex, double scale, double offsetX,
+            double offsetY, int canvasHeight)
     {
-        var vertexes = new List<Vector3>();
-        if (polyline.GetType().Name != "Polyline") return vertexes;
+        var startPoint = TransformPoint(new Vector3(startVertex.Position.X, startVertex.Position.Y, 0), scale, offsetX,
+            offsetY, canvasHeight);
+        var endPoint = TransformPoint(new Vector3(endVertex.Position.X, endVertex.Position.Y, 0), scale, offsetX,
+            offsetY, canvasHeight);
 
-        var vertexesProperty = polyline.GetType().GetProperty("Vertexes");
-        if (vertexesProperty?.GetValue(polyline) is not IEnumerable<object> vertexesList) return vertexes;
+        var bulge = startVertex.Bulge;
+        var chordLength = Math.Sqrt(Math.Pow(endVertex.Position.X - startVertex.Position.X, 2) +
+                                    Math.Pow(endVertex.Position.Y - startVertex.Position.Y, 2));
+        var sagitta = Math.Abs(bulge) * chordLength / 2;
+        var radius = (Math.Pow(chordLength / 2, 2) + Math.Pow(sagitta, 2)) / (2 * sagitta);
 
-        foreach (var vertex in vertexesList)
-        {
-            var positionProperty = vertex.GetType().GetProperty("Position");
-            if (positionProperty?.GetValue(vertex) is Vector3 position)
-                vertexes.Add(position);
-        }
+        var theta = 4 * Math.Atan(Math.Abs(bulge));
+        var gamma = (Math.PI - theta) / 2;
+        var phi = Math.Atan2(endVertex.Position.Y - startVertex.Position.Y,
+            endVertex.Position.X - startVertex.Position.X);
+        var centerAngle = bulge > 0 ? phi + gamma : phi - gamma;
 
-        return vertexes;
+        var centerX = startVertex.Position.X + radius * Math.Cos(centerAngle);
+        var centerY = startVertex.Position.Y + radius * Math.Sin(centerAngle);
+
+        var transformedCenter = TransformPoint(new Vector3(centerX, centerY, 0), scale, offsetX, offsetY, canvasHeight);
+        var transformedRadius = (float)(radius * scale);
+
+        var startAngle = Math.Atan2(startVertex.Position.Y - centerY, startVertex.Position.X - centerX);
+        var endAngle = Math.Atan2(endVertex.Position.Y - centerY, endVertex.Position.X - centerX);
+        var sweepAngle = bulge > 0 ? endAngle - startAngle : startAngle - endAngle;
+        if (sweepAngle < 0) sweepAngle += 2 * Math.PI;
+
+        startAngle = -startAngle * 180 / Math.PI;
+        sweepAngle = -sweepAngle * 180 / Math.PI;
+
+        var startAngleDeg = (float)startAngle;
+        var sweepAngleDeg = (float)sweepAngle;
+
+        if (bulge < 0) sweepAngleDeg = -sweepAngleDeg;
+
+        var rect = new RectangleF(
+            transformedCenter.X - transformedRadius,
+            transformedCenter.Y - transformedRadius,
+            2 * transformedRadius,
+            2 * transformedRadius
+        );
+
+        return (
+            startPoint,
+            endPoint,
+            transformedRadius,
+            startAngleDeg,
+            sweepAngleDeg,
+            rect
+        );
+    }
+    
+    private PointF TransformPoint(Vector3 point, double scale, double offsetX, double offsetY, int canvasHeight)
+    {
+        var x = (float)(point.X * scale + offsetX);
+        var y = canvasHeight - (float)(point.Y * scale + offsetY);
+        return new PointF(x, y);
     }
 
-    private List<Vector3> InterpolateSpline(List<Vector3> controlPoints, int degree, List<double> knotValues,
-        int subdivisions)
+    private PointF TransformPoint(Vector2 point, double scale, double offsetX, double offsetY, int canvasHeight)
     {
-        var vertices = new List<Vector3>();
-        var step = 1.0 / subdivisions;
-
-        for (var i = 0; i <= subdivisions; i++)
-        {
-            var t = i * step * (knotValues.Last() - knotValues.First()) + knotValues.First();
-            var point = DeBoor(t, degree, controlPoints, knotValues);
-            vertices.Add(point);
-        }
-
-        return vertices;
+        return new PointF(
+            (float)(point.X * scale + offsetX),
+            canvasHeight - (float)(point.Y * scale + offsetY)
+        );
     }
 
-    private Vector3 DeBoor(double t, int degree, List<Vector3> controlPoints, List<double> knotValues)
+    private bool IsValidPoint(PointF point)
     {
-        var n = controlPoints.Count;
+        return float.IsFinite(point.X) && float.IsFinite(point.Y) &&
+               Math.Abs(point.X) < 10000 && Math.Abs(point.Y) < 10000;
+    }
+}
 
-        var s = -1;
-        for (var i = degree; i < knotValues.Count - degree - 1; i++)
-            if (t >= knotValues[i] && t < knotValues[i + 1])
-            {
-                s = i;
-                break;
-            }
+public class SvgRenderer : BaseRenderer
+{
+    public override object Render(DxfDocument dxf, int width, int height)
+    {
+        var entities = BaseRenderer.CollectEntities(dxf);
+        if (entities.Count == 0) 
+            return CreateEmptySvg(width, height);
 
-        if (s == -1) return controlPoints[controlPoints.Count - 1];
+        var bounds = CalculateBoundingBox(entities);
+        return Render(entities, bounds, width, height);
+    }
+    
+    public override object Render(List<EntityObject> entities, (double MinX, double MinY, double MaxX, double MaxY) bounds, int width, int height)
+    {
+        if (bounds.MinX >= bounds.MaxX || bounds.MinY >= bounds.MaxY)
+            return CreateEmptySvg(width, height);
 
-        var dPoints = new Vector3[degree + 1];
-        for (var j = 0; j <= degree; j++) dPoints[j] = controlPoints[s - degree + j];
+        var drawingWidth = bounds.MaxX - bounds.MinX;
+        var drawingHeight = bounds.MaxY - bounds.MinY;
+        
+        var padding = Math.Max(drawingWidth, drawingHeight) * 0.1;
+        var viewMinX = bounds.MinX - padding;
+        var viewMinY = bounds.MinY - padding; 
+        var viewWidth = drawingWidth + 2 * padding;
+        var viewHeight = drawingHeight + 2 * padding;
 
-        for (var r = 1; r <= degree; r++)
-        for (var j = degree; j >= r; j--)
+        var avgDimension = (viewWidth + viewHeight) / 2;
+        var strokeWidth = avgDimension * 0.0225;
+        strokeWidth = Math.Max(avgDimension * 0.015, Math.Min(avgDimension * 0.0375, strokeWidth));
+
+        var culture = CultureInfo.InvariantCulture;
+        var svg = new StringBuilder();
+        
+        svg.AppendLine($"<svg width=\"{width}\" height=\"{height}\" viewBox=\"{viewMinX.ToString("F2", culture)} {viewMinY.ToString("F2", culture)} {viewWidth.ToString("F2", culture)} {viewHeight.ToString("F2", culture)}\" xmlns=\"http://www.w3.org/2000/svg\" shape-rendering=\"geometricPrecision\">");
+        svg.AppendLine($"  <rect x=\"{viewMinX.ToString("F2", culture)}\" y=\"{viewMinY.ToString("F2", culture)}\" width=\"{viewWidth.ToString("F2", culture)}\" height=\"{viewHeight.ToString("F2", culture)}\" fill=\"white\"/>");
+        svg.AppendLine($"  <g transform=\"scale(1,-1) translate(0,{(-(viewMinY * 2 + viewHeight)).ToString("F2", culture)})\" stroke=\"#000000\" stroke-width=\"{strokeWidth.ToString("F3", culture)}\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\" shape-rendering=\"geometricPrecision\">");
+
+        foreach (var entity in entities)
         {
-            var alpha = (t - knotValues[s - degree + j]) / (knotValues[s + 1 - r + j] - knotValues[s - degree + j]);
-            dPoints[j] = (1.0 - alpha) * dPoints[j - 1] + alpha * dPoints[j];
+            var color = GetEntityColorHex(entity);
+            RenderEntityToSvg(svg, entity, color, culture);
         }
 
-        return dPoints[degree];
-    }
+        svg.AppendLine("  </g>");
+        svg.AppendLine("</svg>");
 
+        return svg.ToString();
+    }
+    
     private string CreateEmptySvg(int width, int height)
     {
         return $@"<svg width=""{width}"" height=""{height}"" viewBox=""0 0 {width} {height}"" xmlns=""http://www.w3.org/2000/svg"">
   <rect width=""100%"" height=""100%"" fill=""white""/>
 </svg>";
     }
-
-    private string GetEntityColorHex(EntityObject entity)
-    {
-        var color = GetEntityColor(entity);
-        return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
-    }
-
-    private void RenderEntityDirectToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
+    
+    private void RenderEntityToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
     {
         switch (entity)
         {
@@ -800,28 +798,28 @@ public class DxfThumbnailGenerator
                 svg.AppendLine($"    <circle cx=\"{circle.Center.X.ToString("F4", culture)}\" cy=\"{circle.Center.Y.ToString("F4", culture)}\" r=\"{circle.Radius.ToString("F4", culture)}\" stroke=\"{color}\" fill=\"none\"/>");
                 break;
             case Arc arc:
-                RenderArcDirectToSvg(svg, arc, color, culture);
+                RenderArcToSvg(svg, arc, color, culture);
                 break;
             case Polyline2D polyline2D:
-                RenderPolyline2DDirectToSvg(svg, polyline2D, color, culture);
+                RenderPolyline2DToSvg(svg, polyline2D, color, culture);
                 break;
             case Polyline3D polyline3D:
-                RenderPolyline3DDirectToSvg(svg, polyline3D, color, culture);
+                RenderPolyline3DToSvg(svg, polyline3D, color, culture);
                 break;
             case Spline spline:
-                RenderSplineDirectToSvg(svg, spline, color, culture);
+                RenderSplineToSvg(svg, spline, color, culture);
                 break;
             case Ellipse ellipse:
-                RenderEllipseDirectToSvg(svg, ellipse, color, culture);
+                RenderEllipseToSvg(svg, ellipse, color, culture);
                 break;
             default:
                 if (entity.GetType().Name == "Polyline")
-                    RenderGenericPolylineDirectToSvg(svg, entity, color, culture);
+                    RenderGenericPolylineToSvg(svg, entity, color, culture);
                 break;
         }
     }
 
-    private void RenderArcDirectToSvg(StringBuilder svg, Arc arc, string color, CultureInfo culture)
+    private void RenderArcToSvg(StringBuilder svg, Arc arc, string color, CultureInfo culture)
     {
         var startAngleRad = arc.StartAngle * Math.PI / 180;
         var endAngleRad = arc.EndAngle * Math.PI / 180;
@@ -840,7 +838,7 @@ public class DxfThumbnailGenerator
         svg.AppendLine($"    <path d=\"M {startX.ToString("F4", culture)},{startY.ToString("F4", culture)} A {arc.Radius.ToString("F4", culture)},{arc.Radius.ToString("F4", culture)} 0 {largeArcFlag},{sweepFlag} {endX.ToString("F4", culture)},{endY.ToString("F4", culture)}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderPolyline2DDirectToSvg(StringBuilder svg, Polyline2D polyline2D, string color, CultureInfo culture)
+    private void RenderPolyline2DToSvg(StringBuilder svg, Polyline2D polyline2D, string color, CultureInfo culture)
     {
         if (polyline2D.Vertexes.Count == 0) return;
 
@@ -848,8 +846,6 @@ public class DxfThumbnailGenerator
         var firstVertex = polyline2D.Vertexes[0];
         pathData.Append($"{firstVertex.Position.X.ToString("F4", culture)},{firstVertex.Position.Y.ToString("F4", culture)}");
 
-        // Для незамкнутых полилиний идем до предпоследней вершины
-        // Для замкнутых - по всем вершинам, чтобы замкнуть на первую
         var vertexCount = polyline2D.IsClosed ? polyline2D.Vertexes.Count : polyline2D.Vertexes.Count - 1;
         
         for (var i = 0; i < vertexCount; i++)
@@ -858,16 +854,13 @@ public class DxfThumbnailGenerator
             var nextIndex = (i + 1) % polyline2D.Vertexes.Count;
             var nextVertex = polyline2D.Vertexes[nextIndex];
             
-            // Пропускаем начальную точку только в первой итерации
             if (i == 0 && currentVertex.Position.X == firstVertex.Position.X && 
                 currentVertex.Position.Y == firstVertex.Position.Y)
             {
-                // Переходим к следующей вершине без добавления команды перемещения
             }
             
             if (Math.Abs(currentVertex.Bulge) > 1e-9)
             {
-                // Используем тот же алгоритм, что и для PNG
                 var bulge = currentVertex.Bulge;
                 var chordLength = Math.Sqrt(Math.Pow(nextVertex.Position.X - currentVertex.Position.X, 2) +
                                            Math.Pow(nextVertex.Position.Y - currentVertex.Position.Y, 2));
@@ -877,19 +870,13 @@ public class DxfThumbnailGenerator
                 var theta = 4 * Math.Atan(Math.Abs(bulge));
                 var sweepAngle = theta * 180 / Math.PI;
                 
-                // Для SVG: largeArcFlag определяет большую (>180°) или малую дугу
-                // sweepFlag: 0 = против часовой, 1 = по часовой
                 var largeArcFlag = sweepAngle > 180 ? 1 : 0;
-                // После переворота по вертикали (scale(1,-1)) направление меняется
-                // Положительный булдж = выпуклая дуга, нужен sweepFlag = 1
-                // Отрицательный булдж = вогнутая дуга, нужен sweepFlag = 0
                 var sweepFlag = bulge > 0 ? 1 : 0;
                 
                 pathData.Append($" A {radius.ToString("F4", culture)},{radius.ToString("F4", culture)} 0 {largeArcFlag},{sweepFlag} {nextVertex.Position.X.ToString("F4", culture)},{nextVertex.Position.Y.ToString("F4", culture)}");
             }
             else
             {
-                // Всегда добавляем линию к следующей точке для прямых сегментов
                 pathData.Append($" L {nextVertex.Position.X.ToString("F4", culture)},{nextVertex.Position.Y.ToString("F4", culture)}");
             }
         }
@@ -900,7 +887,7 @@ public class DxfThumbnailGenerator
         svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderPolyline3DDirectToSvg(StringBuilder svg, Polyline3D polyline3D, string color, CultureInfo culture)
+    private void RenderPolyline3DToSvg(StringBuilder svg, Polyline3D polyline3D, string color, CultureInfo culture)
     {
         if (polyline3D.Vertexes.Count == 0) return;
 
@@ -920,7 +907,7 @@ public class DxfThumbnailGenerator
         svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderSplineDirectToSvg(StringBuilder svg, Spline spline, string color, CultureInfo culture)
+    private void RenderSplineToSvg(StringBuilder svg, Spline spline, string color, CultureInfo culture)
     {
         var splineVertices = InterpolateSpline(spline.ControlPoints.ToList(), spline.Degree, spline.Knots.ToList(), SplineSubdivisions);
         if (splineVertices.Count < 2) return;
@@ -938,7 +925,7 @@ public class DxfThumbnailGenerator
         svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderGenericPolylineDirectToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
+    private void RenderGenericPolylineToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
     {
         var vertexes = GetPolylineVertexes(entity);
         if (vertexes.Count == 0) return;
@@ -956,7 +943,7 @@ public class DxfThumbnailGenerator
         svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderEllipseDirectToSvg(StringBuilder svg, Ellipse ellipse, string color, CultureInfo culture)
+    private void RenderEllipseToSvg(StringBuilder svg, Ellipse ellipse, string color, CultureInfo culture)
     {
         var majorAxis = ellipse.MajorAxis;
         var minorAxis = ellipse.MinorAxis;
@@ -967,7 +954,47 @@ public class DxfThumbnailGenerator
         
         svg.AppendLine($"    <ellipse cx=\"{center.X.ToString("F4", culture)}\" cy=\"{center.Y.ToString("F4", culture)}\" rx=\"{majorAxis.ToString("F4", culture)}\" ry=\"{minorAxis.ToString("F4", culture)}\" transform=\"rotate({rotationDegrees.ToString("F2", culture)} {center.X.ToString("F4", culture)} {center.Y.ToString("F4", culture)})\" stroke=\"{color}\" fill=\"none\"/>");
     }
+}
 
+public class DxfThumbnailGenerator
+{
+    private readonly BitmapRenderer _bitmapRenderer = new();
+    private readonly SvgRenderer _svgRenderer = new();
+    
+    public (Bitmap Bitmap, string Svg) GenerateBoth(string filePath)
+    {
+        try
+        {
+            var dxf = DxfDocument.Load(filePath);
+            var entities = BaseRenderer.CollectEntities(dxf);
+            
+            if (entities.Count == 0)
+            {
+                return (
+                    new Bitmap(BaseRenderer.DefaultThumbnailSize, BaseRenderer.DefaultThumbnailSize),
+                    CreateEmptySvg()
+                );
+            }
+
+            var bounds = _bitmapRenderer.CalculateBoundingBox(entities);
+            
+            return (
+                (Bitmap)_bitmapRenderer.Render(entities, bounds, BaseRenderer.DefaultThumbnailSize, BaseRenderer.DefaultThumbnailSize),
+                (string)_svgRenderer.Render(entities, bounds, BaseRenderer.DefaultThumbnailSize, BaseRenderer.DefaultThumbnailSize)
+            );
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error loading DXF file for thumbnail generation: {ex.Message}", ex);
+        }
+    }
+    
+    private string CreateEmptySvg()
+    {
+        return $@"<svg width=""{BaseRenderer.DefaultThumbnailSize}"" height=""{BaseRenderer.DefaultThumbnailSize}"" viewBox=""0 0 {BaseRenderer.DefaultThumbnailSize} {BaseRenderer.DefaultThumbnailSize}"" xmlns=""http://www.w3.org/2000/svg"">
+  <rect width=""100%"" height=""100%"" fill=""white""/>
+</svg>";
+    }
 }
 
 public static class DxfOptimizer
