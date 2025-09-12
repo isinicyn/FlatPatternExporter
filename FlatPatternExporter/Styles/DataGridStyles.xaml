@@ -5,7 +5,6 @@
                     xmlns:converters="clr-namespace:FlatPatternExporter.Converters">
     <converters:PropertyExpressionByNameConverter x:Key="PropertyExpressionByNameConverter" />
     <converters:DynamicPropertyValueConverter x:Key="DynamicPropertyValueConverter" />
-    <converters:SvgToImageConverter x:Key="SvgToImageConverter" />
 
     <!-- Базовые стили для ячеек -->
 
@@ -99,17 +98,12 @@
         </Grid>
     </ControlTemplate>
 
-    <!-- Шаблон для колонки "Изобр. развертки" (bitmap) -->
+    <!-- Шаблон для колонки "Изобр. развертки" -->
     <DataTemplate x:Key="DxfImageTemplate">
         <ContentControl Template="{StaticResource DxfImageContainerTemplate}" 
                         Tag="{Binding DxfPreview}"/>
     </DataTemplate>
 
-    <!-- Шаблон для колонки "Изобр. развертки" (SVG) -->
-    <DataTemplate x:Key="DxfSvgImageTemplate">
-        <ContentControl Template="{StaticResource DxfImageContainerTemplate}" 
-                        Tag="{Binding DxfSvgPreview, Converter={StaticResource SvgToImageConverter}}"/>
-    </DataTemplate>
 
     <!-- Шаблон для колонки ID с индикатором развертки -->
     <DataTemplate x:Key="IDWithFlatPatternIndicatorTemplate">

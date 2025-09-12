@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using FlatPatternExporter.Converters;
 using Inventor;
+using Svg.Skia;
 using Binding = System.Windows.Data.Binding;
 using File = System.IO.File;
 using MessageBox = System.Windows.MessageBox;
@@ -20,6 +21,53 @@ namespace FlatPatternExporter;
 
 public partial class FlatPatternExporterMainWindow : Window
 {
+    /// <summary>
+    /// Конвертирует SVG строку в BitmapImage
+    /// </summary>
+    private static BitmapImage? ConvertSvgToBitmapImage(string svgContent)
+    {
+        if (string.IsNullOrEmpty(svgContent))
+            return null;
+
+        try
+        {
+            var svg = new SKSvg();
+            var svgDocument = svg.FromSvg(svgContent);
+            
+            if (svgDocument == null)
+                return null;
+
+            var bounds = svgDocument.CullRect;
+            
+            if (bounds.Width <= 0 || bounds.Height <= 0)
+                return null;
+
+            using var surface = SkiaSharp.SKSurface.Create(new SkiaSharp.SKImageInfo((int)bounds.Width, (int)bounds.Height));
+            if (surface?.Canvas == null)
+                return null;
+
+            surface.Canvas.Clear(SkiaSharp.SKColors.White);
+            surface.Canvas.DrawPicture(svgDocument);
+            surface.Canvas.Flush();
+
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SkiaSharp.SKEncodedImageFormat.Png, 100);
+            
+            var bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = new MemoryStream(data.ToArray());
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+            bitmapImage.Freeze();
+
+            return bitmapImage;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     /// <summary>
     /// Общий метод для чтения всех свойств из документа с использованием PropertyManager
     /// </summary>
@@ -117,38 +165,28 @@ public partial class FlatPatternExporterMainWindow : Window
     }
 
 
-    private (BitmapImage? Bitmap, string? Svg) GenerateDxfThumbnails(string dxfDirectory, string partNumber)
+    private BitmapImage? GenerateDxfThumbnails(string dxfDirectory, string partNumber)
     {
         var searchPattern = partNumber + "*.dxf"; // Шаблон поиска
         var dxfFiles = Directory.GetFiles(dxfDirectory, searchPattern);
 
-        if (dxfFiles.Length == 0) return (null, null);
+        if (dxfFiles.Length == 0) return null;
 
         try
         {
             var dxfFilePath = dxfFiles[0]; // Берем первый найденный файл, соответствующий шаблону
             var generator = new DxfThumbnailGenerator();
-            var (bitmap, svg) = generator.GenerateBoth(dxfFilePath);
+            var svg = generator.GenerateSvg(dxfFilePath);
 
             BitmapImage? bitmapImage = null;
 
-            // Инициализация изображения должна выполняться в UI потоке
+            // Конвертируем SVG в BitmapImage
             Dispatcher.Invoke(() =>
             {
-                using (var memoryStream = new MemoryStream())
-                {
-                    bitmap.Save(memoryStream, ImageFormat.Png);
-                    memoryStream.Position = 0;
-
-                    bitmapImage = new BitmapImage();
-                    bitmapImage.BeginInit();
-                    bitmapImage.StreamSource = memoryStream;
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmapImage.EndInit();
-                }
+                bitmapImage = ConvertSvgToBitmapImage(svg);
             });
 
-            return (bitmapImage!, svg);
+            return bitmapImage;
         }
         catch (Exception ex)
         {
@@ -157,7 +195,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 MessageBox.Show($"Ошибка при генерации миниатюр DXF: {ex.Message}", "Ошибка", MessageBoxButton.OK,
                     MessageBoxImage.Error);
             });
-            return (null, null);
+            return null;
         }
     }
 
@@ -1033,24 +1071,20 @@ public partial class FlatPatternExporterMainWindow : Window
                 }
 
                 BitmapImage? dxfPreview = null;
-                string? dxfSvgPreview = null;
                 if (generateThumbnails)
                 {
                     AcadVersionType selectedEnumVersion = AcadVersionType.V2000;
                     Dispatcher.Invoke(() => { selectedEnumVersion = SelectedAcadVersion; });
                     if (AcadVersionMapping.SupportsOptimization(selectedEnumVersion))
                     {
-                        var thumbnails = GenerateDxfThumbnails(thicknessDir, partNumber);
-                        dxfPreview = thumbnails.Bitmap;
-                        dxfSvgPreview = thumbnails.Svg;
+                        dxfPreview = GenerateDxfThumbnails(thicknessDir, partNumber);
                     }
                 }
 
                 Dispatcher.Invoke(() =>
                 {
                     partData.ProcessingStatus = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Error;
-                    partData.DxfPreview = dxfPreview!;
-                    partData.DxfSvgPreview = dxfSvgPreview;
+                    partData.DxfPreview = dxfPreview;
                 });
 
                 if (exportSuccess)

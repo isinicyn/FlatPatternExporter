@@ -150,17 +150,6 @@ public static class PropertyMetadataRegistry
             IsSortable = false,
             IsSearchable = false
         },
-        ["DxfSvgPreview"] = new PropertyDefinition
-        {
-            InternalName = "DxfSvgPreview",
-            DisplayName = "SVG изображение развертки",
-            ColumnHeader = "SVG развертки",
-            Category = "Обработка",
-            Type = PropertyType.Document,
-            ColumnTemplate = "DxfSvgImageTemplate",
-            IsSortable = false,
-            IsSearchable = false
-        },
 
         // ===== Summary Information =====
         ["Author"] = new PropertyDefinition

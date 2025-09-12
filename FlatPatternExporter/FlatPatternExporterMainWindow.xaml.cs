@@ -1902,19 +1902,6 @@ public class PartData : INotifyPropertyChanged
         } 
     }
 
-    private string? dxfSvgPreview;
-    public string? DxfSvgPreview 
-    { 
-        get => dxfSvgPreview; 
-        set 
-        { 
-            if (dxfSvgPreview != value)
-            {
-                dxfSvgPreview = value; 
-                OnPropertyChanged(); 
-            }
-        } 
-    }
     
     private ProcessingStatus processingStatus = ProcessingStatus.NotProcessed;
     public ProcessingStatus ProcessingStatus 
