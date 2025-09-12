@@ -32,7 +32,6 @@
                          ItemsSource="{Binding PresetManager.TemplatePresets, ElementName=Root}"
                          DisplayMemberPath="Name"
                          SelectedItem="{Binding PresetManager.SelectedTemplatePreset, Mode=TwoWay, ElementName=Root}"
-                         SelectionChanged="TemplatePresetsComboBox_SelectionChanged"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          Margin="{StaticResource BottomSmallMarginThickness}"
@@ -53,7 +52,7 @@
                             Content="Сохранить"
                             Click="SaveChangesButton_Click"
                             Style="{StaticResource InteractiveActionButtonStyle}"
-                            IsEnabled="{Binding PresetManager.SelectedTemplatePreset, ElementName=Root, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
+                            IsEnabled="{Binding IsSaveButtonEnabled, ElementName=Root}"
                             ToolTip="Сохранить текущее содержимое шаблона в выбранный пресет"
                             Margin="{StaticResource BottomSmallMarginThickness}"/>
 
@@ -61,7 +60,7 @@
                             Content="Переименовать"
                             Click="RenamePresetButton_Click"
                             Style="{StaticResource InteractiveActionButtonStyle}"
-                            IsEnabled="{Binding PresetManager.SelectedTemplatePreset, ElementName=Root, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
+                            IsEnabled="{Binding IsRenameButtonEnabled, ElementName=Root}"
                             ToolTip="Переименовать выбранный пресет"
                             Margin="{StaticResource BottomSmallMarginThickness}"/>
 
@@ -69,7 +68,7 @@
                             Content="Дублировать"
                             Click="DuplicatePresetButton_Click"
                             Style="{StaticResource InteractiveActionButtonStyle}"
-                            IsEnabled="{Binding PresetManager.SelectedTemplatePreset, ElementName=Root, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
+                            IsEnabled="{Binding IsPresetSelected, ElementName=Root}"
                             ToolTip="Создать копию выбранного пресета"
                             Margin="{StaticResource BottomSmallMarginThickness}"/>
 
@@ -77,7 +76,7 @@
                             Content="Удалить"
                             Click="DeletePresetButton_Click"
                             Style="{StaticResource WarningButtonStyle}"
-                            IsEnabled="{Binding PresetManager.SelectedTemplatePreset, ElementName=Root, Converter={x:Static converters:ObjectToBooleanConverter.Instance}}"
+                            IsEnabled="{Binding IsPresetSelected, ElementName=Root}"
                             ToolTip="Удалить выбранный пресет"
                             Margin="{StaticResource BottomSmallMarginThickness}"/>
                 </StackPanel>

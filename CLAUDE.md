@@ -40,7 +40,6 @@ FlatPatternExporter/
     │   ├── EnumToBooleanConverter.cs           # Универсальная привязка enum к RadioButton
     │   ├── DynamicPropertyValueConverter.cs    # Извлечение значений свойств по имени пути
     │   ├── PropertyExpressionByNameConverter.cs # Определение видимости fx индикатора
-    │   ├── ObjectToBooleanConverter.cs         # Проверка объекта на null для IsEnabled
     │   └── IPictureDispConverter.cs            # Преобразование IPictureDisp в System.Drawing.Image
     │
     ├── MarshalCore.cs                  # COM interop
