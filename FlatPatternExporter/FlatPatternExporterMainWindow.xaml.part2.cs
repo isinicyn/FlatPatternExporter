@@ -116,18 +116,19 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private BitmapImage GenerateDxfThumbnail(string dxfDirectory, string partNumber)
+
+    private (BitmapImage? Bitmap, string? Svg) GenerateDxfThumbnails(string dxfDirectory, string partNumber)
     {
         var searchPattern = partNumber + "*.dxf"; // Шаблон поиска
         var dxfFiles = Directory.GetFiles(dxfDirectory, searchPattern);
 
-        if (dxfFiles.Length == 0) return null!;
+        if (dxfFiles.Length == 0) return (null, null);
 
         try
         {
             var dxfFilePath = dxfFiles[0]; // Берем первый найденный файл, соответствующий шаблону
             var generator = new DxfThumbnailGenerator();
-            var bitmap = generator.GenerateThumbnail(dxfFilePath);
+            var (bitmap, svg) = generator.GenerateBoth(dxfFilePath);
 
             BitmapImage? bitmapImage = null;
 
@@ -147,40 +148,16 @@ public partial class FlatPatternExporterMainWindow : Window
                 }
             });
 
-            return bitmapImage!;
+            return (bitmapImage!, svg);
         }
         catch (Exception ex)
         {
             Dispatcher.Invoke(() =>
             {
-                MessageBox.Show($"Ошибка при генерации миниатюры DXF: {ex.Message}", "Ошибка", MessageBoxButton.OK,
+                MessageBox.Show($"Ошибка при генерации миниатюр DXF: {ex.Message}", "Ошибка", MessageBoxButton.OK,
                     MessageBoxImage.Error);
             });
-            return null!;
-        }
-    }
-
-    private string? GenerateDxfSvgPreview(string dxfDirectory, string partNumber)
-    {
-        var searchPattern = partNumber + "*.dxf"; // Шаблон поиска
-        var dxfFiles = Directory.GetFiles(dxfDirectory, searchPattern);
-
-        if (dxfFiles.Length == 0) return null;
-
-        try
-        {
-            var dxfFilePath = dxfFiles[0]; // Берем первый найденный файл, соответствующий шаблону
-            var generator = new DxfThumbnailGenerator();
-            return generator.GenerateSvg(dxfFilePath);
-        }
-        catch (Exception ex)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                MessageBox.Show($"Ошибка при генерации SVG миниатюры DXF: {ex.Message}", "Ошибка", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            });
-            return null;
+            return (null, null);
         }
     }
 
@@ -1063,8 +1040,9 @@ public partial class FlatPatternExporterMainWindow : Window
                     Dispatcher.Invoke(() => { selectedEnumVersion = SelectedAcadVersion; });
                     if (AcadVersionMapping.SupportsOptimization(selectedEnumVersion))
                     {
-                        dxfPreview = GenerateDxfThumbnail(thicknessDir, partNumber);
-                        dxfSvgPreview = GenerateDxfSvgPreview(thicknessDir, partNumber);
+                        var thumbnails = GenerateDxfThumbnails(thicknessDir, partNumber);
+                        dxfPreview = thumbnails.Bitmap;
+                        dxfSvgPreview = thumbnails.Svg;
                     }
                 }
 

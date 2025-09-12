@@ -15,29 +15,17 @@ public class DxfThumbnailGenerator
     private const float DefaultPenWidth = 1f;
     private static readonly double[] CardinalAngles = { 0, 90, 180, 270 };
     private static readonly Color DefaultEntityColor = Color.Black;
-    public Bitmap GenerateThumbnail(string filePath)
-    {
-        try
-        {
-            var dxf = DxfDocument.Load(filePath);
-            return RenderDxfToBitmap(dxf);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Error loading DXF file: {ex.Message}", ex);
-        }
-    }
 
-    public string GenerateSvg(string filePath)
+    public (Bitmap Bitmap, string Svg) GenerateBoth(string filePath)
     {
         try
         {
             var dxf = DxfDocument.Load(filePath);
-            return RenderDxfToSvg(dxf, DefaultThumbnailSize, DefaultThumbnailSize);
+            return (RenderDxfToBitmap(dxf), RenderDxfToSvg(dxf, DefaultThumbnailSize, DefaultThumbnailSize));
         }
         catch (Exception ex)
         {
-            throw new Exception($"Error loading DXF file for SVG generation: {ex.Message}", ex);
+            throw new Exception($"Error loading DXF file for thumbnail generation: {ex.Message}", ex);
         }
     }
 
