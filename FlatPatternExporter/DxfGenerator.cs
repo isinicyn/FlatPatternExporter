@@ -961,37 +961,6 @@ public class DxfThumbnailGenerator
     private readonly BitmapRenderer _bitmapRenderer = new();
     private readonly SvgRenderer _svgRenderer = new();
     
-    public (Bitmap Bitmap, string Svg) GenerateBoth(string filePath)
-        => GenerateBoth(filePath, BaseRenderer.DefaultThumbnailSize, BaseRenderer.DefaultThumbnailSize);
-
-    public (Bitmap Bitmap, string Svg) GenerateBoth(string filePath, int width, int height)
-    {
-        try
-        {
-            var dxf = DxfDocument.Load(filePath);
-            var entities = BaseRenderer.CollectEntities(dxf);
-            
-            if (entities.Count == 0)
-            {
-                return (
-                    new Bitmap(width, height),
-                    CreateEmptySvg(width, height)
-                );
-            }
-
-            var bounds = _bitmapRenderer.CalculateBoundingBox(entities);
-            
-            return (
-                (Bitmap)_bitmapRenderer.Render(entities, bounds, width, height),
-                (string)_svgRenderer.Render(entities, bounds, width, height)
-            );
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Error loading DXF file for thumbnail generation: {ex.Message}", ex);
-        }
-    }
-
     public Bitmap GenerateBitmap(string filePath, int width = 0, int height = 0)
     {
         try
@@ -1020,14 +989,7 @@ public class DxfThumbnailGenerator
         {
             throw new Exception($"Error loading DXF file for SVG generation: {ex.Message}", ex);
         }
-    }
-    
-    private string CreateEmptySvg(int width, int height)
-    {
-        return $@"<svg width=""{width}"" height=""{height}"" viewBox=""0 0 {width} {height}"" xmlns=""http://www.w3.org/2000/svg"">
-  <rect width=""100%"" height=""100%"" fill=""white""/>
-</svg>";
-    }
+    }    
 }
 
 public static class DxfOptimizer
