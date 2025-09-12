@@ -67,24 +67,29 @@
                VerticalAlignment="Center"/>
     </DataTemplate>
 
-    <!-- Шаблон для колонки "Изобр. развертки" (старый bitmap) -->
-    <DataTemplate x:Key="DxfImageTemplate">
+    <!-- Базовый стиль для TextBlock "Нет миниатюры" -->
+    <Style x:Key="NoThumbnailTextStyle" TargetType="TextBlock">
+        <Setter Property="Text" Value="Нет миниатюры"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontSize" Value="{StaticResource SmallFontSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+    </Style>
+
+    <!-- Централизованный шаблон для DXF изображений -->
+    <ControlTemplate x:Key="DxfImageContainerTemplate" TargetType="ContentControl">
         <Grid Margin="{StaticResource VerticalHairlineMarginThickness}">
-            <Image Source="{Binding DxfPreview}" 
-                   HorizontalAlignment="Center" 
-                   VerticalAlignment="Center"/>
-            <TextBlock Text="Нет миниатюры" 
-                       HorizontalAlignment="Center" 
-                       VerticalAlignment="Center" 
-                       FontSize="{StaticResource SmallFontSize}" 
-                       Foreground="{DynamicResource TextDisabledBrush}"
-                       TextWrapping="Wrap"
-                       TextAlignment="Center">
+            <Image HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"
+                   Source="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}"/>
+            <TextBlock>
                 <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource NoThumbnailTextStyle}">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding DxfPreview}" Value="{x:Null}">
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -92,33 +97,18 @@
                 </TextBlock.Style>
             </TextBlock>
         </Grid>
+    </ControlTemplate>
+
+    <!-- Шаблон для колонки "Изобр. развертки" (bitmap) -->
+    <DataTemplate x:Key="DxfImageTemplate">
+        <ContentControl Template="{StaticResource DxfImageContainerTemplate}" 
+                        Tag="{Binding DxfPreview}"/>
     </DataTemplate>
 
     <!-- Шаблон для колонки "Изобр. развертки" (SVG) -->
     <DataTemplate x:Key="DxfSvgImageTemplate">
-        <Grid Margin="{StaticResource VerticalHairlineMarginThickness}">
-            <Image Source="{Binding DxfSvgPreview, Converter={StaticResource SvgToImageConverter}}" 
-                   HorizontalAlignment="Center" 
-                   VerticalAlignment="Center"/>
-            <TextBlock Text="Нет миниатюры" 
-                       HorizontalAlignment="Center" 
-                       VerticalAlignment="Center" 
-                       FontSize="{StaticResource SmallFontSize}" 
-                       Foreground="{DynamicResource TextDisabledBrush}"
-                       TextWrapping="Wrap"
-                       TextAlignment="Center">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding DxfSvgPreview}" Value="{x:Null}">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-        </Grid>
+        <ContentControl Template="{StaticResource DxfImageContainerTemplate}" 
+                        Tag="{Binding DxfSvgPreview, Converter={StaticResource SvgToImageConverter}}"/>
     </DataTemplate>
 
     <!-- Шаблон для колонки ID с индикатором развертки -->
