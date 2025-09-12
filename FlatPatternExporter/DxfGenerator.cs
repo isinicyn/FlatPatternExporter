@@ -55,15 +55,7 @@ public class DxfThumbnailGenerator
         if (entities.Count == 0) 
             return CreateEmptySvg(width, height);
 
-        // Фильтруем только основные типы объектов для отображения
-        var validEntities = entities.Where(e => 
-            e is Line || e is Circle || e is Arc || 
-            e is Polyline2D || e is Polyline3D).ToList();
-        
-        if (validEntities.Count == 0)
-            return CreateEmptySvg(width, height);
-
-        var bounds = CalculateBoundingBox(validEntities);
+        var bounds = CalculateBoundingBox(entities);
         
         // Проверим валидность границ
         if (bounds.MinX >= bounds.MaxX || bounds.MinY >= bounds.MaxY)
@@ -94,7 +86,7 @@ public class DxfThumbnailGenerator
         svg.AppendLine($"  <rect x=\"{viewMinX.ToString("F2", culture)}\" y=\"{viewMinY.ToString("F2", culture)}\" width=\"{viewWidth.ToString("F2", culture)}\" height=\"{viewHeight.ToString("F2", culture)}\" fill=\"white\"/>");
         svg.AppendLine($"  <g transform=\"scale(1,-1) translate(0,{(-(viewMinY * 2 + viewHeight)).ToString("F2", culture)})\" stroke=\"#000000\" stroke-width=\"{strokeWidth.ToString("F3", culture)}\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\" shape-rendering=\"geometricPrecision\">");
 
-        foreach (var entity in validEntities)
+        foreach (var entity in entities)
         {
             var color = GetEntityColorHex(entity);
             RenderEntityDirectToSvg(svg, entity, color, culture);
@@ -816,7 +808,15 @@ public class DxfThumbnailGenerator
             case Polyline3D polyline3D:
                 RenderPolyline3DDirectToSvg(svg, polyline3D, color, culture);
                 break;
+            case Spline spline:
+                RenderSplineDirectToSvg(svg, spline, color, culture);
+                break;
+            case Ellipse ellipse:
+                RenderEllipseDirectToSvg(svg, ellipse, color, culture);
+                break;
             default:
+                if (entity.GetType().Name == "Polyline")
+                    RenderGenericPolylineDirectToSvg(svg, entity, color, culture);
                 break;
         }
     }
@@ -918,6 +918,54 @@ public class DxfThumbnailGenerator
             pathData.Append(" Z");
 
         svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
+    }
+
+    private void RenderSplineDirectToSvg(StringBuilder svg, Spline spline, string color, CultureInfo culture)
+    {
+        var splineVertices = InterpolateSpline(spline.ControlPoints.ToList(), spline.Degree, spline.Knots.ToList(), SplineSubdivisions);
+        if (splineVertices.Count < 2) return;
+
+        var pathData = new StringBuilder("M ");
+        var firstVertex = splineVertices[0];
+        pathData.Append($"{firstVertex.X.ToString("F4", culture)},{firstVertex.Y.ToString("F4", culture)}");
+
+        for (var i = 1; i < splineVertices.Count; i++)
+        {
+            var vertex = splineVertices[i];
+            pathData.Append($" L {vertex.X.ToString("F4", culture)},{vertex.Y.ToString("F4", culture)}");
+        }
+
+        svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
+    }
+
+    private void RenderGenericPolylineDirectToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
+    {
+        var vertexes = GetPolylineVertexes(entity);
+        if (vertexes.Count == 0) return;
+
+        var pathData = new StringBuilder("M ");
+        var firstVertex = vertexes[0];
+        pathData.Append($"{firstVertex.X.ToString("F4", culture)},{firstVertex.Y.ToString("F4", culture)}");
+
+        for (var i = 1; i < vertexes.Count; i++)
+        {
+            var vertex = vertexes[i];
+            pathData.Append($" L {vertex.X.ToString("F4", culture)},{vertex.Y.ToString("F4", culture)}");
+        }
+
+        svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
+    }
+
+    private void RenderEllipseDirectToSvg(StringBuilder svg, Ellipse ellipse, string color, CultureInfo culture)
+    {
+        var majorAxis = ellipse.MajorAxis;
+        var minorAxis = ellipse.MinorAxis;
+        var center = ellipse.Center;
+        
+        var majorAxisVector = ellipse.MajorAxis * ellipse.Normal;
+        var rotationDegrees = Math.Atan2(majorAxisVector.Y, majorAxisVector.X) * 180 / Math.PI;
+        
+        svg.AppendLine($"    <ellipse cx=\"{center.X.ToString("F4", culture)}\" cy=\"{center.Y.ToString("F4", culture)}\" rx=\"{majorAxis.ToString("F4", culture)}\" ry=\"{minorAxis.ToString("F4", culture)}\" transform=\"rotate({rotationDegrees.ToString("F2", culture)} {center.X.ToString("F4", culture)} {center.Y.ToString("F4", culture)})\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
 }
