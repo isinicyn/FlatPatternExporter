@@ -160,6 +160,30 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
+    private string? GenerateDxfSvgPreview(string dxfDirectory, string partNumber)
+    {
+        var searchPattern = partNumber + "*.dxf"; // Шаблон поиска
+        var dxfFiles = Directory.GetFiles(dxfDirectory, searchPattern);
+
+        if (dxfFiles.Length == 0) return null;
+
+        try
+        {
+            var dxfFilePath = dxfFiles[0]; // Берем первый найденный файл, соответствующий шаблону
+            var generator = new DxfThumbnailGenerator();
+            return generator.GenerateSvg(dxfFilePath);
+        }
+        catch (Exception ex)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                MessageBox.Show($"Ошибка при генерации SVG миниатюры DXF: {ex.Message}", "Ошибка", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            });
+            return null;
+        }
+    }
+
     private async Task<BitmapImage> GetThumbnailAsync(PartDocument document)
     {
         try
@@ -1032,6 +1056,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 }
 
                 BitmapImage? dxfPreview = null;
+                string? dxfSvgPreview = null;
                 if (generateThumbnails)
                 {
                     AcadVersionType selectedEnumVersion = AcadVersionType.V2000;
@@ -1039,6 +1064,7 @@ public partial class FlatPatternExporterMainWindow : Window
                     if (AcadVersionMapping.SupportsOptimization(selectedEnumVersion))
                     {
                         dxfPreview = GenerateDxfThumbnail(thicknessDir, partNumber);
+                        dxfSvgPreview = GenerateDxfSvgPreview(thicknessDir, partNumber);
                     }
                 }
 
@@ -1046,6 +1072,7 @@ public partial class FlatPatternExporterMainWindow : Window
                 {
                     partData.ProcessingStatus = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Error;
                     partData.DxfPreview = dxfPreview!;
+                    partData.DxfSvgPreview = dxfSvgPreview;
                 });
 
                 if (exportSuccess)

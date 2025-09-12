@@ -1,7 +1,8 @@
 ﻿using System.Drawing.Drawing2D;
+using System.Globalization;
+using System.Text;
 using netDxf;
 using netDxf.Entities;
-using netDxf.Header;
 using FlatPatternExporter;
 
 namespace DxfGenerator;
@@ -27,6 +28,18 @@ public class DxfThumbnailGenerator
         }
     }
 
+    public string GenerateSvg(string filePath)
+    {
+        try
+        {
+            var dxf = DxfDocument.Load(filePath);
+            return RenderDxfToSvg(dxf, DefaultThumbnailSize, DefaultThumbnailSize);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error loading DXF file for SVG generation: {ex.Message}", ex);
+        }
+    }
 
     private Bitmap RenderDxfToBitmap(DxfDocument dxf)
     {
@@ -44,6 +57,63 @@ public class DxfThumbnailGenerator
         RenderEntities(g, entities, transform);
         
         return bitmap;
+    }
+
+    private string RenderDxfToSvg(DxfDocument dxf, int width, int height)
+    {
+        var entities = CollectEntities(dxf);
+        if (entities.Count == 0) 
+            return CreateEmptySvg(width, height);
+
+        // Фильтруем только основные типы объектов для отображения
+        var validEntities = entities.Where(e => 
+            e is Line || e is Circle || e is Arc || 
+            e is Polyline2D || e is Polyline3D).ToList();
+        
+        if (validEntities.Count == 0)
+            return CreateEmptySvg(width, height);
+
+        var bounds = CalculateBoundingBox(validEntities);
+        
+        // Проверим валидность границ
+        if (bounds.MinX >= bounds.MaxX || bounds.MinY >= bounds.MaxY)
+            return CreateEmptySvg(width, height);
+
+        // Вычисляем размеры исходного чертежа
+        var drawingWidth = bounds.MaxX - bounds.MinX;
+        var drawingHeight = bounds.MaxY - bounds.MinY;
+        
+        // Добавляем отступы (10% с каждой стороны)
+        var padding = Math.Max(drawingWidth, drawingHeight) * 0.1;
+        var viewMinX = bounds.MinX - padding;
+        var viewMinY = bounds.MinY - padding; 
+        var viewWidth = drawingWidth + 2 * padding;
+        var viewHeight = drawingHeight + 2 * padding;
+
+        // Вычисляем оптимальную толщину линии для хорошей видимости
+        // Используем 2.25% от размера viewport для обеспечения хорошей видимости
+        var avgDimension = (viewWidth + viewHeight) / 2;
+        var strokeWidth = avgDimension * 0.0225;
+        // Ограничиваем толщину разумными пределами (1.5% - 3.75% от размера)
+        strokeWidth = Math.Max(avgDimension * 0.015, Math.Min(avgDimension * 0.0375, strokeWidth));
+
+        var culture = CultureInfo.InvariantCulture;
+        var svg = new StringBuilder();
+        
+        svg.AppendLine($"<svg width=\"{width}\" height=\"{height}\" viewBox=\"{viewMinX.ToString("F2", culture)} {viewMinY.ToString("F2", culture)} {viewWidth.ToString("F2", culture)} {viewHeight.ToString("F2", culture)}\" xmlns=\"http://www.w3.org/2000/svg\" shape-rendering=\"geometricPrecision\">");
+        svg.AppendLine($"  <rect x=\"{viewMinX.ToString("F2", culture)}\" y=\"{viewMinY.ToString("F2", culture)}\" width=\"{viewWidth.ToString("F2", culture)}\" height=\"{viewHeight.ToString("F2", culture)}\" fill=\"white\"/>");
+        svg.AppendLine($"  <g transform=\"scale(1,-1) translate(0,{(-(viewMinY * 2 + viewHeight)).ToString("F2", culture)})\" stroke=\"#000000\" stroke-width=\"{strokeWidth.ToString("F3", culture)}\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\" shape-rendering=\"geometricPrecision\">");
+
+        foreach (var entity in validEntities)
+        {
+            var color = GetEntityColorHex(entity);
+            RenderEntityDirectToSvg(svg, entity, color, culture);
+        }
+
+        svg.AppendLine("  </g>");
+        svg.AppendLine("</svg>");
+
+        return svg.ToString();
     }
 
     private static void ConfigureGraphics(Graphics g)
@@ -610,6 +680,143 @@ public class DxfThumbnailGenerator
 
         return dPoints[degree];
     }
+
+    private string CreateEmptySvg(int width, int height)
+    {
+        return $@"<svg width=""{width}"" height=""{height}"" viewBox=""0 0 {width} {height}"" xmlns=""http://www.w3.org/2000/svg"">
+  <rect width=""100%"" height=""100%"" fill=""white""/>
+</svg>";
+    }
+
+    private string GetEntityColorHex(EntityObject entity)
+    {
+        var color = GetEntityColor(entity);
+        return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+    }
+
+    private void RenderEntityDirectToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
+    {
+        switch (entity)
+        {
+            case Line line:
+                svg.AppendLine($"    <line x1=\"{line.StartPoint.X.ToString("F4", culture)}\" y1=\"{line.StartPoint.Y.ToString("F4", culture)}\" x2=\"{line.EndPoint.X.ToString("F4", culture)}\" y2=\"{line.EndPoint.Y.ToString("F4", culture)}\" stroke=\"{color}\"/>");
+                break;
+            case Circle circle:
+                svg.AppendLine($"    <circle cx=\"{circle.Center.X.ToString("F4", culture)}\" cy=\"{circle.Center.Y.ToString("F4", culture)}\" r=\"{circle.Radius.ToString("F4", culture)}\" stroke=\"{color}\" fill=\"none\"/>");
+                break;
+            case Arc arc:
+                RenderArcDirectToSvg(svg, arc, color, culture);
+                break;
+            case Polyline2D polyline2D:
+                RenderPolyline2DDirectToSvg(svg, polyline2D, color, culture);
+                break;
+            case Polyline3D polyline3D:
+                RenderPolyline3DDirectToSvg(svg, polyline3D, color, culture);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void RenderArcDirectToSvg(StringBuilder svg, Arc arc, string color, CultureInfo culture)
+    {
+        var startAngleRad = arc.StartAngle * Math.PI / 180;
+        var endAngleRad = arc.EndAngle * Math.PI / 180;
+        
+        var startX = arc.Center.X + arc.Radius * Math.Cos(startAngleRad);
+        var startY = arc.Center.Y + arc.Radius * Math.Sin(startAngleRad);
+        var endX = arc.Center.X + arc.Radius * Math.Cos(endAngleRad);
+        var endY = arc.Center.Y + arc.Radius * Math.Sin(endAngleRad);
+        
+        var sweepAngle = arc.EndAngle - arc.StartAngle;
+        if (sweepAngle < 0) sweepAngle += 360;
+        
+        var largeArcFlag = sweepAngle > 180 ? 1 : 0;
+        var sweepFlag = 1;
+        
+        svg.AppendLine($"    <path d=\"M {startX.ToString("F4", culture)},{startY.ToString("F4", culture)} A {arc.Radius.ToString("F4", culture)},{arc.Radius.ToString("F4", culture)} 0 {largeArcFlag},{sweepFlag} {endX.ToString("F4", culture)},{endY.ToString("F4", culture)}\" stroke=\"{color}\" fill=\"none\"/>");
+    }
+
+    private void RenderPolyline2DDirectToSvg(StringBuilder svg, Polyline2D polyline2D, string color, CultureInfo culture)
+    {
+        if (polyline2D.Vertexes.Count == 0) return;
+
+        var pathData = new StringBuilder("M ");
+        var firstVertex = polyline2D.Vertexes[0];
+        pathData.Append($"{firstVertex.Position.X.ToString("F4", culture)},{firstVertex.Position.Y.ToString("F4", culture)}");
+
+        // Для незамкнутых полилиний идем до предпоследней вершины
+        // Для замкнутых - по всем вершинам, чтобы замкнуть на первую
+        var vertexCount = polyline2D.IsClosed ? polyline2D.Vertexes.Count : polyline2D.Vertexes.Count - 1;
+        
+        for (var i = 0; i < vertexCount; i++)
+        {
+            var currentVertex = polyline2D.Vertexes[i];
+            var nextIndex = (i + 1) % polyline2D.Vertexes.Count;
+            var nextVertex = polyline2D.Vertexes[nextIndex];
+            
+            // Пропускаем начальную точку только в первой итерации
+            if (i == 0 && currentVertex.Position.X == firstVertex.Position.X && 
+                currentVertex.Position.Y == firstVertex.Position.Y)
+            {
+                // Переходим к следующей вершине без добавления команды перемещения
+            }
+            
+            if (Math.Abs(currentVertex.Bulge) > 1e-9)
+            {
+                // Используем тот же алгоритм, что и для PNG
+                var bulge = currentVertex.Bulge;
+                var chordLength = Math.Sqrt(Math.Pow(nextVertex.Position.X - currentVertex.Position.X, 2) +
+                                           Math.Pow(nextVertex.Position.Y - currentVertex.Position.Y, 2));
+                var sagitta = Math.Abs(bulge) * chordLength / 2;
+                var radius = (Math.Pow(chordLength / 2, 2) + Math.Pow(sagitta, 2)) / (2 * sagitta);
+                
+                var theta = 4 * Math.Atan(Math.Abs(bulge));
+                var sweepAngle = theta * 180 / Math.PI;
+                
+                // Для SVG: largeArcFlag определяет большую (>180°) или малую дугу
+                // sweepFlag: 0 = против часовой, 1 = по часовой
+                var largeArcFlag = sweepAngle > 180 ? 1 : 0;
+                // После переворота по вертикали (scale(1,-1)) направление меняется
+                // Положительный булдж = выпуклая дуга, нужен sweepFlag = 1
+                // Отрицательный булдж = вогнутая дуга, нужен sweepFlag = 0
+                var sweepFlag = bulge > 0 ? 1 : 0;
+                
+                pathData.Append($" A {radius.ToString("F4", culture)},{radius.ToString("F4", culture)} 0 {largeArcFlag},{sweepFlag} {nextVertex.Position.X.ToString("F4", culture)},{nextVertex.Position.Y.ToString("F4", culture)}");
+            }
+            else
+            {
+                // Всегда добавляем линию к следующей точке для прямых сегментов
+                pathData.Append($" L {nextVertex.Position.X.ToString("F4", culture)},{nextVertex.Position.Y.ToString("F4", culture)}");
+            }
+        }
+
+        if (polyline2D.IsClosed)
+            pathData.Append(" Z");
+
+        svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
+    }
+
+    private void RenderPolyline3DDirectToSvg(StringBuilder svg, Polyline3D polyline3D, string color, CultureInfo culture)
+    {
+        if (polyline3D.Vertexes.Count == 0) return;
+
+        var pathData = new StringBuilder("M ");
+        var firstVertex = polyline3D.Vertexes[0];
+        pathData.Append($"{firstVertex.X.ToString("F4", culture)},{firstVertex.Y.ToString("F4", culture)}");
+
+        for (var i = 1; i < polyline3D.Vertexes.Count; i++)
+        {
+            var vertex = polyline3D.Vertexes[i];
+            pathData.Append($" L {vertex.X.ToString("F4", culture)},{vertex.Y.ToString("F4", culture)}");
+        }
+
+        if (polyline3D.IsClosed)
+            pathData.Append(" Z");
+
+        svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
+    }
+
 }
 
 public static class DxfOptimizer

@@ -5,6 +5,7 @@
                     xmlns:converters="clr-namespace:FlatPatternExporter.Converters">
     <converters:PropertyExpressionByNameConverter x:Key="PropertyExpressionByNameConverter" />
     <converters:DynamicPropertyValueConverter x:Key="DynamicPropertyValueConverter" />
+    <converters:SvgToImageConverter x:Key="SvgToImageConverter" />
 
     <!-- Базовые стили для ячеек -->
 
@@ -66,7 +67,7 @@
                VerticalAlignment="Center"/>
     </DataTemplate>
 
-    <!-- Шаблон для колонки "Изобр. развертки" -->
+    <!-- Шаблон для колонки "Изобр. развертки" (старый bitmap) -->
     <DataTemplate x:Key="DxfImageTemplate">
         <Grid Margin="{StaticResource VerticalHairlineMarginThickness}">
             <Image Source="{Binding DxfPreview}" 
@@ -84,6 +85,33 @@
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding DxfPreview}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+    </DataTemplate>
+
+    <!-- Шаблон для колонки "Изобр. развертки" (SVG) -->
+    <DataTemplate x:Key="DxfSvgImageTemplate">
+        <Grid Margin="{StaticResource VerticalHairlineMarginThickness}">
+            <Image Source="{Binding DxfSvgPreview, Converter={StaticResource SvgToImageConverter}}" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"/>
+            <TextBlock Text="Нет миниатюры" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center" 
+                       FontSize="{StaticResource SmallFontSize}" 
+                       Foreground="{DynamicResource TextDisabledBrush}"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DxfSvgPreview}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
