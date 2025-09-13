@@ -45,6 +45,7 @@
                             Content="Создать"
                             Click="CreatePresetButton_Click"
                             Style="{StaticResource InteractiveActionButtonStyle}"
+                            IsEnabled="{Binding IsCreateButtonEnabled, ElementName=Root}"
                             ToolTip="Создать новый пресет на основе текущего шаблона"
                             Margin="{StaticResource BottomSmallMarginThickness}"/>
 

@@ -73,9 +73,6 @@ public class TemplatePresetManager : INotifyPropertyChanged
         error = null;
         presetName = presetName.Trim();
 
-        if (!ValidatePresetName(presetName, null, out error))
-            return false;
-
         var newPreset = new TemplatePreset { Name = presetName, Template = template };
         TemplatePresets.Add(newPreset);
         SelectedTemplatePreset = newPreset;
@@ -97,14 +94,12 @@ public class TemplatePresetManager : INotifyPropertyChanged
 
     public bool RenameSelected(string newName, out string? error)
     {
-        if (!ValidateSelectedPreset(out error))
+        error = null;
+        if (SelectedTemplatePreset == null)
             return false;
 
         newName = newName.Trim();
-        if (!ValidatePresetName(newName, SelectedTemplatePreset, out error))
-            return false;
-
-        SelectedTemplatePreset!.Name = newName;
+        SelectedTemplatePreset.Name = newName;
         return true;
     }
 
@@ -125,24 +120,6 @@ public class TemplatePresetManager : INotifyPropertyChanged
         return true;
     }
 
-    private bool ValidatePresetName(string name, TemplatePreset? exclude, out string? error)
-    {
-        error = null;
-
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            error = "Имя пресета не может быть пустым";
-            return false;
-        }
-
-        if (TemplatePresets.Any(p => !ReferenceEquals(p, exclude) && string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase)))
-        {
-            error = "Пресет с таким именем уже существует";
-            return false;
-        }
-
-        return true;
-    }
 
     private string GenerateUniqueName(string baseName)
     {
@@ -159,7 +136,7 @@ public class TemplatePresetManager : INotifyPropertyChanged
         return candidate;
     }
 
-    private bool PresetNameExists(string name) => 
+    public bool PresetNameExists(string name) =>
         TemplatePresets.Any(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
     
     private bool ValidateSelectedPreset(out string? error)

@@ -29,6 +29,10 @@ public partial class TemplatePresetManagerControl : UserControl
         DependencyProperty.Register(nameof(IsSaveButtonEnabled), typeof(bool), typeof(TemplatePresetManagerControl),
             new PropertyMetadata(false));
 
+    public static readonly DependencyProperty IsCreateButtonEnabledProperty =
+        DependencyProperty.Register(nameof(IsCreateButtonEnabled), typeof(bool), typeof(TemplatePresetManagerControl),
+            new PropertyMetadata(false));
+
     public TemplatePresetManager PresetManager
     {
         get => (TemplatePresetManager)GetValue(PresetManagerProperty);
@@ -57,6 +61,12 @@ public partial class TemplatePresetManagerControl : UserControl
     {
         get => (bool)GetValue(IsSaveButtonEnabledProperty);
         set => SetValue(IsSaveButtonEnabledProperty, value);
+    }
+
+    public bool IsCreateButtonEnabled
+    {
+        get => (bool)GetValue(IsCreateButtonEnabledProperty);
+        set => SetValue(IsCreateButtonEnabledProperty, value);
     }
 
     public TemplatePresetManagerControl()
@@ -154,12 +164,25 @@ public partial class TemplatePresetManagerControl : UserControl
     private void UpdateButtonStates()
     {
         var selected = PresetManager?.SelectedTemplatePreset;
+        var trimmedName = GetTrimmedPresetName();
+
         IsPresetSelected = selected != null;
-        IsRenameButtonEnabled = selected != null && 
-                                GetTrimmedPresetName() != selected.Name;
-        IsSaveButtonEnabled = selected != null && 
+
+        IsRenameButtonEnabled = selected != null &&
+                               !string.IsNullOrWhiteSpace(trimmedName) &&
+                               trimmedName != selected.Name &&
+                               (trimmedName == selected.Name || !PresetManager!.PresetNameExists(trimmedName));
+
+        IsSaveButtonEnabled = selected != null &&
                              TokenService != null &&
                              selected.Template != TokenService.FileNameTemplate;
+
+        IsCreateButtonEnabled = PresetManager != null &&
+                               TokenService != null &&
+                               !string.IsNullOrWhiteSpace(trimmedName) &&
+                               !PresetManager.PresetNameExists(trimmedName) &&
+                               !string.IsNullOrWhiteSpace(TokenService.FileNameTemplate) &&
+                               TokenService.IsFileNameTemplateValid;
     }
 
     private void DeletePresetButton_Click(object sender, RoutedEventArgs e)
@@ -172,12 +195,7 @@ public partial class TemplatePresetManagerControl : UserControl
     {
         if (!ValidateAndGetTemplate(out var template)) return;
 
-        if (!PresetManager.CreatePreset(GetTrimmedPresetName(), template, out var error))
-        {
-            ShowNameValidation(error);
-            return;
-        }
-
+        PresetManager!.CreatePreset(GetTrimmedPresetName(), template, out _);
         RefreshUI();
     }
 
@@ -235,15 +253,9 @@ public partial class TemplatePresetManagerControl : UserControl
     {
         if (!HasSelectedPreset()) return;
 
-        if (!PresetManager!.RenameSelected(GetTrimmedPresetName(), out var error))
-        {
-            ShowNameValidation(error);
-        }
-        else
-        {
-            ClearNameValidation();
-            UpdateButtonStates();
-        }
+        PresetManager!.RenameSelected(GetTrimmedPresetName(), out _);
+        ClearNameValidation();
+        UpdateButtonStates();
     }
 
     private void DuplicatePresetButton_Click(object? sender, RoutedEventArgs e)
