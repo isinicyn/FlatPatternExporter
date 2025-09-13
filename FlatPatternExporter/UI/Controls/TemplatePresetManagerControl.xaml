@@ -87,9 +87,6 @@
                 </StackPanel>
             </Grid>
 
-            <Separator Style="{StaticResource HorizontalSeparatorStyle}"
-                       Margin="{StaticResource VerticalSmallMarginThickness}"/>
-
             <!-- Поле имени пресета -->
             <TextBlock Text="Имя пресета:" Style="{StaticResource SectionHeaderTextStyle}"/>
             <TextBox x:Name="PresetNameTextBox"
