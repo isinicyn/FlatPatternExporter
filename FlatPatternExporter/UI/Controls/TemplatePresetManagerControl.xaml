@@ -92,12 +92,6 @@
                      Style="{StaticResource BaseTextBoxStyle}"
                      ToolTip="Введите имя пресета для создания или переименования"
                      Margin="{StaticResource BottomSmallMarginThickness}"/>
-
-            <TextBlock x:Name="NameValidationTextBlock"
-                       Foreground="{DynamicResource ErrorBrush}"
-                       FontSize="{StaticResource SmallFontSize}"
-                       TextWrapping="Wrap"
-                       Visibility="Collapsed"/>
         </StackPanel>
     </GroupBox>
 </UserControl>

@@ -79,17 +79,9 @@ public class TemplatePresetManager : INotifyPropertyChanged
         return true;
     }
 
-    public bool UpdateSelectedTemplate(string template, out string? error)
+    public void UpdateSelectedTemplate(string template)
     {
-        error = null;
-        if (SelectedTemplatePreset is null)
-        {
-            error = "Не выбран пресет";
-            return false;
-        }
-
-        SelectedTemplatePreset.Template = template;
-        return true;
+        SelectedTemplatePreset!.Template = template;
     }
 
     public bool RenameSelected(string newName, out string? error)
@@ -103,11 +95,8 @@ public class TemplatePresetManager : INotifyPropertyChanged
         return true;
     }
 
-    public bool DuplicateSelected(out string? error)
+    public void DuplicateSelected()
     {
-        if (!ValidateSelectedPreset(out error))
-            return false;
-
         var baseName = SelectedTemplatePreset!.Name;
         var newName = GenerateUniqueName($"{baseName} (копия)");
         var duplicate = new TemplatePreset
@@ -117,7 +106,6 @@ public class TemplatePresetManager : INotifyPropertyChanged
         };
         TemplatePresets.Add(duplicate);
         SelectedTemplatePreset = duplicate;
-        return true;
     }
 
 
@@ -138,17 +126,6 @@ public class TemplatePresetManager : INotifyPropertyChanged
 
     public bool PresetNameExists(string name) =>
         TemplatePresets.Any(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
-    
-    private bool ValidateSelectedPreset(out string? error)
-    {
-        error = null;
-        if (SelectedTemplatePreset is null)
-        {
-            error = "Не выбран пресет";
-            return false;
-        }
-        return true;
-    }
 
     public bool DeleteSelectedPreset()
     {

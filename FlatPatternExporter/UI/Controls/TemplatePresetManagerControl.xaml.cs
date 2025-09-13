@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using UserControl = System.Windows.Controls.UserControl;
-using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter;
 
@@ -153,7 +152,6 @@ public partial class TemplatePresetManagerControl : UserControl
             TokenService.FileNameTemplate = template;
         }
 
-        ClearNameValidation();
     }
 
     private void PresetNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -193,59 +191,20 @@ public partial class TemplatePresetManagerControl : UserControl
 
     private void CreatePresetButton_Click(object? sender, RoutedEventArgs e)
     {
-        if (!ValidateAndGetTemplate(out var template)) return;
-
-        PresetManager!.CreatePreset(GetTrimmedPresetName(), template, out _);
+        PresetManager!.CreatePreset(GetTrimmedPresetName(), TokenService!.FileNameTemplate, out _);
         RefreshUI();
     }
 
     private void SaveChangesButton_Click(object? sender, RoutedEventArgs e)
     {
-        if (!ValidateAndGetTemplate(out var template) || !HasSelectedPreset()) 
-            return;
+        if (!HasSelectedPreset()) return;
 
-        if (PresetManager.UpdateSelectedTemplate(template, out var error))
-        {
-            ClearNameValidation();
-            UpdateButtonStates();
-        }
-        else if (!string.IsNullOrEmpty(error))
-        {
-            ShowMessage(error);
-        }
-    }
-
-    private bool ValidateAndGetTemplate(out string template)
-    {
-        template = "";
-        
-        if (TokenService == null || PresetManager == null) 
-            return false;
-
-        template = TokenService.FileNameTemplate;
-        
-        return template switch
-        {
-            "" or null => ShowValidationError("Шаблон не может быть пустым."),
-            _ when !TokenService.IsFileNameTemplateValid => ShowValidationError("Текущий шаблон содержит ошибки. Исправьте шаблон перед операцией."),
-            _ => true
-        };
-    }
-
-    private bool ShowValidationError(string message)
-    {
-        ShowMessage(message);
-        return false;
-    }
-
-    private void ShowMessage(string message, MessageBoxImage icon = MessageBoxImage.Warning)
-    {
-        MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, icon);
+        PresetManager!.UpdateSelectedTemplate(TokenService!.FileNameTemplate);
+        UpdateButtonStates();
     }
 
     private void RefreshUI()
     {
-        ClearNameValidation();
         UpdateEmptyState();
     }
 
@@ -254,7 +213,6 @@ public partial class TemplatePresetManagerControl : UserControl
         if (!HasSelectedPreset()) return;
 
         PresetManager!.RenameSelected(GetTrimmedPresetName(), out _);
-        ClearNameValidation();
         UpdateButtonStates();
     }
 
@@ -262,28 +220,12 @@ public partial class TemplatePresetManagerControl : UserControl
     {
         if (!HasSelectedPreset()) return;
 
-        if (!PresetManager!.DuplicateSelected(out var error))
-        {
-            if (!string.IsNullOrEmpty(error))
-                ShowMessage(error);
-        }
-        else
-        {
-            RefreshUI();
-        }
+        PresetManager!.DuplicateSelected();
+        RefreshUI();
     }
 
     private bool HasSelectedPreset() => PresetManager?.SelectedTemplatePreset != null;
     
     private string GetTrimmedPresetName() => PresetNameTextBox.Text.Trim();
 
-    private void ShowNameValidation(string? message)
-    {
-        NameValidationTextBlock.Text = message ?? "";
-        NameValidationTextBlock.Visibility = string.IsNullOrWhiteSpace(message) 
-            ? Visibility.Collapsed 
-            : Visibility.Visible;
-    }
-
-    private void ClearNameValidation() => ShowNameValidation(null);
 }
