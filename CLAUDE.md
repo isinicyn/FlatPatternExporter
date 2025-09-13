@@ -30,7 +30,10 @@ FlatPatternExporter/
     │   ├── SettingsManager.cs          # Персистентность настроек
     │   ├── TemplatePresetManager.cs    # Управление пресетами шаблонов
     │   ├── CommonEnums.cs              # Базовые enum и маппинги
-    │   └── LayerSettingsClasses.cs     # Модели настроек слоев + хелперы
+    │   ├── LayerSettingsClasses.cs     # Модели настроек слоев + хелперы
+    │   ├── VersionInfoService.cs       # Получение версии приложения и коммитов
+    │   ├── ConflictDataProcessor.cs    # Обработка данных конфликтов партнамберов
+    │   └── PropertyListManager.cs      # Управление списками свойств с фильтрацией
     │
     ├── UI/                             # Пользовательский интерфейс
     │   ├── Windows/                    # Окна приложения
@@ -112,9 +115,16 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `TemplatePresetManager` - управление пресетами шаблонов
 - `CommonEnums` - базовые перечисления и маппинги
 - `LayerSettingsClasses` - комплексное решение (модели + хелперы + валидаторы)
+- `VersionInfoService` - получение версии приложения и информации о коммитах
+- `ConflictDataProcessor` - обработка и трансформация данных конфликтов партнамберов
+- `PropertyListManager` - управление списками свойств с фильтрацией и состоянием
 
 **UI/ - Интерфейс пользователя:**
-- **Windows/**: основные окна приложения (FlatPatternExporterMainWindow, AboutWindow, ConflictDetailsWindow, SelectIPropertyWindow)
+- **Windows/**: основные окна приложения с чистой архитектурой без бизнес-логики
+  - `FlatPatternExporterMainWindow` - главное окно приложения
+  - `AboutWindow` - независимое окно информации о программе
+  - `ConflictDetailsWindow` - окно конфликтов с инжекцией делегата открытия документов
+  - `SelectIPropertyWindow` - окно выбора свойств с полной инжекцией зависимостей
 - **Controls/**: пользовательские элементы управления (LayerSettingControl, TemplatePresetManagerControl)
 
 **Стили и ресурсы**:

@@ -557,25 +557,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    public string GetVersion()
-    {
-        var assembly = Assembly.GetExecutingAssembly();
-        var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-        Console.WriteLine($"Raw Informational Version: {informationalVersion}");
-
-        if (informationalVersion != null && informationalVersion.Contains("build:"))
-        {
-            var parts = informationalVersion.Split(new[] { "build:" }, StringSplitOptions.None);
-            if (parts.Length > 1)
-            {
-                var version = parts[0].Trim();
-                var shortCommitHash = parts[1].Split('+')[0].Trim(); // Берем только часть до '+'
-                return $"{version} build:{shortCommitHash}";
-            }
-        }
-
-        return informationalVersion ?? "Версия неизвестна";
-    }
 
     /// <summary>
     /// Централизованное управление состоянием UI
@@ -788,8 +769,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
     private void AddPresetIPropertyButton_Click(object sender, RoutedEventArgs e)
     {
-        var selectIPropertyWindow =
-            new SelectIPropertyWindow(PresetIProperties, this); // Передаем `this` как ссылку на MainWindow
+        var selectIPropertyWindow = new SelectIPropertyWindow(
+            PresetIProperties,
+            columnHeader => PartsDataGrid.Columns.Any(c => c.Header.ToString() == columnHeader),
+            AddIPropertyColumn,
+            AddUserDefinedIPropertyColumn,
+            RemoveDataGridColumn);
         selectIPropertyWindow.ShowDialog();
     }
 
@@ -1540,9 +1525,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
 
         // Создаем и показываем окно с деталями конфликтов
-        var conflictWindow = new ConflictDetailsWindow(_conflictFileDetails);
-        conflictWindow.Owner = this; // Устанавливаем основное окно как родительское
-        conflictWindow.ShowDialog(); // Ожидаем закрытия окна
+        var conflictWindow = new ConflictDetailsWindow(_conflictFileDetails, OpenInventorDocument);
+        conflictWindow.Owner = this;
+        conflictWindow.ShowDialog();
     }
 
 

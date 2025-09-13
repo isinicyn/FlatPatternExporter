@@ -3,80 +3,50 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Data;
+using FlatPatternExporter.Core;
 using Button = System.Windows.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter;
 public partial class SelectIPropertyWindow : Window
 {
-    private readonly FlatPatternExporterMainWindow _mainWindow;
-    private readonly ObservableCollection<PresetIProperty> _allProperties;
-    private string _searchFilter = "";
-    private string _categoryFilter = "";
+    private readonly PropertyListManager _propertyListManager;
+    private readonly Func<string, bool> _isColumnAdded;
+    private readonly Action<PresetIProperty> _addIPropertyColumn;
+    private readonly Action<string> _addUserDefinedColumn;
+    private readonly Action<string, bool> _removeColumn;
     private bool _isInitialized = false;
 
-    public SelectIPropertyWindow(ObservableCollection<PresetIProperty> presetIProperties, FlatPatternExporterMainWindow mainWindow)
+    public SelectIPropertyWindow(
+        ObservableCollection<PresetIProperty> presetIProperties,
+        Func<string, bool> isColumnAdded,
+        Action<PresetIProperty> addIPropertyColumn,
+        Action<string> addUserDefinedColumn,
+        Action<string, bool> removeColumn)
     {
         InitializeComponent();
 
-        _mainWindow = mainWindow;
-        _allProperties = presetIProperties;
-        
-        StandardProperties = [];
-        UserDefinedProperties = [];
-        
+        _propertyListManager = new PropertyListManager(presetIProperties);
+        _isColumnAdded = isColumnAdded;
+        _addIPropertyColumn = addIPropertyColumn;
+        _addUserDefinedColumn = addUserDefinedColumn;
+        _removeColumn = removeColumn;
+
         DataContext = this;
-        
-        InitializeProperties();
+
+        _propertyListManager.InitializeProperties();
         InitializeFilters();
         UpdatePropertyStates();
-        
+
         _isInitialized = true;
     }
 
-    public ObservableCollection<PresetIProperty> StandardProperties { get; set; }
-    public ObservableCollection<PresetIProperty> UserDefinedProperties { get; set; }
-
-    private void InitializeProperties()
-    {
-        foreach (var property in _allProperties)
-        {
-            if (property.IsUserDefined)
-            {
-                UserDefinedProperties.Add(property);
-            }
-            else
-            {
-                StandardProperties.Add(property);
-            }
-        }
-        
-        InitializeUserDefinedPropertiesFromRegistry();
-    }
-
-    private void InitializeUserDefinedPropertiesFromRegistry()
-    {
-        foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
-        {
-            if (!UserDefinedProperties.Any(p => p.ColumnHeader == userProperty.ColumnHeader))
-            {
-                var presetProperty = new PresetIProperty
-                {
-                    ColumnHeader = userProperty.ColumnHeader,
-                    ListDisplayName = userProperty.DisplayName,
-                    InventorPropertyName = userProperty.InternalName,
-                    Category = userProperty.Category,
-                    IsUserDefined = true
-                };
-
-                UserDefinedProperties.Add(presetProperty);
-            }
-        }
-    }
+    public ObservableCollection<PresetIProperty> StandardProperties => _propertyListManager.StandardProperties;
+    public ObservableCollection<PresetIProperty> UserDefinedProperties => _propertyListManager.UserDefinedProperties;
 
     private void InitializeFilters()
     {
-        var categories = StandardProperties.Select(p => p.Category).Distinct().OrderBy(c => c);
+        var categories = _propertyListManager.GetCategories();
         foreach (var category in categories)
         {
             CategoryFilter.Items.Add(new ComboBoxItem { Content = category });
@@ -87,15 +57,16 @@ public partial class SelectIPropertyWindow : Window
     {
         foreach (var property in StandardProperties.Concat(UserDefinedProperties))
         {
-            property.IsAdded = _mainWindow.PartsDataGrid.Columns.Any(c => c.Header.ToString() == property.ColumnHeader);
+            property.IsAdded = _isColumnAdded(property.ColumnHeader);
         }
     }
 
 
     private void StandardSearchBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        _searchFilter = StandardSearchBox.Text;
-        ClearStandardSearchButton.IsEnabled = !string.IsNullOrEmpty(_searchFilter);
+        string searchFilter = StandardSearchBox.Text;
+        ClearStandardSearchButton.IsEnabled = !string.IsNullOrEmpty(searchFilter);
+        _propertyListManager.SetSearchFilter(searchFilter);
         ApplyFilters();
     }
 
@@ -109,15 +80,13 @@ public partial class SelectIPropertyWindow : Window
     private void CategoryFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!_isInitialized) return;
-        
-        if (CategoryFilter.SelectedIndex == 0)
+
+        string categoryFilter = "";
+        if (CategoryFilter.SelectedIndex != 0 && CategoryFilter.SelectedItem is ComboBoxItem item)
         {
-            _categoryFilter = "";
+            categoryFilter = item.Content?.ToString() ?? "";
         }
-        else if (CategoryFilter.SelectedItem is ComboBoxItem item)
-        {
-            _categoryFilter = item.Content?.ToString() ?? "";
-        }
+        _propertyListManager.SetCategoryFilter(categoryFilter);
         ApplyFilters();
     }
 
@@ -126,18 +95,7 @@ public partial class SelectIPropertyWindow : Window
         var view = CollectionViewSource.GetDefaultView(StandardPropertiesListBox.ItemsSource);
         if (view != null)
         {
-            view.Filter = item =>
-            {
-                if (item is PresetIProperty property)
-                {
-                    bool matchesSearch = string.IsNullOrEmpty(_searchFilter) || 
-                                        property.ListDisplayName.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase);
-                    bool matchesCategory = string.IsNullOrEmpty(_categoryFilter) || 
-                                          property.Category == _categoryFilter;
-                    return matchesSearch && matchesCategory;
-                }
-                return true;
-            };
+            _propertyListManager.ApplyFilters(view);
         }
     }
 
@@ -201,7 +159,7 @@ public partial class SelectIPropertyWindow : Window
                 
             if (result == MessageBoxResult.Yes)
             {
-                _mainWindow.RemoveDataGridColumn(property.ColumnHeader, removeDataOnly: false);
+                _removeColumn(property.ColumnHeader, false);
                 
                 var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(property.ColumnHeader);
                 if (!string.IsNullOrEmpty(internalName))
@@ -209,7 +167,7 @@ public partial class SelectIPropertyWindow : Window
                     PropertyMetadataRegistry.RemoveUserDefinedProperty(internalName);
                 }
                 
-                UserDefinedProperties.Remove(property);
+                _propertyListManager.RemoveUserDefinedProperty(property);
             }
         }
     }
@@ -218,7 +176,7 @@ public partial class SelectIPropertyWindow : Window
     {
         if (!property.IsAdded)
         {
-            _mainWindow.AddIPropertyColumn(property);
+            _addIPropertyColumn(property);
             property.IsAdded = true;
         }
     }
@@ -233,7 +191,7 @@ public partial class SelectIPropertyWindow : Window
                 var propertyName = PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(internalName);
                 if (!string.IsNullOrEmpty(propertyName))
                 {
-                    _mainWindow.AddUserDefinedIPropertyColumn(propertyName);
+                    _addUserDefinedColumn(propertyName);
                 }
             }
             property.IsAdded = true;
@@ -242,7 +200,7 @@ public partial class SelectIPropertyWindow : Window
 
     private void RemovePropertyFromGrid(PresetIProperty property)
     {
-        _mainWindow.RemoveDataGridColumn(property.ColumnHeader, removeDataOnly: true);
+        _removeColumn(property.ColumnHeader, true);
         property.IsAdded = false;
     }
 
@@ -262,39 +220,16 @@ public partial class SelectIPropertyWindow : Window
     private void AddUserDefinedPropertyButton_Click(object sender, RoutedEventArgs e)
     {
         string userDefinedPropertyName = UserDefinedPropertyTextBox.Text.Trim();
-        
-        if (!string.IsNullOrWhiteSpace(userDefinedPropertyName))
+
+        var newProperty = _propertyListManager.CreateUserDefinedProperty(userDefinedPropertyName);
+        if (newProperty == null)
         {
-            var internalName = $"UDP_{userDefinedPropertyName}";
-            var columnHeader = $"(Пользов.) {userDefinedPropertyName}";
-
-            if (PropertyMetadataRegistry.UserDefinedProperties.Any(p => p.InternalName == internalName))
-            {
-                MessageBox.Show($"Свойство '{userDefinedPropertyName}' уже добавлено.", "Предупреждение",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            PropertyMetadataRegistry.AddUserDefinedProperty(userDefinedPropertyName);
-
-            var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == internalName);
-            if (userProperty != null)
-            {
-                var newUserProperty = new PresetIProperty
-                {
-                    ColumnHeader = userProperty.ColumnHeader,
-                    ListDisplayName = userProperty.DisplayName,
-                    InventorPropertyName = userProperty.InventorPropertyName ?? userDefinedPropertyName,
-                    Category = userProperty.Category,
-                    IsAdded = false,
-                    IsUserDefined = true
-                };
-                
-                UserDefinedProperties.Add(newUserProperty);
-            }
-
-            UserDefinedPropertyTextBox.Text = "";
+            MessageBox.Show($"Свойство '{userDefinedPropertyName}' уже добавлено.", "Предупреждение",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
         }
+
+        UserDefinedPropertyTextBox.Text = "";
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)

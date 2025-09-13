@@ -1589,8 +1589,8 @@ public partial class FlatPatternExporterMainWindow : Window
 
     private void AboutButton_Click(object sender, RoutedEventArgs e)
     {
-        var aboutWindow = new AboutWindow(this); // Передаем текущий экземпляр MainWindow
-        aboutWindow.ShowDialog(); // Отображаем окно как диалоговое
+        var aboutWindow = new AboutWindow();
+        aboutWindow.ShowDialog();
     }
 
     private void UpdateNoColumnsOverlayVisibility()

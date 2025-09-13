@@ -1,52 +1,22 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using MessageBox = System.Windows.MessageBox;
+using FlatPatternExporter.Core;
 
 namespace FlatPatternExporter;
 
 
-
-public class ConflictPartNumberGroup
-{
-    public string PartNumber { get; set; } = "";
-    public List<ConflictFileInfo> Files { get; set; } = new();
-}
-
-public class ConflictFileInfo
-{
-    public string FileName { get; set; } = "";
-    public string ModelState { get; set; } = "";
-    public string FilePath { get; set; } = "";
-    public string FileNameOnly => Path.GetFileName(FileName);
-}
-
 public partial class ConflictDetailsWindow
 {
-    public List<ConflictPartNumberGroup> ConflictGroups { get; set; } = new();
+    private readonly Action<string, string>? _openDocumentAction;
+    public List<ConflictPartNumberGroup> ConflictGroups { get; set; } = [];
 
-    public ConflictDetailsWindow(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
+    public ConflictDetailsWindow(Dictionary<string, List<PartConflictInfo>> conflictFileDetails,
+                               Action<string, string>? openDocumentAction = null)
     {
         InitializeComponent();
-        PrepareConflictData(conflictFileDetails);
+        _openDocumentAction = openDocumentAction;
+        ConflictGroups = ConflictDataProcessor.PrepareConflictData(conflictFileDetails);
         DataContext = this;
-    }
-
-    private void PrepareConflictData(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
-    {
-        ConflictGroups = conflictFileDetails.Select(entry => new ConflictPartNumberGroup
-        {
-            PartNumber = entry.Key,
-            Files = entry.Value.Select(conflictInfo => new ConflictFileInfo
-            {
-                FileName = conflictInfo.FileName,
-                ModelState = conflictInfo.ModelState,
-                FilePath = conflictInfo.FileName
-            }).OrderBy(f => f.FileName).ToList()
-        }).OrderBy(g => g.PartNumber).ToList();
     }
 
     private void ExecuteOpenFile(ConflictFileInfo? fileInfo)
@@ -54,14 +24,7 @@ public partial class ConflictDetailsWindow
         if (fileInfo?.FilePath == null)
             return;
 
-        // Получаем ссылку на главное окно для использования централизованного метода
-        var mainWindow = Owner as FlatPatternExporterMainWindow;
-        if (mainWindow != null)
-        {
-            // Используем централизованный метод открытия с состоянием модели
-            // Обработка ошибок уже есть внутри OpenInventorDocument()
-            mainWindow.OpenInventorDocument(fileInfo.FilePath, fileInfo.ModelState);
-        }
+        _openDocumentAction?.Invoke(fileInfo.FilePath, fileInfo.ModelState);
     }
 
     private void OpenFileMenuItem_Click(object sender, RoutedEventArgs e)
