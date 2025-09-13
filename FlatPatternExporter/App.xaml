@@ -1,7 +1,7 @@
 ﻿<Application x:Class="FlatPatternExporter.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="FlatPatternExporterMainWindow.xaml">
+             StartupUri="UI/Windows/FlatPatternExporterMainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

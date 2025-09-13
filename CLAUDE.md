@@ -19,20 +19,29 @@ FlatPatternExporter/
     ├── AssemblyInfo.cs                 # Информация о сборке
     ├── FPExport.ico                    # Иконка приложения
     │
-    ├── FlatPatternExporterMainWindow.xaml(.cs,.part2.cs)  # Главное окно
-    ├── AboutWindow.xaml(.cs)           # Окно "О программе"
-    ├── ConflictDetailsWindow.xaml(.cs) # Окно деталей конфликтов
-    ├── SelectIPropertyWindow.xaml(.cs) # Окно выбора свойств
+    ├── Libraries/                      # Внешние библиотеки для переноса
+    │   ├── DxfGenerator.cs             # Будущая отдельная библиотека DXF
+    │   └── MarshalCore.cs              # Отдельная библиотека COM interop
     │
-    ├── LayerSettingControl.xaml(.cs)   # Элемент управления слоями
-    ├── TemplatePresetManagerControl.xaml(.cs) # Элемент управления пресетами шаблонов
+    ├── Core/                           # Ядро системы и бизнес-логика
+    │   ├── PropertyMetadataRegistry.cs # Центральный реестр метаданных
+    │   ├── PropertyManager.cs          # Менеджер свойств Inventor API
+    │   ├── TokenService.cs             # Обработка токенов имен файлов
+    │   ├── SettingsManager.cs          # Персистентность настроек
+    │   ├── TemplatePresetManager.cs    # Управление пресетами шаблонов
+    │   ├── CommonEnums.cs              # Базовые enum и маппинги
+    │   └── LayerSettingsClasses.cs     # Модели настроек слоев + хелперы
     │
-    ├── Styles/                         # XAML стили
-    │   ├── ColorResources.xaml
-    │   ├── IconResources.xaml
-    │   ├── ButtonStyles.xaml
-    │   ├── DataGridStyles.xaml
-    │   └── GeneralStyles.xaml
+    ├── UI/                             # Пользовательский интерфейс
+    │   ├── Windows/                    # Окна приложения
+    │   │   ├── FlatPatternExporterMainWindow.xaml(.cs,.part2.cs)
+    │   │   ├── AboutWindow.xaml(.cs)
+    │   │   ├── ConflictDetailsWindow.xaml(.cs)
+    │   │   └── SelectIPropertyWindow.xaml(.cs)
+    │   │
+    │   └── Controls/                   # Пользовательские элементы
+    │       ├── LayerSettingControl.xaml(.cs)
+    │       └── TemplatePresetManagerControl.xaml(.cs)
     │
     ├── Converters/                     # WPF конвертеры
     │   ├── ColorToBrushConverter.cs            # Конвертация названия цвета в SolidColorBrush
@@ -42,15 +51,12 @@ FlatPatternExporter/
     │   ├── PropertyExpressionByNameConverter.cs # Определение видимости fx индикатора
     │   └── IPictureDispConverter.cs            # Преобразование IPictureDisp в System.Drawing.Image
     │
-    ├── MarshalCore.cs                  # COM interop
-    ├── DxfGenerator.cs                 # Генератор DXF
-    ├── PropertyManager.cs              # Управление свойствами
-    ├── PropertyMetadataRegistry.cs     # Централизованная система метаданных свойств
-    ├── SettingsManager.cs              # Настройки пользователя
-    ├── LayerSettingsClasses.cs         # Классы настроек слоев
-    ├── TokenService.cs                 # Сервис работы с токенами
-    ├── TemplatePresetManager.cs        # Управление пресетами имен файлов
-    ├── CommonEnums.cs                  # Общие enum и их маппинги на отображаемые значения
+    ├── Styles/                         # XAML стили
+    │   ├── ColorResources.xaml
+    │   ├── IconResources.xaml
+    │   ├── ButtonStyles.xaml
+    │   ├── DataGridStyles.xaml
+    │   └── GeneralStyles.xaml
     │
     └── Properties/                     # Свойства проекта
         ├── launchSettings.json
@@ -89,22 +95,27 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 ### Зависимости проекта
 - Autodesk Inventor Interop: `C:\Program Files\Autodesk\Inventor 2026\Bin\Public Assemblies\Autodesk.Inventor.Interop.dll`
 - netDxf.netstandard (v3.0.1) для работы с DXF файлами
+- Svg.Skia (v3.0.6) для конвертации SVG в PNG/BitmapImage
 - stdole (v17.14.40260) для COM interop
 
 ### Ключевые компоненты
 
-**Основные окна**:
-- `FlatPatternExporterMainWindow` - Главное окно приложения для экспорта разверток со встроенным функционалом управления слоями
-- `ConflictDetailsWindow` - Окно деталей конфликтов
-- `AboutWindow` - Окно "О программе"
+**Libraries/ - Подготовка к выделению:**
+- `DxfGenerator` - генератор DXF (namespace: DxfGenerator)
+- `MarshalCore` - COM interop библиотека (namespace: DefineEdge)
 
-**Диалоги управления свойствами**:
-- `SelectIPropertyWindow` - Окно выбора свойств с интегрированным функционалом добавления пользовательских свойств
+**Core/ - Центральные компоненты:**
+- `PropertyMetadataRegistry` - централизованный реестр метаданных свойств (7 зависимостей)
+- `PropertyManager` - работа с Inventor API, использует реестр
+- `TokenService` - специализированная обработка токенов (7 зависимостей)
+- `SettingsManager` - персистентность настроек
+- `TemplatePresetManager` - управление пресетами шаблонов
+- `CommonEnums` - базовые перечисления и маппинги
+- `LayerSettingsClasses` - комплексное решение (модели + хелперы + валидаторы)
 
-**Компоненты LayerSettings** (интегрированы):
-- `LayerSettingControl` - Пользовательский элемент управления для конфигурации слоев
-- `LayerSettingsClasses` - Классы моделей данных, конвертеры и вспомогательные методы
-- `LayerSettingsHelper` - Статические методы для работы с настройками слоев
+**UI/ - Интерфейс пользователя:**
+- **Windows/**: основные окна приложения (FlatPatternExporterMainWindow, AboutWindow, ConflictDetailsWindow, SelectIPropertyWindow)
+- **Controls/**: пользовательские элементы управления (LayerSettingControl, TemplatePresetManagerControl)
 
 **Стили и ресурсы**:
 - `ColorResources.xaml` - Централизованные цветовые ресурсы приложения
@@ -113,17 +124,13 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DataGridStyles.xaml` - Стили для DataGrid элементов
 - `GeneralStyles.xaml` - Общие стили приложения
 
-**Утилиты**:
-- `MarshalCore` - Основная функциональность COM interop  
-- `DxfGenerator` - Генератор и обработка DXF файлов
-- `IPictureDispConverter` - Конвертер изображений
-- `SettingsManager` - Система сохранения и загрузки настроек пользователя в JSON
-- `PropertyManager` - Управление пользовательскими свойствами iProperty
-- `PropertyMetadataRegistry` - Централизованная система метаданных свойств документов Inventor
-- `TextWithFxIndicator` - Компонент с FX индикатором для текстовых полей
-- `TokenService` - Централизованная обработка токенов для генерации имен файлов
-- `TemplatePresetManager` - Управление пресетами шаблонов имен файлов с сохранением по индексу
-- `CommonEnums` - Централизованные enum и их маппинги (AcadVersionMapping, SplineReplacementMapping)
+**Converters/ - WPF конвертеры:**
+- `ColorToBrushConverter` - конвертация названия цвета в SolidColorBrush
+- `LineTypeToGeometryConverter` - визуализация типов линий в LayerSettings
+- `EnumToBooleanConverter` - универсальная привязка enum к RadioButton
+- `DynamicPropertyValueConverter` - извлечение значений свойств по имени пути
+- `PropertyExpressionByNameConverter` - определение видимости fx индикатора
+- `IPictureDispConverter` - преобразование IPictureDisp в System.Drawing.Image
 
 ### Управление версиями
 Проект использует версионирование на основе Git в процессе сборки:
@@ -133,8 +140,11 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 
 ### Целевая платформа
 - Среда выполнения: `win-x64`
-- Фреймворк: `net8.0-windows`
-- Тип отладочной информации: embedded для конфигураций Debug и Release
+- Фреймворк: `net8.0-windows10.0.26100.0`
+- Поддержка Windows Forms и WPF включена
+- Nullable reference types включены
+- ImplicitUsings включены
+- Тип отладочной информации: full для Debug, none для Release
 
 ### Особенности функционала экспорта разверток
 Приложение специализируется на экспорте разверток деталей из листового металла:
