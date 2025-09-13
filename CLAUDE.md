@@ -50,7 +50,7 @@ FlatPatternExporter/
     ├── LayerSettingsClasses.cs         # Классы настроек слоев
     ├── TokenService.cs                 # Сервис работы с токенами
     ├── TemplatePresetManager.cs        # Управление пресетами имен файлов
-    ├── EnumMappings.cs                 # Маппинги enum типов на отображаемые значения
+    ├── CommonEnums.cs                  # Общие enum и их маппинги на отображаемые значения
     │
     └── Properties/                     # Свойства проекта
         ├── launchSettings.json
@@ -123,7 +123,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `TextWithFxIndicator` - Компонент с FX индикатором для текстовых полей
 - `TokenService` - Централизованная обработка токенов для генерации имен файлов
 - `TemplatePresetManager` - Управление пресетами шаблонов имен файлов с сохранением по индексу
-- `EnumMappings` - Централизованные маппинги enum типов (AcadVersionMapping, SplineReplacementMapping)
+- `CommonEnums` - Централизованные enum и их маппинги (AcadVersionMapping, SplineReplacementMapping)
 
 ### Управление версиями
 Проект использует версионирование на основе Git в процессе сборки:

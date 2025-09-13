@@ -2,6 +2,58 @@ using netDxf.Header;
 
 namespace FlatPatternExporter;
 
+public enum ExportFolderType
+{
+    ChooseFolder = 0,      // Указать папку в процессе экспорта
+    ComponentFolder = 1,   // Папка компонента
+    PartFolder = 2,        // Рядом с деталью
+    ProjectFolder = 3,     // Папка проекта
+    FixedFolder = 4        // Фиксированная папка
+}
+
+public enum ProcessingMethod
+{
+    Traverse = 0,          // Перебор
+    BOM = 1               // Спецификация
+}
+
+public enum SplineReplacementType
+{
+    Lines = 0,            // Линии
+    Arcs = 1              // Дуги
+}
+
+public enum AcadVersionType
+{
+    V2018 = 0,           // 2018
+    V2013 = 1,           // 2013
+    V2010 = 2,           // 2010
+    V2007 = 3,           // 2007
+    V2004 = 4,           // 2004
+    V2000 = 5,           // 2000 (по умолчанию)
+    R12 = 6              // R12
+}
+
+public enum ProcessingStatus
+{
+    NotProcessed,   // Не обработан (прозрачный)
+    Success,        // Успешно экспортирован (зеленый)
+    Error          // Ошибка экспорта (красный)
+}
+
+public enum DocumentType
+{
+    Assembly,
+    Part,
+    Invalid
+}
+
+public enum OperationType
+{
+    Scan,
+    Export
+}
+
 public static class AcadVersionMapping
 {
     private static readonly Dictionary<AcadVersionType, (string Name, DxfVersion? Dxf)> Map = new()
