@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -20,7 +19,6 @@ using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using DefineEdge;
 using FlatPatternExporter.Core;
-using FlatPatternExporter.UI.Controls;
 using Inventor;
 using Binding = System.Windows.Data.Binding;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -31,7 +29,6 @@ using Style = System.Windows.Style;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace FlatPatternExporter.UI.Windows;
-
 
 public class AcadVersionItem
 {
@@ -106,6 +103,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
     private string _actualSearchText = string.Empty;
     private readonly DispatcherTimer _searchDelayTimer;
+
+    // Словарь горячих клавиш для централизованной обработки
+    private readonly Dictionary<Key, Func<Task>> _hotKeyActions;
     
     // DataGrid управление колонками
     private AdornerLayer? _adornerLayer;
@@ -184,11 +184,18 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         return templates;
     }
 
-
-
     public FlatPatternExporterMainWindow()
     {
         InitializeComponent();
+
+        // Инициализация словаря горячих клавиш
+        _hotKeyActions = new Dictionary<Key, Func<Task>>
+        {
+            [Key.F5] = StartScanAsync,
+            [Key.F6] = StartNormalExportAsync,
+            [Key.F8] = () => { StartClearList(); return Task.CompletedTask; },
+            [Key.F9] = StartQuickExportAsync
+        };
         InitializeInventor();
         SetProjectFolderInfo(); // Инициализация папки проекта при запуске
         PartsDataGrid.ItemsSource = _partsData;
@@ -198,7 +205,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         PartsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
         
         // Обновляем видимость оверлея при изменении коллекции колонок
-        ((System.Collections.Specialized.INotifyCollectionChanged)PartsDataGrid.Columns).CollectionChanged += (s, e) => UpdateNoColumnsOverlayVisibility();
+        ((INotifyCollectionChanged)PartsDataGrid.Columns).CollectionChanged += (s, e) => UpdateNoColumnsOverlayVisibility();
         
 
         // Настройка TokenService для работы с визуальным контейнером
@@ -211,15 +218,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Устанавливаем ItemsSource для DataGrid
         PartsDataGrid.ItemsSource = _partsDataView.View;
 
-
-
         // Настраиваем таймер для задержки поиска
         _searchDelayTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromSeconds(1) // 1 секунда задержки
         };
         _searchDelayTimer.Tick += SearchDelayTimer_Tick;
-
 
         // Инициализируем настройки слоев
         LayerSettings = LayerSettingsHelper.InitializeLayerSettings();
@@ -1386,28 +1390,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
     private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.F5)
+        // Проверяем, есть ли обработчик для нажатой клавиши
+        if (_hotKeyActions.TryGetValue(e.Key, out var action))
         {
-            // Запускаем сканирование автоматически
-            await StartScanAsync();
-            e.Handled = true;
-        }
-        else if (e.Key == Key.F6)
-        {
-            // Запускаем обычный экспорт автоматически
-            await StartNormalExportAsync();
-            e.Handled = true;
-        }
-        else if (e.Key == Key.F8)
-        {
-            // Очищаем список автоматически
-            StartClearList();
-            e.Handled = true;
-        }
-        else if (e.Key == Key.F9)
-        {
-            // Запускаем быстрый экспорт автоматически
-            await StartQuickExportAsync();
+            await action();
             e.Handled = true;
         }
     }
