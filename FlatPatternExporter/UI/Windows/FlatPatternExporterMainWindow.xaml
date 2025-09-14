@@ -286,10 +286,99 @@
                             </Grid.ColumnDefinitions>
 
                             <!-- Левая колонка: Менеджер пресетов -->
-                            <local:TemplatePresetManagerControl Grid.Column="0" 
-                                                              PresetManager="{Binding PresetManager}" 
-                                                              TokenService="{Binding TokenService}"
-                                                              Margin="{StaticResource RightSmallMarginThickness}"/>
+                            <GroupBox Grid.Column="0" Header="Менеджер пресетов шаблонов" Style="{StaticResource BaseGroupBoxStyle}"
+                                      Margin="{StaticResource RightSmallMarginThickness}">
+                                <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
+                                    <!-- Список пресетов и действия -->
+                                    <TextBlock Text="Сохраненные пресеты:" Style="{StaticResource SectionHeaderTextStyle}"/>
+
+                                    <Grid Margin="{StaticResource BottomSmallMarginThickness}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <ListBox x:Name="TemplatePresetsListBox"
+                                                 Grid.Column="0"
+                                                 ItemsSource="{Binding PresetManager.TemplatePresets}"
+                                                 DisplayMemberPath="Name"
+                                                 SelectedItem="{Binding PresetManager.SelectedTemplatePreset, Mode=TwoWay}"
+                                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                 Margin="{StaticResource BottomSmallMarginThickness}"
+                                                 ToolTip="Выберите сохраненный пресет шаблона" MaxHeight="140"/>
+
+                                        <Border x:Name="EmptyStatePanel"
+                                                Grid.Column="0"
+                                                Background="{StaticResource BackgroundSecondaryBrush}"
+                                                BorderBrush="{StaticResource BorderSecondaryBrush}"
+                                                BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                                                Padding="{StaticResource StandardPaddingThickness}"
+                                                Margin="{StaticResource BottomSmallMarginThickness}"
+                                                MaxHeight="140"
+                                                Visibility="Collapsed">
+                                            <TextBlock Text="Нет сохраненных пресетов. Создайте первый пресет для быстрого доступа к часто используемым шаблонам."
+                                                       Style="{StaticResource OverlayHintTextStyle}"
+                                                       TextAlignment="Left"
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" 
+                                                    Orientation="Vertical"
+                                                    Margin="{StaticResource LeftSmallMarginThickness}">
+                                            
+                                            <Button x:Name="CreatePresetButton"
+                                                    Content="Создать"
+                                                    Click="CreatePresetButton_Click"
+                                                    Style="{StaticResource InteractiveActionButtonStyle}"
+                                                    IsEnabled="{Binding IsCreateButtonEnabled}"
+                                                    ToolTip="Создать новый пресет на основе текущего шаблона"
+                                                    Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+                                            <Button x:Name="SaveChangesButton"
+                                                    Content="Сохранить"
+                                                    Click="SaveChangesButton_Click"
+                                                    Style="{StaticResource InteractiveActionButtonStyle}"
+                                                    IsEnabled="{Binding IsSaveButtonEnabled}"
+                                                    ToolTip="Сохранить текущее содержимое шаблона в выбранный пресет"
+                                                    Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+                                            <Button x:Name="RenamePresetButton"
+                                                    Content="Переименовать"
+                                                    Click="RenamePresetButton_Click"
+                                                    Style="{StaticResource InteractiveActionButtonStyle}"
+                                                    IsEnabled="{Binding IsRenameButtonEnabled}"
+                                                    ToolTip="Переименовать выбранный пресет"
+                                                    Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+                                            <Button x:Name="DuplicatePresetButton"
+                                                    Content="Дублировать"
+                                                    Click="DuplicatePresetButton_Click"
+                                                    Style="{StaticResource InteractiveActionButtonStyle}"
+                                                    IsEnabled="{Binding IsPresetSelected}"
+                                                    ToolTip="Создать копию выбранного пресета"
+                                                    Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+                                            <Button x:Name="DeletePresetButton"
+                                                    Content="Удалить"
+                                                    Click="DeletePresetButton_Click"
+                                                    Style="{StaticResource WarningButtonStyle}"
+                                                    IsEnabled="{Binding IsPresetSelected}"
+                                                    ToolTip="Удалить выбранный пресет"
+                                                    Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Поле имени пресета -->
+                                    <TextBlock Text="Имя пресета:" Style="{StaticResource SectionHeaderTextStyle}"/>
+                                    <TextBox x:Name="PresetNameTextBox"
+                                             Style="{StaticResource BaseTextBoxStyle}"
+                                             ToolTip="Введите имя пресета для создания или переименования"
+                                             Margin="{StaticResource BottomSmallMarginThickness}"
+                                             TextChanged="PresetNameTextBox_TextChanged"/>
+                                </StackPanel>
+                            </GroupBox>
 
                             <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
 

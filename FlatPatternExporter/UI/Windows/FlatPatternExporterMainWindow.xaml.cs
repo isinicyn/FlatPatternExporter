@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -71,6 +72,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private bool _hasMissingReferences = false;
     private int _itemCounter = 1;
     private bool _isInitializing = true;
+    private bool _isUpdatingState;
     
     // UI состояние
     private double _scanProgressValue;
@@ -238,6 +240,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Добавляем обработчики для отслеживания нажатия и отпускания клавиши Ctrl
         KeyDown += MainWindow_KeyDown;
         KeyUp += MainWindow_KeyUp;
+
+        PresetManager.PropertyChanged += PresetManager_PropertyChanged;
+        PresetManager.TemplatePresets.CollectionChanged += TemplatePresets_CollectionChanged;
+        TokenService!.PropertyChanged += TokenService_PropertyChanged;
 
         SetUIState(UIState.Initial);
         
@@ -556,6 +562,190 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
         }
     }
+
+    private bool _isRenameButtonEnabled;
+    public bool IsRenameButtonEnabled
+    {
+        get => _isRenameButtonEnabled;
+        set
+        {
+            if (_isRenameButtonEnabled != value)
+            {
+                _isRenameButtonEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _isPresetSelected;
+    public bool IsPresetSelected
+    {
+        get => _isPresetSelected;
+        set
+        {
+            if (_isPresetSelected != value)
+            {
+                _isPresetSelected = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _isSaveButtonEnabled;
+    public bool IsSaveButtonEnabled
+    {
+        get => _isSaveButtonEnabled;
+        set
+        {
+            if (_isSaveButtonEnabled != value)
+            {
+                _isSaveButtonEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _isCreateButtonEnabled;
+    public bool IsCreateButtonEnabled
+    {
+        get => _isCreateButtonEnabled;
+        set
+        {
+            if (_isCreateButtonEnabled != value)
+            {
+                _isCreateButtonEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private void TemplatePresets_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        UpdateEmptyState();
+    }
+
+    private void PresetManager_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(TemplatePresetManager.SelectedTemplatePreset))
+        {
+            UpdatePresetNameTextBox();
+            UpdateButtonStates();
+        }
+    }
+
+    private void TokenService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(TokenService.FileNameTemplate) ||
+            e.PropertyName == nameof(TokenService.IsFileNameTemplateValid))
+        {
+            UpdateButtonStates();
+        }
+    }
+
+    private void UpdateEmptyState()
+    {
+        var isEmpty = PresetManager?.TemplatePresets.Count == 0;
+        if (EmptyStatePanel != null && TemplatePresetsListBox != null)
+        {
+            EmptyStatePanel.Visibility = isEmpty ? Visibility.Visible : Visibility.Collapsed;
+            TemplatePresetsListBox.Visibility = isEmpty ? Visibility.Collapsed : Visibility.Visible;
+        }
+    }
+
+    private void UpdatePresetNameTextBox()
+    {
+        var selected = PresetManager?.SelectedTemplatePreset;
+        _isUpdatingState = true;
+        try
+        {
+            if (PresetNameTextBox != null)
+            {
+                PresetNameTextBox.Text = selected?.Name ?? string.Empty;
+            }
+            if (selected != null && TokenService != null && TokenService.FileNameTemplate != selected.Template)
+            {
+                TokenService.FileNameTemplate = selected.Template;
+            }
+        }
+        finally
+        {
+            _isUpdatingState = false;
+        }
+    }
+
+    private void PresetNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!_isUpdatingState)
+        {
+            UpdateButtonStates();
+        }
+    }
+
+    private void UpdateButtonStates()
+    {
+        if (_isUpdatingState) return;
+
+        var selected = PresetManager?.SelectedTemplatePreset;
+        var trimmedName = GetTrimmedPresetName();
+
+        IsPresetSelected = selected != null;
+
+        if (selected != null)
+        {
+            bool nameChanged = !string.Equals(trimmedName, selected.Name, StringComparison.Ordinal);
+            bool duplicateExists = PresetManager!.TemplatePresets
+                .Any(p => !ReferenceEquals(p, selected) && string.Equals(p.Name, trimmedName, StringComparison.OrdinalIgnoreCase));
+
+            IsRenameButtonEnabled = !string.IsNullOrWhiteSpace(trimmedName) && nameChanged && !duplicateExists;
+        }
+        else
+        {
+            IsRenameButtonEnabled = false;
+        }
+
+        IsSaveButtonEnabled = selected != null &&
+                              TokenService != null &&
+                              selected.Template != TokenService.FileNameTemplate;
+
+        IsCreateButtonEnabled = PresetManager != null &&
+                                TokenService != null &&
+                                !string.IsNullOrWhiteSpace(trimmedName) &&
+                                !PresetManager.PresetNameExists(trimmedName) &&
+                                !string.IsNullOrWhiteSpace(TokenService.FileNameTemplate) &&
+                                TokenService.IsFileNameTemplateValid;
+    }
+
+    private void DeletePresetButton_Click(object sender, RoutedEventArgs e)
+    {
+        PresetManager?.DeleteSelectedPreset();
+    }
+
+    private void CreatePresetButton_Click(object sender, RoutedEventArgs e)
+    {
+        PresetManager?.CreatePreset(GetTrimmedPresetName(), TokenService!.FileNameTemplate, out _);
+    }
+
+    private void SaveChangesButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!HasSelectedPreset() || TokenService == null) return;
+        PresetManager!.UpdateSelectedTemplate(TokenService.FileNameTemplate);
+        UpdateButtonStates();
+    }
+
+    private void RenamePresetButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!HasSelectedPreset()) return;
+        PresetManager!.RenameSelected(GetTrimmedPresetName(), out _);
+    }
+
+    private void DuplicatePresetButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!HasSelectedPreset()) return;
+        PresetManager!.DuplicateSelected();
+    }
+
+    private bool HasSelectedPreset() => PresetManager?.SelectedTemplatePreset != null;
+    private string GetTrimmedPresetName() => (PresetNameTextBox?.Text ?? string.Empty).Trim();
 
 
     /// <summary>
