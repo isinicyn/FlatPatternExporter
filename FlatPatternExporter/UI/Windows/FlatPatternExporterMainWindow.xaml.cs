@@ -238,7 +238,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Устанавливаем DataContext для текущего окна
         DataContext = this;
 
-        // Добавляем обработчик для горячих клавиш F5 (сканирование), F6 (экспорт), F9 (быстрый экспорт)
+        // Добавляем обработчик для горячих клавиш F5 (сканирование), F6 (экспорт), F8 (очистка), F9 (быстрый экспорт)
         KeyDown += MainWindow_KeyDown;
 
         PresetManager.PropertyChanged += PresetManager_PropertyChanged;
@@ -1398,6 +1398,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             await StartNormalExportAsync();
             e.Handled = true;
         }
+        else if (e.Key == Key.F8)
+        {
+            // Очищаем список автоматически
+            StartClearList();
+            e.Handled = true;
+        }
         else if (e.Key == Key.F9)
         {
             // Запускаем быстрый экспорт автоматически
@@ -1490,6 +1496,20 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         // Завершение операции
         CompleteOperation(result, OperationType.Export, ref _isExporting);
+    }
+
+    private void StartClearList()
+    {
+        // Проверяем, что не идут операции экспорта или сканирования
+        if (_isExporting || _isScanning)
+        {
+            MessageBox.Show("Нельзя очистить список во время выполнения операций.", "Информация",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        // Выполняем очистку через существующий метод
+        ClearList_Click(this, null!);
     }
 
     private async Task StartQuickExportAsync()
