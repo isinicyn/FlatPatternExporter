@@ -795,18 +795,11 @@ public partial class FlatPatternExporterMainWindow : Window
 
     private async void ExportButton_Click(object sender, RoutedEventArgs e)
     {
-        // Переносим фокус на кнопку сканирования, чтобы убрать выделение с кнопки экспорта
-        ScanButton.Focus();
         
         // Если экспорт уже идет, выполняем прерывание
         if (HandleExportCancellation()) return;
 
-        // Режим быстрого экспорта с Ctrl
-        if (_isCtrlPressed)
-        {
-            await ExportWithoutScan();
-            return;
-        }
+        // Обычный режим экспорта
 
         // Валидация документа
         var validation = ValidateDocumentOrShowError();

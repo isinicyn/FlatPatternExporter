@@ -104,7 +104,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
         }
     }
-    private bool _isCtrlPressed;
     private string _actualSearchText = string.Empty;
     private readonly DispatcherTimer _searchDelayTimer;
     
@@ -239,9 +238,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Устанавливаем DataContext для текущего окна
         DataContext = this;
 
-        // Добавляем обработчики для отслеживания нажатия и отпускания клавиши Ctrl
+        // Добавляем обработчик для клавиши F9
         KeyDown += MainWindow_KeyDown;
-        KeyUp += MainWindow_KeyUp;
 
         PresetManager.PropertyChanged += PresetManager_PropertyChanged;
         PresetManager.TemplatePresets.CollectionChanged += TemplatePresets_CollectionChanged;
@@ -1386,32 +1384,23 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
         }
     }
-    private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+    private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+        if (e.Key == Key.F9)
         {
-            _isCtrlPressed = true;
-            UpdateUIForCtrlState();
+            // Запускаем быстрый экспорт автоматически
+            await StartQuickExportAsync();
+            e.Handled = true;
         }
     }
 
-    private void MainWindow_KeyUp(object sender, KeyEventArgs e)
+    private async Task StartQuickExportAsync()
     {
-        if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
-        {
-            _isCtrlPressed = false;
-            UpdateUIForCtrlState();
-        }
-    }
+        // Проверяем, что не идут другие операции
+        if (_isExporting || _isScanning)
+            return;
 
-    private void UpdateUIForCtrlState()
-    {
-        if (!_isExporting && !_isScanning)
-        {
-            var currentState = UIState.CreateAfterOperationState(_partsData.Count > 0, false, ProgressLabelRun.Text);
-            currentState.ExportEnabled = _isCtrlPressed || _partsData.Count > 0;
-            SetUIState(currentState);
-        }
+        await ExportWithoutScan();
     }
 
     /// <summary>
