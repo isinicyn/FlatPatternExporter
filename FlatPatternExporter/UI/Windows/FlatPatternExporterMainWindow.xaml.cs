@@ -238,7 +238,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Устанавливаем DataContext для текущего окна
         DataContext = this;
 
-        // Добавляем обработчик для горячих клавиш F5 (сканирование) и F9 (быстрый экспорт)
+        // Добавляем обработчик для горячих клавиш F5 (сканирование), F6 (экспорт), F9 (быстрый экспорт)
         KeyDown += MainWindow_KeyDown;
 
         PresetManager.PropertyChanged += PresetManager_PropertyChanged;
@@ -1392,6 +1392,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             await StartScanAsync();
             e.Handled = true;
         }
+        else if (e.Key == Key.F6)
+        {
+            // Запускаем обычный экспорт автоматически
+            await StartNormalExportAsync();
+            e.Handled = true;
+        }
         else if (e.Key == Key.F9)
         {
             // Запускаем быстрый экспорт автоматически
@@ -1436,6 +1442,54 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         // Завершение операции
         CompleteOperation(result, OperationType.Scan, ref _isScanning);
+    }
+
+    private async Task StartNormalExportAsync()
+    {
+        // Проверяем, что не идут другие операции
+        if (_isExporting || _isScanning)
+            return;
+
+        // Проверяем, что есть данные для экспорта (как у кнопки)
+        if (_partsData.Count == 0)
+        {
+            MessageBox.Show("Нет данных для экспорта. Сначала выполните сканирование.", "Информация",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        // Выполняем обычный экспорт
+        await PerformNormalExportAsync();
+    }
+
+    private async Task PerformNormalExportAsync()
+    {
+        // Валидация документа
+        var validation = ValidateDocumentOrShowError();
+        if (validation == null) return;
+
+        // Подготовка контекста экспорта (требует предварительного сканирования)
+        var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: true, showProgress: true);
+        if (context == null) return;
+
+        // Настройка UI для экспорта
+        InitializeOperation(UIState.Exporting, ref _isExporting);
+        var stopwatch = Stopwatch.StartNew();
+
+        // Выполнение экспорта через централизованную обработку ошибок
+        var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.PartNumber)).ToList();
+        var result = await ExecuteWithErrorHandlingAsync(async () =>
+        {
+            var processedCount = 0;
+            var skippedCount = 0;
+            await Task.Run(() => ExportDXF(partsDataList, context.TargetDirectory, context.Multiplier,
+                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts!.Token), _operationCts!.Token);
+
+            return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
+        }, "экспорта");
+
+        // Завершение операции
+        CompleteOperation(result, OperationType.Export, ref _isExporting);
     }
 
     private async Task StartQuickExportAsync()

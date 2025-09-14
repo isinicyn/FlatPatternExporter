@@ -795,38 +795,11 @@ public partial class FlatPatternExporterMainWindow : Window
 
     private async void ExportButton_Click(object sender, RoutedEventArgs e)
     {
-        
         // Если экспорт уже идет, выполняем прерывание
         if (HandleExportCancellation()) return;
 
-        // Обычный режим экспорта
-
-        // Валидация документа
-        var validation = ValidateDocumentOrShowError();
-        if (validation == null) return;
-
-        // Подготовка контекста экспорта
-        var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: true, showProgress: true);
-        if (context == null) return;
-
-        // Настройка UI для экспорта
-        InitializeOperation(UIState.Exporting, ref _isExporting);
-        var stopwatch = Stopwatch.StartNew();
-
-        // Выполнение экспорта через централизованную обработку ошибок
-        var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.PartNumber)).ToList();
-        var result = await ExecuteWithErrorHandlingAsync(async () =>
-        {
-            var processedCount = 0;
-            var skippedCount = 0;
-            await Task.Run(() => ExportDXF(partsDataList, context.TargetDirectory, context.Multiplier, 
-                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts!.Token), _operationCts!.Token);
-            
-            return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
-        }, "экспорта");
-
-        // Завершение операции
-        CompleteOperation(result, OperationType.Export, ref _isExporting);
+        // Выполняем обычный экспорт
+        await PerformNormalExportAsync();
     }
 
     private string GetElapsedTime(TimeSpan timeSpan)
