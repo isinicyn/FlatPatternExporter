@@ -27,7 +27,7 @@
 
             <!-- Элементы управления по левому краю -->
             <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
-                <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareProgressButtonStyle}" Tag="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" RenderTransformOrigin="0,0"/>
+                <Button x:Name="ScanButton" Content="Сканировать" Click="ScanButton_Click" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareProgressButtonStyle}" Tag="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTip="Нажмите F5 для быстрого сканирования" RenderTransformOrigin="0,0"/>
                 <Button x:Name="ClearButton" Content="Очистить" Click="ClearList_Click" IsEnabled="True" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareButtonStyle}"/>
                 <Button x:Name="ExportButton" Content="Экспорт" Click="ExportButton_Click" IsEnabled="False" Style="{StaticResource LargeSquareProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="Нажмите F9 для быстрого экспорта без предварительного сканирования" Margin="{StaticResource RightStandardMarginThickness}"/>
 

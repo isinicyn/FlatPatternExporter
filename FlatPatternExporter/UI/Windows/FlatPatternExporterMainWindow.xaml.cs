@@ -238,7 +238,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Устанавливаем DataContext для текущего окна
         DataContext = this;
 
-        // Добавляем обработчик для клавиши F9
+        // Добавляем обработчик для горячих клавиш F5 (сканирование) и F9 (быстрый экспорт)
         KeyDown += MainWindow_KeyDown;
 
         PresetManager.PropertyChanged += PresetManager_PropertyChanged;
@@ -1386,12 +1386,56 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
     private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.F9)
+        if (e.Key == Key.F5)
+        {
+            // Запускаем сканирование автоматически
+            await StartScanAsync();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.F9)
         {
             // Запускаем быстрый экспорт автоматически
             await StartQuickExportAsync();
             e.Handled = true;
         }
+    }
+
+    private async Task StartScanAsync()
+    {
+        // Проверяем, что не идут другие операции
+        if (_isExporting || _isScanning)
+            return;
+
+        // Вызываем логику сканирования из ScanButton_Click
+        await PerformScanOperationAsync();
+    }
+
+    private async Task PerformScanOperationAsync()
+    {
+        // Валидация документа
+        var validation = ValidateDocumentOrShowError();
+        if (validation == null) return;
+
+        // Настройка UI для сканирования
+        InitializeOperation(UIState.Scanning, ref _isScanning);
+        _hasMissingReferences = false;
+
+        // Прогресс для сканирования структуры сборки
+        var scanProgress = new Progress<ScanProgress>(progress =>
+        {
+            var progressState = UIState.Scanning;
+            progressState.ProgressValue = progress.TotalItems > 0 ? (double)progress.ProcessedItems / progress.TotalItems * 100 : 0;
+            progressState.ProgressText = $"{progress.CurrentOperation} - {progress.CurrentItem}";
+            SetUIState(progressState);
+        });
+
+        // Выполнение сканирования
+        var result = await ExecuteWithErrorHandlingAsync(
+            () => ScanDocumentAsync(validation.Document!, _operationCts!.Token, updateUI: true, scanProgress),
+            "сканирования");
+
+        // Завершение операции
+        CompleteOperation(result, OperationType.Scan, ref _isScanning);
     }
 
     private async Task StartQuickExportAsync()
@@ -1673,30 +1717,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             return;
         }
 
-        // Валидация документа
-        var validation = ValidateDocumentOrShowError();
-        if (validation == null) return;
-
-        // Настройка UI для сканирования
-        InitializeOperation(UIState.Scanning, ref _isScanning);
-        _hasMissingReferences = false;
-
-        // Прогресс для сканирования структуры сборки
-        var scanProgress = new Progress<ScanProgress>(progress =>
-        {
-            var progressState = UIState.Scanning;
-            progressState.ProgressValue = progress.TotalItems > 0 ? (double)progress.ProcessedItems / progress.TotalItems * 100 : 0;
-            progressState.ProgressText = $"{progress.CurrentOperation} - {progress.CurrentItem}";
-            SetUIState(progressState);
-        });
-
-        // Выполнение сканирования
-        var result = await ExecuteWithErrorHandlingAsync(
-            () => ScanDocumentAsync(validation.Document!, _operationCts!.Token, updateUI: true, scanProgress),
-            "сканирования");
-
-        // Завершение операции
-        CompleteOperation(result, OperationType.Scan, ref _isScanning);
+        // Выполняем сканирование
+        await PerformScanOperationAsync();
     }
     private void ConflictFilesButton_Click(object sender, RoutedEventArgs e)
     {
