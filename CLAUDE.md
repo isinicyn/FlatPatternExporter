@@ -34,7 +34,7 @@ FlatPatternExporter/
     │
     ├── Core/                           # Ядро системы и бизнес-логика
     │   ├── PropertyMetadataRegistry.cs # Центральный реестр метаданных
-    │   ├── PropertyManager.cs          # Менеджер свойств Inventor API
+    │   ├── PropertyManager.cs  		# Менеджер свойств Inventor API
     │   ├── TokenService.cs             # Обработка токенов имен файлов
     │   ├── SettingsManager.cs          # Персистентность настроек
     │   ├── TemplatePresetManager.cs    # Управление пресетами шаблонов
@@ -52,8 +52,7 @@ FlatPatternExporter/
     │   │   └── SelectIPropertyWindow.xaml(.cs)
     │   │
     │   └── Controls/                   # Пользовательские элементы
-    │       ├── LayerSettingControl.xaml(.cs)
-    │       └── TemplatePresetManagerControl.xaml(.cs)
+    │       └── LayerSettingControl.xaml(.cs)
     │
     ├── Converters/                     # WPF конвертеры
     │   ├── ColorToBrushConverter.cs            # Конвертация названия цвета в SolidColorBrush
@@ -116,7 +115,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DxfGenerator` - генератор DXF (namespace: DxfGenerator)
 - `MarshalCore` - COM interop библиотека (namespace: DefineEdge)
 
-**Core/ - Центральные компоненты:**
+**Core/ - Центральные компоненты (namespace: FlatPatternExporter.Core):**
 - `PropertyMetadataRegistry` - централизованный реестр метаданных свойств (7 зависимостей)
 - `PropertyManager` - работа с Inventor API, использует реестр
 - `TokenService` - специализированная обработка токенов (7 зависимостей)
@@ -129,12 +128,12 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `PropertyListManager` - управление списками свойств с фильтрацией и состоянием
 
 **UI/ - Интерфейс пользователя:**
-- **Windows/**: основные окна приложения с чистой архитектурой без бизнес-логики
+- **Windows/ (namespace: FlatPatternExporter.UI.Windows)**: основные окна приложения с чистой архитектурой без бизнес-логики
   - `FlatPatternExporterMainWindow` - главное окно приложения
   - `AboutWindow` - независимое окно информации о программе
   - `ConflictDetailsWindow` - окно конфликтов с инжекцией делегата открытия документов
   - `SelectIPropertyWindow` - окно выбора свойств с полной инжекцией зависимостей
-- **Controls/**: пользовательские элементы управления (LayerSettingControl, TemplatePresetManagerControl)
+- **Controls/ (namespace: FlatPatternExporter.UI.Controls)**: пользовательские элементы управления (LayerSettingControl)
 
 **Стили и ресурсы**:
 - `ColorResources.xaml` - Централизованные цветовые ресурсы приложения
@@ -143,13 +142,32 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DataGridStyles.xaml` - Стили для DataGrid элементов
 - `GeneralStyles.xaml` - Общие стили приложения
 
-**Converters/ - WPF конвертеры:**
+**Converters/ - WPF конвертеры (namespace: FlatPatternExporter.Converters):**
 - `ColorToBrushConverter` - конвертация названия цвета в SolidColorBrush
 - `LineTypeToGeometryConverter` - визуализация типов линий в LayerSettings
 - `EnumToBooleanConverter` - универсальная привязка enum к RadioButton
 - `DynamicPropertyValueConverter` - извлечение значений свойств по имени пути
 - `PropertyExpressionByNameConverter` - определение видимости fx индикатора
 - `IPictureDispConverter` - преобразование IPictureDisp в System.Drawing.Image
+
+### Структура пространств имен
+Проект следует конвенции .NET по соответствию пространств имен структуре папок:
+
+**Основные пространства имен:**
+- `FlatPatternExporter` - корневое пространство имен (App.xaml.cs)
+- `FlatPatternExporter.Core` - все файлы в папке Core/
+- `FlatPatternExporter.UI.Windows` - все окна в папке UI/Windows/
+- `FlatPatternExporter.UI.Controls` - пользовательские элементы в UI/Controls/
+- `FlatPatternExporter.Converters` - WPF конвертеры в Converters/
+- `DxfGenerator` - независимая библиотека генерации DXF (Libraries/DxfGenerator.cs)
+- `DefineEdge` - независимая библиотека COM interop (Libraries/MarshalCore.cs)
+
+**Зависимости между пространствами имен:**
+- `UI.Windows` → `Core` (using FlatPatternExporter.Core)
+- `UI.Controls` → `Core` (using FlatPatternExporter.Core)
+- `Converters` → `UI.Windows` (using FlatPatternExporter.UI.Windows)
+- `Core` → `UI.Windows` (using FlatPatternExporter.UI.Windows) для моделей данных
+- `Libraries` → `Core`, `UI.Windows` для внешних типов
 
 ### Управление версиями
 Проект использует версионирование на основе Git в процессе сборки:

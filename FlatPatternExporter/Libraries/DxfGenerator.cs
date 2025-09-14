@@ -3,7 +3,8 @@ using System.Globalization;
 using System.Text;
 using netDxf;
 using netDxf.Entities;
-using FlatPatternExporter;
+using FlatPatternExporter.Core;
+using FlatPatternExporter.UI.Windows;
 
 namespace DxfGenerator;
 

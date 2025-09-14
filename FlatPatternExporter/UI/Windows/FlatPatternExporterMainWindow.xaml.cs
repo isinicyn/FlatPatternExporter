@@ -19,6 +19,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using DefineEdge;
+using FlatPatternExporter.Core;
+using FlatPatternExporter.UI.Controls;
 using Inventor;
 using Binding = System.Windows.Data.Binding;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -28,7 +30,7 @@ using Size = System.Windows.Size;
 using Style = System.Windows.Style;
 using TextBox = System.Windows.Controls.TextBox;
 
-namespace FlatPatternExporter;
+namespace FlatPatternExporter.UI.Windows;
 
 
 public class AcadVersionItem
@@ -1615,7 +1617,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     return result;
                 }
                 
-                var mgr = new PropertyManager((Document)partDoc);
+                var mgr = new Core.PropertyManager((Document)partDoc);
                 var partNumber = mgr.GetMappedProperty("PartNumber");
                 if (!string.IsNullOrEmpty(partNumber))
                 {
@@ -1636,7 +1638,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 }
                 else
                 {
-                    if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+                    if (partDoc.SubType == Core.PropertyManager.SheetMetalSubType)
                     {
                         sheetMetalParts.Add(partNumber, 1);
                         result.ProcessedCount = 1;
@@ -1893,7 +1895,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private async Task<int> ProcessSinglePart(PartDocument partDoc, IProgress<PartData> partProgress)
     {
-        if (partDoc.SubType == PropertyManager.SheetMetalSubType)
+        if (partDoc.SubType == Core.PropertyManager.SheetMetalSubType)
         {
             var processingState = UIState.Scanning;
             processingState.ProgressText = "Обработка детали...";

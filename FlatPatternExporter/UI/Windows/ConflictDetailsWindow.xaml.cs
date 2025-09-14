@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using FlatPatternExporter.Core;
 
-namespace FlatPatternExporter;
+namespace FlatPatternExporter.UI.Windows;
 
 
 public partial class ConflictDetailsWindow

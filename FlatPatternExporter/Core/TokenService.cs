@@ -4,8 +4,9 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using FlatPatternExporter.UI.Windows;
 
-namespace FlatPatternExporter;
+namespace FlatPatternExporter.Core;
 
 public class TokenElement
 {

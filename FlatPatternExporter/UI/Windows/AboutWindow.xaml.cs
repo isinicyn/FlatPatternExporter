@@ -2,7 +2,7 @@
 using FlatPatternExporter.Core;
 using Clipboard = System.Windows.Clipboard;
 
-namespace FlatPatternExporter
+namespace FlatPatternExporter.UI.Windows
 {
     public partial class AboutWindow : Window
     {

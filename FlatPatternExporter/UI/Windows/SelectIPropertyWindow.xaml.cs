@@ -7,7 +7,7 @@ using FlatPatternExporter.Core;
 using Button = System.Windows.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
 
-namespace FlatPatternExporter;
+namespace FlatPatternExporter.UI.Windows;
 public partial class SelectIPropertyWindow : Window
 {
     private readonly PropertyListManager _propertyListManager;

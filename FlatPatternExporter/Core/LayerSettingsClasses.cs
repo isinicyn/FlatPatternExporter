@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 
-namespace FlatPatternExporter;
+namespace FlatPatternExporter.Core;
     /// <summary>
     /// Константы для настроек слоев по умолчанию
     /// </summary>

@@ -1,4 +1,5 @@
 using System.IO;
+using FlatPatternExporter.UI.Windows;
 
 namespace FlatPatternExporter.Core;
 

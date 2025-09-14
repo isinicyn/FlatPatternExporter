@@ -1,7 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using FlatPatternExporter.Core;
 
-namespace FlatPatternExporter
+namespace FlatPatternExporter.UI.Controls
 {
     public partial class LayerSettingControl : System.Windows.Controls.UserControl
     {

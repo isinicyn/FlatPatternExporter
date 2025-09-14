@@ -1,7 +1,7 @@
-﻿<UserControl x:Class="FlatPatternExporter.LayerSettingControl"
+﻿<UserControl x:Class="FlatPatternExporter.UI.Controls.LayerSettingControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FlatPatternExporter"
+             xmlns:local="clr-namespace:FlatPatternExporter.UI.Controls"
              xmlns:converters="clr-namespace:FlatPatternExporter.Converters"
              HorizontalAlignment="Left">
     <UserControl.Resources>

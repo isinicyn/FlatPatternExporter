@@ -3,8 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FlatPatternExporter.UI.Windows;
 
-namespace FlatPatternExporter;
+namespace FlatPatternExporter.Core;
 
 public record LayerSettingData
 {

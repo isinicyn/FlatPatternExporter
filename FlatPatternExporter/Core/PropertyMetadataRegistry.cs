@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
+using FlatPatternExporter.UI.Windows;
 
-namespace FlatPatternExporter;
+namespace FlatPatternExporter.Core;
 
 /// <summary>
 /// Централизованная система метаданных свойств документов Inventor
