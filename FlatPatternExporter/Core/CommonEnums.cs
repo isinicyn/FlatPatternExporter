@@ -1,4 +1,4 @@
-using netDxf.Header;
+﻿using netDxf.Header;
 
 namespace FlatPatternExporter.Core;
 

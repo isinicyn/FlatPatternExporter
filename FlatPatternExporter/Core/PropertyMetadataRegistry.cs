@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using FlatPatternExporter.UI.Windows;
 
 namespace FlatPatternExporter.Core;
