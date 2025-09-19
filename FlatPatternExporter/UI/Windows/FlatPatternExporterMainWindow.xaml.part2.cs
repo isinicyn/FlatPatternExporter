@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
-using DxfGenerator;
+using DxfRenderer;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;

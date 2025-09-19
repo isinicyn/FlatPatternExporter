@@ -28,8 +28,8 @@ FlatPatternExporter/
     ├── AssemblyInfo.cs                 # Информация о сборке
     ├── FPExport.ico                    # Иконка приложения
     │
-    ├── Libraries/                      # Внешние независимые библиотеки 
-    │   ├── DxfGenerator.cs             # Будущая отдельная библиотека DXF
+    ├── Libraries/                      # Внешние независимые библиотеки
+    │   ├── DxfRenderer.cs              # Библиотека рендеринга DXF файлов
     │   └── MarshalCore.cs              # Отдельная библиотека COM interop
     │
     ├── Core/                           # Ядро системы и бизнес-логика
@@ -42,7 +42,8 @@ FlatPatternExporter/
     │   ├── LayerSettingsClasses.cs     # Модели настроек слоев + хелперы
     │   ├── VersionInfoService.cs       # Получение версии приложения и коммитов
     │   ├── ConflictDataProcessor.cs    # Обработка данных конфликтов партнамберов
-    │   └── PropertyListManager.cs      # Управление списками свойств с фильтрацией
+    │   ├── PropertyListManager.cs      # Управление списками свойств с фильтрацией
+    │   └── DxfOptimizer.cs             # Оптимизация DXF файлов
     │
     ├── UI/                             # Пользовательский интерфейс
     │   ├── Windows/                    # Окна приложения
@@ -112,7 +113,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 ### Ключевые компоненты
 
 **Libraries/ - Внешние независимые библиотеки:**
-- `DxfGenerator` - генератор DXF (namespace: DxfGenerator)
+- `DxfRenderer` - библиотека рендеринга DXF файлов (namespace: DxfRenderer)
 - `MarshalCore` - COM interop библиотека (namespace: DefineEdge)
 
 **Core/ - Центральные компоненты (namespace: FlatPatternExporter.Core):**
@@ -126,6 +127,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `VersionInfoService` - получение версии приложения и информации о коммитах
 - `ConflictDataProcessor` - обработка и трансформация данных конфликтов партнамберов
 - `PropertyListManager` - управление списками свойств с фильтрацией и состоянием
+- `DxfOptimizer` - оптимизация DXF файлов для различных версий AutoCAD
 
 **UI/ - Интерфейс пользователя:**
 - **Windows/ (namespace: FlatPatternExporter.UI.Windows)**: основные окна приложения с чистой архитектурой без бизнес-логики
@@ -159,7 +161,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `FlatPatternExporter.UI.Windows` - все окна в папке UI/Windows/
 - `FlatPatternExporter.UI.Controls` - пользовательские элементы в UI/Controls/
 - `FlatPatternExporter.Converters` - WPF конвертеры в Converters/
-- `DxfGenerator` - независимая библиотека генерации DXF (Libraries/DxfGenerator.cs)
+- `DxfRenderer` - независимая библиотека рендеринга DXF (Libraries/DxfRenderer.cs)
 - `DefineEdge` - независимая библиотека COM interop (Libraries/MarshalCore.cs)
 
 **Зависимости между пространствами имен:**
