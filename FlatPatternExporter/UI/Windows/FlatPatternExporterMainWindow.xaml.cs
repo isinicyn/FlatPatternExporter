@@ -1975,7 +1975,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var partData = await GetPartDataAsync(partDoc, 1, 1);
             if (partData != null)
             {
-                ((IProgress<PartData>)partProgress).Report(partData);
+                partProgress.Report(partData);
                 
                 var completedState = UIState.Scanning;
                 completedState.ProgressValue = 100;
@@ -2336,16 +2336,6 @@ public class PartConflictInfo
     
     // Уникальный идентификатор для сравнения
     public string UniqueId => $"{FileName}|{ModelState}";
-    
-    public override bool Equals(object? obj)
-    {
-        return obj is PartConflictInfo other && UniqueId == other.UniqueId;
-    }
-    
-    public override int GetHashCode()
-    {
-        return UniqueId.GetHashCode();
-    }
 }
 
 
@@ -2500,7 +2490,6 @@ public class OperationResult
     public TimeSpan ElapsedTime { get; set; }
     public bool WasCancelled { get; set; }
     public List<string> Errors { get; set; } = new();
-    public bool IsSuccess => !WasCancelled && Errors.Count == 0;
 }
 
 // Результат валидации документа
