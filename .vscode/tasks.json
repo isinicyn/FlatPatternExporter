@@ -7,10 +7,32 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/FlatPatternExporter/FlatPatternExporter.csproj",
+                "${workspaceFolder}/FlatPatternExporter.sln",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+                "/consoleloggerparameters:NoSummary"
             ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build-release",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/FlatPatternExporter.sln",
+                "--configuration",
+                "Release",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
             "problemMatcher": "$msCompile"
         },
         {
@@ -19,22 +41,30 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/FlatPatternExporter/FlatPatternExporter.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+                "${workspaceFolder}/FlatPatternExporter.sln",
+                "--configuration",
+                "Release",
+                "--arch",
+                "x64"
             ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always"
+            },
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "watch",
+            "label": "clean",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "watch",
-                "run",
-                "--project",
-                "${workspaceFolder}/FlatPatternExporter/FlatPatternExporter.csproj"
+                "clean",
+                "${workspaceFolder}/FlatPatternExporter.sln"
             ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always"
+            },
             "problemMatcher": "$msCompile"
         }
     ]

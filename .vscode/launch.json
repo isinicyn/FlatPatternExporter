@@ -2,25 +2,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
-            "name": ".NET Core Launch (console)",
+            "name": "FlatPatternExporter Debug",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/FlatPatternExporter/bin/Debug/net8.0-windows10.0.26100.0/win-x64/FlatPatternExporter.dll",
+            "program": "${workspaceFolder}/FlatPatternExporter/bin/Debug/net8.0-windows10.0.26100.0/win-x64/FlatPatternExporter.exe",
             "args": [],
-            "cwd": "${workspaceFolder}/FlatPatternExporter",
-            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+            "cwd": "${workspaceFolder}",
             "console": "internalConsole",
-            "stopAtEntry": false
+            "stopAtEntry": false,
+            "preLaunchTask": "build"
         },
         {
-            "name": ".NET Core Attach",
+            "name": "FlatPatternExporter Release",
             "type": "coreclr",
-            "request": "attach"
+            "request": "launch",
+            "program": "${workspaceFolder}/FlatPatternExporter/bin/Release/net8.0-windows10.0.26100.0/win-x64/FlatPatternExporter.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "preLaunchTask": "build-release"
         }
     ]
 }
