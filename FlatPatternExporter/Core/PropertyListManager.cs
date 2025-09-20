@@ -4,21 +4,14 @@ using FlatPatternExporter.UI.Windows;
 
 namespace FlatPatternExporter.Core;
 
-public class PropertyListManager
+public class PropertyListManager(ObservableCollection<PresetIProperty> allProperties)
 {
-    private readonly ObservableCollection<PresetIProperty> _allProperties;
+    private readonly ObservableCollection<PresetIProperty> _allProperties = allProperties;
     private string _searchFilter = "";
     private string _categoryFilter = "";
 
-    public PropertyListManager(ObservableCollection<PresetIProperty> allProperties)
-    {
-        _allProperties = allProperties;
-        StandardProperties = [];
-        UserDefinedProperties = [];
-    }
-
-    public ObservableCollection<PresetIProperty> StandardProperties { get; }
-    public ObservableCollection<PresetIProperty> UserDefinedProperties { get; }
+    public ObservableCollection<PresetIProperty> StandardProperties { get; } = [];
+    public ObservableCollection<PresetIProperty> UserDefinedProperties { get; } = [];
 
     public void InitializeProperties()
     {

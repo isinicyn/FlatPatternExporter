@@ -21,15 +21,15 @@ public static class ConflictDataProcessor
 {
     public static List<ConflictPartNumberGroup> PrepareConflictData(Dictionary<string, List<PartConflictInfo>> conflictFileDetails)
     {
-        return conflictFileDetails.Select(entry => new ConflictPartNumberGroup
+        return [.. conflictFileDetails.Select(entry => new ConflictPartNumberGroup
         {
             PartNumber = entry.Key,
-            Files = entry.Value.Select(conflictInfo => new ConflictFileInfo
+            Files = [.. entry.Value.Select(conflictInfo => new ConflictFileInfo
             {
                 FileName = conflictInfo.FileName,
                 ModelState = conflictInfo.ModelState,
                 FilePath = conflictInfo.FileName
-            }).OrderBy(f => f.FileName).ToList()
-        }).OrderBy(g => g.PartNumber).ToList();
+            }).OrderBy(f => f.FileName)]
+        }).OrderBy(g => g.PartNumber)];
     }
 }
