@@ -13,7 +13,7 @@ public abstract class BaseRenderer
     protected const int SplineSubdivisions = 50;
     protected const double MinGeometrySize = 0.05;
     protected const double MinBoundsSize = 1.0;
-    protected static readonly double[] CardinalAngles = { 0, 90, 180, 270 };
+    protected static readonly double[] CardinalAngles = [0, 90, 180, 270];
     protected static readonly Color DefaultEntityColor = Color.Black;
     
     public abstract object Render(DxfDocument dxf, int width, int height);
@@ -32,7 +32,7 @@ public abstract class BaseRenderer
         return entities;
     }
     
-    public (double MinX, double MinY, double MaxX, double MaxY) CalculateBoundingBox(IEnumerable<EntityObject> entities)
+    public static (double MinX, double MinY, double MaxX, double MaxY) CalculateBoundingBox(IEnumerable<EntityObject> entities)
     {
         double minX = double.MaxValue, minY = double.MaxValue, maxX = double.MinValue, maxY = double.MinValue;
         foreach (var entity in entities)
@@ -40,7 +40,7 @@ public abstract class BaseRenderer
         return (minX, minY, maxX, maxY);
     }
     
-    protected void UpdateBounds(EntityObject entity, ref double minX, ref double minY, ref double maxX, ref double maxY)
+    protected static void UpdateBounds(EntityObject entity, ref double minX, ref double minY, ref double maxX, ref double maxY)
     {
         if (entity is Line line)
         {
@@ -125,7 +125,7 @@ public abstract class BaseRenderer
         }
         else if (entity is Spline spline)
         {
-            var splineVertices = InterpolateSpline(spline.ControlPoints.ToList(), spline.Degree, spline.Knots.ToList(), SplineSubdivisions);
+            var splineVertices = InterpolateSpline([.. spline.ControlPoints], spline.Degree, [.. spline.Knots], SplineSubdivisions);
             foreach (var point in splineVertices)
             {
                 minX = Math.Min(minX, point.X);
@@ -170,7 +170,7 @@ public abstract class BaseRenderer
         }
     }
     
-    protected void UpdateBoundsForPoint(Vector3 point, ref double minX, ref double minY, ref double maxX, ref double maxY)
+    protected static void UpdateBoundsForPoint(Vector3 point, ref double minX, ref double minY, ref double maxX, ref double maxY)
     {
         minX = Math.Min(minX, point.X);
         minY = Math.Min(minY, point.Y);
@@ -178,7 +178,7 @@ public abstract class BaseRenderer
         maxY = Math.Max(maxY, point.Y);
     }
     
-    protected bool IsAngleBetween(double angle, double startAngle, double endAngle)
+    protected static bool IsAngleBetween(double angle, double startAngle, double endAngle)
     {
         angle = (angle + 360) % 360;
         startAngle = (startAngle + 360) % 360;
@@ -189,7 +189,7 @@ public abstract class BaseRenderer
         return startAngle <= angle || angle <= endAngle;
     }
     
-    protected (Vector2 center, double radius, double startAngle, double endAngle)? GetArcGeomFromBulge(
+    protected static (Vector2 center, double radius, double startAngle, double endAngle)? GetArcGeomFromBulge(
         Polyline2DVertex startV, Polyline2DVertex endV)
     {
         var bulge = startV.Bulge;
@@ -224,7 +224,7 @@ public abstract class BaseRenderer
         return (center, radius, startAngle, endAngle);
     }
     
-    protected List<Vector3> GetPolylineVertexes(EntityObject polyline)
+    protected static List<Vector3> GetPolylineVertexes(EntityObject polyline)
     {
         var vertexes = new List<Vector3>();
         if (polyline.GetType().Name != "Polyline") return vertexes;
@@ -242,7 +242,7 @@ public abstract class BaseRenderer
         return vertexes;
     }
     
-    protected PolylineSmoothType GetPolylineSmoothType(EntityObject entity)
+    protected static PolylineSmoothType GetPolylineSmoothType(EntityObject entity)
     {
         var smoothTypeProperty = entity.GetType().GetProperty("SmoothType");
         if (smoothTypeProperty?.GetValue(entity) is PolylineSmoothType smoothType)
@@ -250,7 +250,7 @@ public abstract class BaseRenderer
         return PolylineSmoothType.NoSmooth;
     }
     
-    protected List<Vector3> InterpolateSpline(List<Vector3> controlPoints, int degree, List<double> knotValues,
+    protected static List<Vector3> InterpolateSpline(List<Vector3> controlPoints, int degree, List<double> knotValues,
         int subdivisions)
     {
         var vertices = new List<Vector3>();
@@ -266,9 +266,9 @@ public abstract class BaseRenderer
         return vertices;
     }
 
-    protected Vector3 DeBoor(double t, int degree, List<Vector3> controlPoints, List<double> knotValues)
+    protected static Vector3 DeBoor(double t, int degree, List<Vector3> controlPoints, List<double> knotValues)
     {
-        var n = controlPoints.Count;
+        _ = controlPoints.Count;
 
         var s = -1;
         for (var i = degree; i < knotValues.Count - degree - 1; i++)
@@ -278,7 +278,7 @@ public abstract class BaseRenderer
                 break;
             }
 
-        if (s == -1) return controlPoints[controlPoints.Count - 1];
+        if (s == -1) return controlPoints[^1];
 
         var dPoints = new Vector3[degree + 1];
         for (var j = 0; j <= degree; j++) dPoints[j] = controlPoints[s - degree + j];
@@ -293,7 +293,7 @@ public abstract class BaseRenderer
         return dPoints[degree];
     }
     
-    protected Color GetEntityColor(EntityObject entity)
+    protected static Color GetEntityColor(EntityObject entity)
     {
         Color color;
 
@@ -309,7 +309,7 @@ public abstract class BaseRenderer
         return color;
     }
     
-    protected string GetEntityColorHex(EntityObject entity)
+    protected static string GetEntityColorHex(EntityObject entity)
     {
         var color = GetEntityColor(entity);
         return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
@@ -351,7 +351,7 @@ public class BitmapRenderer : BaseRenderer
         g.InterpolationMode = InterpolationMode.HighQualityBicubic;
     }
     
-    private (double Scale, double OffsetX, double OffsetY) CalculateTransform(
+    private static (double Scale, double OffsetX, double OffsetY) CalculateTransform(
         (double MinX, double MinY, double MaxX, double MaxY) bounds, int width, int height)
     {
         var rangeX = Math.Max(bounds.MaxX - bounds.MinX, MinBoundsSize);
@@ -373,7 +373,7 @@ public class BitmapRenderer : BaseRenderer
         return (scale, offsetX, offsetY);
     }
     
-    private float CalculatePenWidth((double MinX, double MinY, double MaxX, double MaxY) bounds, int width, int height)
+    private static float CalculatePenWidth((double MinX, double MinY, double MaxX, double MaxY) bounds, int width, int height)
     {
         var drawingWidth = bounds.MaxX - bounds.MinX;
         var drawingHeight = bounds.MaxY - bounds.MinY;
@@ -510,9 +510,9 @@ public class BitmapRenderer : BaseRenderer
         }
     }
 
-    private void RenderSpline(Graphics g, Spline spline, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
+    private static void RenderSpline(Graphics g, Spline spline, (double Scale, double OffsetX, double OffsetY) transform, Pen pen, int canvasHeight)
     {
-        var splineVertices = InterpolateSpline(spline.ControlPoints.ToList(), spline.Degree, spline.Knots.ToList(), SplineSubdivisions);
+        var splineVertices = InterpolateSpline([.. spline.ControlPoints], spline.Degree, [.. spline.Knots], SplineSubdivisions);
         if (splineVertices.Count > 1)
         {
             var points = splineVertices.Select(v => TransformPoint(v, transform.Scale, transform.OffsetX, transform.OffsetY, canvasHeight)).ToArray();
@@ -579,9 +579,9 @@ public class BitmapRenderer : BaseRenderer
             {
                 try
                 {
-                    var arcSegment = GetArcSegmentFromBulge(vertex, nextVertex, scale, offsetX, offsetY, canvasHeight);
-                    if (arcSegment.Radius >= MinGeometrySize && IsValidPoint(arcSegment.StartPoint) && IsValidPoint(arcSegment.EndPoint))
-                        g.DrawArc(pen, arcSegment.Rect, arcSegment.StartAngle, arcSegment.SweepAngle);
+                    var (StartPoint, EndPoint, Radius, StartAngle, SweepAngle, Rect)= GetArcSegmentFromBulge(vertex, nextVertex, scale, offsetX, offsetY, canvasHeight);
+                    if (Radius >= MinGeometrySize && IsValidPoint(StartPoint) && IsValidPoint(EndPoint))
+                        g.DrawArc(pen, Rect, StartAngle, SweepAngle);
                 }
                 catch (OutOfMemoryException)
                 {
@@ -651,7 +651,7 @@ public class BitmapRenderer : BaseRenderer
         }
     }
     
-    private (PointF StartPoint, PointF EndPoint, float Radius, float StartAngle, float SweepAngle, RectangleF Rect)
+    private static (PointF StartPoint, PointF EndPoint, float Radius, float StartAngle, float SweepAngle, RectangleF Rect)
         GetArcSegmentFromBulge(Polyline2DVertex startVertex, Polyline2DVertex endVertex, double scale, double offsetX,
             double offsetY, int canvasHeight)
     {
@@ -708,14 +708,14 @@ public class BitmapRenderer : BaseRenderer
         );
     }
     
-    private PointF TransformPoint(Vector3 point, double scale, double offsetX, double offsetY, int canvasHeight)
+    private static PointF TransformPoint(Vector3 point, double scale, double offsetX, double offsetY, int canvasHeight)
     {
         var x = (float)(point.X * scale + offsetX);
         var y = canvasHeight - (float)(point.Y * scale + offsetY);
         return new PointF(x, y);
     }
 
-    private PointF TransformPoint(Vector2 point, double scale, double offsetX, double offsetY, int canvasHeight)
+    private static PointF TransformPoint(Vector2 point, double scale, double offsetX, double offsetY, int canvasHeight)
     {
         return new PointF(
             (float)(point.X * scale + offsetX),
@@ -779,14 +779,14 @@ public class SvgRenderer : BaseRenderer
         return svg.ToString();
     }
     
-    private string CreateEmptySvg(int width, int height)
+    private static string CreateEmptySvg(int width, int height)
     {
         return $@"<svg width=""{width}"" height=""{height}"" viewBox=""0 0 {width} {height}"" xmlns=""http://www.w3.org/2000/svg"">
   <rect width=""100%"" height=""100%"" fill=""white""/>
 </svg>";
     }
     
-    private void RenderEntityToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
+    private static void RenderEntityToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
     {
         switch (entity)
         {
@@ -818,7 +818,7 @@ public class SvgRenderer : BaseRenderer
         }
     }
 
-    private void RenderArcToSvg(StringBuilder svg, Arc arc, string color, CultureInfo culture)
+    private static void RenderArcToSvg(StringBuilder svg, Arc arc, string color, CultureInfo culture)
     {
         var startAngleRad = arc.StartAngle * Math.PI / 180;
         var endAngleRad = arc.EndAngle * Math.PI / 180;
@@ -837,7 +837,7 @@ public class SvgRenderer : BaseRenderer
         svg.AppendLine($"    <path d=\"M {startX.ToString("F4", culture)},{startY.ToString("F4", culture)} A {arc.Radius.ToString("F4", culture)},{arc.Radius.ToString("F4", culture)} 0 {largeArcFlag},{sweepFlag} {endX.ToString("F4", culture)},{endY.ToString("F4", culture)}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderPolyline2DToSvg(StringBuilder svg, Polyline2D polyline2D, string color, CultureInfo culture)
+    private static void RenderPolyline2DToSvg(StringBuilder svg, Polyline2D polyline2D, string color, CultureInfo culture)
     {
         if (polyline2D.Vertexes.Count == 0) return;
 
@@ -886,7 +886,7 @@ public class SvgRenderer : BaseRenderer
         svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderPolyline3DToSvg(StringBuilder svg, Polyline3D polyline3D, string color, CultureInfo culture)
+    private static void RenderPolyline3DToSvg(StringBuilder svg, Polyline3D polyline3D, string color, CultureInfo culture)
     {
         if (polyline3D.Vertexes.Count == 0) return;
 
@@ -906,9 +906,9 @@ public class SvgRenderer : BaseRenderer
         svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderSplineToSvg(StringBuilder svg, Spline spline, string color, CultureInfo culture)
+    private static void RenderSplineToSvg(StringBuilder svg, Spline spline, string color, CultureInfo culture)
     {
-        var splineVertices = InterpolateSpline(spline.ControlPoints.ToList(), spline.Degree, spline.Knots.ToList(), SplineSubdivisions);
+        var splineVertices = InterpolateSpline([.. spline.ControlPoints], spline.Degree, [.. spline.Knots], SplineSubdivisions);
         if (splineVertices.Count < 2) return;
 
         var pathData = new StringBuilder("M ");
@@ -924,7 +924,7 @@ public class SvgRenderer : BaseRenderer
         svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderGenericPolylineToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
+    private static void RenderGenericPolylineToSvg(StringBuilder svg, EntityObject entity, string color, CultureInfo culture)
     {
         var vertexes = GetPolylineVertexes(entity);
         if (vertexes.Count == 0) return;
@@ -942,7 +942,7 @@ public class SvgRenderer : BaseRenderer
         svg.AppendLine($"    <path d=\"{pathData}\" stroke=\"{color}\" fill=\"none\"/>");
     }
 
-    private void RenderEllipseToSvg(StringBuilder svg, Ellipse ellipse, string color, CultureInfo culture)
+    private static void RenderEllipseToSvg(StringBuilder svg, Ellipse ellipse, string color, CultureInfo culture)
     {
         var majorAxis = ellipse.MajorAxis;
         var minorAxis = ellipse.MinorAxis;
