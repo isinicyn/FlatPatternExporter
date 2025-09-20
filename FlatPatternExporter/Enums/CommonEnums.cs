@@ -1,6 +1,6 @@
 ﻿using netDxf.Header;
 
-namespace FlatPatternExporter.Core;
+namespace FlatPatternExporter.Enums;
 
 public enum ExportFolderType
 {

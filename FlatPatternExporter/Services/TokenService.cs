@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using FlatPatternExporter.UI.Windows;
 
-namespace FlatPatternExporter.Core;
+namespace FlatPatternExporter.Services;
 
 public class TokenElement
 {

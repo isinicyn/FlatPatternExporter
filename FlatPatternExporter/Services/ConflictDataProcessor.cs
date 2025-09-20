@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using FlatPatternExporter.UI.Windows;
 
-namespace FlatPatternExporter.Core;
+namespace FlatPatternExporter.Services;
 
 public class ConflictPartNumberGroup
 {

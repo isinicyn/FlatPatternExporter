@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using FlatPatternExporter.Core;
+using FlatPatternExporter.Services;
 using Clipboard = System.Windows.Clipboard;
 
 namespace FlatPatternExporter.UI.Windows

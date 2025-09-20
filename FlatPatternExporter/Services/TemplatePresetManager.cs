@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using MessageBox = System.Windows.MessageBox;
 
-namespace FlatPatternExporter.Core;
+namespace FlatPatternExporter.Services;
 
 public class TemplatePreset : INotifyPropertyChanged
 {

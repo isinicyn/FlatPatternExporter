@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using FlatPatternExporter.UI.Windows;
 
-namespace FlatPatternExporter.Core;
+namespace FlatPatternExporter.Services;
 
 public class PropertyListManager(ObservableCollection<PresetIProperty> allProperties)
 {

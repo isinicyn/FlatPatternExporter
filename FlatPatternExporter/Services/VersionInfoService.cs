@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace FlatPatternExporter.Core;
+namespace FlatPatternExporter.Services;
 
 public class VersionInfoService
 {

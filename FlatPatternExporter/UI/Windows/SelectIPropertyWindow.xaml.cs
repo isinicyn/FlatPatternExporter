@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Data;
-using FlatPatternExporter.Core;
+using FlatPatternExporter.Services;
 using Button = System.Windows.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
 

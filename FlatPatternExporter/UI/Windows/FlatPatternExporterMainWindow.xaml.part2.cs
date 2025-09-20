@@ -9,7 +9,10 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using FlatPatternExporter.Converters;
-using FlatPatternExporter.Core;
+using FlatPatternExporter.Enums;
+using FlatPatternExporter.Models;
+using FlatPatternExporter.Services;
+using FlatPatternExporter.Utilities;
 using Inventor;
 using Svg.Skia;
 using Binding = System.Windows.Data.Binding;
@@ -72,7 +75,7 @@ public partial class FlatPatternExporterMainWindow : Window
     /// <summary>
     /// Общий метод для чтения всех свойств из документа с использованием PropertyManager
     /// </summary>
-    private static void ReadAllPropertiesFromPart(PartDocument _, PartData partData, Core.PropertyManager mgr)
+    private static void ReadAllPropertiesFromPart(PartDocument _, PartData partData, Services.PropertyManager mgr)
     {
         partData.FileName = mgr.GetFileName();
         partData.FullFileName = mgr.GetFullFileName();
@@ -119,7 +122,7 @@ public partial class FlatPatternExporterMainWindow : Window
         };
 
         // Создаем единый экземпляр PropertyManager для всех операций
-        var mgr = new Core.PropertyManager((Document)partDoc);
+        var mgr = new Services.PropertyManager((Document)partDoc);
         
         ReadAllPropertiesFromPart(partDoc, partData, mgr);
 
@@ -143,7 +146,7 @@ public partial class FlatPatternExporterMainWindow : Window
     /// <summary>
     /// Устанавливает состояния выражений для всех редактируемых свойств
     /// </summary>
-    private static void SetExpressionStatesForAllProperties(PartData partData, Core.PropertyManager mgr)
+    private static void SetExpressionStatesForAllProperties(PartData partData, Services.PropertyManager mgr)
     {
         partData.BeginExpressionBatch();
         try
@@ -292,14 +295,14 @@ public partial class FlatPatternExporterMainWindow : Window
                 {
                     if (occ.Definition.Document is PartDocument partDoc)
                     {
-                        var mgr = new Core.PropertyManager((Document)partDoc);
+                        var mgr = new Services.PropertyManager((Document)partDoc);
                         var partNumber = mgr.GetMappedProperty("PartNumber");
                         if (!string.IsNullOrEmpty(partNumber))
                         {
                             // Добавляем документ в кеш
                             AddDocumentToCache(partDoc, partNumber);
                             
-                            if (partDoc.SubType == Core.PropertyManager.SheetMetalSubType)
+                            if (partDoc.SubType == Services.PropertyManager.SheetMetalSubType)
                             {
                                 // Добавляем в трекер конфликтов
                                 var modelState = mgr.GetModelState();
@@ -488,14 +491,14 @@ public partial class FlatPatternExporterMainWindow : Window
             {
                 if (document is PartDocument partDoc)
                 {
-                    var mgr = new Core.PropertyManager((Document)partDoc);
+                    var mgr = new Services.PropertyManager((Document)partDoc);
                     var partNumber = mgr.GetMappedProperty("PartNumber");
                     if (!string.IsNullOrEmpty(partNumber))
                     {
                         // Добавляем документ в кеш
                         AddDocumentToCache(partDoc, partNumber);
                         
-                        if (partDoc.SubType == Core.PropertyManager.SheetMetalSubType)
+                        if (partDoc.SubType == Services.PropertyManager.SheetMetalSubType)
                         {
                             // Добавляем в трекер конфликтов
                             var modelState = mgr.GetModelState();
@@ -625,14 +628,14 @@ public partial class FlatPatternExporterMainWindow : Window
             }
             else
             {
-                var mgr = new Core.PropertyManager((Document)partDoc);
+                var mgr = new Services.PropertyManager((Document)partDoc);
                 var partNumber = mgr.GetMappedProperty("PartNumber");
                 if (!string.IsNullOrEmpty(partNumber))
                 {
                     // Добавляем документ в кеш
                     AddDocumentToCache(partDoc, partNumber);
                     
-                    if (partDoc.SubType == Core.PropertyManager.SheetMetalSubType)
+                    if (partDoc.SubType == Services.PropertyManager.SheetMetalSubType)
                     {
                         sheetMetalParts.Add(partNumber, 1);
                     }
@@ -1103,7 +1106,7 @@ public partial class FlatPatternExporterMainWindow : Window
         foreach (Document doc in docs)
             if (doc is PartDocument pd)
             {
-                var mgr = new Core.PropertyManager((Document)pd);
+                var mgr = new Services.PropertyManager((Document)pd);
                 if (mgr.GetMappedProperty("PartNumber") == partNumber)
                     return pd; // Возвращаем найденный открытый документ
             }
@@ -1172,7 +1175,7 @@ public partial class FlatPatternExporterMainWindow : Window
             return;
         }
 
-        var mgr = new Core.PropertyManager(doc);
+        var mgr = new Services.PropertyManager(doc);
         var partNumber = mgr.GetMappedProperty("PartNumber");
         var description = mgr.GetMappedProperty("Description");
         var modelStateInfo = mgr.GetModelState();
@@ -1328,7 +1331,7 @@ public partial class FlatPatternExporterMainWindow : Window
         foreach (Document doc in docs)
             if (doc is PartDocument pd)
             {
-                var mgr = new Core.PropertyManager((Document)pd);
+                var mgr = new Services.PropertyManager((Document)pd);
                 if (mgr.GetMappedProperty("PartNumber") == partNumber)
                     return pd.FullFileName; // Возвращаем полный путь найденного документа
             }
@@ -1405,7 +1408,7 @@ public partial class FlatPatternExporterMainWindow : Window
             var partDoc = GetCachedPartDocument(partData.PartNumber) ?? OpenPartDocument(partData.PartNumber);
             if (partDoc != null)
             {
-                var mgr = new Core.PropertyManager((Document)partDoc);
+                var mgr = new Services.PropertyManager((Document)partDoc);
                 var value = mgr.GetMappedProperty(propertyName) ?? "";
                 partData.AddUserDefinedProperty(columnHeader, value);
                 

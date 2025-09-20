@@ -1,7 +1,8 @@
 ﻿using netDxf;
 using netDxf.Entities;
+using FlatPatternExporter.Enums;
 
-namespace FlatPatternExporter.Core;
+namespace FlatPatternExporter.Utilities;
 
 public static class DxfOptimizer
 {

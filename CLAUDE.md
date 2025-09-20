@@ -32,17 +32,23 @@ FlatPatternExporter/
     │   ├── DxfRenderer.cs              # Библиотека рендеринга DXF файлов
     │   └── MarshalCore.cs              # Отдельная библиотека COM interop
     │
-    ├── Core/                           # Ядро системы и бизнес-логика
+    ├── Enums/                          # Перечисления
+    │   └── CommonEnums.cs              # Базовые enum и маппинги
+    │
+    ├── Models/                         # Модели данных
+    │   └── LayerSettingsClasses.cs     # Модели настроек слоев с INotifyPropertyChanged
+    │
+    ├── Services/                       # Сервисы и бизнес-логика
     │   ├── PropertyMetadataRegistry.cs # Центральный реестр метаданных
-    │   ├── PropertyManager.cs  		# Менеджер свойств Inventor API
+    │   ├── PropertyManager.cs          # Менеджер свойств Inventor API
     │   ├── TokenService.cs             # Обработка токенов имен файлов
     │   ├── SettingsManager.cs          # Персистентность настроек
     │   ├── TemplatePresetManager.cs    # Управление пресетами шаблонов
-    │   ├── CommonEnums.cs              # Базовые enum и маппинги
-    │   ├── LayerSettingsClasses.cs     # Модели настроек слоев + хелперы
     │   ├── VersionInfoService.cs       # Получение версии приложения и коммитов
     │   ├── ConflictDataProcessor.cs    # Обработка данных конфликтов партнамберов
-    │   ├── PropertyListManager.cs      # Управление списками свойств с фильтрацией
+    │   └── PropertyListManager.cs      # Управление списками свойств с фильтрацией
+    │
+    ├── Utilities/                      # Утилиты
     │   └── DxfOptimizer.cs             # Оптимизация DXF файлов
     │
     ├── UI/                             # Пользовательский интерфейс
@@ -116,17 +122,23 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DxfRenderer` - библиотека рендеринга DXF файлов (namespace: DxfRenderer)
 - `MarshalCore` - COM interop библиотека (namespace: DefineEdge)
 
-**Core/ - Центральные компоненты (namespace: FlatPatternExporter.Core):**
+**Enums/ - Перечисления (namespace: FlatPatternExporter.Enums):**
+- `CommonEnums` - базовые перечисления (ExportFolderType, ProcessingMethod, AcadVersionType и др.)
+
+**Models/ - Модели данных (namespace: FlatPatternExporter.Models):**
+- `LayerSettingsClasses` - модели настроек слоев (LayerSetting, LayerDefaults, валидаторы)
+
+**Services/ - Сервисы и бизнес-логика (namespace: FlatPatternExporter.Services):**
 - `PropertyMetadataRegistry` - централизованный реестр метаданных свойств (7 зависимостей)
 - `PropertyManager` - работа с Inventor API, использует реестр
 - `TokenService` - специализированная обработка токенов (7 зависимостей)
 - `SettingsManager` - персистентность настроек
 - `TemplatePresetManager` - управление пресетами шаблонов
-- `CommonEnums` - базовые перечисления и маппинги
-- `LayerSettingsClasses` - комплексное решение (модели + хелперы + валидаторы)
 - `VersionInfoService` - получение версии приложения и информации о коммитах
 - `ConflictDataProcessor` - обработка и трансформация данных конфликтов партнамберов
 - `PropertyListManager` - управление списками свойств с фильтрацией и состоянием
+
+**Utilities/ - Утилиты (namespace: FlatPatternExporter.Utilities):**
 - `DxfOptimizer` - оптимизация DXF файлов для различных версий AutoCAD
 
 **UI/ - Интерфейс пользователя:**
@@ -157,7 +169,10 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 
 **Основные пространства имен:**
 - `FlatPatternExporter` - корневое пространство имен (App.xaml.cs)
-- `FlatPatternExporter.Core` - все файлы в папке Core/
+- `FlatPatternExporter.Enums` - перечисления в папке Enums/
+- `FlatPatternExporter.Models` - модели данных в папке Models/
+- `FlatPatternExporter.Services` - сервисы в папке Services/
+- `FlatPatternExporter.Utilities` - утилиты в папке Utilities/
 - `FlatPatternExporter.UI.Windows` - все окна в папке UI/Windows/
 - `FlatPatternExporter.UI.Controls` - пользовательские элементы в UI/Controls/
 - `FlatPatternExporter.Converters` - WPF конвертеры в Converters/
@@ -165,11 +180,12 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DefineEdge` - независимая библиотека COM interop (Libraries/MarshalCore.cs)
 
 **Зависимости между пространствами имен:**
-- `UI.Windows` → `Core` (using FlatPatternExporter.Core)
-- `UI.Controls` → `Core` (using FlatPatternExporter.Core)
-- `Converters` → `UI.Windows` (using FlatPatternExporter.UI.Windows)
-- `Core` → `UI.Windows` (using FlatPatternExporter.UI.Windows) для моделей данных
-- `Libraries` → `Core`, `UI.Windows` для внешних типов
+- `UI.Windows` → `Enums`, `Models`, `Services`, `Utilities`
+- `UI.Controls` → `Models`
+- `Services` → `Enums`, `Models`, `UI.Windows`
+- `Utilities` → `Enums`
+- `Converters` → `UI.Windows`
+- `Libraries` → `Services`, `UI.Windows` для внешних типов
 
 ### Управление версиями
 Проект использует версионирование на основе Git в процессе сборки:

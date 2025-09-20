@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using FlatPatternExporter.Core;
+using FlatPatternExporter.Models;
 
 namespace FlatPatternExporter.UI.Controls
 {
