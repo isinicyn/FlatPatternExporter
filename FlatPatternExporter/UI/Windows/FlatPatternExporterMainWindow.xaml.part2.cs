@@ -72,7 +72,7 @@ public partial class FlatPatternExporterMainWindow : Window
     /// <summary>
     /// Общий метод для чтения всех свойств из документа с использованием PropertyManager
     /// </summary>
-    private void ReadAllPropertiesFromPart(PartDocument partDoc, PartData partData, Core.PropertyManager mgr)
+    private static void ReadAllPropertiesFromPart(PartDocument _, PartData partData, Core.PropertyManager mgr)
     {
         partData.FileName = mgr.GetFileName();
         partData.FullFileName = mgr.GetFullFileName();
@@ -143,7 +143,7 @@ public partial class FlatPatternExporterMainWindow : Window
     /// <summary>
     /// Устанавливает состояния выражений для всех редактируемых свойств
     /// </summary>
-    private void SetExpressionStatesForAllProperties(PartData partData, Core.PropertyManager mgr)
+    private static void SetExpressionStatesForAllProperties(PartData partData, Core.PropertyManager mgr)
     {
         partData.BeginExpressionBatch();
         try
@@ -245,14 +245,12 @@ public partial class FlatPatternExporterMainWindow : Window
         string fullFileName = "";
         if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
         {
-            var partDoc = occ.Definition.Document as PartDocument;
-            if (partDoc != null)
+            if (occ.Definition.Document is PartDocument partDoc)
                 fullFileName = partDoc.FullFileName;
         }
         else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
         {
-            var asmDoc = occ.Definition.Document as AssemblyDocument;
-            if (asmDoc != null)
+            if (occ.Definition.Document is AssemblyDocument asmDoc)
                 fullFileName = asmDoc.FullFileName;
         }
         return fullFileName;
@@ -292,8 +290,7 @@ public partial class FlatPatternExporterMainWindow : Window
             {
                 if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
                 {
-                    var partDoc = occ.Definition.Document as PartDocument;
-                    if (partDoc != null)
+                    if (occ.Definition.Document is PartDocument partDoc)
                     {
                         var mgr = new Core.PropertyManager((Document)partDoc);
                         var partNumber = mgr.GetMappedProperty("PartNumber");
@@ -484,14 +481,12 @@ public partial class FlatPatternExporterMainWindow : Window
             var componentDefinition = row.ComponentDefinitions[1];
             if (componentDefinition == null) return;
 
-            var document = componentDefinition.Document as Document;
-            if (document == null) return;
+            if (componentDefinition.Document is not Document document) return;
 
             // Обрабатываем только детали из листового металла (не подсборки)
             if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
             {
-                var partDoc = document as PartDocument;
-                if (partDoc != null)
+                if (document is PartDocument partDoc)
                 {
                     var mgr = new Core.PropertyManager((Document)partDoc);
                     var partNumber = mgr.GetMappedProperty("PartNumber");
@@ -802,7 +797,7 @@ public partial class FlatPatternExporterMainWindow : Window
         await PerformNormalExportAsync();
     }
 
-    private string GetElapsedTime(TimeSpan timeSpan)
+    private static string GetElapsedTime(TimeSpan timeSpan)
     {
         if (timeSpan.TotalMinutes >= 1)
             return $"{(int)timeSpan.TotalMinutes} мин. {timeSpan.Seconds}.{timeSpan.Milliseconds:D3} сек.";
@@ -828,7 +823,7 @@ public partial class FlatPatternExporterMainWindow : Window
                     "Информация", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (dialogResult == MessageBoxResult.No) return;
 
-            selectedItems = selectedItems.Except(itemsWithoutFlatPattern).ToList();
+            selectedItems = [.. selectedItems.Except(itemsWithoutFlatPattern)];
         }
 
         // Валидация документа
@@ -1080,14 +1075,12 @@ public partial class FlatPatternExporterMainWindow : Window
         });
     }
 
-    private bool IsFileLocked(string filePath)
+    private static bool IsFileLocked(string filePath)
     {
         try
         {
-            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-            {
-                stream.Close();
-            }
+            using var stream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            stream.Close();
         }
         catch (IOException)
         {
@@ -1121,11 +1114,11 @@ public partial class FlatPatternExporterMainWindow : Window
         return null; // Возвращаем null, если документ не найден
     }
 
-    private bool IsValidPath(string path)
+    private static bool IsValidPath(string path)
     {
         try
         {
-            new FileInfo(path);
+            _ = new FileInfo(path);
             return true;
         }
         catch
@@ -1509,8 +1502,9 @@ public partial class FlatPatternExporterMainWindow : Window
 
     private Style CreateCellTagStyle(string propertyPath)
     {
-        var baseStyle = PartsDataGrid.FindResource("DataGridCellStyle") as Style;
-        var style = baseStyle != null ? new Style(typeof(DataGridCell), baseStyle) : new Style(typeof(DataGridCell));
+        var style = PartsDataGrid.FindResource("DataGridCellStyle") is Style baseStyle
+            ? new Style(typeof(DataGridCell), baseStyle)
+            : new Style(typeof(DataGridCell));
         style.Setters.Add(new Setter(FrameworkElement.TagProperty, propertyPath));
         return style;
     }
@@ -1543,10 +1537,9 @@ public partial class FlatPatternExporterMainWindow : Window
             CellTemplate = template,
             SortMemberPath = $"UserDefinedProperties[{columnHeader}]",
             IsReadOnly = false,
-            ClipboardContentBinding = new Binding($"UserDefinedProperties[{columnHeader}]")
+            ClipboardContentBinding = new Binding($"UserDefinedProperties[{columnHeader}]"),
+            CellStyle = CreateCellTagStyle($"UserDefinedProperties[{columnHeader}]")
         };
-
-        column.CellStyle = CreateCellTagStyle($"UserDefinedProperties[{columnHeader}]");
 
         PartsDataGrid.Columns.Add(column);
 
@@ -1580,10 +1573,10 @@ public partial class FlatPatternExporterMainWindow : Window
     private void ResetQuantity_Click(object sender, RoutedEventArgs e)
     {
         var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
-        if (!selectedItems.Any()) return;
+        if (selectedItems.Count == 0) return;
 
         var overriddenItems = selectedItems.Where(item => item.IsOverridden).ToList();
-        if (!overriddenItems.Any())
+        if (overriddenItems.Count == 0)
         {
             MessageBox.Show("В выбранных элементах нет переопределенных количеств.", "Информация", 
                 MessageBoxButton.OK, MessageBoxImage.Information);
