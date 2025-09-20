@@ -704,7 +704,7 @@ public static class PropertyMetadataRegistry
     /// </summary>
     public static string GetInventorNameFromUserDefinedInternalName(string internalName)
     {
-        return IsUserDefinedProperty(internalName) ? internalName.Substring(4) : internalName;
+        return IsUserDefinedProperty(internalName) ? internalName[4..] : internalName;
     }
 
     /// <summary>

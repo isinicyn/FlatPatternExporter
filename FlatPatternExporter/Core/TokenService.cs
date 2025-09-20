@@ -36,13 +36,16 @@ public class TokenElement
     }
 }
 
-public class TokenService : INotifyPropertyChanged
+public partial class TokenService : INotifyPropertyChanged
 {
-    private static readonly Regex TokenRegex = new(@"\{(\w+)\}", RegexOptions.Compiled);
-    private static readonly Regex CustomTextRegex = new(@"\{CUSTOM:([^}]+)\}", RegexOptions.Compiled);
+    [GeneratedRegex(@"\{(\w+)\}")]
+    private static partial Regex TokenRegex();
+
+    [GeneratedRegex(@"\{CUSTOM:([^}]+)\}")]
+    private static partial Regex CustomTextRegex();
     private Dictionary<string, Func<PartData, string>> _tokenResolvers;
     private IList<PartData> _partsData;
-    private List<TokenElement> _tokenElements = new();
+    private readonly List<TokenElement> _tokenElements = [];
     private WrapPanel? _tokenContainer;
 
     private string _fileNameTemplate = string.Empty;
@@ -53,7 +56,7 @@ public class TokenService : INotifyPropertyChanged
 
     public TokenService()
     {
-        _partsData = new List<PartData>();
+        _partsData = [];
         _tokenResolvers = BuildTokenResolvers();
         
         // Подписываемся на изменения в коллекции пользовательских свойств
@@ -72,7 +75,7 @@ public class TokenService : INotifyPropertyChanged
         UpdatePreview();
     }
 
-    private Dictionary<string, Func<PartData, string>> BuildTokenResolvers()
+    private static Dictionary<string, Func<PartData, string>> BuildTokenResolvers()
     {
         var resolvers = new Dictionary<string, Func<PartData, string>>();
         var partDataType = typeof(PartData);
@@ -126,7 +129,7 @@ public class TokenService : INotifyPropertyChanged
         bool usePlaceholders = partData == null || string.IsNullOrEmpty(partData.PartNumber);
 
         // Обрабатываем обычные токены
-        result = TokenRegex.Replace(result, match =>
+        result = TokenRegex().Replace(result, match =>
         {
             var token = match.Groups[1].Value;
             
@@ -157,7 +160,7 @@ public class TokenService : INotifyPropertyChanged
         });
 
         // Обрабатываем кастомные токены
-        result = CustomTextRegex.Replace(result, match =>
+        result = CustomTextRegex().Replace(result, match =>
         {
             return match.Groups[1].Value; // Возвращаем текст как есть
         });
@@ -171,7 +174,7 @@ public class TokenService : INotifyPropertyChanged
             return false;
 
         // Проверяем обычные токены
-        var tokenMatches = TokenRegex.Matches(template);
+        var tokenMatches = TokenRegex().Matches(template);
         var validTokens = tokenMatches.All(match => _tokenResolvers.ContainsKey(match.Groups[1].Value));
         
         // Кастомные токены всегда валидны (не нуждаются в разрешении)
@@ -220,7 +223,7 @@ public class TokenService : INotifyPropertyChanged
         return ($"{preview}.dxf", true);
     }
 
-    public PartData? CreateSamplePartData(IList<PartData> partsData, PartData? selectedData = null)
+    public static PartData? CreateSamplePartData(IList<PartData> partsData, PartData? selectedData = null)
     {
         // Используем выбранную деталь, если она передана
         if (selectedData != null)
@@ -238,7 +241,7 @@ public class TokenService : INotifyPropertyChanged
         return null;
     }
 
-    private string SanitizeFileName(string fileName)
+    private static string SanitizeFileName(string fileName)
     {
         if (string.IsNullOrEmpty(fileName))
             return fileName;
@@ -301,7 +304,7 @@ public class TokenService : INotifyPropertyChanged
 
     public void UpdatePartsData(IList<PartData> partsData)
     {
-        _partsData = partsData ?? new List<PartData>();
+        _partsData = partsData ?? [];
         UpdatePreview();
     }
 
@@ -337,10 +340,10 @@ public class TokenService : INotifyPropertyChanged
 
         var allMatches = new List<(Match match, bool isCustom)>();
         
-        foreach (Match match in TokenRegex.Matches(_fileNameTemplate))
+        foreach (Match match in TokenRegex().Matches(_fileNameTemplate))
             allMatches.Add((match, false));
         
-        foreach (Match match in CustomTextRegex.Matches(_fileNameTemplate))
+        foreach (Match match in CustomTextRegex().Matches(_fileNameTemplate))
             allMatches.Add((match, true));
         
         allMatches.Sort((a, b) => a.match.Index.CompareTo(b.match.Index));
@@ -421,7 +424,7 @@ public class TokenService : INotifyPropertyChanged
             var combinedText = existingCustomText + customText;
             var combinedToken = $"{{CUSTOM:{combinedText}}}";
             
-            FileNameTemplate = _fileNameTemplate.Substring(0, match.Index) + combinedToken;
+            FileNameTemplate = string.Concat(_fileNameTemplate.AsSpan(0, match.Index), combinedToken);
         }
         else
         {
