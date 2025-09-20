@@ -1276,7 +1276,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    private void UpdateAdornerPosition(DataGridColumnReorderingEventArgs? e)
+    private void UpdateAdornerPosition(DataGridColumnReorderingEventArgs? _)
     {
         if (_headerAdorner == null)
             return;
@@ -1431,7 +1431,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         // Выполнение сканирования
         var result = await ExecuteWithErrorHandlingAsync(
-            () => ScanDocumentAsync(validation.Document!, _operationCts!.Token, updateUI: true, scanProgress),
+            () => ScanDocumentAsync(validation.Document!, updateUI: true, scanProgress, _operationCts!.Token),
             "сканирования");
 
         // Завершение операции
@@ -1569,9 +1569,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private static bool IsTextAllowed(string text)
     {
         // Регулярное выражение для проверки положительных чисел
-        var regex = new Regex("^[1-9][0-9]*$"); // Разрешены только положительные числа больше нуля
-        return regex.IsMatch(text);
+        return PositiveNumberRegex().IsMatch(text);
     }
+
+    [GeneratedRegex("^[1-9][0-9]*$")]
+    private static partial Regex PositiveNumberRegex();
 
     private void UpdateQuantitiesWithMultiplier(int multiplier)
     {
@@ -1605,10 +1607,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// Унифицированный метод сканирования документа
     /// </summary>
     private async Task<OperationResult> ScanDocumentAsync(
-        Document document, 
-        CancellationToken cancellationToken = default,
+        Document document,
         bool updateUI = true,
-        IProgress<ScanProgress>? progress = null)
+        IProgress<ScanProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
         var result = new OperationResult();

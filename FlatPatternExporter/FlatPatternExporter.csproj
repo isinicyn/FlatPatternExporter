@@ -7,15 +7,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>FPExport.ico</ApplicationIcon>	
-  
+    <ApplicationIcon>FPExport.ico</ApplicationIcon>
+    <LangVersion>12.0</LangVersion>
+
     <StartupObject>FlatPatternExporter.App</StartupObject>
     
     <!-- Метаданные приложения -->
     <AssemblyTitle>FlatPatternExporter</AssemblyTitle>
     <AssemblyDescription>Приложение для экспорта разверток деталей из листового металла из Autodesk Inventor</AssemblyDescription>
     <AssemblyProduct>FlatPatternExporter</AssemblyProduct>
-    <AssemblyCopyright>Copyright © 2024</AssemblyCopyright>
+    <AssemblyCopyright>Copyright © 2025</AssemblyCopyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
