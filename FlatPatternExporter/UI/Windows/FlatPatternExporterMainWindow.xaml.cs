@@ -56,13 +56,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Данные и коллекции
     private readonly ObservableCollection<PartData> _partsData = [];
     private readonly CollectionViewSource _partsDataView;
-    private List<PartData> _conflictingParts = new();
-    private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = new();
+    private readonly List<PartData> _conflictingParts = [];
+    private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = [];
     private readonly ConcurrentDictionary<string, List<PartConflictInfo>> _partNumberTracker = new();
     
     // Кеш документов для изоляции среды обработки
-    private readonly Dictionary<string, PartDocument> _documentCache = new();
-    private readonly Dictionary<string, string> _partNumberToFullFileName = new();
+    private readonly Dictionary<string, PartDocument> _documentCache = [];
+    private readonly Dictionary<string, string> _partNumberToFullFileName = [];
     
     // Состояние процессов
     private bool _isScanning;
@@ -296,10 +296,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<string> AvailableColors { get; set; }
     public ObservableCollection<string> LineTypes { get; set; }
     public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
-    public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = new();
-    public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = new();
-    public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> AvailableTokens { get; set; } = new();
-    public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> UserDefinedTokens { get; set; } = new();
+    public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = [];
+    public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = [];
+    public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> AvailableTokens { get; set; } = [];
+    public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> UserDefinedTokens { get; set; } = [];
     public TemplatePresetManager PresetManager { get; } = new();    
 
     // Публичные свойства для привязки данных CheckBox
@@ -830,7 +830,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// <summary>
     /// Централизованная обработка ошибок для операций
     /// </summary>
-    private async Task<T> ExecuteWithErrorHandlingAsync<T>(
+    private static async Task<T> ExecuteWithErrorHandlingAsync<T>(
         Func<Task<T>> operation,
         string operationName) where T : OperationResult, new()
     {
@@ -841,8 +841,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         catch (OperationCanceledException)
         {
             // Операция была отменена - возвращаем результат с флагом отмены
-            var result = new T();
-            result.WasCancelled = true;
+            var result = new T
+            {
+                WasCancelled = true
+            };
             return result;
         }
         catch (Exception ex)
@@ -991,7 +993,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var source = e.OriginalSource as DependencyObject;
 
         // Ищем DataGrid по иерархии визуальных элементов
-        while (source != null && !(source is DataGrid)) source = VisualTreeHelper.GetParent(source);
+        while (source != null && source is not DataGrid) source = VisualTreeHelper.GetParent(source);
 
         // Если DataGrid не найден (клик был вне DataGrid), сбрасываем выделение
         if (source == null) PartsDataGrid.UnselectAll();
@@ -1088,14 +1090,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Получаем значение из пользовательского свойства
             // Находим User Defined Property по ColumnHeader
             var userProp = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeader);
-            if (userProp != null && partData.UserDefinedProperties.ContainsKey(userProp.InventorPropertyName!))
+            if (userProp != null && partData.UserDefinedProperties.TryGetValue(userProp.InventorPropertyName!, out string? value))
             {
-                searchValue = partData.UserDefinedProperties[userProp.InventorPropertyName!];
+                searchValue = value;
             }
 
             // Проверяем совпадение
             if (!string.IsNullOrEmpty(searchValue) && 
-                searchValue.ToLower().Contains(_actualSearchText))
+                searchValue.Contains(_actualSearchText, StringComparison.CurrentCultureIgnoreCase))
             {
                 e.Accepted = true;
                 return;
@@ -1557,8 +1559,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private void MultiplierTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
         // Проверяем текущий текст вместе с новым вводом
-        var textBox = sender as TextBox;
-        if (textBox == null) return;
+        if (sender is not TextBox textBox) return;
         var newText = textBox.Text.Insert(textBox.CaretIndex, e.Text);
 
         // Проверяем, является ли текст положительным числом больше нуля
@@ -1788,8 +1789,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
 
         // Создаем и показываем окно с деталями конфликтов
-        var conflictWindow = new ConflictDetailsWindow(_conflictFileDetails, OpenInventorDocument);
-        conflictWindow.Owner = this;
+        var conflictWindow = new ConflictDetailsWindow(_conflictFileDetails, OpenInventorDocument)
+        {
+            Owner = this
+        };
         conflictWindow.ShowDialog();
     }
 
@@ -1874,8 +1877,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void InitializeAvailableTokens()
     {
-        AvailableTokens = new ObservableCollection<PropertyMetadataRegistry.PropertyDefinition>();
-        UserDefinedTokens = new ObservableCollection<PropertyMetadataRegistry.PropertyDefinition>();
+        AvailableTokens = [];
+        UserDefinedTokens = [];
         
         RefreshAvailableTokens();
         
@@ -1952,7 +1955,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         };
         
         _partNumberTracker.AddOrUpdate(partNumber,
-            new List<PartConflictInfo> { conflictInfo },
+            [conflictInfo],
             (key, existingList) =>
             {
                 // Проверяем, есть ли уже такой же файл + состояние модели
@@ -2008,7 +2011,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Оставляем только те записи, у которых больше одного файла (т.е. есть конфликт)
         var conflictingPartNumbers = _partNumberTracker.Where(p => p.Value.Count > 1).ToDictionary(p => p.Key, p => p.Value);
 
-        if (conflictingPartNumbers.Any())
+        if (conflictingPartNumbers.Count!=0)
         {
             _conflictingParts.AddRange(conflictingPartNumbers.SelectMany(entry => entry.Value.Select(v => new PartData { PartNumber = v.PartNumber })));
 
@@ -2476,7 +2479,7 @@ public class ExportContext
 {
     public string TargetDirectory { get; set; } = "";
     public int Multiplier { get; set; } = 1;
-    public Dictionary<string, int> SheetMetalParts { get; set; } = new();
+    public Dictionary<string, int> SheetMetalParts { get; set; } = [];
     public bool GenerateThumbnails { get; set; } = true;
     public bool IsValid { get; set; } = true;
     public string ErrorMessage { get; set; } = "";
@@ -2489,7 +2492,7 @@ public class OperationResult
     public int SkippedCount { get; set; }
     public TimeSpan ElapsedTime { get; set; }
     public bool WasCancelled { get; set; }
-    public List<string> Errors { get; set; } = new();
+    public List<string> Errors { get; set; } = [];
 }
 
 // Результат валидации документа
