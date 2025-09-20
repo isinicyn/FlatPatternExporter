@@ -263,7 +263,7 @@ public static class SettingsManager
         window.SelectedProcessingMethod = settings.SelectedProcessingMethod;
         
         // DXF export settings
-        window.SelectedAcadVersion = settings.DxfExport.SelectedAcadVersion;
+        window.SetAcadVersion(settings.DxfExport.SelectedAcadVersion, suppressMessage: true);
         window.MergeProfilesIntoPolyline = settings.DxfExport.MergeProfilesIntoPolyline;
         window.RebaseGeometry = settings.DxfExport.RebaseGeometry;
         window.TrimCenterlines = settings.DxfExport.TrimCenterlines;

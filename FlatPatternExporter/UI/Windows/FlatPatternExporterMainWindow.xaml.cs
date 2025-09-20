@@ -70,7 +70,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private CancellationTokenSource? _operationCts;
     private bool _hasMissingReferences = false;
     private int _itemCounter = 1;
-    private bool _isInitializing = true;
     private bool _isUpdatingState;
     
     // UI состояние
@@ -260,8 +259,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Инициализируем данные в TokenService
         _tokenService.UpdatePartsData(_partsData);
         
-        // Завершаем инициализацию
-        _isInitializing = false;
     }
 
     private void LoadSettings()
@@ -423,24 +420,26 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public AcadVersionType SelectedAcadVersion
     {
         get => _selectedAcadVersion;
-        set
-        {
-            if (_selectedAcadVersion != value)
-            {
-                _selectedAcadVersion = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(IsOptimizeDxfEnabled));
+        set => SetAcadVersion(value, suppressMessage: false);
+    }
 
-                if (!AcadVersionMapping.SupportsOptimization(_selectedAcadVersion))
+    internal void SetAcadVersion(AcadVersionType value, bool suppressMessage)
+    {
+        if (_selectedAcadVersion != value)
+        {
+            _selectedAcadVersion = value;
+            OnPropertyChanged(nameof(SelectedAcadVersion));
+            OnPropertyChanged(nameof(IsOptimizeDxfEnabled));
+
+            if (!AcadVersionMapping.SupportsOptimization(_selectedAcadVersion))
+            {
+                OptimizeDxf = false;
+                if (!suppressMessage)
                 {
-                    OptimizeDxf = false;
-                    if (!_isInitializing)
-                    {
-                        var ver = AcadVersionMapping.GetDisplayName(_selectedAcadVersion);
-                        MessageBox.Show(
-                            $"Для версии {ver} отключены оптимизация DXF и генерация миниатюр.\n\nДанная версия не поддерживается используемой библиотекой.",
-                            "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
+                    var ver = AcadVersionMapping.GetDisplayName(_selectedAcadVersion);
+                    MessageBox.Show(
+                        $"Для версии {ver} отключены оптимизация DXF и генерация миниатюр.\n\nДанная версия не поддерживается используемой библиотекой.",
+                        "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
         }
