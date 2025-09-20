@@ -12,7 +12,7 @@ public class DynamicPropertyValueConverter : IMultiValueConverter
         {
             if (propPath.StartsWith("UserDefinedProperties["))
             {
-                var key = propPath.Substring("UserDefinedProperties[".Length).TrimEnd(']');
+                var key = propPath["UserDefinedProperties[".Length..].TrimEnd(']');
                 return partData.UserDefinedProperties.TryGetValue(key, out var v) ? v : string.Empty;
             }
             var pi = typeof(PartData).GetProperty(propPath);
@@ -23,6 +23,6 @@ public class DynamicPropertyValueConverter : IMultiValueConverter
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
     {
-        return Array.Empty<object>();
+        return [];
     }
 }

@@ -18,6 +18,6 @@ public class PropertyExpressionByNameConverter : IMultiValueConverter
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
     {
-        return Array.Empty<object>();
+        return [];
     }
 }
