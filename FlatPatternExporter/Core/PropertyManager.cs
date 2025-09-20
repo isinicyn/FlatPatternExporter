@@ -8,15 +8,10 @@ namespace FlatPatternExporter.Core;
 /// Класс для централизованного управления доступом к свойствам документов Inventor.
 /// Обеспечивает единый интерфейс для работы с iProperty и обычными свойствами документов.
 /// </summary>
-public class PropertyManager
+public class PropertyManager(Document document)
 {
-    private readonly Document _document;
+    private readonly Document _document = document ?? throw new ArgumentNullException(nameof(document));
     public static readonly string SheetMetalSubType = "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}";
-
-    public PropertyManager(Document document)
-    {
-        _document = document ?? throw new ArgumentNullException(nameof(document));
-    }
 
     /// <summary>
     /// Получает маппинг для Inventor Property
@@ -121,7 +116,7 @@ public class PropertyManager
         var prop = GetPropertyObject(ourName);
         if (prop == null) return false;
 
-        return !string.IsNullOrEmpty(prop.Expression) && prop.Expression.StartsWith("=");
+        return !string.IsNullOrEmpty(prop.Expression) && prop.Expression.StartsWith('=');
     }
 
     /// <summary>
