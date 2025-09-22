@@ -427,3 +427,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Kiro folder (project management files)
+.kiro/
