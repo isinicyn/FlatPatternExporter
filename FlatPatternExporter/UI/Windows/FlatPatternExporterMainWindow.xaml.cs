@@ -52,6 +52,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Сервисы
     private readonly TokenService _tokenService = new();
     private readonly Core.ScanService _scanService;
+    private readonly ThumbnailService _thumbnailService = new();
     private readonly Core.ExportService _exportService;
 
     // Данные и коллекции
