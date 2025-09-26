@@ -8,24 +8,24 @@ using Inventor;
 
 namespace FlatPatternExporter.Core;
 
-public class PartDataService
+public class PartDataReader
 {
-    private readonly InventorService _inventorService;
-    private readonly ScanService _scanService;
-    private readonly ThumbnailService _thumbnailService;
+    private readonly InventorManager _inventorManager;
+    private readonly DocumentScanner _documentScanner;
+    private readonly ThumbnailGenerator _thumbnailGenerator;
     private readonly Dispatcher _dispatcher;
 
-    public PartDataService(InventorService inventorService, ScanService scanService, ThumbnailService thumbnailService, Dispatcher dispatcher)
+    public PartDataReader(InventorManager inventorManager, DocumentScanner documentScanner, ThumbnailGenerator thumbnailGenerator, Dispatcher dispatcher)
     {
-        _inventorService = inventorService;
-        _scanService = scanService;
-        _thumbnailService = thumbnailService;
+        _inventorManager = inventorManager;
+        _documentScanner = documentScanner;
+        _thumbnailGenerator = thumbnailGenerator;
         _dispatcher = dispatcher;
     }
 
     public async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber, bool loadThumbnail = true)
     {
-        var partDoc = _scanService.DocumentCache.GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
+        var partDoc = _documentScanner.DocumentCache.GetCachedPartDocument(partNumber) ?? _inventorManager.OpenPartDocument(partNumber);
         if (partDoc == null) return null!;
 
         return await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
@@ -39,7 +39,7 @@ public class PartDataService
             OriginalQuantity = quantity
         };
 
-        var mgr = new Services.PropertyManager((Document)partDoc);
+        var mgr = new PropertyManager((Document)partDoc);
 
         ReadAllPropertiesFromPart(partDoc, partData, mgr);
 
@@ -51,7 +51,7 @@ public class PartDataService
 
         if (loadThumbnail)
         {
-            partData.Preview = await _thumbnailService.GetThumbnailAsync(partDoc, _dispatcher);
+            partData.Preview = await _thumbnailGenerator.GetThumbnailAsync(partDoc, _dispatcher);
         }
 
         partData.SetQuantityInternal(quantity);
@@ -59,7 +59,7 @@ public class PartDataService
         return partData;
     }
 
-    private static void ReadAllPropertiesFromPart(PartDocument _, PartData partData, Services.PropertyManager mgr)
+    private static void ReadAllPropertiesFromPart(PartDocument _, PartData partData, PropertyManager mgr)
     {
         partData.FileName = mgr.GetFileName();
         partData.FullFileName = mgr.GetFullFileName();
@@ -82,7 +82,7 @@ public class PartDataService
         }
     }
 
-    private static void SetExpressionStatesForAllProperties(PartData partData, Services.PropertyManager mgr)
+    private static void SetExpressionStatesForAllProperties(PartData partData, PropertyManager mgr)
     {
         partData.BeginExpressionBatch();
         try
@@ -121,10 +121,10 @@ public class PartDataService
 
         foreach (var partData in partsData)
         {
-            var partDoc = _scanService.DocumentCache.GetCachedPartDocument(partData.PartNumber) ?? _inventorService.OpenPartDocument(partData.PartNumber);
+            var partDoc = _documentScanner.DocumentCache.GetCachedPartDocument(partData.PartNumber) ?? _inventorManager.OpenPartDocument(partData.PartNumber);
             if (partDoc != null)
             {
-                var mgr = new Services.PropertyManager((Document)partDoc);
+                var mgr = new PropertyManager((Document)partDoc);
                 var value = mgr.GetMappedProperty(propertyName) ?? "";
                 partData.AddUserDefinedProperty(columnHeader, value);
 
@@ -158,7 +158,7 @@ public class PartDataService
             };
         }
 
-        var mgr = new Services.PropertyManager(doc);
+        var mgr = new PropertyManager(doc);
         return new DocumentInfo
         {
             DocumentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" : "Деталь",

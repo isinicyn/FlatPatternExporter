@@ -9,7 +9,7 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter.Core;
 
-public class InventorService
+public class InventorManager
 {
     private Inventor.Application? _thisApplication;
     private string _projectName = string.Empty;
@@ -173,7 +173,7 @@ public class InventorService
         foreach (Document doc in docs)
             if (doc is PartDocument pd)
             {
-                var mgr = new Services.PropertyManager((Document)pd);
+                var mgr = new PropertyManager((Document)pd);
                 if (mgr.GetMappedProperty("PartNumber") == partNumber)
                     return pd;
             }
@@ -191,7 +191,7 @@ public class InventorService
         foreach (Document doc in docs)
             if (doc is PartDocument pd)
             {
-                var mgr = new Services.PropertyManager((Document)pd);
+                var mgr = new PropertyManager((Document)pd);
                 if (mgr.GetMappedProperty("PartNumber") == partNumber)
                     return pd.FullFileName;
             }

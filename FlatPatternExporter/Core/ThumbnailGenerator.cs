@@ -11,7 +11,7 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter.Core;
 
-public class ThumbnailService
+public class ThumbnailGenerator
 {
     /// <summary>
     /// Конвертирует SVG строку в BitmapImage

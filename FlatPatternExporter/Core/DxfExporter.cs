@@ -14,18 +14,18 @@ using Directory = System.IO.Directory;
 
 namespace FlatPatternExporter.Core;
 
-public class ExportService
+public class DxfExporter
 {
-    private readonly InventorService _inventorService;
-    private readonly ScanService _scanService;
-    private readonly DocumentCacheService _documentCache;
+    private readonly InventorManager _inventorManager;
+    private readonly DocumentScanner _documentScanner;
+    private readonly DocumentCache _documentCache;
     private readonly TokenService _tokenService;
 
-    public ExportService(InventorService inventorService, ScanService scanService,
-        DocumentCacheService documentCache, TokenService tokenService)
+    public DxfExporter(InventorManager inventorManager, DocumentScanner documentScanner,
+        DocumentCache documentCache, TokenService tokenService)
     {
-        _inventorService = inventorService;
-        _scanService = scanService;
+        _inventorManager = inventorManager;
+        _documentScanner = documentScanner;
         _documentCache = documentCache;
         _tokenService = tokenService;
     }
@@ -43,7 +43,7 @@ public class ExportService
         {
             if (requireScan && document != lastScannedDocument)
             {
-                _scanService.ConflictAnalyzer.Clear();
+                _documentScanner.ConflictAnalyzer.Clear();
             }
 
             if (requireScan && document != lastScannedDocument)
@@ -71,7 +71,7 @@ public class ExportService
                 IncludeLibraryComponents = exportOptions.IncludeLibraryComponents
             };
 
-            var scanResult = await _scanService.ScanDocumentAsync(
+            var scanResult = await _documentScanner.ScanDocumentAsync(
                 document,
                 exportOptions.SelectedProcessingMethod,
                 scanOptions,
@@ -105,7 +105,7 @@ public class ExportService
                 break;
 
             case ExportFolderType.ComponentFolder:
-                targetDir = Path.GetDirectoryName(_inventorService.Application?.ActiveDocument?.FullFileName) ?? "";
+                targetDir = Path.GetDirectoryName(_inventorManager.Application?.ActiveDocument?.FullFileName) ?? "";
                 break;
 
             case ExportFolderType.FixedFolder:
@@ -119,7 +119,7 @@ public class ExportService
             case ExportFolderType.ProjectFolder:
                 try
                 {
-                    targetDir = _inventorService.Application?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? "";
+                    targetDir = _inventorManager.Application?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? "";
                     if (string.IsNullOrEmpty(targetDir))
                     {
                         return false;
@@ -171,7 +171,7 @@ public class ExportService
 
             if (exportOptions.SelectedExportFolder == ExportFolderType.PartFolder)
             {
-                var partPath = _documentCache.GetCachedPartPath(partNumber) ?? _inventorService.GetPartDocumentFullPath(partNumber);
+                var partPath = _documentCache.GetCachedPartPath(partNumber) ?? _inventorManager.GetPartDocumentFullPath(partNumber);
                 if (!string.IsNullOrEmpty(partPath))
                 {
                     targetDir = Path.GetDirectoryName(partPath) ?? "";
@@ -185,7 +185,7 @@ public class ExportService
             PartDocument? partDoc = null;
             try
             {
-                partDoc = _documentCache.GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
+                partDoc = _documentCache.GetCachedPartDocument(partNumber) ?? _inventorManager.OpenPartDocument(partNumber);
                 if (partDoc == null) throw new Exception("Файл детали не найден или не может быть открыт");
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;

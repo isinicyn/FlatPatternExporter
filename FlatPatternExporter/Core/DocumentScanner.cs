@@ -3,25 +3,25 @@ using System.Runtime.InteropServices;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.UI.Windows;
 using Inventor;
-using PropertyManager = FlatPatternExporter.Services.PropertyManager;
+using PropertyManager = FlatPatternExporter.Core.PropertyManager;
 
 namespace FlatPatternExporter.Core;
 
-public class ScanService
+public class DocumentScanner
 {
-    private readonly InventorService _inventorService;
-    private readonly DocumentCacheService _documentCache;
+    private readonly InventorManager _inventorManager;
+    private readonly DocumentCache _documentCache;
     private readonly ConflictAnalyzer _conflictAnalyzer;
     private bool _hasMissingReferences;
 
-    public ScanService(InventorService inventorService)
+    public DocumentScanner(InventorManager inventorManager)
     {
-        _inventorService = inventorService;
-        _documentCache = new DocumentCacheService();
+        _inventorManager = inventorManager;
+        _documentCache = new DocumentCache();
         _conflictAnalyzer = new ConflictAnalyzer();
     }
 
-    public DocumentCacheService DocumentCache => _documentCache;
+    public DocumentCache DocumentCache => _documentCache;
     public ConflictAnalyzer ConflictAnalyzer => _conflictAnalyzer;
     public bool HasMissingReferences => _hasMissingReferences;
 
@@ -61,7 +61,7 @@ public class ScanService
             {
                 var partDoc = (PartDocument)document;
 
-                if (!options.IncludeLibraryComponents && _inventorService.IsLibraryComponent(partDoc.FullFileName))
+                if (!options.IncludeLibraryComponents && _inventorManager.IsLibraryComponent(partDoc.FullFileName))
                 {
                     result.ProcessedCount = 0;
                     return result;
@@ -363,7 +363,7 @@ public class ScanService
         if (options.ExcludePhantomParts && bomStructure == BOMStructureEnum.kPhantomBOMStructure)
             return true;
 
-        if (!options.IncludeLibraryComponents && !string.IsNullOrEmpty(fullFileName) && _inventorService.IsLibraryComponent(fullFileName))
+        if (!options.IncludeLibraryComponents && !string.IsNullOrEmpty(fullFileName) && _inventorManager.IsLibraryComponent(fullFileName))
             return true;
 
         return false;

@@ -1,9 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
+using FlatPatternExporter.Services;
 using Inventor;
 
-namespace FlatPatternExporter.Services;
+namespace FlatPatternExporter.Core;
 /// <summary>
 /// Класс для централизованного управления доступом к свойствам документов Inventor.
 /// Обеспечивает единый интерфейс для работы с iProperty и обычными свойствами документов.

@@ -45,16 +45,15 @@ public class SplineReplacementItem
 public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
     // Inventor API
-    private readonly InventorService _inventorService = new();
-    public Inventor.Application? _thisApplication => _inventorService.Application;
+    private readonly InventorManager _inventorManager = new();
     private Document? _lastScannedDocument;
 
     // Сервисы
     private readonly TokenService _tokenService = new();
-    private readonly Core.ScanService _scanService;
-    private readonly ThumbnailService _thumbnailService = new();
-    private readonly Core.ExportService _exportService;
-    private readonly Core.PartDataService _partDataService;
+    private readonly DocumentScanner _documentScanner;
+    private readonly ThumbnailGenerator _thumbnailGenerator = new();
+    private readonly DxfExporter _dxfExporter;
+    private readonly PartDataReader _partDataReader;
 
     // Данные и коллекции
     private readonly ObservableCollection<PartData> _partsData = [];
@@ -181,10 +180,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public FlatPatternExporterMainWindow()
     {
         // Инициализация сервисов до InitializeComponent для предотвращения NullReferenceException
-        _inventorService.InitializeInventor();
-        _scanService = new Core.ScanService(_inventorService);
-        _exportService = new Core.ExportService(_inventorService, _scanService, _scanService.DocumentCache, _tokenService);
-        _partDataService = new Core.PartDataService(_inventorService, _scanService, _thumbnailService, Dispatcher);
+        _inventorManager.InitializeInventor();
+        _documentScanner = new Core.DocumentScanner(_inventorManager);
+        _dxfExporter = new Core.DxfExporter(_inventorManager, _documentScanner, _documentScanner.DocumentCache, _tokenService);
+        _partDataReader = new Core.PartDataReader(_inventorManager, _documentScanner, _thumbnailGenerator, Dispatcher);
 
         InitializeComponent();
 
@@ -771,7 +770,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 ExportProgressValue = state.ProgressValue;
         }
         
-        _inventorService.SetInventorUserInterfaceState(state.InventorUIDisabled);
+        _inventorManager.SetInventorUserInterfaceState(state.InventorUIDisabled);
     }
 
     /// <summary>
@@ -805,12 +804,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             case OperationType.Scan:
                 // Для сканирования показываем специальные сообщения о конфликтах и ссылках
-                if (_scanService.ConflictAnalyzer.ConflictCount > 0)
+                if (_documentScanner.ConflictAnalyzer.ConflictCount > 0)
                 {
-                    MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_scanService.ConflictAnalyzer.ConflictCount}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Конфликты\" на панели управления для просмотра деталей конфликтов.",
+                    MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_documentScanner.ConflictAnalyzer.ConflictCount}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Конфликты\" на панели управления для просмотра деталей конфликтов.",
                         "Конфликт обозначений", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
-                else if (_scanService.HasMissingReferences)
+                else if (_documentScanner.HasMissingReferences)
                 {
                     MessageBox.Show("В сборке обнаружены компоненты с потерянными ссылками. Некоторые данные могли быть пропущены.",
                         "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -860,7 +859,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// </summary>
     private DocumentValidationResult? ValidateDocumentOrShowError()
     {
-        var validation = _inventorService.ValidateActiveDocument();
+        var validation = _inventorManager.ValidateActiveDocument();
         if (!validation.IsValid)
         {
             MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -875,7 +874,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private async Task<Core.ExportContext?> PrepareExportContextOrShowError(Document document, bool requireScan = true, bool showProgress = false)
     {
         var exportOptions = CreateExportOptions();
-        var context = await _exportService.PrepareExportContextAsync(document, requireScan, showProgress, _lastScannedDocument, exportOptions);
+        var context = await _dxfExporter.PrepareExportContextAsync(document, requireScan, showProgress, _lastScannedDocument, exportOptions);
         if (!context.IsValid)
         {
             MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -1399,7 +1398,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var processedCount = 0;
             var skippedCount = 0;
             var exportProgress = new Progress<double>(UpdateExportProgress);
-            await Task.Run(() => _exportService.ExportDXF(partsDataList, context.TargetDirectory, context.Multiplier,
+            await Task.Run(() => _dxfExporter.ExportDXF(partsDataList, context.TargetDirectory, context.Multiplier,
                 exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
 
             return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
@@ -1520,7 +1519,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             };
 
             // Используем ScanService для сканирования
-            var scanResult = await _scanService.ScanDocumentAsync(
+            var scanResult = await _documentScanner.ScanDocumentAsync(
                 document,
                 SelectedProcessingMethod,
                 scanOptions,
@@ -1534,7 +1533,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (updateUI && sheetMetalParts.Count > 0)
             {
                 // Анализ конфликтов уже выполнен в ScanService
-                if (_scanService.ConflictAnalyzer.HasConflicts)
+                if (_documentScanner.ConflictAnalyzer.HasConflicts)
                 {
                     await Dispatcher.InvokeAsync(() =>
                     {
@@ -1568,7 +1567,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        var partData = await _partDataService.GetPartDataAsync(part.Key, part.Value, itemCounter++);
+                        var partData = await _partDataReader.GetPartDataAsync(part.Key, part.Value, itemCounter++);
                         if (partData != null)
                         {
                             ((IProgress<PartData>)partProgress).Report(partData);
@@ -1587,7 +1586,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
 
             if (updateUI && int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
-                _partDataService.UpdateQuantitiesWithMultiplier(_partsData, multiplier);
+                _partDataReader.UpdateQuantitiesWithMultiplier(_partsData, multiplier);
 
             result.WasCancelled = cancellationToken.IsCancellationRequested;
             
@@ -1629,13 +1628,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
     private void ConflictFilesButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_scanService.ConflictAnalyzer.ConflictFileDetails == null || _scanService.ConflictAnalyzer.ConflictFileDetails.Count == 0)
+        if (_documentScanner.ConflictAnalyzer.ConflictFileDetails == null || _documentScanner.ConflictAnalyzer.ConflictFileDetails.Count == 0)
         {
             return;
         }
 
         // Создаем и показываем окно с деталями конфликтов
-        var conflictWindow = new ConflictDetailsWindow(_scanService.ConflictAnalyzer.ConflictFileDetails, _inventorService.OpenInventorDocument)
+        var conflictWindow = new ConflictDetailsWindow(_documentScanner.ConflictAnalyzer.ConflictFileDetails, _inventorManager.OpenInventorDocument)
         {
             Owner = this
         };
@@ -1681,9 +1680,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Метод для обновления информации о проекте в UI
     private void UpdateProjectInfo()
     {
-        _inventorService.SetProjectFolderInfo();
-        ProjectNameRun.Text = _inventorService.ProjectName;
-        ProjectStackPanelItem.ToolTip = _inventorService.ProjectWorkspacePath;
+        _inventorManager.SetProjectFolderInfo();
+        ProjectNameRun.Text = _inventorManager.ProjectName;
+        ProjectStackPanelItem.ToolTip = _inventorManager.ProjectWorkspacePath;
     }
 
     private void InitializeAcadVersions()
@@ -1754,7 +1753,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// </summary>
     private void ClearConflictData()
     {
-        _scanService.ConflictAnalyzer.Clear();
+        _documentScanner.ConflictAnalyzer.Clear();
         ConflictFilesButton.IsEnabled = false; // Отключаем кнопку при очистке данных
     }
 
@@ -1814,7 +1813,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 await Task.Delay(1); // Минимальная задержка для обновления UI
             }
 
-            var partData = await _partDataService.GetPartDataAsync(part.Key, part.Value * context.Multiplier, itemCounter++, loadThumbnail: false);
+            var partData = await _partDataReader.GetPartDataAsync(part.Key, part.Value * context.Multiplier, itemCounter++, loadThumbnail: false);
             if (partData != null)
             {
                 // Не вызываем SetQuantityInternal повторно - количество уже установлено правильно в GetPartDataAsync
@@ -1837,7 +1836,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var processedCount = 0;
             var skippedCount = 0;
             var exportProgress = new Progress<double>(p => { });
-            await Task.Run(() => _exportService.ExportDXF(tempPartsDataList, context.TargetDirectory, context.Multiplier,
+            await Task.Run(() => _dxfExporter.ExportDXF(tempPartsDataList, context.TargetDirectory, context.Multiplier,
                 exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
 
             return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
@@ -1904,7 +1903,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var processedCount = 0;
             var skippedCount = itemsWithoutFlatPattern.Count;
             var exportProgress = new Progress<double>(UpdateExportProgress);
-            await Task.Run(() => _exportService.ExportDXF(selectedItems, context.TargetDirectory, context.Multiplier,
+            await Task.Run(() => _dxfExporter.ExportDXF(selectedItems, context.TargetDirectory, context.Multiplier,
                 exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
 
             return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
@@ -1918,7 +1917,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
         {
-            _partDataService.UpdateQuantitiesWithMultiplier(_partsData, multiplier);
+            _partDataReader.UpdateQuantitiesWithMultiplier(_partsData, multiplier);
 
             // Проверка на null перед изменением состояния кнопки
             if (ClearMultiplierButton != null)
@@ -1928,7 +1927,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             // Если введенное значение некорректное, сбрасываем текст на "1" и выключаем кнопку сброса
             MultiplierTextBox.Text = "1";
-            _partDataService.UpdateQuantitiesWithMultiplier(_partsData, 1);
+            _partDataReader.UpdateQuantitiesWithMultiplier(_partsData, 1);
 
             if (ClearMultiplierButton != null) ClearMultiplierButton.IsEnabled = false;
         }
@@ -1938,7 +1937,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         // Сбрасываем множитель на 1
         MultiplierTextBox.Text = "1";
-        _partDataService.UpdateQuantitiesWithMultiplier(_partsData, 1);
+        _partDataReader.UpdateQuantitiesWithMultiplier(_partsData, 1);
 
         // Выключаем кнопку сброса
         ClearMultiplierButton.IsEnabled = false;
@@ -1946,7 +1945,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void UpdateDocumentInfo(Document? doc)
     {
-        var docInfo = _partDataService.GetDocumentInfo(doc);
+        var docInfo = _partDataReader.GetDocumentInfo(doc);
 
         if (string.IsNullOrEmpty(docInfo.DocumentType))
         {
@@ -1984,11 +1983,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _tokenService.UpdatePartsData(_partsData);
 
         // Отключаем кнопку "Конфликты" и очищаем список конфликтов
-        _scanService.ConflictAnalyzer.Clear();
+        _documentScanner.ConflictAnalyzer.Clear();
         ConflictFilesButton.IsEnabled = false;
 
         // Очищаем кеш документов
-        _scanService.DocumentCache.ClearCache();
+        _documentScanner.DocumentCache.ClearCache();
     }
 
     private void RemoveSelectedRows_Click(object sender, RoutedEventArgs e)
@@ -2047,7 +2046,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         foreach (var item in selectedItems)
         {
             var partNumber = item.PartNumber;
-            var fullPath = _scanService.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorService.GetPartDocumentFullPath(partNumber);
+            var fullPath = _documentScanner.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorManager.GetPartDocumentFullPath(partNumber);
 
             // Проверка на null перед использованием fullPath
             if (string.IsNullOrEmpty(fullPath))
@@ -2082,7 +2081,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         foreach (var item in selectedItems)
         {
             var partNumber = item.PartNumber;
-            var fullPath = _scanService.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorService.GetPartDocumentFullPath(partNumber);
+            var fullPath = _documentScanner.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorManager.GetPartDocumentFullPath(partNumber);
             var targetModelState = item.ModelState;
 
             // Проверка на null перед использованием fullPath
@@ -2094,7 +2093,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
 
             // Открываем файл с указанием состояния модели
-            _inventorService.OpenInventorDocument(fullPath, targetModelState);
+            _inventorManager.OpenInventorDocument(fullPath, targetModelState);
         }
     }
 
@@ -2107,7 +2106,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     public void FillPropertyData(string propertyName)
     {
-        _partDataService.FillPropertyData(_partsData, propertyName);
+        _partDataReader.FillPropertyData(_partsData, propertyName);
     }
 
     private void RemoveUserDefinedIPropertyColumn(string columnHeaderName)

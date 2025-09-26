@@ -2,7 +2,7 @@ using Inventor;
 
 namespace FlatPatternExporter.Core;
 
-public class DocumentCacheService
+public class DocumentCache
 {
     private readonly Dictionary<string, PartDocument> _documentCache = [];
     private readonly Dictionary<string, string> _partNumberToFullFileName = [];

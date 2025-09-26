@@ -29,13 +29,15 @@ FlatPatternExporter/
     ├── FPExport.ico                    # Иконка приложения
     │
     ├── Core/                           # Бизнес-логика и сервисы ядра
-    │   ├── InventorService.cs          # Работа с Inventor API
-    │   ├── ScanService.cs              # Сканирование документов и сборок
-    │   ├── DocumentCacheService.cs     # Управление кешем документов
+    │   ├── InventorManager.cs          # Работа с Inventor API
+    │   ├── DocumentScanner.cs          # Сканирование документов и сборок
+    │   ├── DocumentCache.cs            # Управление кешем документов
     │   ├── ConflictAnalyzer.cs         # Анализ конфликтов обозначений
-    │   ├── ExportService.cs            # Экспорт разверток в DXF
-    │   ├── ThumbnailService.cs         # Генерация миниатюр
-    │   └── PartDataService.cs          # Работа со свойствами деталей
+    │   ├── DxfExporter.cs              # Экспорт разверток в DXF
+    │   ├── ThumbnailGenerator.cs       # Генерация миниатюр
+    │   ├── PartDataReader.cs           # Работа со свойствами деталей
+    │   ├── PropertyManager.cs          # Менеджер свойств документов Inventor
+    │   └── ConflictDataProcessor.cs    # Обработка данных конфликтов
     │
     ├── Libraries/                      # Внешние независимые библиотеки
     │   ├── DxfRenderer.cs              # Библиотека рендеринга DXF файлов
@@ -47,14 +49,12 @@ FlatPatternExporter/
     ├── Models/                         # Модели данных
     │   └── LayerSettingsClasses.cs     # Модели настроек слоев с INotifyPropertyChanged
     │
-    ├── Services/                       # Сервисы и бизнес-логика
+    ├── Services/                       # Вспомогательные сервисы
     │   ├── PropertyMetadataRegistry.cs # Центральный реестр метаданных
-    │   ├── PropertyManager.cs          # Менеджер свойств Inventor API
     │   ├── TokenService.cs             # Обработка токенов имен файлов
     │   ├── SettingsManager.cs          # Персистентность настроек
     │   ├── TemplatePresetManager.cs    # Управление пресетами шаблонов
     │   ├── VersionInfoService.cs       # Получение версии приложения и коммитов
-    │   ├── ConflictDataProcessor.cs    # Обработка данных конфликтов партнамберов
     │   └── PropertyListManager.cs      # Управление списками свойств с фильтрацией
     │
     ├── Utilities/                      # Утилиты
@@ -128,13 +128,15 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 ### Ключевые компоненты
 
 **Core/ - Бизнес-логика ядра (namespace: FlatPatternExporter.Core):**
-- `InventorService` - работа с Inventor API (подключение, валидация документов, управление проектами)
-- `ScanService` - сканирование структуры документов, обход сборок, обработка BOM
-- `DocumentCacheService` - управление кешем документов для оптимизации производительности
+- `InventorManager` - работа с Inventor API (подключение, валидация документов, управление проектами)
+- `DocumentScanner` - сканирование структуры документов, обход сборок, обработка BOM
+- `DocumentCache` - управление кешем документов для оптимизации производительности
 - `ConflictAnalyzer` - анализ конфликтов обозначений деталей
-- `ExportService` - экспорт разверток в DXF с настройками слоев и оптимизацией
-- `ThumbnailService` - генерация миниатюр из DXF и документов Inventor
-- `PartDataService` - работа со свойствами деталей, чтение iProperties, заполнение данных
+- `DxfExporter` - экспорт разверток в DXF с настройками слоев и оптимизацией
+- `ThumbnailGenerator` - генерация миниатюр из DXF и документов Inventor
+- `PartDataReader` - работа со свойствами деталей, чтение iProperties, заполнение данных
+- `PropertyManager` - централизованное управление доступом к свойствам документов Inventor
+- `ConflictDataProcessor` - обработка и трансформация данных конфликтов
 - Классы: `ScanResult`, `ScanOptions`, `ScanProgress`, `PartConflictInfo`, `ExportContext`, `ExportOptions`, `DocumentInfo`
 
 **Libraries/ - Внешние независимые библиотеки:**
@@ -147,14 +149,12 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 **Models/ - Модели данных (namespace: FlatPatternExporter.Models):**
 - `LayerSettingsClasses` - модели настроек слоев (LayerSetting, LayerDefaults, валидаторы)
 
-**Services/ - Сервисы и бизнес-логика (namespace: FlatPatternExporter.Services):**
+**Services/ - Вспомогательные сервисы (namespace: FlatPatternExporter.Services):**
 - `PropertyMetadataRegistry` - централизованный реестр метаданных свойств
-- `PropertyManager` - работа с Inventor API, использует реестр
-- `TokenService` - специализированная обработка токенов
-- `SettingsManager` - персистентность настроек
+- `TokenService` - специализированная обработка токенов имен файлов
+- `SettingsManager` - персистентность настроек приложения
 - `TemplatePresetManager` - управление пресетами шаблонов
 - `VersionInfoService` - получение версии приложения и информации о коммитах
-- `ConflictDataProcessor` - обработка и трансформация данных конфликтов партнамберов
 - `PropertyListManager` - управление списками свойств с фильтрацией и состоянием
 
 **Utilities/ - Утилиты (namespace: FlatPatternExporter.Utilities):**
@@ -241,14 +241,14 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Содержит ссылки на PartDocument объекты, индексированные по номеру детали (PartNumber)
 - Дополнительно кеширует полные пути к файлам для быстрого доступа
 
-**Сервис DocumentCacheService (namespace: FlatPatternExporter.Core):**
+**Сервис DocumentCache (namespace: FlatPatternExporter.Core):**
 - Инкапсулирует всю логику кеширования
 - `AddDocumentToCache()` - добавление документа в кеш
 - `GetCachedPartDocument()` - получение документа из кеша
 - `GetCachedPartPath()` - получение пути к файлу детали
 - `ClearCache()` - очистка кеша
 
-**Точки заполнения кеша в ScanService:**
+**Точки заполнения кеша в DocumentScanner:**
 - `ProcessComponentOccurrences` - при методе обработки "Перебор"
 - `ProcessBOMRowSimple` - при методе обработки "Спецификация"
 - `ScanDocumentAsync` - для одиночных деталей
