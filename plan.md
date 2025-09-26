@@ -2,7 +2,7 @@
 
 ## 1. Анализ текущего состояния
 
-После анализа файлов `FlatPatternExporterMainWindow.xaml.cs` и `FlatPatternExporterMainWindow.xaml.part2.cs` выявлены следующие блоки бизнес-логики, смешанные с UI-кодом:
+После анализа файлов 'FlatPatternExporterMainWindow.xaml.cs' и 'FlatPatternExporterMainWindow.xaml.part2.cs' выявлены следующие блоки бизнес-логики, смешанные с UI-кодом:
 
 ### Основные функциональные блоки:
 1. **Работа с Inventor API** - подключение, валидация документов, получение свойств
@@ -202,7 +202,14 @@ FlatPatternExporter/
   - Удалены дублирующиеся методы и неиспользуемые свойства
   - Обновлены все ссылки на использование сервиса
   - Проект успешно скомпилирован
-- [ ] Этап 5: ExportService
+- [x] Этап 5: ExportService - **Завершён успешно**
+  - Создан файл Core/ExportService.cs
+  - Перенесены методы ExportDXF, PrepareExportContextAsync, PrepareForExport
+  - Перенесены вспомогательные методы PrepareExportOptions, IsFileLocked, IsValidPath
+  - Перенесены классы ExportContext и ExportOptions
+  - Обновлены зависимости в MainWindow
+  - Удалены перенесенные методы из исходных файлов
+  - Проект успешно скомпилирован
 - [ ] Этап 6: ThumbnailService
 - [ ] Этап 7: PartDataService
 - [ ] Этап 8: Финальная очистка

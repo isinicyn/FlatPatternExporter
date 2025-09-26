@@ -1,11 +1,8 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -55,6 +52,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Сервисы
     private readonly TokenService _tokenService = new();
     private readonly Core.ScanService _scanService;
+    private readonly Core.ExportService _exportService;
 
     // Данные и коллекции
     private readonly ObservableCollection<PartData> _partsData = [];
@@ -208,6 +206,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Инициализация CollectionViewSource для фильтрации
         // Инициализация сервисов
         _scanService = new Core.ScanService(_inventorService);
+        _exportService = new Core.ExportService(_inventorService, _scanService, _scanService.DocumentCache, _tokenService);
 
         _partsDataView = new CollectionViewSource { Source = _partsData };
         _partsDataView.Filter += PartsData_Filter;
@@ -870,9 +869,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// <summary>
     /// Централизованная подготовка контекста экспорта с показом ошибки
     /// </summary>
-    private async Task<ExportContext?> PrepareExportContextOrShowError(Document document, bool requireScan = true, bool showProgress = false)
+    private async Task<Core.ExportContext?> PrepareExportContextOrShowError(Document document, bool requireScan = true, bool showProgress = false)
     {
-        var context = await PrepareExportContextAsync(document, requireScan, showProgress);
+        var exportOptions = CreateExportOptions();
+        var context = await _exportService.PrepareExportContextAsync(document, requireScan, showProgress, _lastScannedDocument, exportOptions);
         if (!context.IsValid)
         {
             MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -881,6 +881,36 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             return null;
         }
         return context;
+    }
+
+    private Core.ExportOptions CreateExportOptions()
+    {
+        return new Core.ExportOptions
+        {
+            SelectedExportFolder = SelectedExportFolder,
+            FixedFolderPath = FixedFolderPath,
+            EnableSubfolder = EnableSubfolder,
+            SubfolderName = SubfolderNameTextBox.Text,
+            Multiplier = int.TryParse(MultiplierTextBox.Text, out var m) ? m : 1,
+            SelectedProcessingMethod = SelectedProcessingMethod,
+            ExcludeReferenceParts = ExcludeReferenceParts,
+            ExcludePurchasedParts = ExcludePurchasedParts,
+            ExcludePhantomParts = ExcludePhantomParts,
+            IncludeLibraryComponents = IncludeLibraryComponents,
+            OrganizeByMaterial = OrganizeByMaterial,
+            OrganizeByThickness = OrganizeByThickness,
+            EnableFileNameConstructor = EnableFileNameConstructor,
+            OptimizeDxf = OptimizeDxf,
+            EnableSplineReplacement = EnableSplineReplacement,
+            SelectedSplineReplacement = SelectedSplineReplacement,
+            SplineTolerance = SplineToleranceTextBox.Text,
+            SelectedAcadVersion = SelectedAcadVersion,
+            MergeProfilesIntoPolyline = MergeProfilesIntoPolyline,
+            RebaseGeometry = RebaseGeometry,
+            TrimCenterlines = TrimCenterlines,
+            LayerSettings = LayerSettings.ToList(),
+            ShowFileLockedDialogs = true
+        };
     }
 
     /// <summary>
@@ -1360,12 +1390,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         // Выполнение экспорта через централизованную обработку ошибок
         var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.PartNumber)).ToList();
+        var exportOptions = CreateExportOptions();
         var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
             var processedCount = 0;
             var skippedCount = 0;
-            await Task.Run(() => ExportDXF(partsDataList, context.TargetDirectory, context.Multiplier,
-                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts!.Token), _operationCts!.Token);
+            var exportProgress = new Progress<double>(UpdateExportProgress);
+            await Task.Run(() => _exportService.ExportDXF(partsDataList, context.TargetDirectory, context.Multiplier,
+                exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
 
             return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
         }, "экспорта");
@@ -1411,38 +1443,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
 
 
-    private void PrepareExportOptions(out string options)
-    {
-        var sb = new StringBuilder();
-
-        sb.Append($"AcadVersion={AcadVersionMapping.GetTranslatorCode(SelectedAcadVersion)}");
-
-        if (EnableSplineReplacement)
-        {
-            var splineTolerance = SplineToleranceTextBox.Text;
-
-            var decimalSeparator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-            splineTolerance = splineTolerance.Replace('.', decimalSeparator).Replace(',', decimalSeparator);
-
-            if (SelectedSplineReplacement == SplineReplacementType.Lines)
-                sb.Append($"&SimplifySplines=True&SplineTolerance={splineTolerance}");
-            else if (SelectedSplineReplacement == SplineReplacementType.Arcs)
-                sb.Append($"&SimplifySplines=True&SimplifyAsTangentArcs=True&SplineTolerance={splineTolerance}");
-        }
-        else
-        {
-            sb.Append("&SimplifySplines=False");
-        }
-
-        if (MergeProfilesIntoPolyline) sb.Append("&MergeProfilesIntoPolyline=True");
-
-        if (RebaseGeometry) sb.Append("&RebaseGeometry=True");
-
-        if (TrimCenterlines) // Проверяем новое поле TrimCenterlinesAtContour
-            sb.Append("&TrimCenterlinesAtContour=True");
-
-        options = sb.ToString();
-    }
 
     private void MultiplierTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
@@ -2217,16 +2217,6 @@ public class UIState
     };
 }
 
-// Контекст для экспорта
-public class ExportContext
-{
-    public string TargetDirectory { get; set; } = "";
-    public int Multiplier { get; set; } = 1;
-    public Dictionary<string, int> SheetMetalParts { get; set; } = [];
-    public bool GenerateThumbnails { get; set; } = true;
-    public bool IsValid { get; set; } = true;
-    public string ErrorMessage { get; set; } = "";
-}
 
 // Результат операции
 public class OperationResult

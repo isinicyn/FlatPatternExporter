@@ -2,22 +2,18 @@
 using System.Drawing.Imaging;
 using System.IO;
 using DxfRenderer;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using FlatPatternExporter.Converters;
 using FlatPatternExporter.Enums;
-using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
-using FlatPatternExporter.Utilities;
 using Inventor;
 using Svg.Skia;
 using Binding = System.Windows.Data.Binding;
 using File = System.IO.File;
 using MessageBox = System.Windows.MessageBox;
-using Path = System.IO.Path;
 using Style = System.Windows.Style;
 
 namespace FlatPatternExporter.UI.Windows;
@@ -252,134 +248,7 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    /// <summary>
-    /// Централизованная подготовка контекста экспорта
-    /// </summary>
-    private async Task<ExportContext> PrepareExportContextAsync(Document document, bool requireScan = true, bool showProgress = false)
-{
-    var context = new ExportContext();
-    
-    try
-    {
-        // Очищаем конфликты только если сменился документ (чтобы не показывать неактуальные конфликты)
-        if (requireScan && document != _lastScannedDocument)
-        {
-            _scanService.ConflictAnalyzer.Clear();
-        }
-        
-        // Проверяем документ на валидность
-        if (requireScan && document != _lastScannedDocument)
-        {
-            context.IsValid = false;
-            context.ErrorMessage = "Активный документ изменился. Пожалуйста, повторите сканирование перед экспортом.";
-            return context;
-        }
 
-        // Подготавливаем папку экспорта
-        if (!PrepareForExport(out var targetDir, out var multiplier))
-        {
-            context.IsValid = false;
-            context.ErrorMessage = "Ошибка при подготовке параметров экспорта";
-            return context;
-        }
-
-        context.TargetDirectory = targetDir;
-        context.Multiplier = multiplier;
-
-        // Используем ScanService для сканирования
-        var scanOptions = new Core.ScanOptions
-        {
-            ExcludeReferenceParts = ExcludeReferenceParts,
-            ExcludePurchasedParts = ExcludePurchasedParts,
-            ExcludePhantomParts = ExcludePhantomParts,
-            IncludeLibraryComponents = IncludeLibraryComponents
-        };
-
-        var scanResult = await _scanService.ScanDocumentAsync(
-            document,
-            SelectedProcessingMethod,
-            scanOptions,
-            showProgress ? new Progress<ScanProgress>() : null);
-
-        context.SheetMetalParts = scanResult.SheetMetalParts;
-        context.IsValid = true;
-    }
-    catch (Exception ex)
-    {
-        context.IsValid = false;
-        context.ErrorMessage = $"Ошибка при подготовке экспорта: {ex.Message}";
-    }
-
-    return context;
-}
-
-    private bool PrepareForExport(out string targetDir, out int multiplier)
-    {
-        targetDir = "";
-        multiplier = 1;
-
-        // Обрабатываем выбор папки экспорта через enum
-        switch (SelectedExportFolder)
-        {
-            case ExportFolderType.ChooseFolder:
-                // Открываем диалог выбора папки
-                var dialog = new FolderBrowserDialog();
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    targetDir = dialog.SelectedPath;
-                else
-                    return false;
-                break;
-            
-            case ExportFolderType.ComponentFolder:
-                // Папка компонента
-                targetDir = Path.GetDirectoryName(_thisApplication?.ActiveDocument?.FullFileName) ?? "";
-                break;
-            
-            case ExportFolderType.FixedFolder:
-                if (string.IsNullOrEmpty(_fixedFolderPath))
-                {
-                    MessageBox.Show("Выберите фиксированную папку.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-                targetDir = _fixedFolderPath;
-                break;
-            
-            case ExportFolderType.ProjectFolder:
-                try
-                {
-                    targetDir = _thisApplication?.DesignProjectManager?.ActiveDesignProject?.WorkspacePath ?? "";
-                    if (string.IsNullOrEmpty(targetDir))
-                    {
-                        MessageBox.Show("Не удалось получить путь проекта.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при получении папки проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-                break;
-            
-            case ExportFolderType.PartFolder:
-                // Обрабатывается отдельно в ExportDXF методе
-                break;
-        }
-
-        if (EnableSubfolder && !string.IsNullOrEmpty(SubfolderNameTextBox.Text))
-        {
-            targetDir = Path.Combine(targetDir!, SubfolderNameTextBox.Text);
-            if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
-        }
-
-        if (!int.TryParse(MultiplierTextBox.Text, out multiplier))
-        {
-            MessageBox.Show("Введите допустимое целое число для множителя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            return false;
-        }
-
-        return true;
-    }
 
     private async Task ExportWithoutScan()
     {
@@ -435,12 +304,15 @@ public partial class FlatPatternExporterMainWindow : Window
 
         // Выполнение экспорта через централизованную обработку ошибок
         context.GenerateThumbnails = false;
+        var exportOptions = CreateExportOptions();
+        exportOptions.ShowFileLockedDialogs = true;
         var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
             var processedCount = 0;
             var skippedCount = 0;
-            await Task.Run(() => ExportDXF(tempPartsDataList, context.TargetDirectory, context.Multiplier, 
-                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts!.Token), _operationCts!.Token);
+            var exportProgress = new Progress<double>(p => { });
+            await Task.Run(() => _exportService.ExportDXF(tempPartsDataList, context.TargetDirectory, context.Multiplier,
+                exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
             
             return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
         }, "быстрого экспорта");
@@ -500,12 +372,14 @@ public partial class FlatPatternExporterMainWindow : Window
         var stopwatch = Stopwatch.StartNew();
         
         // Выполнение экспорта через централизованную обработку ошибок
+        var exportOptions = CreateExportOptions();
         var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
             var processedCount = 0;
             var skippedCount = itemsWithoutFlatPattern.Count;
-            await Task.Run(() => ExportDXF(selectedItems, context.TargetDirectory, context.Multiplier, 
-                ref processedCount, ref skippedCount, context.GenerateThumbnails, _operationCts!.Token), _operationCts!.Token);
+            var exportProgress = new Progress<double>(UpdateExportProgress);
+            await Task.Run(() => _exportService.ExportDXF(selectedItems, context.TargetDirectory, context.Multiplier,
+                exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
             
             return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
         }, "экспорта выделенных деталей");
@@ -514,256 +388,6 @@ public partial class FlatPatternExporterMainWindow : Window
         CompleteOperation(result, OperationType.Export, ref _isExporting);
     }
 
-    private void ExportDXF(IEnumerable<PartData> partsDataList, string targetDir, int multiplier,
-        ref int processedCount, ref int skippedCount, bool generateThumbnails, CancellationToken cancellationToken = default)
-    {
-
-        var totalParts = partsDataList.Count();
-
-        Dispatcher.Invoke(() =>
-        {
-            UpdateExportProgress(0);
-        });
-
-        var localProcessedCount = processedCount;
-        var localSkippedCount = skippedCount;
-
-        foreach (var partData in partsDataList)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var partNumber = partData.PartNumber;
-            var qty = partData.IsOverridden ? partData.Quantity : partData.OriginalQuantity * multiplier;
-
-            // Обработка для PartFolder через свойство
-            if (SelectedExportFolder == ExportFolderType.PartFolder)
-            {
-                var partPath = _scanService.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorService.GetPartDocumentFullPath(partNumber);
-                if (!string.IsNullOrEmpty(partPath))
-                {
-                    targetDir = Path.GetDirectoryName(partPath) ?? "";
-                }
-                else
-                {
-                    targetDir = "";
-                }
-            }
-
-            PartDocument? partDoc = null;
-            try
-            {
-                partDoc = _scanService.DocumentCache.GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
-                if (partDoc == null) throw new Exception("Файл детали не найден или не может быть открыт");
-
-                var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
-                var material = partData.Material;
-                var thickness = partData.Thickness;
-
-                var materialDir = OrganizeByMaterial ? Path.Combine(targetDir, material) : targetDir;
-                if (!Directory.Exists(materialDir)) Directory.CreateDirectory(materialDir);
-
-                var thicknessDir = OrganizeByThickness
-                    ? Path.Combine(materialDir, thickness)
-                    : materialDir;
-                if (!Directory.Exists(thicknessDir)) Directory.CreateDirectory(thicknessDir);
-
-                // Генерируем имя файла на основе конструктора
-                string fileName;
-                if (EnableFileNameConstructor && !string.IsNullOrEmpty(_tokenService.FileNameTemplate))
-                {
-                    fileName = _tokenService.ResolveTemplate(_tokenService.FileNameTemplate, partData);
-                }
-                else
-                {
-                    fileName = partNumber;
-                }
-
-                var filePath = Path.Combine(thicknessDir, fileName + ".dxf");
-
-                if (!IsValidPath(filePath)) continue;
-
-                var exportSuccess = false;
-
-                if (smCompDef.HasFlatPattern)
-                {
-                    var flatPattern = smCompDef.FlatPattern;
-                    var oDataIO = flatPattern.DataIO;
-
-                    try
-                    {
-                        string? options = null;
-                        Dispatcher.Invoke(() => PrepareExportOptions(out options));
-
-                        // Интеграция настроек слоев
-                        var layerOptionsBuilder = new StringBuilder();
-                        var invisibleLayersBuilder = new StringBuilder();
-
-                        foreach (var layer in LayerSettings) // Используем настройки слоев
-                        {
-                            if (layer.CanBeHidden && !layer.IsChecked)
-                            {
-                                invisibleLayersBuilder.Append($"{layer.LayerName};");
-                                continue;
-                            }
-
-                            if (!string.IsNullOrWhiteSpace(layer.CustomName))
-                                layerOptionsBuilder.Append($"&{layer.DisplayName}={layer.CustomName}");
-
-                            if (layer.SelectedLineType != "Default")
-                                layerOptionsBuilder.Append(
-                                    $"&{layer.DisplayName}LineType={LayerSettingsHelper.GetLineTypeValue(layer.SelectedLineType)}");
-
-                            if (layer.SelectedColor != "White")
-                                layerOptionsBuilder.Append(
-                                    $"&{layer.DisplayName}Color={LayerSettingsHelper.GetColorValue(layer.SelectedColor)}");
-                        }
-
-                        if (invisibleLayersBuilder.Length > 0)
-                        {
-                            invisibleLayersBuilder.Length -= 1; // Убираем последний символ ";"
-                            layerOptionsBuilder.Append($"&InvisibleLayers={invisibleLayersBuilder}");
-                        }
-
-                        // Объединяем общие параметры и параметры слоев
-                        options += layerOptionsBuilder.ToString();
-
-                        var dxfOptions = $"FLAT PATTERN DXF?{options}";
-
-                        // Debugging output
-                        Debug.WriteLine($"DXF Options: {dxfOptions}");
-
-                        // Создаем файл, если он не существует
-                        if (!File.Exists(filePath)) File.Create(filePath).Close();
-
-                        // Проверка на занятость файла
-                        if (IsFileLocked(filePath))
-                        {
-                            var result = MessageBox.Show(
-                                $"Файл {filePath} занят другим приложением. Прервать операцию?",
-                                "Предупреждение",
-                                MessageBoxButton.YesNo,
-                                MessageBoxImage.Warning,
-                                MessageBoxResult.No // Устанавливаем "No" как значение по умолчанию
-                            );
-
-                            if (result == MessageBoxResult.Yes)
-                            {
-                                throw new OperationCanceledException(); // Прерываем операцию
-                            }
-
-                            while (IsFileLocked(filePath))
-                            {
-                                var waitResult = MessageBox.Show(
-                                    "Ожидание разблокировки файла. Возможно файл открыт в программе просмотра. Закройте файл и нажмите OK.",
-                                    "Информация",
-                                    MessageBoxButton.OKCancel,
-                                    MessageBoxImage.Information,
-                                    MessageBoxResult.Cancel // Устанавливаем "Cancel" как значение по умолчанию
-                                );
-
-                                if (waitResult == MessageBoxResult.Cancel)
-                                {
-                                    throw new OperationCanceledException(); // Прерываем операцию
-                                }
-
-                                Thread.Sleep(1000); // Ожидание 1 секунды перед повторной проверкой
-                            }
-
-                            cancellationToken.ThrowIfCancellationRequested();
-                        }
-
-                        oDataIO.WriteDataToFile(dxfOptions, filePath);
-                        exportSuccess = true;
-
-                        // Оптимизация DXF если включена настройка и версия не R12
-                        if (OptimizeDxf && exportSuccess)
-                        {
-                            AcadVersionType selectedEnumVersion = AcadVersionType.V2000;
-                            Dispatcher.Invoke(() => { selectedEnumVersion = SelectedAcadVersion; });
-                            if (AcadVersionMapping.SupportsOptimization(selectedEnumVersion))
-                            {
-                                DxfOptimizer.OptimizeDxfFile(filePath, selectedEnumVersion);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // Обработка ошибок экспорта DXF
-                        Debug.WriteLine($"Ошибка экспорта DXF: {ex.Message}");
-                    }
-                }
-
-                BitmapImage? dxfPreview = null;
-                if (generateThumbnails)
-                {
-                    AcadVersionType selectedEnumVersion = AcadVersionType.V2000;
-                    Dispatcher.Invoke(() => { selectedEnumVersion = SelectedAcadVersion; });
-                    if (AcadVersionMapping.SupportsOptimization(selectedEnumVersion))
-                    {
-                        dxfPreview = GenerateDxfThumbnails(thicknessDir, partNumber);
-                    }
-                }
-
-                Dispatcher.Invoke(() =>
-                {
-                    partData.ProcessingStatus = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Error;
-                    partData.DxfPreview = dxfPreview;
-                });
-
-                if (exportSuccess)
-                    localProcessedCount++;
-                else
-                    localSkippedCount++;
-
-                Dispatcher.Invoke(() => 
-                { 
-                    UpdateExportProgress(totalParts > 0 ? (double)localProcessedCount / totalParts * 100 : 0);
-                });
-            }
-            catch (Exception ex)
-            {
-                localSkippedCount++;
-                Debug.WriteLine($"Ошибка обработки детали: {ex.Message}");
-            }
-        }
-
-        processedCount = localProcessedCount;
-        skippedCount = localSkippedCount;
-
-        Dispatcher.Invoke(() =>
-        {
-            UpdateExportProgress(100);
-        });
-    }
-
-    private static bool IsFileLocked(string filePath)
-    {
-        try
-        {
-            using var stream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-            stream.Close();
-        }
-        catch (IOException)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-
-    private static bool IsValidPath(string path)
-    {
-        try
-        {
-            _ = new FileInfo(path);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
 
     private void MultiplierTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {

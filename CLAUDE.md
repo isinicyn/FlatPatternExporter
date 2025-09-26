@@ -32,7 +32,8 @@ FlatPatternExporter/
     │   ├── InventorService.cs          # Работа с Inventor API
     │   ├── ScanService.cs              # Сканирование документов и сборок
     │   ├── DocumentCacheService.cs     # Управление кешем документов
-    │   └── ConflictAnalyzer.cs         # Анализ конфликтов обозначений
+    │   ├── ConflictAnalyzer.cs         # Анализ конфликтов обозначений
+    │   └── ExportService.cs            # Экспорт разверток в DXF
     │
     ├── Libraries/                      # Внешние независимые библиотеки
     │   ├── DxfRenderer.cs              # Библиотека рендеринга DXF файлов
@@ -129,7 +130,8 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `ScanService` - сканирование структуры документов, обход сборок, обработка BOM
 - `DocumentCacheService` - управление кешем документов для оптимизации производительности
 - `ConflictAnalyzer` - анализ конфликтов обозначений деталей
-- Классы: `ScanResult`, `ScanOptions`, `ScanProgress`, `PartConflictInfo`
+- `ExportService` - экспорт разверток в DXF с настройками слоев и оптимизацией
+- Классы: `ScanResult`, `ScanOptions`, `ScanProgress`, `PartConflictInfo`, `ExportContext`, `ExportOptions`
 
 **Libraries/ - Внешние независимые библиотеки:**
 - `DxfRenderer` - библиотека рендеринга DXF файлов (namespace: DxfRenderer)
