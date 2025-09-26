@@ -103,7 +103,7 @@ public partial class FlatPatternExporterMainWindow : Window
     // Перегрузка для сборок - открывает документ по partNumber
     private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber, bool loadThumbnail = true)
     {
-        var partDoc = GetCachedPartDocument(partNumber) ?? OpenPartDocument(partNumber);
+        var partDoc = GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
         if (partDoc == null) return null!;
         
         return await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
@@ -523,25 +523,6 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private bool IsLibraryComponent(string fullFileName)
-    {
-        try
-        {
-            if (_thisApplication?.DesignProjectManager == null)
-                return false;
-                
-            _thisApplication.DesignProjectManager.IsFileInActiveProject(
-                fullFileName, 
-                out var projectPathType, 
-                out _);
-                
-            return projectPathType == LocationTypeEnum.kLibraryLocation;
-        }
-        catch
-        {
-            return false;
-        }
-    }
 
     private bool ShouldExcludeComponent(BOMStructureEnum bomStructure, string fullFileName)
     {
@@ -554,7 +535,7 @@ public partial class FlatPatternExporterMainWindow : Window
         if (ExcludePhantomParts && bomStructure == BOMStructureEnum.kPhantomBOMStructure)
             return true;
 
-        if (!IncludeLibraryComponents && !string.IsNullOrEmpty(fullFileName) && IsLibraryComponent(fullFileName))
+        if (!IncludeLibraryComponents && !string.IsNullOrEmpty(fullFileName) && _inventorService.IsLibraryComponent(fullFileName))
             return true;
 
         return false;
@@ -622,7 +603,7 @@ public partial class FlatPatternExporterMainWindow : Window
             var partDoc = (PartDocument)document;
             
             // Проверяем, не является ли деталь библиотечным компонентом
-            if (!IncludeLibraryComponents && IsLibraryComponent(partDoc.FullFileName))
+            if (!IncludeLibraryComponents && _inventorService.IsLibraryComponent(partDoc.FullFileName))
             {
                 // Библиотечный компонент исключается
             }
@@ -880,7 +861,7 @@ public partial class FlatPatternExporterMainWindow : Window
             // Обработка для PartFolder через свойство
             if (SelectedExportFolder == ExportFolderType.PartFolder)
             {
-                var partPath = GetPartDocumentFullPath(partNumber);
+                var partPath = _partNumberToFullFileName.TryGetValue(partNumber, out var cachedPath) ? cachedPath : _inventorService.GetPartDocumentFullPath(partNumber);
                 if (!string.IsNullOrEmpty(partPath))
                 {
                     targetDir = Path.GetDirectoryName(partPath) ?? "";
@@ -894,7 +875,7 @@ public partial class FlatPatternExporterMainWindow : Window
             PartDocument? partDoc = null;
             try
             {
-                partDoc = GetCachedPartDocument(partNumber) ?? OpenPartDocument(partNumber);
+                partDoc = GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
                 if (partDoc == null) throw new Exception("Файл детали не найден или не может быть открыт");
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
@@ -1093,29 +1074,6 @@ public partial class FlatPatternExporterMainWindow : Window
         return false;
     }
 
-    private PartDocument? OpenPartDocument(string partNumber)
-    {
-        // Сначала проверяем кеш
-        var cachedDoc = GetCachedPartDocument(partNumber);
-        if (cachedDoc != null) return cachedDoc;
-
-        var docs = _thisApplication?.Documents;
-        if (docs == null) return null;
-
-        // Попытка найти открытый документ
-        foreach (Document doc in docs)
-            if (doc is PartDocument pd)
-            {
-                var mgr = new Services.PropertyManager((Document)pd);
-                if (mgr.GetMappedProperty("PartNumber") == partNumber)
-                    return pd; // Возвращаем найденный открытый документ
-            }
-
-        // Если документ не найден
-        MessageBox.Show($"Документ с номером детали {partNumber} не найден среди открытых.", "Ошибка",
-            MessageBoxButton.OK, MessageBoxImage.Error);
-        return null; // Возвращаем null, если документ не найден
-    }
 
     private static bool IsValidPath(string path)
     {
@@ -1268,7 +1226,7 @@ public partial class FlatPatternExporterMainWindow : Window
         foreach (var item in selectedItems)
         {
             var partNumber = item.PartNumber;
-            var fullPath = GetPartDocumentFullPath(partNumber);
+            var fullPath = _partNumberToFullFileName.TryGetValue(partNumber, out var cachedPath) ? cachedPath : _inventorService.GetPartDocumentFullPath(partNumber);
 
             // Проверка на null перед использованием fullPath
             if (string.IsNullOrEmpty(fullPath))
@@ -1303,7 +1261,7 @@ public partial class FlatPatternExporterMainWindow : Window
         foreach (var item in selectedItems)
         {
             var partNumber = item.PartNumber;
-            var fullPath = GetPartDocumentFullPath(partNumber);
+            var fullPath = _partNumberToFullFileName.TryGetValue(partNumber, out var cachedPath) ? cachedPath : _inventorService.GetPartDocumentFullPath(partNumber);
             var targetModelState = item.ModelState;
 
             // Проверка на null перед использованием fullPath
@@ -1315,67 +1273,10 @@ public partial class FlatPatternExporterMainWindow : Window
             }
 
             // Открываем файл с указанием состояния модели
-            OpenInventorDocument(fullPath, targetModelState);
+            _inventorService.OpenInventorDocument(fullPath, targetModelState);
         }
     }
-    private string? GetPartDocumentFullPath(string partNumber)
-    {
-        // Сначала проверяем кеш
-        if (_partNumberToFullFileName.TryGetValue(partNumber, out var cachedPath))
-            return cachedPath;
 
-        var docs = _thisApplication?.Documents;
-        if (docs == null) return null;
-
-        // Попытка найти открытый документ
-        foreach (Document doc in docs)
-            if (doc is PartDocument pd)
-            {
-                var mgr = new Services.PropertyManager((Document)pd);
-                if (mgr.GetMappedProperty("PartNumber") == partNumber)
-                    return pd.FullFileName; // Возвращаем полный путь найденного документа
-            }
-
-        // Если документ не найден среди открытых
-        MessageBox.Show($"Документ с номером детали {partNumber} не найден среди открытых.", "Ошибка",
-            MessageBoxButton.OK, MessageBoxImage.Error);
-        return null; // Возвращаем null, если документ не найден
-    }
-
-    /// <summary>
-    /// Централизованный метод для открытия файла в Inventor с указанием состояния модели
-    /// </summary>
-    /// <param name="filePath">Полный путь к файлу</param>
-    /// <param name="modelState">Имя состояния модели (может быть null или пустая строка)</param>
-    public void OpenInventorDocument(string filePath, string? modelState = null)
-    {
-        if (!File.Exists(filePath))
-        {
-            MessageBox.Show($"Файл по пути {filePath} не найден.", "Ошибка", 
-                MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
-        }
-
-        try
-        {
-            if (!string.IsNullOrEmpty(modelState))
-            {
-                // Используем синтаксис с угловыми скобками для указания состояния модели
-                var pathWithModelState = $"{filePath}<{modelState}>";
-                _thisApplication?.Documents?.Open(pathWithModelState);
-            }
-            else
-            {
-                // Открываем обычным способом, если состояние модели не указано
-                _thisApplication?.Documents?.Open(filePath);
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Ошибка при открытии файла по пути {filePath}: {ex.Message}", "Ошибка",
-                MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
 
     private void PartsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -1405,7 +1306,7 @@ public partial class FlatPatternExporterMainWindow : Window
 
         foreach (var partData in _partsData)
         {
-            var partDoc = GetCachedPartDocument(partData.PartNumber) ?? OpenPartDocument(partData.PartNumber);
+            var partDoc = GetCachedPartDocument(partData.PartNumber) ?? _inventorService.OpenPartDocument(partData.PartNumber);
             if (partDoc != null)
             {
                 var mgr = new Services.PropertyManager((Document)partDoc);

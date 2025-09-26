@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using DefineEdge;
+using FlatPatternExporter.Core;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
@@ -50,7 +51,8 @@ public class SplineReplacementItem
 public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
     // Inventor API
-    public Inventor.Application? _thisApplication;
+    private readonly InventorService _inventorService = new();
+    public Inventor.Application? _thisApplication => _inventorService.Application;
     private Document? _lastScannedDocument;
     
     // Сервисы
@@ -198,8 +200,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             [Key.F8] = () => { StartClearList(); return Task.CompletedTask; },
             [Key.F9] = StartQuickExportAsync
         };
-        InitializeInventor();
-        SetProjectFolderInfo(); // Инициализация папки проекта при запуске
+        _inventorService.InitializeInventor();
+        UpdateProjectInfo(); // Инициализация папки проекта при запуске
         PartsDataGrid.ItemsSource = _partsData;
         PartsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
@@ -774,7 +776,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 ExportProgressValue = state.ProgressValue;
         }
         
-        SetInventorUserInterfaceState(state.InventorUIDisabled);
+        _inventorService.SetInventorUserInterfaceState(state.InventorUIDisabled);
     }
 
     /// <summary>
@@ -857,24 +859,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    /// <summary>
-    /// Централизованный метод для управления интерфейсом Inventor
-    /// </summary>
-    /// <param name="disableInteraction">true - отключить взаимодействие с пользователем, false - включить</param>
-    public void SetInventorUserInterfaceState(bool disableInteraction)
-    {
-        if (_thisApplication?.UserInterfaceManager != null)
-        {
-            _thisApplication.UserInterfaceManager.UserInteractionDisabled = disableInteraction;
-        }
-    }
 
     /// <summary>
     /// Централизованная валидация активного документа с показом ошибки
     /// </summary>
     private DocumentValidationResult? ValidateDocumentOrShowError()
     {
-        var validation = ValidateActiveDocument();
+        var validation = _inventorService.ValidateActiveDocument();
         if (!validation.IsValid)
         {
             MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -1293,105 +1284,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         );
     }
 
-    /// <summary>
-    /// Централизованная валидация активного документа
-    /// </summary>
-    private DocumentValidationResult ValidateActiveDocument()
-    {
-        if (!EnsureInventorConnection())
-        {
-            return new DocumentValidationResult
-            {
-                IsValid = false,
-                ErrorMessage = "Не удалось подключиться к Inventor"
-            };
-        }
 
-        var doc = _thisApplication?.ActiveDocument;
-        if (doc == null)
-        {
-            return new DocumentValidationResult
-            {
-                IsValid = false,
-                ErrorMessage = "Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова."
-            };
-        }
-
-        var docType = doc.DocumentType switch
-        {
-            DocumentTypeEnum.kAssemblyDocumentObject => DocumentType.Assembly,
-            DocumentTypeEnum.kPartDocumentObject => DocumentType.Part,
-            _ => DocumentType.Invalid
-        };
-
-        if (docType == DocumentType.Invalid)
-        {
-            return new DocumentValidationResult
-            {
-                IsValid = false,
-                ErrorMessage = "Откройте сборку или деталь для работы с приложением."
-            };
-        }
-
-        return new DocumentValidationResult
-        {
-            Document = doc,
-            DocType = docType,
-            IsValid = true,
-            DocumentTypeName = docType == DocumentType.Assembly ? "Сборка" : "Деталь"
-        };
-    }
-
-    /// <summary>
-    /// Переподключается к Inventor каждый раз
-    /// </summary>
-    /// <returns>true если Inventor доступен, false если нет</returns>
-    private bool EnsureInventorConnection()
-    {
-        try
-        {
-            _thisApplication = (Inventor.Application)MarshalCore.GetActiveObject("Inventor.Application");
-            if (_thisApplication != null)
-            {
-                InitializeProjectData();
-                return true;
-            }
-        }
-        catch (COMException)
-        {
-            MessageBox.Show(
-                "Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.", "Ошибка",
-                MessageBoxButton.OK, MessageBoxImage.Error);
-            _thisApplication = null;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("Произошла ошибка при подключении к Inventor: " + ex.Message, "Ошибка", MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            _thisApplication = null;
-        }
-
-        return false;
-    }
-
-    private void InitializeInventor()
-    {
-        EnsureInventorConnection();
-    }
-    private void InitializeProjectData()
-    {
-        if (_thisApplication != null)
-        {
-            try
-            {
-                SetProjectFolderInfo();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при инициализации данных проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-    }
     private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
         // Проверяем, есть ли обработчик для нажатой клавиши
@@ -1709,7 +1602,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 var partDoc = (PartDocument)document;
                 
                 // Проверяем, не является ли деталь библиотечным компонентом
-                if (!IncludeLibraryComponents && IsLibraryComponent(partDoc.FullFileName))
+                if (!IncludeLibraryComponents && _inventorService.IsLibraryComponent(partDoc.FullFileName))
                 {
                     result.ProcessedCount = 0;
                     return result;
@@ -1793,7 +1686,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
 
         // Создаем и показываем окно с деталями конфликтов
-        var conflictWindow = new ConflictDetailsWindow(_conflictFileDetails, OpenInventorDocument)
+        var conflictWindow = new ConflictDetailsWindow(_conflictFileDetails, _inventorService.OpenInventorDocument)
         {
             Owner = this
         };
@@ -1812,7 +1705,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Особая логика для ProjectFolder
         if (SelectedExportFolder == ExportFolderType.ProjectFolder)
         {
-            SetProjectFolderInfo(); // Устанавливаем информацию о проекте при выборе
+            UpdateProjectInfo(); // Устанавливаем информацию о проекте при выборе
         }
     }
 
@@ -1836,23 +1729,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (textBox != null)
             textBox.CaretIndex = Math.Max(caretIndex, 0);
     }
-    // Метод для получения и установки информации о проекте
-    private void SetProjectFolderInfo()
+    // Метод для обновления информации о проекте в UI
+    private void UpdateProjectInfo()
     {
-        if (_thisApplication == null) return;
-
-        try
-        {
-            var activeProject = _thisApplication.DesignProjectManager.ActiveDesignProject;
-            var projectName = activeProject.Name;
-            var projectWorkspacePath = activeProject.WorkspacePath;
-            ProjectNameRun.Text = projectName;
-            ProjectStackPanelItem.ToolTip = projectWorkspacePath;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Не удалось получить информацию о проекте: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        _inventorService.SetProjectFolderInfo();
+        ProjectNameRun.Text = _inventorService.ProjectName;
+        ProjectStackPanelItem.ToolTip = _inventorService.ProjectWorkspacePath;
     }
 
     private void InitializeAcadVersions()
