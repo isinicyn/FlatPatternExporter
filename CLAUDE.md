@@ -62,7 +62,7 @@ FlatPatternExporter/
     │
     ├── UI/                             # Пользовательский интерфейс
     │   ├── Windows/                    # Окна приложения
-    │   │   ├── FlatPatternExporterMainWindow.xaml(.cs,.part2.cs)
+    │   │   ├── FlatPatternExporterMainWindow.xaml(.cs)
     │   │   ├── AboutWindow.xaml(.cs)
     │   │   ├── ConflictDetailsWindow.xaml(.cs)
     │   │   └── SelectIPropertyWindow.xaml(.cs)
