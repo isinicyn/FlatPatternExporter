@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using FlatPatternExporter.Converters;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Services;
 using Inventor;
@@ -16,106 +14,6 @@ namespace FlatPatternExporter.UI.Windows;
 public partial class FlatPatternExporterMainWindow : Window
 {
 
-    /// <summary>
-    /// Общий метод для чтения всех свойств из документа с использованием PropertyManager
-    /// </summary>
-    private static void ReadAllPropertiesFromPart(PartDocument _, PartData partData, Services.PropertyManager mgr)
-    {
-        partData.FileName = mgr.GetFileName();
-        partData.FullFileName = mgr.GetFullFileName();
-        partData.ModelState = mgr.GetModelState();
-        partData.HasFlatPattern = mgr.HasFlatPattern();
-        partData.Thickness = mgr.GetThickness();
-
-        // Устанавливаем состояния выражений для всех редактируемых свойств
-        SetExpressionStatesForAllProperties(partData, mgr);
-
-        // Автоматически заполняем все свойства типа IProperty из реестра
-        foreach (var property in PropertyMetadataRegistry.Properties.Values
-                     .Where(p => p.Type == PropertyMetadataRegistry.PropertyType.IProperty))
-        {
-            var value = mgr.GetMappedProperty(property.InternalName);
-            var propInfo = typeof(PartData).GetProperty(property.InternalName);
-            
-            if (propInfo != null && !string.IsNullOrEmpty(value))
-            {
-                propInfo.SetValue(partData, value);
-            }
-        }
-    }
-
-    // Перегрузка для сборок - открывает документ по partNumber
-    private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber, bool loadThumbnail = true)
-    {
-        var partDoc = _scanService.DocumentCache.GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
-        if (partDoc == null) return null!;
-        
-        return await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
-    }
-
-    // Основной метод - работает с уже открытым документом  
-    private async Task<PartData> GetPartDataAsync(PartDocument partDoc, int quantity, int itemNumber, bool loadThumbnail = true)
-    {
-
-        // Создаем новый объект PartData
-        var partData = new PartData
-        {
-            Item = itemNumber,
-            
-            OriginalQuantity = quantity
-        };
-
-        // Создаем единый экземпляр PropertyManager для всех операций
-        var mgr = new Services.PropertyManager((Document)partDoc);
-        
-        ReadAllPropertiesFromPart(partDoc, partData, mgr);
-
-        foreach (var userDefinedProperty in PropertyMetadataRegistry.UserDefinedProperties)
-        {
-            var value = mgr.GetMappedProperty(userDefinedProperty.InternalName);
-            // Используем ColumnHeader как ключ для совместимости с биндингами DataGrid
-            partData.UserDefinedProperties[userDefinedProperty.ColumnHeader] = value;
-        }
-
-        if (loadThumbnail)
-        {
-            partData.Preview = await _thumbnailService.GetThumbnailAsync(partDoc, Dispatcher);
-        }
-
-        partData.SetQuantityInternal(quantity);
-        
-        return partData;
-    }
-
-    /// <summary>
-    /// Устанавливает состояния выражений для всех редактируемых свойств
-    /// </summary>
-    private static void SetExpressionStatesForAllProperties(PartData partData, Services.PropertyManager mgr)
-    {
-        partData.BeginExpressionBatch();
-        try
-        {
-            foreach (var property in PropertyMetadataRegistry.GetEditableProperties())
-            {
-                var isExpression = mgr.IsMappedPropertyExpression(property);
-                partData.SetPropertyExpressionState(property, isExpression);
-            }
-            foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
-            {
-                var isExpression = mgr.IsMappedPropertyExpression(userProperty.InternalName);
-                partData.SetPropertyExpressionState($"UserDefinedProperties[{userProperty.ColumnHeader}]", isExpression);
-            }
-        }
-        finally
-        {
-            partData.EndExpressionBatch();
-        }
-    }
-
-
-
-
-
     private void SelectFixedFolderButton_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new FolderBrowserDialog();
@@ -124,8 +22,6 @@ public partial class FlatPatternExporterMainWindow : Window
             FixedFolderPath = dialog.SelectedPath;
         }
     }
-
-
 
     private async Task ExportWithoutScan()
     {
@@ -164,8 +60,8 @@ public partial class FlatPatternExporterMainWindow : Window
                 SetUIState(progressState);
                 await Task.Delay(1); // Минимальная задержка для обновления UI
             }
-            
-            var partData = await GetPartDataAsync(part.Key, part.Value * context.Multiplier, itemCounter++, loadThumbnail: false);
+
+            var partData = await _partDataService.GetPartDataAsync(part.Key, part.Value * context.Multiplier, itemCounter++, loadThumbnail: false);
             if (partData != null)
             {
                 // Не вызываем SetQuantityInternal повторно - количество уже установлено правильно в GetPartDataAsync
@@ -265,12 +161,11 @@ public partial class FlatPatternExporterMainWindow : Window
         CompleteOperation(result, OperationType.Export, ref _isExporting);
     }
 
-
     private void MultiplierTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
         {
-            UpdateQuantitiesWithMultiplier(multiplier);
+            _partDataService.UpdateQuantitiesWithMultiplier(_partsData, multiplier);
 
             // Проверка на null перед изменением состояния кнопки
             if (ClearMultiplierButton != null)
@@ -280,7 +175,7 @@ public partial class FlatPatternExporterMainWindow : Window
         {
             // Если введенное значение некорректное, сбрасываем текст на "1" и выключаем кнопку сброса
             MultiplierTextBox.Text = "1";
-            UpdateQuantitiesWithMultiplier(1);
+            _partDataService.UpdateQuantitiesWithMultiplier(_partsData, 1);
 
             if (ClearMultiplierButton != null) ClearMultiplierButton.IsEnabled = false;
         }
@@ -290,15 +185,17 @@ public partial class FlatPatternExporterMainWindow : Window
     {
         // Сбрасываем множитель на 1
         MultiplierTextBox.Text = "1";
-        UpdateQuantitiesWithMultiplier(1);
+        _partDataService.UpdateQuantitiesWithMultiplier(_partsData, 1);
 
         // Выключаем кнопку сброса
         ClearMultiplierButton.IsEnabled = false;
     }
 
-    private void UpdateDocumentInfo(string documentType, Document? doc)
+    private void UpdateDocumentInfo(Document? doc)
     {
-        if (string.IsNullOrEmpty(documentType) || doc == null)
+        var docInfo = _partDataService.GetDocumentInfo(doc);
+
+        if (string.IsNullOrEmpty(docInfo.DocumentType))
         {
             var noDocState = UIState.Initial;
             noDocState.ProgressText = "Информация о документе не доступна";
@@ -311,21 +208,14 @@ public partial class FlatPatternExporterMainWindow : Window
             return;
         }
 
-        var mgr = new Services.PropertyManager(doc);
-        var partNumber = mgr.GetMappedProperty("PartNumber");
-        var description = mgr.GetMappedProperty("Description");
-        var modelStateInfo = mgr.GetModelState();
-        var isPrimaryModelState = mgr.IsPrimaryModelState();
-
         // Заполняем отдельные поля в блоке информации о документе
-        DocumentTypeLabel.Text = documentType;
-        PartNumberLabel.Text = partNumber;
-        DescriptionLabel.Text = description;
-        ModelStateLabel.Text = modelStateInfo;
-        
-        // Устанавливаем свойство для триггера стиля
-        IsPrimaryModelState = isPrimaryModelState;
+        DocumentTypeLabel.Text = docInfo.DocumentType;
+        PartNumberLabel.Text = docInfo.PartNumber;
+        DescriptionLabel.Text = docInfo.Description;
+        ModelStateLabel.Text = docInfo.ModelState;
 
+        // Устанавливаем свойство для триггера стиля
+        IsPrimaryModelState = docInfo.IsPrimaryModelState;
     }
 
     private void ClearList_Click(object sender, RoutedEventArgs e)
@@ -335,7 +225,7 @@ public partial class FlatPatternExporterMainWindow : Window
         SetUIState(UIState.CreateClearedState());
 
         // Обнуляем информацию о документе
-        UpdateDocumentInfo("", null);
+        UpdateDocumentInfo(null);
         
         // Обновляем TokenService для отображения placeholder'ов
         _tokenService.UpdatePartsData(_partsData);
@@ -466,37 +356,7 @@ public partial class FlatPatternExporterMainWindow : Window
 
     public void FillPropertyData(string propertyName)
     {
-        // Если нет данных для заполнения, выходим
-        if (_partsData.Count == 0)
-            return;
-
-        // Проверяем, является ли это стандартным свойством через реестр
-        var isStandardProperty = PropertyMetadataRegistry.Properties.ContainsKey(propertyName);
-
-        // Если это стандартное свойство, то оно уже загружено - данные готовы
-        if (isStandardProperty)
-        {
-            return;
-        }
-
-        // Для User Defined Properties загружаем данные из файлов
-        var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == propertyName);
-        var columnHeader = userProperty?.ColumnHeader ?? propertyName;
-
-        foreach (var partData in _partsData)
-        {
-            var partDoc = _scanService.DocumentCache.GetCachedPartDocument(partData.PartNumber) ?? _inventorService.OpenPartDocument(partData.PartNumber);
-            if (partDoc != null)
-            {
-                var mgr = new Services.PropertyManager((Document)partDoc);
-                var value = mgr.GetMappedProperty(propertyName) ?? "";
-                partData.AddUserDefinedProperty(columnHeader, value);
-                
-                // Устанавливаем состояние выражения для User Defined свойства
-                var isExpression = mgr.IsMappedPropertyExpression(propertyName);
-                partData.SetPropertyExpressionState($"UserDefinedProperties[{columnHeader}]", isExpression);
-            }
-        }
+        _partDataService.FillPropertyData(_partsData, propertyName);
     }
 
     private void RemoveUserDefinedIPropertyColumn(string columnHeaderName)

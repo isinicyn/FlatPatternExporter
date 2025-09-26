@@ -54,6 +54,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly Core.ScanService _scanService;
     private readonly ThumbnailService _thumbnailService = new();
     private readonly Core.ExportService _exportService;
+    private readonly Core.PartDataService _partDataService;
 
     // Данные и коллекции
     private readonly ObservableCollection<PartData> _partsData = [];
@@ -179,6 +180,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     public FlatPatternExporterMainWindow()
     {
+        // Инициализация сервисов до InitializeComponent для предотвращения NullReferenceException
+        _inventorService.InitializeInventor();
+        _scanService = new Core.ScanService(_inventorService);
+        _exportService = new Core.ExportService(_inventorService, _scanService, _scanService.DocumentCache, _tokenService);
+        _partDataService = new Core.PartDataService(_inventorService, _scanService, _thumbnailService, Dispatcher);
+
         InitializeComponent();
 
         // Инициализация словаря горячих клавиш
@@ -189,25 +196,20 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             [Key.F8] = () => { StartClearList(); return Task.CompletedTask; },
             [Key.F9] = StartQuickExportAsync
         };
-        _inventorService.InitializeInventor();
+
         UpdateProjectInfo(); // Инициализация папки проекта при запуске
         PartsDataGrid.ItemsSource = _partsData;
         PartsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
         PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
         PartsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
-        
+
         // Обновляем видимость оверлея при изменении коллекции колонок
         ((INotifyCollectionChanged)PartsDataGrid.Columns).CollectionChanged += (s, e) => UpdateNoColumnsOverlayVisibility();
-        
+
 
         // Настройка TokenService для работы с визуальным контейнером
         TokenService?.SetTokenContainer(TokenContainer);
-        
-        // Инициализация CollectionViewSource для фильтрации
-        // Инициализация сервисов
-        _scanService = new Core.ScanService(_inventorService);
-        _exportService = new Core.ExportService(_inventorService, _scanService, _scanService.DocumentCache, _tokenService);
 
         _partsDataView = new CollectionViewSource { Source = _partsData };
         _partsDataView.Filter += PartsData_Filter;
@@ -1464,16 +1466,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     [GeneratedRegex("^[1-9][0-9]*$")]
     private static partial Regex PositiveNumberRegex();
 
-    private void UpdateQuantitiesWithMultiplier(int multiplier)
-    {
-        foreach (var partData in _partsData)
-        {
-            partData.IsOverridden = false;
-            partData.SetQuantityInternal(partData.OriginalQuantity * multiplier);
-            partData.IsMultiplied = multiplier > 1;
-        }
-    }
-
     private void IncrementMultiplierButton_Click(object sender, RoutedEventArgs e)
     {
         if (int.TryParse(MultiplierTextBox.Text, out int currentValue))
@@ -1506,12 +1498,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         
         try
         {
-            var documentType = document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" : "Деталь";
-            
             if (updateUI)
             {
                 // Получаем и отображаем информацию о документе
-                UpdateDocumentInfo(documentType, document);
+                UpdateDocumentInfo(document);
                 _partsData.Clear();
                 _itemCounter = 1;
             }
@@ -1578,7 +1568,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++);
+                        var partData = await _partDataService.GetPartDataAsync(part.Key, part.Value, itemCounter++);
                         if (partData != null)
                         {
                             ((IProgress<PartData>)partProgress).Report(partData);
@@ -1597,7 +1587,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
 
             if (updateUI && int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
-                UpdateQuantitiesWithMultiplier(multiplier);
+                _partDataService.UpdateQuantitiesWithMultiplier(_partsData, multiplier);
 
             result.WasCancelled = cancellationToken.IsCancellationRequested;
             

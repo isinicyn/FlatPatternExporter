@@ -215,5 +215,12 @@ FlatPatternExporter/
   - Перенесены методы генерации миниатюр из MainWindow
   - Обновлены все зависимости
   - Проект успешно скомпилирован
-- [ ] Этап 7: PartDataService
+- [x] Этап 7: PartDataService - **Завершён успешно**
+  - Создан файл Core/PartDataService.cs
+  - Перенесены методы GetPartDataAsync, ReadAllPropertiesFromPart, SetExpressionStatesForAllProperties
+  - Перенесены методы FillPropertyData, UpdateQuantitiesWithMultiplier, UpdateDocumentInfo
+  - Добавлен новый класс DocumentInfo для передачи информации о документе
+  - Обновлены все зависимости в MainWindow и part2.cs
+  - Удалены перенесенные методы из исходных файлов
+  - Проект успешно скомпилирован
 - [ ] Этап 8: Финальная очистка
