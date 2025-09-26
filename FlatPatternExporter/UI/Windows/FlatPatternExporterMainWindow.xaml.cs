@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -17,12 +16,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
-using DefineEdge;
 using FlatPatternExporter.Core;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
-using FlatPatternExporter.Utilities;
 using Inventor;
 using Binding = System.Windows.Data.Binding;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -54,26 +51,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly InventorService _inventorService = new();
     public Inventor.Application? _thisApplication => _inventorService.Application;
     private Document? _lastScannedDocument;
-    
+
     // Сервисы
     private readonly TokenService _tokenService = new();
-    
+    private readonly Core.ScanService _scanService;
+
     // Данные и коллекции
     private readonly ObservableCollection<PartData> _partsData = [];
     private readonly CollectionViewSource _partsDataView;
-    private readonly List<PartData> _conflictingParts = [];
-    private Dictionary<string, List<PartConflictInfo>> _conflictFileDetails = [];
-    private readonly ConcurrentDictionary<string, List<PartConflictInfo>> _partNumberTracker = new();
-    
-    // Кеш документов для изоляции среды обработки
-    private readonly Dictionary<string, PartDocument> _documentCache = [];
-    private readonly Dictionary<string, string> _partNumberToFullFileName = [];
     
     // Состояние процессов
     private bool _isScanning;
     private bool _isExporting;
     private CancellationTokenSource? _operationCts;
-    private bool _hasMissingReferences = false;
     private int _itemCounter = 1;
     private bool _isUpdatingState;
     
@@ -216,6 +206,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         TokenService?.SetTokenContainer(TokenContainer);
         
         // Инициализация CollectionViewSource для фильтрации
+        // Инициализация сервисов
+        _scanService = new Core.ScanService(_inventorService);
+
         _partsDataView = new CollectionViewSource { Source = _partsData };
         _partsDataView.Filter += PartsData_Filter;
 
@@ -810,12 +803,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             case OperationType.Scan:
                 // Для сканирования показываем специальные сообщения о конфликтах и ссылках
-                if (_conflictingParts.Count > 0)
+                if (_scanService.ConflictAnalyzer.ConflictCount > 0)
                 {
-                    MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_conflictingParts.Count}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Конфликты\" на панели управления для просмотра деталей конфликтов.",
+                    MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_scanService.ConflictAnalyzer.ConflictCount}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Конфликты\" на панели управления для просмотра деталей конфликтов.",
                         "Конфликт обозначений", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
-                else if (_hasMissingReferences)
+                else if (_scanService.HasMissingReferences)
                 {
                     MessageBox.Show("В сборке обнаружены компоненты с потерянными ссылками. Некоторые данные могли быть пропущены.",
                         "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -1313,7 +1306,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         // Настройка UI для сканирования
         InitializeOperation(UIState.Scanning, ref _isScanning);
-        _hasMissingReferences = false;
+        // Сброс флага отсутствующих ссылок выполняется внутри ScanService
 
         // Прогресс для сканирования структуры сборки
         var scanProgress = new Progress<ScanProgress>(progress =>
@@ -1526,115 +1519,80 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
             var sheetMetalParts = new Dictionary<string, int>();
 
-            if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+            // Создаем опции для сканирования
+            var scanOptions = new Core.ScanOptions
             {
-                var asmDoc = (AssemblyDocument)document;
-                
-                if (SelectedProcessingMethod == ProcessingMethod.Traverse)
-                    await Task.Run(() => ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, progress, cancellationToken), cancellationToken);
-                else if (SelectedProcessingMethod == ProcessingMethod.BOM)
-                    await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, progress, cancellationToken), cancellationToken);
+                ExcludeReferenceParts = ExcludeReferenceParts,
+                ExcludePurchasedParts = ExcludePurchasedParts,
+                ExcludePhantomParts = ExcludePhantomParts,
+                IncludeLibraryComponents = IncludeLibraryComponents
+            };
 
-                // Анализируем конфликты и удаляем конфликтующие детали
-                if (updateUI)
+            // Используем ScanService для сканирования
+            var scanResult = await _scanService.ScanDocumentAsync(
+                document,
+                SelectedProcessingMethod,
+                scanOptions,
+                progress,
+                cancellationToken);
+
+            sheetMetalParts = scanResult.SheetMetalParts;
+            result.ProcessedCount = scanResult.ProcessedCount;
+
+            // Обработка деталей для UI
+            if (updateUI && sheetMetalParts.Count > 0)
+            {
+                // Анализ конфликтов уже выполнен в ScanService
+                if (_scanService.ConflictAnalyzer.HasConflicts)
                 {
                     await Dispatcher.InvokeAsync(() =>
                     {
-                        var analysisState = UIState.Scanning;
-                        analysisState.ProgressText = "Анализ конфликтов обозначений...";
-                        SetUIState(analysisState);
+                        ConflictFilesButton.IsEnabled = true;
                     });
                 }
-                
-                await AnalyzePartNumberConflictsAsync();
-                FilterConflictingParts(sheetMetalParts);
 
-                result.ProcessedCount = sheetMetalParts.Count;
-
-                if (updateUI)
+                // Переключаем прогресс на обработку деталей
+                await Dispatcher.InvokeAsync(() =>
                 {
-                    // Переключаем прогресс на обработку деталей
-                    await Dispatcher.InvokeAsync(() =>
-                    {
-                        var processingState = UIState.Scanning;
-                        processingState.ProgressText = "Обработка деталей...";
-                        processingState.ProgressValue = 0;
-                        SetUIState(processingState);
-                    });
+                    var processingState = UIState.Scanning;
+                    processingState.ProgressText = "Обработка деталей...";
+                    processingState.ProgressValue = 0;
+                    SetUIState(processingState);
+                });
 
-                    var itemCounter = 1;
-                    var totalParts = sheetMetalParts.Count;
-                    var processedParts = 0;
-                    
-                    var partProgress = new Progress<PartData>(partData =>
-                    {
-                        partData.Item = _itemCounter;
-                        _partsData.Add(partData);
-                        _itemCounter++;
-                    });
+                var itemCounter = 1;
+                var totalParts = sheetMetalParts.Count;
+                var processedParts = 0;
 
-                    await Task.Run(async () =>
+                var partProgress = new Progress<PartData>(partData =>
+                {
+                    partData.Item = _itemCounter;
+                    _partsData.Add(partData);
+                    _itemCounter++;
+                });
+
+                await Task.Run(async () =>
+                {
+                    foreach (var part in sheetMetalParts)
                     {
-                        foreach (var part in sheetMetalParts)
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++);
+                        if (partData != null)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            var partData = await GetPartDataAsync(part.Key, part.Value, itemCounter++);
-                            if (partData != null)
-                            {
-                                ((IProgress<PartData>)partProgress).Report(partData);
-                            }
-                            
-                            processedParts++;
-                            await Dispatcher.InvokeAsync(() =>
-                            {
-                                var progressState = UIState.Scanning;
-                                progressState.ProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
-                                progressState.ProgressText = $"Обработка деталей - {processedParts} из {totalParts}";
-                                SetUIState(progressState);
-                            });
+                            ((IProgress<PartData>)partProgress).Report(partData);
                         }
-                    }, cancellationToken);
-                }
-            }
-            else if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-            {
-                var partDoc = (PartDocument)document;
-                
-                // Проверяем, не является ли деталь библиотечным компонентом
-                if (!IncludeLibraryComponents && _inventorService.IsLibraryComponent(partDoc.FullFileName))
-                {
-                    result.ProcessedCount = 0;
-                    return result;
-                }
-                
-                var mgr = new Services.PropertyManager((Document)partDoc);
-                var partNumber = mgr.GetMappedProperty("PartNumber");
-                if (!string.IsNullOrEmpty(partNumber))
-                {
-                    // Добавляем документ в кеш
-                    AddDocumentToCache(partDoc, partNumber);
-                }
-                
-                if (updateUI)
-                {
-                    var partProgress = new Progress<PartData>(partData =>
-                    {
-                        partData.Item = _itemCounter;
-                        _partsData.Add(partData);
-                        _itemCounter++;
-                    });
-                    
-                    result.ProcessedCount = await ProcessSinglePart(partDoc, partProgress);
-                }
-                else
-                {
-                    if (partDoc.SubType == Services.PropertyManager.SheetMetalSubType)
-                    {
-                        sheetMetalParts.Add(partNumber, 1);
-                        result.ProcessedCount = 1;
+
+                        processedParts++;
+                        await Dispatcher.InvokeAsync(() =>
+                        {
+                            var progressState = UIState.Scanning;
+                            progressState.ProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
+                            progressState.ProgressText = $"Обработка деталей - {processedParts} из {totalParts}";
+                            SetUIState(progressState);
+                        });
                     }
-                }
+                }, cancellationToken);
             }
 
             if (updateUI && int.TryParse(MultiplierTextBox.Text, out var multiplier) && multiplier > 0)
@@ -1680,13 +1638,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
     private void ConflictFilesButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_conflictFileDetails == null || _conflictFileDetails.Count == 0)
+        if (_scanService.ConflictAnalyzer.ConflictFileDetails == null || _scanService.ConflictAnalyzer.ConflictFileDetails.Count == 0)
         {
             return;
         }
 
         // Создаем и показываем окно с деталями конфликтов
-        var conflictWindow = new ConflictDetailsWindow(_conflictFileDetails, _inventorService.OpenInventorDocument)
+        var conflictWindow = new ConflictDetailsWindow(_scanService.ConflictAnalyzer.ConflictFileDetails, _inventorService.OpenInventorDocument)
         {
             Owner = this
         };
@@ -1805,109 +1763,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// </summary>
     private void ClearConflictData()
     {
-        _partNumberTracker.Clear();
-        _conflictingParts.Clear();
-        _conflictFileDetails.Clear();
+        _scanService.ConflictAnalyzer.Clear();
         ConflictFilesButton.IsEnabled = false; // Отключаем кнопку при очистке данных
-    }
-
-    private void AddDocumentToCache(PartDocument partDoc, string partNumber)
-    {
-        if (!string.IsNullOrEmpty(partNumber) && !_documentCache.ContainsKey(partNumber))
-        {
-            _documentCache[partNumber] = partDoc;
-            _partNumberToFullFileName[partNumber] = partDoc.FullFileName;
-        }
-    }
-
-    private PartDocument? GetCachedPartDocument(string partNumber)
-    {
-        return _documentCache.TryGetValue(partNumber, out var partDoc) ? partDoc : null;
-    }
-
-    private void ClearDocumentCache()
-    {
-        _documentCache.Clear();
-        _partNumberToFullFileName.Clear();
-    }
-
-    private void AddPartToConflictTracker(string partNumber, string fileName, string modelState)
-    {
-        var conflictInfo = new PartConflictInfo
-        {
-            PartNumber = partNumber,
-            FileName = fileName,
-            ModelState = modelState
-        };
-        
-        _partNumberTracker.AddOrUpdate(partNumber,
-            [conflictInfo],
-            (key, existingList) =>
-            {
-                // Проверяем, есть ли уже такой же файл + состояние модели
-                if (!existingList.Any(p => p.UniqueId == conflictInfo.UniqueId))
-                {
-                    existingList.Add(conflictInfo);
-                }
-                return existingList;
-            });
-    }
-
-    private async Task<int> ProcessSinglePart(PartDocument partDoc, IProgress<PartData> partProgress)
-    {
-        if (partDoc.SubType == Services.PropertyManager.SheetMetalSubType)
-        {
-            var processingState = UIState.Scanning;
-            processingState.ProgressText = "Обработка детали...";
-            SetUIState(processingState);
-            
-            var partData = await GetPartDataAsync(partDoc, 1, 1);
-            if (partData != null)
-            {
-                partProgress.Report(partData);
-                
-                var completedState = UIState.Scanning;
-                completedState.ProgressValue = 100;
-                SetUIState(completedState);
-                return 1; // Успешно обработана 1 деталь
-            }
-        }
-        return 0; // Деталь не обработана (не листовой металл или ошибка)
-    }
-
-    private void FilterConflictingParts(Dictionary<string, int> sheetMetalParts)
-    {
-        // Получаем список конфликтующих обозначений
-        var conflictingPartNumbers = _partNumberTracker
-            .Where(p => p.Value.Count > 1)
-            .Select(p => p.Key)
-            .ToHashSet();
-
-        // Удаляем конфликтующие детали из sheetMetalParts
-        foreach (var conflictingPartNumber in conflictingPartNumbers)
-        {
-            sheetMetalParts.Remove(conflictingPartNumber);
-        }
-    }
-
-    private async Task AnalyzePartNumberConflictsAsync()
-    {
-        _conflictingParts.Clear(); // Очищаем список конфликтов перед началом проверки
-
-        // Оставляем только те записи, у которых больше одного файла (т.е. есть конфликт)
-        var conflictingPartNumbers = _partNumberTracker.Where(p => p.Value.Count > 1).ToDictionary(p => p.Key, p => p.Value);
-
-        if (conflictingPartNumbers.Count!=0)
-        {
-            _conflictingParts.AddRange(conflictingPartNumbers.SelectMany(entry => entry.Value.Select(v => new PartData { PartNumber = v.PartNumber })));
-
-            // Используем Dispatcher для обновления UI
-            await Dispatcher.InvokeAsync(() =>
-            {
-                ConflictFilesButton.IsEnabled = true; // Включаем кнопку для просмотра подробностей о конфликтах
-                _conflictFileDetails = conflictingPartNumbers; // Сохраняем подробную информацию о конфликтах для вывода при нажатии кнопки
-            });
-        }
     }
 
     private void TokenListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)

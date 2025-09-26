@@ -28,6 +28,12 @@ FlatPatternExporter/
     ├── AssemblyInfo.cs                 # Информация о сборке
     ├── FPExport.ico                    # Иконка приложения
     │
+    ├── Core/                           # Бизнес-логика и сервисы ядра
+    │   ├── InventorService.cs          # Работа с Inventor API
+    │   ├── ScanService.cs              # Сканирование документов и сборок
+    │   ├── DocumentCacheService.cs     # Управление кешем документов
+    │   └── ConflictAnalyzer.cs         # Анализ конфликтов обозначений
+    │
     ├── Libraries/                      # Внешние независимые библиотеки
     │   ├── DxfRenderer.cs              # Библиотека рендеринга DXF файлов
     │   └── MarshalCore.cs              # Отдельная библиотека COM interop
@@ -118,6 +124,13 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 
 ### Ключевые компоненты
 
+**Core/ - Бизнес-логика ядра (namespace: FlatPatternExporter.Core):**
+- `InventorService` - работа с Inventor API (подключение, валидация документов, управление проектами)
+- `ScanService` - сканирование структуры документов, обход сборок, обработка BOM
+- `DocumentCacheService` - управление кешем документов для оптимизации производительности
+- `ConflictAnalyzer` - анализ конфликтов обозначений деталей
+- Классы: `ScanResult`, `ScanOptions`, `ScanProgress`, `PartConflictInfo`
+
 **Libraries/ - Внешние независимые библиотеки:**
 - `DxfRenderer` - библиотека рендеринга DXF файлов (namespace: DxfRenderer)
 - `MarshalCore` - COM interop библиотека (namespace: DefineEdge)
@@ -129,9 +142,9 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `LayerSettingsClasses` - модели настроек слоев (LayerSetting, LayerDefaults, валидаторы)
 
 **Services/ - Сервисы и бизнес-логика (namespace: FlatPatternExporter.Services):**
-- `PropertyMetadataRegistry` - централизованный реестр метаданных свойств (7 зависимостей)
+- `PropertyMetadataRegistry` - централизованный реестр метаданных свойств
 - `PropertyManager` - работа с Inventor API, использует реестр
-- `TokenService` - специализированная обработка токенов (7 зависимостей)
+- `TokenService` - специализированная обработка токенов
 - `SettingsManager` - персистентность настроек
 - `TemplatePresetManager` - управление пресетами шаблонов
 - `VersionInfoService` - получение версии приложения и информации о коммитах
@@ -142,11 +155,12 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DxfOptimizer` - оптимизация DXF файлов для различных версий AutoCAD
 
 **UI/ - Интерфейс пользователя:**
-- **Windows/ (namespace: FlatPatternExporter.UI.Windows)**: основные окна приложения с чистой архитектурой без бизнес-логики
-  - `FlatPatternExporterMainWindow` - главное окно приложения
+- **Windows/ (namespace: FlatPatternExporter.UI.Windows)**: основные окна приложения
+  - `FlatPatternExporterMainWindow` - главное окно приложения (координация UI и бизнес-логики)
   - `AboutWindow` - независимое окно информации о программе
   - `ConflictDetailsWindow` - окно конфликтов с инжекцией делегата открытия документов
   - `SelectIPropertyWindow` - окно выбора свойств с полной инжекцией зависимостей
+  - Классы: `ScanProgress`, `PartConflictInfo`, `UIState`, `PartData`
 - **Controls/ (namespace: FlatPatternExporter.UI.Controls)**: пользовательские элементы управления (LayerSettingControl)
 
 **Стили и ресурсы**:
@@ -169,6 +183,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 
 **Основные пространства имен:**
 - `FlatPatternExporter` - корневое пространство имен (App.xaml.cs)
+- `FlatPatternExporter.Core` - бизнес-логика ядра в папке Core/
 - `FlatPatternExporter.Enums` - перечисления в папке Enums/
 - `FlatPatternExporter.Models` - модели данных в папке Models/
 - `FlatPatternExporter.Services` - сервисы в папке Services/
@@ -180,8 +195,9 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DefineEdge` - независимая библиотека COM interop (Libraries/MarshalCore.cs)
 
 **Зависимости между пространствами имен:**
-- `UI.Windows` → `Enums`, `Models`, `Services`, `Utilities`
+- `UI.Windows` → `Core`, `Enums`, `Models`, `Services`, `Utilities`
 - `UI.Controls` → `Models`
+- `Core` → `Enums`, `Services`, `UI.Windows` (для классов ScanProgress, PartConflictInfo)
 - `Services` → `Enums`, `Models`, `UI.Windows`
 - `Utilities` → `Enums`
 - `Converters` → `UI.Windows`
@@ -219,17 +235,19 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Содержит ссылки на PartDocument объекты, индексированные по номеру детали (PartNumber)
 - Дополнительно кеширует полные пути к файлам для быстрого доступа
 
-**Компоненты системы:**
-- `_documentCache` - основной кеш PartDocument по партнамберу
-- `_partNumberToFullFileName` - кеш путей к файлам
-- `AddDocumentToCache()` - добавление документа в кеш во время обхода
+**Сервис DocumentCacheService (namespace: FlatPatternExporter.Core):**
+- Инкапсулирует всю логику кеширования
+- `AddDocumentToCache()` - добавление документа в кеш
 - `GetCachedPartDocument()` - получение документа из кеша
-- `ClearDocumentCache()` - очистка кеша при повторном сканировании
+- `GetCachedPartPath()` - получение пути к файлу детали
+- `ClearCache()` - очистка кеша
 
-**Точки заполнения кеша:**
+**Точки заполнения кеша в ScanService:**
 - `ProcessComponentOccurrences` - при методе обработки "Перебор"
-- `ProcessBOMRowSimple` - при методе обработки "Спецификация" 
+- `ProcessBOMRowSimple` - при методе обработки "Спецификация"
 - `ScanDocumentAsync` - для одиночных деталей
+
+**Точки использования кеша в UI:**
 - `PrepareExportContextAsync` - при быстром экспорте без предварительного сканирования
 
 **Преимущества:**

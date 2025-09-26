@@ -2,7 +2,6 @@
 using System.Drawing.Imaging;
 using System.IO;
 using DxfRenderer;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -103,7 +102,7 @@ public partial class FlatPatternExporterMainWindow : Window
     // Перегрузка для сборок - открывает документ по partNumber
     private async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber, bool loadThumbnail = true)
     {
-        var partDoc = GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
+        var partDoc = _scanService.DocumentCache.GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
         if (partDoc == null) return null!;
         
         return await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
@@ -243,303 +242,6 @@ public partial class FlatPatternExporterMainWindow : Window
         }
     }
 
-    private static string GetFullFileName(ComponentOccurrence occ)
-    {
-        string fullFileName = "";
-        if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
-        {
-            if (occ.Definition.Document is PartDocument partDoc)
-                fullFileName = partDoc.FullFileName;
-        }
-        else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
-        {
-            if (occ.Definition.Document is AssemblyDocument asmDoc)
-                fullFileName = asmDoc.FullFileName;
-        }
-        return fullFileName;
-    }
-
-    private void ProcessComponentOccurrences(ComponentOccurrences occurrences, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null, CancellationToken cancellationToken = default)
-    {
-        // Предварительно считаем только компоненты, которые пройдут фильтрацию
-        var filteredOccurrences = new List<ComponentOccurrence>();
-        foreach (ComponentOccurrence occ in occurrences)
-        {
-            if (occ.Suppressed) continue;
-            
-            // Проверяем, является ли компонент виртуальным
-            if (occ.Definition is VirtualComponentDefinition) continue;
-            
-            try
-            {
-                var fullFileName = GetFullFileName(occ);
-                if (!ShouldExcludeComponent(occ.BOMStructure, fullFileName))
-                    filteredOccurrences.Add(occ);
-            }
-            catch
-            {
-                // Игнорируем компоненты с ошибками при фильтрации
-            }
-        }
-        
-        var totalOccurrences = filteredOccurrences.Count;
-        var processedOccurrences = 0;
-
-        foreach (ComponentOccurrence occ in filteredOccurrences)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            try
-            {
-                if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
-                {
-                    if (occ.Definition.Document is PartDocument partDoc)
-                    {
-                        var mgr = new Services.PropertyManager((Document)partDoc);
-                        var partNumber = mgr.GetMappedProperty("PartNumber");
-                        if (!string.IsNullOrEmpty(partNumber))
-                        {
-                            // Добавляем документ в кеш
-                            AddDocumentToCache(partDoc, partNumber);
-                            
-                            if (partDoc.SubType == Services.PropertyManager.SheetMetalSubType)
-                            {
-                                // Добавляем в трекер конфликтов
-                                var modelState = mgr.GetModelState();
-                                AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
-                                
-                                if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
-                                    sheetMetalParts[partNumber]++;
-                                else
-                                    sheetMetalParts.Add(partNumber, 1);
-                            }
-                        }
-                    }
-                }
-                else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
-                {
-                    ProcessComponentOccurrences((ComponentOccurrences)occ.SubOccurrences, sheetMetalParts, cancellationToken: cancellationToken); // Рекурсивный вызов без прогресса
-                }
-                
-                // Обновляем прогресс
-                processedOccurrences++;
-                scanProgress?.Report(new ScanProgress
-                {
-                    ProcessedItems = processedOccurrences,
-                    TotalItems = totalOccurrences,
-                    CurrentOperation = "Сканирование компонентов",
-                    CurrentItem = $"Компонент {processedOccurrences} из {totalOccurrences}"
-                });
-            }
-            catch (Exception ex)
-            {
-                // Логирование ошибки
-                Debug.WriteLine($"Ошибка при обработке компонента: {ex.Message}");
-                
-                // Обновляем прогресс даже при ошибке
-                processedOccurrences++;
-                scanProgress?.Report(new ScanProgress
-                {
-                    ProcessedItems = processedOccurrences,
-                    TotalItems = totalOccurrences,
-                    CurrentOperation = "Сканирование компонентов",
-                    CurrentItem = $"Компонент {processedOccurrences} из {totalOccurrences}"
-                });
-            }
-        }
-    }
-
-    private void ProcessBOM(BOM bom, Dictionary<string, int> sheetMetalParts, IProgress<ScanProgress>? scanProgress = null, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            // Получаем все компоненты из BOM рекурсивно в один плоский список с количествами
-            var allBomRows = GetAllBOMRowsRecursively(bom);
-            
-            Debug.WriteLine($"[ProcessBOM] Всего найдено {allBomRows.Count} строк BOM во всей структуре");
-            
-            var processedRows = 0;
-            var totalRows = allBomRows.Count;
-
-            foreach (var (row, parentQuantity) in allBomRows)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                try
-                {
-                    ProcessBOMRowSimple(row, sheetMetalParts, parentQuantity);
-                    
-                    // Обновляем прогресс
-                    processedRows++;
-                    scanProgress?.Report(new ScanProgress
-                    {
-                        ProcessedItems = processedRows,
-                        TotalItems = totalRows,
-                        CurrentOperation = "Сканирование спецификации",
-                        CurrentItem = $"Строка {processedRows} из {totalRows}"
-                    });
-                }
-                catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
-                {
-                    _hasMissingReferences = true;
-                    Debug.WriteLine($"Обнаружен компонент с потерянной ссылкой: {ex.Message}");
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Ошибка при обработке строки BOM: {ex.Message}");
-                    _hasMissingReferences = true;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Общая ошибка при обработке BOM: {ex.Message}");
-            _hasMissingReferences = true;
-        }
-    }
-
-    private List<(BOMRow Row, int ParentQuantity)> GetAllBOMRowsRecursively(BOM bom, int parentQuantity = 1)
-    {
-        var allRows = new List<(BOMRow, int)>();
-        
-        try
-        {
-            // Проверяем настройку скрытия подавленных компонентов
-            var hideSuppressed = bom.HideSuppressedComponentsInBOM;
-            
-            BOMView? bomView = null;
-            foreach (BOMView view in bom.BOMViews)
-            {
-                if (view.ViewType == BOMViewTypeEnum.kModelDataBOMViewType)
-                {
-                    bomView = view;
-                    break;
-                }
-            }
-
-            if (bomView == null) return allRows;
-
-            try
-            {
-                var bomRows = bomView.BOMRows.Cast<BOMRow>().ToArray();
-                
-                foreach (BOMRow row in bomRows)
-                {
-                    // Фильтруем подавленные компоненты
-                    if (!hideSuppressed && row.ItemQuantity <= 0)
-                        continue;
-
-                    // Применяем фильтрацию BOM структуры перед добавлением в список
-                    var componentDefinition = row.ComponentDefinitions[1];
-                    
-                    // Проверяем, является ли компонент виртуальным
-                    if (componentDefinition is VirtualComponentDefinition)
-                    {
-                        // Виртуальные компоненты пропускаем
-                        continue;
-                    }
-                    
-                    if (componentDefinition?.Document is Document document && 
-                        ShouldExcludeComponent(row.BOMStructure, document.FullFileName))
-                        continue;
-                        
-                    // Добавляем строку с учетом количества родительского компонента
-                    allRows.Add((row, parentQuantity));
-                    
-                    // Рекурсивно получаем строки из подсборок
-                    try
-                    {
-                        if (componentDefinition?.Document is AssemblyDocument asmDoc)
-                        {
-                            // Передаем общее количество: parentQuantity * количество данной подсборки
-                            var totalQuantity = parentQuantity * row.ItemQuantity;
-                            var subRows = GetAllBOMRowsRecursively(asmDoc.ComponentDefinition.BOM, totalQuantity);
-                            allRows.AddRange(subRows);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // Игнорируем ошибки при получении подсборок
-                    }
-                }
-            }
-            catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
-            {
-                _hasMissingReferences = true;
-                Debug.WriteLine("Ошибка при доступе к BOMRows. Возможно, в сборке есть потерянные ссылки.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Ошибка при рекурсивном получении BOM: {ex.Message}");
-        }
-        
-        return allRows;
-    }
-
-    private void ProcessBOMRowSimple(BOMRow row, Dictionary<string, int> sheetMetalParts, int parentQuantity = 1)
-    {
-        try
-        {
-            var componentDefinition = row.ComponentDefinitions[1];
-            if (componentDefinition == null) return;
-
-            if (componentDefinition.Document is not Document document) return;
-
-            // Обрабатываем только детали из листового металла (не подсборки)
-            if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-            {
-                if (document is PartDocument partDoc)
-                {
-                    var mgr = new Services.PropertyManager((Document)partDoc);
-                    var partNumber = mgr.GetMappedProperty("PartNumber");
-                    if (!string.IsNullOrEmpty(partNumber))
-                    {
-                        // Добавляем документ в кеш
-                        AddDocumentToCache(partDoc, partNumber);
-                        
-                        if (partDoc.SubType == Services.PropertyManager.SheetMetalSubType)
-                        {
-                            // Добавляем в трекер конфликтов
-                            var modelState = mgr.GetModelState();
-                            AddPartToConflictTracker(partNumber, partDoc.FullFileName, modelState);
-                            
-                            // Учитываем общее количество: количество детали * количество родительских сборок
-                            var totalQuantity = row.ItemQuantity * parentQuantity;
-                            
-                            if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
-                                sheetMetalParts[partNumber] += totalQuantity;
-                            else
-                                sheetMetalParts.Add(partNumber, totalQuantity);
-                        }
-                    }
-                }
-            }
-            // Подсборки больше не обрабатываем - они уже развернуты в GetAllBOMRowsRecursively
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Ошибка при простой обработке строки BOM: {ex.Message}");
-        }
-    }
-
-
-    private bool ShouldExcludeComponent(BOMStructureEnum bomStructure, string fullFileName)
-    {
-        if (ExcludeReferenceParts && bomStructure == BOMStructureEnum.kReferenceBOMStructure)
-            return true;
-
-        if (ExcludePurchasedParts && bomStructure == BOMStructureEnum.kPurchasedBOMStructure)
-            return true;
-
-        if (ExcludePhantomParts && bomStructure == BOMStructureEnum.kPhantomBOMStructure)
-            return true;
-
-        if (!IncludeLibraryComponents && !string.IsNullOrEmpty(fullFileName) && _inventorService.IsLibraryComponent(fullFileName))
-            return true;
-
-        return false;
-    }
 
     private void SelectFixedFolderButton_Click(object sender, RoutedEventArgs e)
     {
@@ -562,7 +264,7 @@ public partial class FlatPatternExporterMainWindow : Window
         // Очищаем конфликты только если сменился документ (чтобы не показывать неактуальные конфликты)
         if (requireScan && document != _lastScannedDocument)
         {
-            ClearConflictData();
+            _scanService.ConflictAnalyzer.Clear();
         }
         
         // Проверяем документ на валидность
@@ -584,47 +286,22 @@ public partial class FlatPatternExporterMainWindow : Window
         context.TargetDirectory = targetDir;
         context.Multiplier = multiplier;
 
-        // Сканируем документ для получения данных
-        var sheetMetalParts = new Dictionary<string, int>();
-
-        if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
+        // Используем ScanService для сканирования
+        var scanOptions = new Core.ScanOptions
         {
-            var asmDoc = (AssemblyDocument)document;
-            
-            if (SelectedProcessingMethod == ProcessingMethod.Traverse)
-                await Task.Run(() => ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, showProgress ? null : null));
-            else if (SelectedProcessingMethod == ProcessingMethod.BOM)
-                await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, showProgress ? null : null));
+            ExcludeReferenceParts = ExcludeReferenceParts,
+            ExcludePurchasedParts = ExcludePurchasedParts,
+            ExcludePhantomParts = ExcludePhantomParts,
+            IncludeLibraryComponents = IncludeLibraryComponents
+        };
 
-            FilterConflictingParts(sheetMetalParts);
-        }
-        else if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-        {
-            var partDoc = (PartDocument)document;
-            
-            // Проверяем, не является ли деталь библиотечным компонентом
-            if (!IncludeLibraryComponents && _inventorService.IsLibraryComponent(partDoc.FullFileName))
-            {
-                // Библиотечный компонент исключается
-            }
-            else
-            {
-                var mgr = new Services.PropertyManager((Document)partDoc);
-                var partNumber = mgr.GetMappedProperty("PartNumber");
-                if (!string.IsNullOrEmpty(partNumber))
-                {
-                    // Добавляем документ в кеш
-                    AddDocumentToCache(partDoc, partNumber);
-                    
-                    if (partDoc.SubType == Services.PropertyManager.SheetMetalSubType)
-                    {
-                        sheetMetalParts.Add(partNumber, 1);
-                    }
-                }
-            }
-        }
+        var scanResult = await _scanService.ScanDocumentAsync(
+            document,
+            SelectedProcessingMethod,
+            scanOptions,
+            showProgress ? new Progress<ScanProgress>() : null);
 
-        context.SheetMetalParts = sheetMetalParts;
+        context.SheetMetalParts = scanResult.SheetMetalParts;
         context.IsValid = true;
     }
     catch (Exception ex)
@@ -861,7 +538,7 @@ public partial class FlatPatternExporterMainWindow : Window
             // Обработка для PartFolder через свойство
             if (SelectedExportFolder == ExportFolderType.PartFolder)
             {
-                var partPath = _partNumberToFullFileName.TryGetValue(partNumber, out var cachedPath) ? cachedPath : _inventorService.GetPartDocumentFullPath(partNumber);
+                var partPath = _scanService.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorService.GetPartDocumentFullPath(partNumber);
                 if (!string.IsNullOrEmpty(partPath))
                 {
                     targetDir = Path.GetDirectoryName(partPath) ?? "";
@@ -875,7 +552,7 @@ public partial class FlatPatternExporterMainWindow : Window
             PartDocument? partDoc = null;
             try
             {
-                partDoc = GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
+                partDoc = _scanService.DocumentCache.GetCachedPartDocument(partNumber) ?? _inventorService.OpenPartDocument(partNumber);
                 if (partDoc == null) throw new Exception("Файл детали не найден или не может быть открыт");
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
@@ -1163,10 +840,11 @@ public partial class FlatPatternExporterMainWindow : Window
         _tokenService.UpdatePartsData(_partsData);
 
         // Отключаем кнопку "Конфликты" и очищаем список конфликтов
-        ClearConflictData();
-        
+        _scanService.ConflictAnalyzer.Clear();
+        ConflictFilesButton.IsEnabled = false;
+
         // Очищаем кеш документов
-        ClearDocumentCache();
+        _scanService.DocumentCache.ClearCache();
 
     }
 
@@ -1226,7 +904,7 @@ public partial class FlatPatternExporterMainWindow : Window
         foreach (var item in selectedItems)
         {
             var partNumber = item.PartNumber;
-            var fullPath = _partNumberToFullFileName.TryGetValue(partNumber, out var cachedPath) ? cachedPath : _inventorService.GetPartDocumentFullPath(partNumber);
+            var fullPath = _scanService.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorService.GetPartDocumentFullPath(partNumber);
 
             // Проверка на null перед использованием fullPath
             if (string.IsNullOrEmpty(fullPath))
@@ -1261,7 +939,7 @@ public partial class FlatPatternExporterMainWindow : Window
         foreach (var item in selectedItems)
         {
             var partNumber = item.PartNumber;
-            var fullPath = _partNumberToFullFileName.TryGetValue(partNumber, out var cachedPath) ? cachedPath : _inventorService.GetPartDocumentFullPath(partNumber);
+            var fullPath = _scanService.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorService.GetPartDocumentFullPath(partNumber);
             var targetModelState = item.ModelState;
 
             // Проверка на null перед использованием fullPath
@@ -1306,7 +984,7 @@ public partial class FlatPatternExporterMainWindow : Window
 
         foreach (var partData in _partsData)
         {
-            var partDoc = GetCachedPartDocument(partData.PartNumber) ?? _inventorService.OpenPartDocument(partData.PartNumber);
+            var partDoc = _scanService.DocumentCache.GetCachedPartDocument(partData.PartNumber) ?? _inventorService.OpenPartDocument(partData.PartNumber);
             if (partDoc != null)
             {
                 var mgr = new Services.PropertyManager((Document)partDoc);
