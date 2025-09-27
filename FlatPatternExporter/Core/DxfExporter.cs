@@ -6,7 +6,6 @@ using System.Windows.Threading;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
-using FlatPatternExporter.UI.Windows;
 using FlatPatternExporter.Utilities;
 using Inventor;
 using Path = System.IO.Path;

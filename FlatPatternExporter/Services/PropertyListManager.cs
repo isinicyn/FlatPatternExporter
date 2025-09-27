@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using FlatPatternExporter.UI.Windows;
+using FlatPatternExporter.Models;
 
 namespace FlatPatternExporter.Services;
 

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using FlatPatternExporter.Enums;
-using FlatPatternExporter.UI.Windows;
+using FlatPatternExporter.Models;
 using Inventor;
 using PropertyManager = FlatPatternExporter.Core.PropertyManager;
 

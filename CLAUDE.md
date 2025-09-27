@@ -47,7 +47,15 @@ FlatPatternExporter/
     │   └── CommonEnums.cs              # Базовые enum и маппинги
     │
     ├── Models/                         # Модели данных
-    │   └── LayerSettingsClasses.cs     # Модели настроек слоев с INotifyPropertyChanged
+    │   ├── LayerSettingsClasses.cs     # Модели настроек слоев с INotifyPropertyChanged
+    │   ├── AcadVersionItem.cs          # Модель для версий AutoCAD
+    │   ├── SplineReplacementItem.cs    # Модель для замены сплайнов
+    │   ├── PartData.cs                 # Основная модель данных детали
+    │   ├── PresetIProperty.cs          # Модель предустановленных свойств
+    │   ├── ScanProgress.cs             # Модель прогресса сканирования
+    │   ├── PartConflictInfo.cs         # Информация о конфликтах
+    │   ├── OperationResult.cs          # Результат операции
+    │   └── DocumentValidationResult.cs # Результат валидации документа
     │
     ├── Services/                       # Вспомогательные сервисы
     │   ├── PropertyMetadataRegistry.cs # Центральный реестр метаданных
@@ -67,8 +75,12 @@ FlatPatternExporter/
     │   │   ├── ConflictDetailsWindow.xaml(.cs)
     │   │   └── SelectIPropertyWindow.xaml(.cs)
     │   │
-    │   └── Controls/                   # Пользовательские элементы
-    │       └── LayerSettingControl.xaml(.cs)
+    │   ├── Controls/                   # Пользовательские элементы
+    │   │   ├── LayerSettingControl.xaml(.cs)
+    │   │   └── HeaderAdorner.cs        # UI компонент для drag&drop колонок
+    │   │
+    │   └── Models/                     # Модели состояния UI
+    │       └── UIState.cs              # Управление состоянием UI
     │
     ├── Converters/                     # WPF конвертеры
     │   ├── ColorToBrushConverter.cs            # Конвертация названия цвета в SolidColorBrush
@@ -137,17 +149,25 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `PartDataReader` - работа со свойствами деталей, чтение iProperties, заполнение данных
 - `PropertyManager` - централизованное управление доступом к свойствам документов Inventor
 - `ConflictDataProcessor` - обработка и трансформация данных конфликтов
-- Классы: `ScanResult`, `ScanOptions`, `ScanProgress`, `PartConflictInfo`, `ExportContext`, `ExportOptions`, `DocumentInfo`
+- Классы: `ScanResult`, `ScanOptions`, `ExportContext`, `ExportOptions`, `DocumentInfo`
 
 **Libraries/ - Внешние независимые библиотеки:**
 - `DxfRenderer` - библиотека рендеринга DXF файлов (namespace: DxfRenderer)
 - `MarshalCore` - COM interop библиотека (namespace: DefineEdge)
 
 **Enums/ - Перечисления (namespace: FlatPatternExporter.Enums):**
-- `CommonEnums` - базовые перечисления (ExportFolderType, ProcessingMethod, AcadVersionType и др.)
+- `CommonEnums` - базовые перечисления (ExportFolderType, ProcessingMethod, ProcessingStatus, AcadVersionType, DocumentType и др.)
 
 **Models/ - Модели данных (namespace: FlatPatternExporter.Models):**
 - `LayerSettingsClasses` - модели настроек слоев (LayerSetting, LayerDefaults, валидаторы)
+- `AcadVersionItem` - модель для версий AutoCAD в ComboBox
+- `SplineReplacementItem` - модель для типов замены сплайнов в ComboBox
+- `PartData` - основная модель данных детали с INotifyPropertyChanged
+- `PresetIProperty` - модель предустановленных свойств с INotifyPropertyChanged
+- `ScanProgress` - модель прогресса сканирования
+- `PartConflictInfo` - информация о конфликтах обозначений
+- `OperationResult` - результат операции сканирования/экспорта
+- `DocumentValidationResult` - результат валидации документа Inventor
 
 **Services/ - Вспомогательные сервисы (namespace: FlatPatternExporter.Services):**
 - `PropertyMetadataRegistry` - централизованный реестр метаданных свойств
@@ -166,8 +186,11 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
   - `AboutWindow` - независимое окно информации о программе
   - `ConflictDetailsWindow` - окно конфликтов с инжекцией делегата открытия документов
   - `SelectIPropertyWindow` - окно выбора свойств с полной инжекцией зависимостей
-  - Классы: `ScanProgress`, `PartConflictInfo`, `UIState`, `PartData`
-- **Controls/ (namespace: FlatPatternExporter.UI.Controls)**: пользовательские элементы управления (LayerSettingControl)
+- **Controls/ (namespace: FlatPatternExporter.UI.Controls)**: пользовательские элементы управления
+  - `LayerSettingControl` - контрол настройки слоя DXF
+  - `HeaderAdorner` - UI компонент для визуализации drag&drop колонок DataGrid
+- **Models/ (namespace: FlatPatternExporter.UI.Models)**: модели состояния UI
+  - `UIState` - управление состоянием интерфейса (кнопки, прогресс, текст)
 
 **Стили и ресурсы**:
 - `ColorResources.xaml` - Централизованные цветовые ресурсы приложения
@@ -201,13 +224,15 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DefineEdge` - независимая библиотека COM interop (Libraries/MarshalCore.cs)
 
 **Зависимости между пространствами имен:**
-- `UI.Windows` → `Core`, `Enums`, `Models`, `Services`, `Utilities`
+- `UI.Windows` → `Core`, `Enums`, `Models`, `Services`, `Utilities`, `UI.Controls`, `UI.Models`
 - `UI.Controls` → `Models`
-- `Core` → `Enums`, `Services`, `UI.Windows` (для классов ScanProgress, PartConflictInfo)
-- `Services` → `Enums`, `Models`, `UI.Windows`
+- `UI.Models` → отсутствуют внешние зависимости
+- `Core` → `Enums`, `Models`, `Services`
+- `Services` → `Enums`, `Models`
 - `Utilities` → `Enums`
-- `Converters` → `UI.Windows`
-- `Libraries` → `Services`, `UI.Windows` для внешних типов
+- `Converters` → `Models`
+- `Models` → `Enums`
+- `Libraries` → `Services` для внешних типов
 
 ### Управление версиями
 Проект использует версионирование на основе Git в процессе сборки:

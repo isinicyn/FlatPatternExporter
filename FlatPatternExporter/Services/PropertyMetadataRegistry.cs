@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using FlatPatternExporter.UI.Windows;
+using FlatPatternExporter.Models;
 
 namespace FlatPatternExporter.Services;
 

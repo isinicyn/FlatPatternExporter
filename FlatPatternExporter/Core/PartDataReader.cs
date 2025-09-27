@@ -2,8 +2,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
-using FlatPatternExporter.UI.Windows;
 using Inventor;
 
 namespace FlatPatternExporter.Core;

@@ -2,8 +2,8 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using DefineEdge;
 using FlatPatternExporter.Enums;
+using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
-using FlatPatternExporter.UI.Windows;
 using Inventor;
 using MessageBox = System.Windows.MessageBox;
 

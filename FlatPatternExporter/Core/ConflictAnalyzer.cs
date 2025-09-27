@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using FlatPatternExporter.UI.Windows;
+using FlatPatternExporter.Models;
 
 namespace FlatPatternExporter.Core;
 

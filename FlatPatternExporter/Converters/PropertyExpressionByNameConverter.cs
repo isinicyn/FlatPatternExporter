@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using FlatPatternExporter.UI.Windows;
+using FlatPatternExporter.Models;
 
 namespace FlatPatternExporter.Converters;
 

@@ -10,13 +10,14 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using FlatPatternExporter.Core;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
+using FlatPatternExporter.UI.Controls;
+using FlatPatternExporter.UI.Models;
 using Inventor;
 using Binding = System.Windows.Data.Binding;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -27,20 +28,6 @@ using Style = System.Windows.Style;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace FlatPatternExporter.UI.Windows;
-
-public class AcadVersionItem
-{
-    public string DisplayName { get; set; } = string.Empty;
-    public AcadVersionType Value { get; set; }
-    public override string ToString() => DisplayName;
-}
-
-public class SplineReplacementItem
-{
-    public string DisplayName { get; set; } = string.Empty;
-    public SplineReplacementType Value { get; set; }
-    public override string ToString() => DisplayName;
-}
 
 public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
 {
@@ -871,7 +858,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// <summary>
     /// Централизованная подготовка контекста экспорта с показом ошибки
     /// </summary>
-    private async Task<Core.ExportContext?> PrepareExportContextOrShowError(Document document, bool requireScan = true, bool showProgress = false)
+    private async Task<ExportContext?> PrepareExportContextOrShowError(Document document, bool requireScan = true, bool showProgress = false)
     {
         var exportOptions = CreateExportOptions();
         var context = await _dxfExporter.PrepareExportContextAsync(document, requireScan, showProgress, _lastScannedDocument, exportOptions);
@@ -885,9 +872,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         return context;
     }
 
-    private Core.ExportOptions CreateExportOptions()
+    private ExportOptions CreateExportOptions()
     {
-        return new Core.ExportOptions
+        return new ExportOptions
         {
             SelectedExportFolder = SelectedExportFolder,
             FixedFolderPath = FixedFolderPath,
@@ -1309,7 +1296,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         );
     }
 
-
     private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
         // Проверяем, есть ли обработчик для нажатой клавиши
@@ -1442,9 +1428,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         progressState.UpdateScanProgress = false;
         SetUIState(progressState);
     }
-
-
-
 
     private void MultiplierTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
@@ -2288,465 +2271,4 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             item.Quantity = item.OriginalQuantity;
         }
     }
-}
-
-public class PartData : INotifyPropertyChanged
-{
-    private int item;
-
-    public string FileName { get; set; } = "";
-    public string FullFileName { get; set; } = "";
-    public string ModelState { get; set; } = "";
-    public BitmapImage? Preview { get; set; }
-    public bool HasFlatPattern { get; set; }
-    public string Material { get; set; } = "";
-    public string Thickness { get; set; } = "";
-    public string PartNumber { get; set; } = "";
-    public string Description { get; set; } = "";
-    public string Author { get; set; } = "";
-    public string Revision { get; set; } = "";
-    public string Project { get; set; } = "";
-    public string StockNumber { get; set; } = "";
-    public string Title { get; set; } = "";
-    public string Subject { get; set; } = "";
-    public string Keywords { get; set; } = "";
-    public string Comments { get; set; } = "";
-    public string Category { get; set; } = "";
-    public string Manager { get; set; } = "";
-    public string Company { get; set; } = "";
-    public string CreationTime { get; set; } = "";
-    public string CostCenter { get; set; } = "";
-    public string CheckedBy { get; set; } = "";
-    public string EngApprovedBy { get; set; } = "";
-    public string UserStatus { get; set; } = "";
-    public string CatalogWebLink { get; set; } = "";
-    public string Vendor { get; set; } = "";
-    public string MfgApprovedBy { get; set; } = "";
-    public string DesignStatus { get; set; } = "";
-    public string Designer { get; set; } = "";
-    public string Engineer { get; set; } = "";
-    public string Authority { get; set; } = "";
-    public string Mass { get; set; } = "";
-    public string SurfaceArea { get; set; } = "";
-    public string Volume { get; set; } = "";
-    public string SheetMetalRule { get; set; } = "";
-    public string FlatPatternWidth { get; set; } = "";
-    public string FlatPatternLength { get; set; } = "";
-    public string FlatPatternArea { get; set; } = "";
-    public string Appearance { get; set; } = "";
-    public string Density { get; set; } = "";
-    public string LastUpdatedWith { get; set; } = "";
-
-    private Dictionary<string, string> userDefinedProperties = [];
-
-    private int quantity;
-    public int OriginalQuantity { get; set; }
-    
-    private bool isOverridden;
-    public bool IsOverridden 
-    { 
-        get => isOverridden; 
-        set 
-        { 
-            isOverridden = value; 
-            OnPropertyChanged(); 
-        } 
-    }
-    
-    private bool isMultiplied;
-    public bool IsMultiplied 
-    { 
-        get => isMultiplied; 
-        set 
-        { 
-            isMultiplied = value; 
-            OnPropertyChanged(); 
-        } 
-    }
-
-    private BitmapImage? dxfPreview;
-    public BitmapImage? DxfPreview 
-    { 
-        get => dxfPreview; 
-        set 
-        { 
-            if (dxfPreview != value)
-            {
-                dxfPreview = value; 
-                OnPropertyChanged(); 
-            }
-        } 
-    }
-
-    
-    private ProcessingStatus processingStatus = ProcessingStatus.NotProcessed;
-    public ProcessingStatus ProcessingStatus 
-    { 
-        get => processingStatus; 
-        set 
-        { 
-            if (processingStatus != value)
-            {
-                processingStatus = value; 
-                OnPropertyChanged(); 
-            }
-        } 
-    }
-
-    public Dictionary<string, string> UserDefinedProperties
-    {
-        get => userDefinedProperties;
-        set
-        {
-            userDefinedProperties = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public int Item
-    {
-        get => item;
-        set
-        {
-            item = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private readonly Dictionary<string, bool> _isExpressionFlags = [];
-    private int _expressionStateVersion;
-    private bool _suppressExpressionVersion;
-    private bool _expressionStateChangedWhileSuppressed;
-
-    public int ExpressionStateVersion
-    {
-        get => _expressionStateVersion;
-        private set
-        {
-            if (_expressionStateVersion != value)
-            {
-                _expressionStateVersion = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public void BeginExpressionBatch()
-    {
-        _suppressExpressionVersion = true;
-        _expressionStateChangedWhileSuppressed = false;
-    }
-
-    public void EndExpressionBatch()
-    {
-        _suppressExpressionVersion = false;
-        if (_expressionStateChangedWhileSuppressed)
-        {
-            _expressionStateChangedWhileSuppressed = false;
-            ExpressionStateVersion++;
-        }
-    }
-
-    /// <summary>
-    /// Проверяет, является ли указанное свойство выражением
-    /// </summary>
-    public bool IsPropertyExpression(string propertyName) => 
-        _isExpressionFlags.TryGetValue(propertyName, out var isExpression) && isExpression;
-
-    /// <summary>
-    /// Устанавливает состояние выражения для свойства
-    /// </summary>
-    public void SetPropertyExpressionState(string propertyName, bool isExpression)
-    {
-        var oldValue = IsPropertyExpression(propertyName);
-        _isExpressionFlags[propertyName] = isExpression;
-
-        if (oldValue != isExpression)
-        {
-            if (_suppressExpressionVersion)
-            {
-                _expressionStateChangedWhileSuppressed = true;
-            }
-            else
-            {
-                ExpressionStateVersion++;
-            }
-        }
-    }
-
-    public int Quantity
-    {
-        get => quantity;
-        set
-        {
-            Debug.WriteLine($"PartData.Quantity setter: PartNumber={PartNumber}, OldValue={quantity}, NewValue={value}, IsOverridden={IsOverridden}");
-            if (value > 0 && quantity != value)
-            {
-                quantity = value;
-                IsOverridden = value != OriginalQuantity;
-                IsMultiplied = false;
-                Debug.WriteLine($"PartData.Quantity setter: Setting IsOverridden={IsOverridden} for {PartNumber}");
-                OnPropertyChanged();
-            }
-            else if (value > 0)
-            {
-                quantity = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    internal void SetQuantityInternal(int value)
-    {
-        Debug.WriteLine($"PartData.SetQuantityInternal: PartNumber={PartNumber}, OldValue={quantity}, NewValue={value}");
-        quantity = value;
-        OnPropertyChanged(nameof(Quantity));
-    }
-
-    // Реализация интерфейса INotifyPropertyChanged
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    public void OnPropertyChanged([CallerMemberName] string? name = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-    // Методы для работы с пользовательскими свойствами
-    public void AddUserDefinedProperty(string propertyName, string propertyValue)
-    {
-        UserDefinedProperties[propertyName] = propertyValue;
-        OnPropertyChanged(nameof(UserDefinedProperties));
-    }
-    public void RemoveUserDefinedProperty(string propertyName) => 
-        userDefinedProperties.Remove(propertyName);
-
-}
-
-public class HeaderAdorner : Adorner
-{
-    private readonly VisualCollection _visuals;
-
-    public HeaderAdorner(UIElement adornedElement, UIElement header)
-        : base(adornedElement)
-    {
-        _visuals = new VisualCollection(this);
-        Child = header;
-        _visuals.Add(Child);
-
-        IsHitTestVisible = false;
-        Opacity = 0.8; // Полупрозрачность
-    }
-
-    public UIElement Child { get; }
-
-    protected override int VisualChildrenCount => _visuals.Count;
-
-    protected override Size ArrangeOverride(Size finalSize)
-    {
-        Child.Arrange(new Rect(finalSize));
-        return finalSize;
-    }
-
-    protected override Visual GetVisualChild(int index)
-    {
-        return _visuals[index];
-    }
-}
-
-public class PresetIProperty : INotifyPropertyChanged
-{
-    public string ColumnHeader { get; set; } = string.Empty; // Заголовок колонки в DataGrid (например, "Обозначение")
-    public string ListDisplayName { get; set; } = string.Empty; // Отображение в списке выбора свойств (например, "Обозначение")
-    public string InventorPropertyName { get; set; } = string.Empty; // Соответствующее имя свойства iProperty в Inventor (например, "PartNumber")
-    public string Category { get; set; } = string.Empty; // Категория свойства для группировки
-    public bool IsUserDefined { get; set; } = false; // Является ли это пользовательским свойством
-
-    private bool _isAdded;
-    public bool IsAdded
-    {
-        get => _isAdded;
-        set
-        {
-            if (_isAdded != value)
-            {
-                _isAdded = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsAdded)));
-            }
-        }
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-}
-
-// Структура для отслеживания прогресса сканирования
-public class ScanProgress
-{
-    public int ProcessedItems { get; set; }
-    public int TotalItems { get; set; }
-    public string CurrentOperation { get; set; } = string.Empty;
-    public string CurrentItem { get; set; } = string.Empty;
-}
-
-
-// Структура для детальной информации о конфликтах обозначений
-public class PartConflictInfo
-{
-    public string PartNumber { get; set; } = string.Empty;
-    public string FileName { get; set; } = string.Empty;
-    public string ModelState { get; set; } = string.Empty;
-    
-    // Уникальный идентификатор для сравнения
-    public string UniqueId => $"{FileName}|{ModelState}";
-}
-
-
-// Класс для управления состоянием UI
-public class UIState
-{
-    private const string SCAN_BUTTON_TEXT = "Сканировать";
-    private const string CANCEL_BUTTON_TEXT = "Прервать";
-    private const string EXPORT_BUTTON_TEXT = "Экспорт";
-    public const string CANCELLING_TEXT = "Прерывание...";
-    
-    public bool ScanEnabled { get; set; }
-    public bool ExportEnabled { get; set; }
-    public bool ClearEnabled { get; set; }
-    public string ScanButtonText { get; set; } = "";
-    public string ExportButtonText { get; set; } = "";
-    public string ProgressText { get; set; } = "";
-    public double ProgressValue { get; set; }
-    public bool InventorUIDisabled { get; set; }
-    public bool UpdateScanProgress { get; set; } = true;
-    public bool UpdateExportProgress { get; set; } = true;
-    
-    public static UIState Initial => new()
-    {
-        ScanEnabled = true,
-        ExportEnabled = false,
-        ClearEnabled = false,
-        ScanButtonText = SCAN_BUTTON_TEXT,
-        ExportButtonText = EXPORT_BUTTON_TEXT,
-        ProgressText = "Документ не выбран",
-        ProgressValue = 0,
-        InventorUIDisabled = false,
-        UpdateScanProgress = true,
-        UpdateExportProgress = true
-    };
-    
-    public static UIState Scanning => new()
-    {
-        ScanEnabled = true,
-        ExportEnabled = false,
-        ClearEnabled = false,
-        ScanButtonText = CANCEL_BUTTON_TEXT,
-        ExportButtonText = EXPORT_BUTTON_TEXT,
-        ProgressText = "Подготовка к сканированию...",
-        ProgressValue = 0,
-        InventorUIDisabled = true,
-        UpdateScanProgress = true,
-        UpdateExportProgress = false
-    };
-    
-    public static UIState CancellingScan => new()
-    {
-        ScanEnabled = false,
-        ScanButtonText = CANCELLING_TEXT,
-        ExportEnabled = false,
-        ExportButtonText = EXPORT_BUTTON_TEXT,
-        ClearEnabled = false,
-        ProgressText = "Прерывание...",
-        ProgressValue = 0,
-        InventorUIDisabled = true,
-        UpdateScanProgress = true,
-        UpdateExportProgress = false
-    };
-    
-    public static UIState Exporting => new()
-    {
-        ScanEnabled = false,
-        ExportEnabled = true,
-        ClearEnabled = false,
-        ScanButtonText = SCAN_BUTTON_TEXT,
-        ExportButtonText = CANCEL_BUTTON_TEXT,
-        ProgressText = "Экспорт данных...",
-        ProgressValue = 0,
-        InventorUIDisabled = true,
-        UpdateScanProgress = false,
-        UpdateExportProgress = true
-    };
-    
-    public static UIState CancellingExport => new()
-    {
-        ScanEnabled = false,
-        ScanButtonText = SCAN_BUTTON_TEXT,
-        ExportEnabled = false,
-        ExportButtonText = CANCELLING_TEXT,
-        ClearEnabled = false,
-        ProgressText = "Прерывание экспорта...",
-        ProgressValue = 0,
-        InventorUIDisabled = true,
-        UpdateScanProgress = false,
-        UpdateExportProgress = true
-    };
-    
-    public static UIState PreparingQuickExport => new()
-    {
-        ScanEnabled = false,
-        ScanButtonText = SCAN_BUTTON_TEXT,
-        ExportEnabled = true,
-        ExportButtonText = CANCEL_BUTTON_TEXT,
-        ClearEnabled = false,
-        ProgressText = "Сканирование и подготовка данных...",
-        ProgressValue = 0,
-        InventorUIDisabled = true,
-        UpdateScanProgress = false,
-        UpdateExportProgress = true
-    };
-    
-    public static UIState CreateClearedState() => new()
-    {
-        ScanEnabled = true,
-        ExportEnabled = false,
-        ClearEnabled = false,
-        ScanButtonText = SCAN_BUTTON_TEXT,
-        ExportButtonText = EXPORT_BUTTON_TEXT,
-        ProgressText = "",
-        ProgressValue = 0,
-        InventorUIDisabled = false,
-        UpdateScanProgress = true,
-        UpdateExportProgress = false
-    };
-    
-    public static UIState CreateAfterOperationState(bool hasData, bool wasCancelled, string statusText) => new()
-    {
-        ScanEnabled = true,
-        ExportEnabled = hasData && !wasCancelled,
-        ClearEnabled = hasData,
-        ScanButtonText = SCAN_BUTTON_TEXT,
-        ExportButtonText = EXPORT_BUTTON_TEXT,
-        ProgressText = statusText,
-        ProgressValue = 0,
-        InventorUIDisabled = false,
-        UpdateScanProgress = true,
-        UpdateExportProgress = true
-    };
-}
-
-
-// Результат операции
-public class OperationResult
-{
-    public int ProcessedCount { get; set; }
-    public int SkippedCount { get; set; }
-    public TimeSpan ElapsedTime { get; set; }
-    public bool WasCancelled { get; set; }
-    public List<string> Errors { get; set; } = [];
-}
-
-// Результат валидации документа
-public class DocumentValidationResult
-{
-    public Document? Document { get; set; }
-    public DocumentType DocType { get; set; }
-    public bool IsValid { get; set; }
-    public string ErrorMessage { get; set; } = "";
-    public string DocumentTypeName { get; set; } = "";
 }
