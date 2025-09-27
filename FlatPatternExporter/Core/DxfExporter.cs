@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Windows.Threading;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
@@ -162,6 +163,8 @@ public class DxfExporter
         var localProcessedCount = processedCount;
         var localSkippedCount = skippedCount;
 
+        var thumbnailGenerator = generateThumbnails ? new ThumbnailGenerator() : null;
+
         foreach (var partData in partsDataList)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -285,6 +288,16 @@ public class DxfExporter
                 }
 
                 partData.ProcessingStatus = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Error;
+
+                if (exportSuccess && generateThumbnails && thumbnailGenerator != null &&
+                    AcadVersionMapping.SupportsOptimization(exportOptions.SelectedAcadVersion))
+                {
+                    var dxfPreview = thumbnailGenerator.GenerateDxfThumbnails(thicknessDir, partNumber, Dispatcher.CurrentDispatcher);
+                    if (dxfPreview != null)
+                    {
+                        partData.DxfPreview = dxfPreview;
+                    }
+                }
 
                 if (exportSuccess)
                     localProcessedCount++;
