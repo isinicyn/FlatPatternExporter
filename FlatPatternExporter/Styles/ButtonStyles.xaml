@@ -414,7 +414,8 @@
                             <Setter TargetName="Border" Property="Background" Value="{StaticResource HighlightBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HoverBackgroundBrush}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectionBackgroundBrush}"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
                             <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="{StaticResource TextDisabledBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
