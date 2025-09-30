@@ -9,7 +9,7 @@
         SizeToContent="Height">
 
 
-    <Grid>
+    <Grid SnapsToDevicePixels="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -22,7 +22,7 @@
                     <DockPanel Margin="{StaticResource BottomSmallMarginThickness}">
                         <TextBlock x:Name="VersionTextBlock" 
                                    Text="{extensions:Localize Text_ProgramVersion}" 
-                                   Style="{StaticResource BaseTextBlockStyle}" VerticalAlignment="Center"/>
+                                   Style="{StaticResource BaseTextBlockStyle}" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold"/>
                         <Button Style="{StaticResource CopyIconButton}" 
                                 Margin="{StaticResource SmallMarginThickness}" 
                                 Click="CopyVersionToClipboard_Click" 
@@ -31,24 +31,60 @@
                         </Button>
                     </DockPanel>
 
-                    <TextBlock Text="{extensions:Localize Text_Author}"
-                               Style="{StaticResource BaseTextBlockStyle}"
-                               Margin="{StaticResource BottomHairlineMarginThickness}"/>
-                    <TextBlock Text="Email: isinicyn@gmail.com"
-                               Style="{StaticResource BaseTextBlockStyle}"
-                               Margin="{StaticResource BottomHairlineMarginThickness}"/>
-                    <TextBlock Text="{extensions:Localize Text_License}"
-                               Style="{StaticResource BaseTextBlockStyle}"
-                               Margin="{StaticResource BottomHairlineMarginThickness}"/>
+                    <Grid Margin="{StaticResource BottomHairlineMarginThickness}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{extensions:Localize Text_AuthorLabel}"
+                                   Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="Ivan Sinicyn"
+                                   Style="{StaticResource BaseTextBlockStyle}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Email:"
+                                   Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="isinicyn@gmail.com"
+                                   Style="{StaticResource BaseTextBlockStyle}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{extensions:Localize Text_LicenseLabel}"
+                                   Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{extensions:Localize Text_LicenseValue}"
+                                   Style="{StaticResource BaseTextBlockStyle}"/>
+                    </Grid>
                 </StackPanel>
             </GroupBox>
 
             <GroupBox Header="{extensions:Localize Header_AISupport}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
-                    <TextBlock Text="ChatGPT 4o, Claude 3.5 Sonnet, Claude 4 Sonnet, Claude 4.1 Opus, Claude 4.5 Sonnet, Mistral Large 2"
-                               FontSize="{StaticResource SmallFontSize}"
+                    <TextBlock FontSize="{StaticResource SmallFontSize}"
                                Foreground="{StaticResource TextMutedBrush}"
-                               TextWrapping="Wrap"/>
+                               TextWrapping="Wrap">
+                        <Run Text="• ChatGPT 4o" FontWeight="SemiBold"/><LineBreak/>
+                        <Run Text="• Mistral Large 2" FontWeight="SemiBold"/><LineBreak/>
+                        <Run Text="• Claude 3.5 Sonnet" FontWeight="SemiBold"/><LineBreak/>
+                        <Run Text="• Claude 4 Sonnet" FontWeight="SemiBold"/><LineBreak/>
+                        <Run Text="• Claude 4.1 Opus" FontWeight="SemiBold"/><LineBreak/>
+                        <Run Text="• Claude 4.5 Sonnet" FontWeight="SemiBold"/>
+                        
+                    </TextBlock>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="{extensions:Localize Header_OpenSourceLibraries}" Margin="{StaticResource TopSmallMarginThickness}">
+                <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
+                    <TextBlock FontSize="{StaticResource SmallFontSize}"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               TextWrapping="Wrap">
+                        <Run Text="• netDxf.netstandard 3.0.1 (MIT License)" FontWeight="SemiBold"/><LineBreak/>
+                        <Run Text="• Svg.Skia 3.2.1 (MIT License)" FontWeight="SemiBold"/><LineBreak/>
+                        <Run Text="• stdole 17.14.40260" FontWeight="SemiBold"/>
+                    </TextBlock>
                 </StackPanel>
             </GroupBox>
         </StackPanel>

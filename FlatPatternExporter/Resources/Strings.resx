@@ -921,17 +921,23 @@ Execution time: {4}</value>
   <data name="Text_ProgramVersion" xml:space="preserve">
     <value>Program version: 1.0.0</value>
   </data>
-  <data name="Text_Author" xml:space="preserve">
-    <value>Author: Ivan Sinicyn</value>
+  <data name="Text_AuthorLabel" xml:space="preserve">
+    <value>Author:</value>
   </data>
-  <data name="Text_License" xml:space="preserve">
-    <value>License: Free</value>
+  <data name="Text_LicenseLabel" xml:space="preserve">
+    <value>License:</value>
+  </data>
+  <data name="Text_LicenseValue" xml:space="preserve">
+    <value>Free</value>
   </data>
   <data name="Text_LastUpdate" xml:space="preserve">
     <value>Last update: 10/09/2023</value>
   </data>
   <data name="Header_AISupport" xml:space="preserve">
     <value>AI-Powered Vibe Coding</value>
+  </data>
+  <data name="Header_OpenSourceLibraries" xml:space="preserve">
+    <value>Open Source Libraries</value>
   </data>
 
   <!-- UIState strings -->

@@ -921,17 +921,23 @@
   <data name="Text_ProgramVersion" xml:space="preserve">
     <value>Версия программы: 1.0.0</value>
   </data>
-  <data name="Text_Author" xml:space="preserve">
-    <value>Автор: Ivan Sinicyn</value>
+  <data name="Text_AuthorLabel" xml:space="preserve">
+    <value>Автор:</value>
   </data>
-  <data name="Text_License" xml:space="preserve">
-    <value>Лицензия: Свободная</value>
+  <data name="Text_LicenseLabel" xml:space="preserve">
+    <value>Лицензия:</value>
+  </data>
+  <data name="Text_LicenseValue" xml:space="preserve">
+    <value>Свободная</value>
   </data>
   <data name="Text_LastUpdate" xml:space="preserve">
     <value>Последнее обновление: 10/09/2023</value>
   </data>
   <data name="Header_AISupport" xml:space="preserve">
     <value>AI поддержка Vibe кодинга</value>
+  </data>
+  <data name="Header_OpenSourceLibraries" xml:space="preserve">
+    <value>Открытые библиотеки</value>
   </data>
 
   <!-- UIState strings -->

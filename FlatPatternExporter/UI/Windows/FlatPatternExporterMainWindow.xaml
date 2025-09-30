@@ -11,7 +11,7 @@
         PreviewMouseLeftButtonDown="MainWindow_PreviewMouseLeftButtonDown"
         Title="FPEx"
         MinHeight="600" MinWidth="1745"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" SnapsToDevicePixels="True">
 
 
     <Grid>
