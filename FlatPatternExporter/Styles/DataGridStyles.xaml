@@ -286,12 +286,8 @@
     </Style>
 
     <!-- Base style for TextBlock inside DataGrid -->
-    <Style x:Key="DataGridTextBlockStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
+    <Style x:Key="DataGridTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseCellStyle}">
         <Setter Property="Padding" Value="{StaticResource SmallPaddingThickness}"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>
 
     <!-- Style for phantom column header during drag -->

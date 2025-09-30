@@ -41,7 +41,7 @@
     <SolidColorBrush x:Key="SelectionBackgroundBrush" Color="#F0F0F0"/>
 
     <!-- Special backgrounds -->
-    <SolidColorBrush x:Key="TokenBackgroundBrush" Color="#F8F8F8"/>
+    <StaticResource x:Key="TokenBackgroundBrush" ResourceKey="BackgroundTertiaryBrush"/>
     <SolidColorBrush x:Key="TokenCustomBackgroundBrush" Color="#F0F8FF"/>
     <SolidColorBrush x:Key="TokenCustomBorderBrush" Color="#4682B4"/>
     <SolidColorBrush x:Key="TokenUserDefinedBackgroundBrush" Color="#FFF8E1"/>
@@ -65,11 +65,11 @@
 
     <!-- Transparent colors -->
     <SolidColorBrush x:Key="TransparentBrush" Color="Transparent"/>
-    <SolidColorBrush x:Key="ProgressBarBrush" Color="#FFE1E1E1"/>
+    <SolidColorBrush x:Key="ProgressBarBrush" Color="#404CAF50"/>
 
     <!-- Colors for processing statuses -->
-    <SolidColorBrush x:Key="ProcessingStatusSuccessBrush" Color="Green"/>
-    <SolidColorBrush x:Key="ProcessingStatusErrorBrush" Color="Red"/>
+    <StaticResource x:Key="ProcessingStatusSuccessBrush" ResourceKey="SuccessBrush"/>
+    <StaticResource x:Key="ProcessingStatusErrorBrush" ResourceKey="ErrorBrush"/>
 
     <!-- Colors for different quantity states -->
     <SolidColorBrush x:Key="QuantityOverriddenBrush" Color="Red"/>
@@ -80,7 +80,7 @@
 
     <!-- Brushes for DataGrid row alternation -->
     <SolidColorBrush x:Key="EvenRowBrush" Color="White"/>
-    <SolidColorBrush x:Key="OddRowBrush" Color="#F5F5F5"/>
+    <StaticResource x:Key="OddRowBrush" ResourceKey="BackgroundQuaternaryBrush"/>
     <SolidColorBrush x:Key="HighlightBrush" Color="#D1E8FF"/>
     <SolidColorBrush x:Key="HighlightTextBrush" Color="Black"/>
 

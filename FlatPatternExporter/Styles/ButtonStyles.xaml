@@ -395,7 +395,8 @@
                                        BorderThickness="0"
                                        Minimum="0"
                                        Maximum="100"
-                                       Value="{TemplateBinding Tag}"/>
+                                       Value="{TemplateBinding Tag}"
+                                       Opacity="0.3"/>
                                 <ContentPresenter x:Name="ContentPresenter"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
@@ -407,14 +408,13 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HighlightBrush}"/>
-                            <Setter TargetName="PART_ProgressBar" Property="Opacity" Value="0.6"/>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource HighlightBrush}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectionBackgroundBrush}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                             <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
                             <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="{StaticResource TextDisabledBrush}"/>
                         </Trigger>
