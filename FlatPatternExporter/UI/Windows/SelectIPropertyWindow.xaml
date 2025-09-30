@@ -184,17 +184,55 @@
                                         Margin="{StaticResource TinyMarginThickness}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="3*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
+                                        <!-- Column 0: Property name -->
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding ListDisplayName}"
                                                    VerticalAlignment="Center"
-                                                   FontSize="{StaticResource StandardFontSize}"/>
+                                                   FontSize="{StaticResource StandardFontSize}"
+                                                   Margin="{StaticResource RightSmallPlusMarginThickness}"/>
 
-                                        <!-- Action buttons -->
-                                        <StackPanel Grid.Column="1"
+                                        <!-- Column 1: Default value input (visible only when added) -->
+                                        <Grid Grid.Column="1">
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAdded}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+
+                                            <TextBox Text="{Binding DefaultValue, UpdateSourceTrigger=PropertyChanged}"
+                                                     Style="{StaticResource BaseTextBoxStyle}"
+                                                     FontSize="{StaticResource StandardFontSize}"/>
+                                            <TextBlock Text="{extensions:Localize Text_DefaultValuePlaceholder}"
+                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       Margin="{StaticResource SmallMarginThickness}"
+                                                       IsHitTestVisible="False"
+                                                       VerticalAlignment="Center"
+                                                       Padding="{StaticResource TextBoxPaddingThickness}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding DefaultValue}" Value="">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+
+                                        <!-- Column 2: Action buttons -->
+                                        <StackPanel Grid.Column="2"
                                                     Orientation="Horizontal">
                                             <Button x:Name="AddPropertyButton"
                                                     ToolTip="{extensions:Localize Button_Add}"
@@ -318,17 +356,55 @@
                                         Margin="{StaticResource TinyMarginThickness}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="3*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
+                                        <!-- Column 0: Property name -->
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding ListDisplayName}"
                                                    VerticalAlignment="Center"
-                                                   FontSize="{StaticResource StandardFontSize}"/>
+                                                   FontSize="{StaticResource StandardFontSize}"
+                                                   Margin="{StaticResource RightSmallPlusMarginThickness}"/>
 
-                                        <!-- Action buttons -->
-                                        <StackPanel Grid.Column="1"
+                                        <!-- Column 1: Default value input (visible only when added) -->
+                                        <Grid Grid.Column="1">
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAdded}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+
+                                            <TextBox Text="{Binding DefaultValue, UpdateSourceTrigger=PropertyChanged}"
+                                                     Style="{StaticResource BaseTextBoxStyle}"
+                                                     FontSize="{StaticResource StandardFontSize}"/>
+                                            <TextBlock Text="{extensions:Localize Text_DefaultValuePlaceholder}"
+                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       Margin="{StaticResource SmallMarginThickness}"
+                                                       IsHitTestVisible="False"
+                                                       VerticalAlignment="Center"
+                                                       Padding="{StaticResource TextBoxPaddingThickness}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding DefaultValue}" Value="">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+
+                                        <!-- Column 2: Action buttons -->
+                                        <StackPanel Grid.Column="2"
                                                     Orientation="Horizontal">
                                             <Button ToolTip="{extensions:Localize Button_Add}"
                                                     Margin="{StaticResource TinyMarginThickness}"

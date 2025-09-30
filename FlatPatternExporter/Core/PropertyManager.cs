@@ -71,7 +71,15 @@ public class PropertyManager(Document document)
     public string GetMappedProperty(string ourName, bool getExpression = false)
     {
         var prop = GetPropertyObject(ourName);
-        if (prop == null) return "";
+        if (prop == null)
+        {
+            // If property not found, check for default value
+            if (!getExpression && PropertyMetadataRegistry.PropertyDefaultValues.TryGetValue(ourName, out var defaultValue))
+            {
+                return defaultValue;
+            }
+            return "";
+        }
 
         string result;
         if (getExpression)
@@ -101,6 +109,12 @@ public class PropertyManager(Document document)
                 {
                     result = mappedValue;
                 }
+            }
+
+            // Apply default value if result is empty
+            if (string.IsNullOrEmpty(result) && PropertyMetadataRegistry.PropertyDefaultValues.TryGetValue(ourName, out var defaultValue))
+            {
+                result = defaultValue;
             }
         }
 

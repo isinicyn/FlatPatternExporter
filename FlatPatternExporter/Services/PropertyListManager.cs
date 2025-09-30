@@ -36,13 +36,29 @@ public class PropertyListManager(ObservableCollection<PresetIProperty> allProper
         {
             if (!UserDefinedProperties.Any(p => p.InventorPropertyName == userProperty.InternalName))
             {
-                var presetProperty = new PresetIProperty
-                {
-                    InventorPropertyName = userProperty.InternalName,
-                    IsUserDefined = true
-                };
+                var existingProperty = _allProperties.FirstOrDefault(p => p.InventorPropertyName == userProperty.InternalName);
 
-                UserDefinedProperties.Add(presetProperty);
+                if (existingProperty != null)
+                {
+                    UserDefinedProperties.Add(existingProperty);
+                }
+                else
+                {
+                    var presetProperty = new PresetIProperty
+                    {
+                        InventorPropertyName = userProperty.InternalName,
+                        IsUserDefined = true
+                    };
+
+                    // Restore default value if exists
+                    if (PropertyMetadataRegistry.PropertyDefaultValues.TryGetValue(userProperty.InternalName, out var defaultValue))
+                    {
+                        presetProperty.DefaultValue = defaultValue;
+                    }
+
+                    _allProperties.Add(presetProperty);
+                    UserDefinedProperties.Add(presetProperty);
+                }
             }
         }
     }
@@ -100,6 +116,7 @@ public class PropertyListManager(ObservableCollection<PresetIProperty> allProper
                 IsUserDefined = true
             };
 
+            _allProperties.Add(newUserProperty);
             UserDefinedProperties.Add(newUserProperty);
             return newUserProperty;
         }
@@ -109,6 +126,11 @@ public class PropertyListManager(ObservableCollection<PresetIProperty> allProper
 
     public bool RemoveUserDefinedProperty(PresetIProperty property)
     {
-        return UserDefinedProperties.Remove(property);
+        var removed = UserDefinedProperties.Remove(property);
+        if (removed)
+        {
+            _allProperties.Remove(property);
+        }
+        return removed;
     }
 }

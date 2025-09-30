@@ -28,6 +28,7 @@ public record InterfaceSettings
 {
     public List<string> ColumnOrder { get; init; } = [];
     public List<string> UserDefinedProperties { get; init; } = [];
+    public Dictionary<string, string> PropertyDefaultValues { get; init; } = [];
     public bool IsExpanded { get; init; }
     public string SelectedLanguage { get; init; } = "en-US";
 }
@@ -183,12 +184,17 @@ public static class SettingsManager
             .Where(name => !string.IsNullOrEmpty(name))
             .ToList();
 
+        var propertyDefaultValues = window.PresetIProperties
+            .Where(p => !string.IsNullOrEmpty(p.DefaultValue))
+            .ToDictionary(p => p.InventorPropertyName, p => p.DefaultValue);
+
         return new ApplicationSettings
         {
             Interface = new InterfaceSettings
             {
                 ColumnOrder = [..columnsInDisplayOrder],
                 UserDefinedProperties = userDefinedProperties,
+                PropertyDefaultValues = propertyDefaultValues,
                 IsExpanded = window.SettingsExpander?.IsExpanded ?? false,
                 SelectedLanguage = LocalizationManager.Instance.CurrentCulture.Name
             },
@@ -306,6 +312,22 @@ public static class SettingsManager
             if (!string.IsNullOrWhiteSpace(userProperty))
             {
                 PropertyMetadataRegistry.AddUserDefinedProperty(userProperty);
+            }
+        }
+
+        // Restore property default values directly to registry
+        PropertyMetadataRegistry.PropertyDefaultValues.Clear();
+        foreach (var kvp in settings.Interface.PropertyDefaultValues)
+        {
+            PropertyMetadataRegistry.PropertyDefaultValues[kvp.Key] = kvp.Value;
+        }
+
+        // Apply default values to existing PresetIProperties
+        foreach (var property in window.PresetIProperties)
+        {
+            if (PropertyMetadataRegistry.PropertyDefaultValues.TryGetValue(property.InventorPropertyName, out var defaultValue))
+            {
+                property.DefaultValue = defaultValue;
             }
         }
 

@@ -549,6 +549,12 @@ public static class PropertyMetadataRegistry
     public static readonly ObservableCollection<PropertyDefinition> UserDefinedProperties = [];
 
     /// <summary>
+    /// Dictionary of property default values (substitutions for empty values)
+    /// Key: InternalName, Value: DefaultValue
+    /// </summary>
+    public static readonly Dictionary<string, string> PropertyDefaultValues = [];
+
+    /// <summary>
     /// Creates a user-defined property definition
     /// </summary>
     public static PropertyDefinition CreateUserDefinedPropertyDefinition(string propertyName)

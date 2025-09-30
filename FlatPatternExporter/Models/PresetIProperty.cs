@@ -6,9 +6,32 @@ namespace FlatPatternExporter.Models;
 public class PresetIProperty : INotifyPropertyChanged
 {
     private bool _isAdded;
+    private string _defaultValue = string.Empty;
 
     public string InventorPropertyName { get; set; } = string.Empty;
     public bool IsUserDefined { get; set; } = false;
+
+    public string DefaultValue
+    {
+        get => _defaultValue;
+        set
+        {
+            if (_defaultValue != value)
+            {
+                _defaultValue = value;
+                OnPropertyChanged(nameof(DefaultValue));
+
+                if (string.IsNullOrEmpty(value))
+                {
+                    PropertyMetadataRegistry.PropertyDefaultValues.Remove(InventorPropertyName);
+                }
+                else
+                {
+                    PropertyMetadataRegistry.PropertyDefaultValues[InventorPropertyName] = value;
+                }
+            }
+        }
+    }
 
     public string ColumnHeader
     {
