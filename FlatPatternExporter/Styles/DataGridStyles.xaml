@@ -2,14 +2,15 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:local="clr-namespace:FlatPatternExporter.UI.Windows"
-                    xmlns:converters="clr-namespace:FlatPatternExporter.Converters">
+                    xmlns:converters="clr-namespace:FlatPatternExporter.Converters"
+                    xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions">
     <converters:PropertyExpressionByNameConverter x:Key="PropertyExpressionByNameConverter" />
     <converters:DynamicPropertyValueConverter x:Key="DynamicPropertyValueConverter" />
 
-    <!-- Базовые стили для ячеек -->
+    <!-- Base styles for cells -->
 
 
-    <!-- Базовый стиль для всех текстовых ячеек -->
+    <!-- Base style for all text cells -->
     <Style x:Key="BaseCellStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
@@ -18,12 +19,12 @@
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>
 
-    <!-- Стандартный стиль для обычных колонок -->
+    <!-- Standard style for regular columns -->
     <Style x:Key="CenteredCellStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseCellStyle}"/>
 
-    <!-- Шаблоны данных -->
-    
-    <!-- Универсальный шаблон: текст + индикатор выражения (fx). Путь к свойству берется из Tag ячейки -->
+    <!-- Data templates -->
+
+    <!-- Universal template: text + expression indicator (fx). Property path is taken from cell Tag -->
     <DataTemplate x:Key="EditableWithFxTemplate">
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <TextBlock VerticalAlignment="Center"
@@ -46,7 +47,7 @@
                        FontStyle="Italic"
                        FontSize="{StaticResource SmallFontSize}"
                        Foreground="{DynamicResource TextMutedBrush}"
-                       ToolTip="Значение задано выражением (Expression)">
+                       ToolTip="{extensions:Localize ToolTip_ExpressionIndicator}">
                 <TextBlock.Visibility>
                     <MultiBinding Converter="{StaticResource PropertyExpressionByNameConverter}">
                         <Binding/>
@@ -58,7 +59,7 @@
         </Grid>
     </DataTemplate>
     
-    <!-- Шаблон для колонки "Изобр. детали" -->
+    <!-- Template for "Part Image" column -->
     <DataTemplate x:Key="PartImageTemplate">
         <Image Source="{Binding Preview}" 
                Margin="{StaticResource VerticalHairlineMarginThickness}" 
@@ -66,9 +67,9 @@
                VerticalAlignment="Center"/>
     </DataTemplate>
 
-    <!-- Базовый стиль для TextBlock "Нет миниатюры" -->
+    <!-- Base style for TextBlock "No Thumbnail" -->
     <Style x:Key="NoThumbnailTextStyle" TargetType="TextBlock">
-        <Setter Property="Text" Value="Нет миниатюры"/>
+        <Setter Property="Text" Value="{extensions:Localize Text_NoThumbnail}"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="FontSize" Value="{StaticResource SmallFontSize}"/>
@@ -78,7 +79,7 @@
         <Setter Property="Visibility" Value="Collapsed"/>
     </Style>
 
-    <!-- Централизованный шаблон для DXF изображений -->
+    <!-- Centralized template for DXF images -->
     <ControlTemplate x:Key="DxfImageContainerTemplate" TargetType="ContentControl">
         <Grid Margin="{StaticResource VerticalHairlineMarginThickness}">
             <Image HorizontalAlignment="Center" 
@@ -98,14 +99,14 @@
         </Grid>
     </ControlTemplate>
 
-    <!-- Шаблон для колонки "Изобр. развертки" -->
+    <!-- Template for "Flat Pattern Image" column -->
     <DataTemplate x:Key="DxfImageTemplate">
         <ContentControl Template="{StaticResource DxfImageContainerTemplate}" 
                         Tag="{Binding DxfPreview}"/>
     </DataTemplate>
 
 
-    <!-- Шаблон для колонки ID с индикатором развертки -->
+    <!-- Template for ID column with flat pattern indicator -->
     <DataTemplate x:Key="IDWithFlatPatternIndicatorTemplate">
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.ColumnDefinitions>
@@ -120,11 +121,11 @@
                 <Rectangle.Style>
                     <Style TargetType="Rectangle">
                         <Setter Property="Fill" Value="{DynamicResource ErrorBrush}"/>
-                        <Setter Property="ToolTip" Value="Развертка отсутствует"/>
+                        <Setter Property="ToolTip" Value="{extensions:Localize ToolTip_FlatPatternMissing}"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding HasFlatPattern}" Value="True">
                                 <Setter Property="Fill" Value="{DynamicResource SuccessBrush}"/>
-                                <Setter Property="ToolTip" Value="Развертка доступна"/>
+                                <Setter Property="ToolTip" Value="{extensions:Localize ToolTip_FlatPatternAvailable}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -142,10 +143,10 @@
 
 
 
-    <!-- Шаблон для колонки "Количество" с цветовой индикацией и возможностью редактирования -->
+    <!-- Template for "Quantity" column with color indication and editing capability -->
     <DataTemplate x:Key="EditableQuantityTemplate">
         <Grid>
-            <!-- Отображение в режиме чтения -->
+            <!-- Display in read mode -->
             <TextBlock Text="{Binding Quantity}" x:Name="DisplayTextBlock">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}">
@@ -165,7 +166,7 @@
                 </TextBlock.Style>
             </TextBlock>
             
-            <!-- Редактирование в режиме редактирования -->
+            <!-- Editing in edit mode -->
             <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
                      HorizontalContentAlignment="Center"
                      x:Name="EditTextBox"
@@ -173,7 +174,7 @@
         </Grid>
         
         <DataTemplate.Triggers>
-            <!-- Переключение между режимами отображения и редактирования -->
+            <!-- Switching between display and edit modes -->
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridCell}, Path=IsEditing}" Value="True">
                 <Setter TargetName="DisplayTextBlock" Property="Visibility" Value="Collapsed"/>
                 <Setter TargetName="EditTextBox" Property="Visibility" Value="Visible"/>
@@ -181,7 +182,7 @@
         </DataTemplate.Triggers>
     </DataTemplate>
 
-    <!-- Шаблон для колонки статуса обработки -->
+    <!-- Template for processing status column -->
     <DataTemplate x:Key="ProcessingStatusTemplate">
         <Border Width="10" Height="10" 
                 BorderBrush="{DynamicResource TextDisabledBrush}" 
@@ -204,7 +205,7 @@
         </Border>
     </DataTemplate>
 
-    <!-- Стили DataGrid -->
+    <!-- DataGrid styles -->
     <Style x:Key="DataGridRowStyle" TargetType="DataGridRow">
         <Setter Property="Background" Value="{StaticResource EvenRowBrush}" />
         <Style.Triggers>
@@ -229,7 +230,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Стиль для заголовков столбцов -->
+    <!-- Style for column headers -->
     <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -244,7 +245,7 @@
         <Setter Property="ContextMenu" Value="{x:Null}"/>
     </Style>
 
-    <!-- Стиль для заголовков строк -->
+    <!-- Style for row headers -->
     <Style x:Key="DataGridRowHeaderStyle" TargetType="DataGridRowHeader">
         <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
@@ -266,7 +267,7 @@
         </Setter>
     </Style>
 
-    <!-- Стиль для ячеек -->
+    <!-- Style for cells -->
     <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
@@ -284,7 +285,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Базовый стиль для TextBlock внутри DataGrid -->
+    <!-- Base style for TextBlock inside DataGrid -->
     <Style x:Key="DataGridTextBlockStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="Padding" Value="{StaticResource SmallPaddingThickness}"/>
@@ -293,7 +294,7 @@
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>
 
-    <!-- Стиль для фантомного заголовка колонки при перетаскивании -->
+    <!-- Style for phantom column header during drag -->
     <Style x:Key="PhantomColumnHeaderStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource LargeFontSize}"/>
         <Setter Property="Padding" Value="{StaticResource SmallPaddingThickness}"/>
@@ -307,14 +308,14 @@
         <Setter Property="FontWeight" Value="Normal"/>
     </Style>
 
-    <!-- Стиль для фантомного заголовка в режиме удаления -->
+    <!-- Style for phantom column header in delete mode -->
     <Style x:Key="PhantomColumnHeaderDeleteStyle" TargetType="TextBlock" BasedOn="{StaticResource PhantomColumnHeaderStyle}">
         <Setter Property="Background" Value="{DynamicResource ErrorBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="FontWeight" Value="Bold"/>
     </Style>
     
-    <!-- Стиль для иконки таблицы -->
+    <!-- Style for table icon -->
     <Style x:Key="TableIconStyle" TargetType="Path">
         <Setter Property="Data" Value="{StaticResource TableIconGeometry}"/>
         <Setter Property="Stroke" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -323,7 +324,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- Стиль для пустой области справа от заголовков -->
+    <!-- Style for empty area to the right of headers -->
     <Style TargetType="DataGridColumnHeadersPresenter">
         <Setter Property="Template">
             <Setter.Value>

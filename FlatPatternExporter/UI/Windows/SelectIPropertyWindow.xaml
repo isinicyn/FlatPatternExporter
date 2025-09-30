@@ -1,19 +1,22 @@
 ﻿<Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:av="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:av="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:local="clr-namespace:FlatPatternExporter.UI.Windows"
+    xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions"
+    xmlns:converters="clr-namespace:FlatPatternExporter.Converters"
+    xmlns:services="clr-namespace:FlatPatternExporter.Services"
     mc:Ignorable="av" x:Class="FlatPatternExporter.UI.Windows.SelectIPropertyWindow"
-    Title="Управление свойствами"
-    ResizeMode="CanResize" 
-    WindowStartupLocation="CenterScreen" 
+    Title="{extensions:Localize Header_SelectProperties}"
+    ResizeMode="CanResize"
+    WindowStartupLocation="CenterScreen"
     MinWidth="400"
     MinHeight="450" Width="560">
-    
+
     <Window.Resources>
-        <!-- CollectionViewSource для стандартных свойств с группировкой -->
+        <!-- CollectionViewSource for standard properties with grouping -->
         <CollectionViewSource x:Key="StandardPropertiesSource"
                               Source="{Binding StandardProperties}">
             <CollectionViewSource.GroupDescriptions>
@@ -25,7 +28,7 @@
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
 
-        <!-- CollectionViewSource для пользовательских свойств -->
+        <!-- CollectionViewSource for user-defined properties -->
         <CollectionViewSource x:Key="UserPropertiesSource"
                               Source="{Binding UserDefinedProperties}">
             <CollectionViewSource.SortDescriptions>
@@ -41,35 +44,35 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок и общая информация -->
-        <Border Grid.Row="0" 
+        <!-- Header and general information -->
+        <Border Grid.Row="0"
                 Background="{StaticResource BackgroundSecondaryBrush}"
                 BorderBrush="{StaticResource BorderLightBrush}"
                 BorderThickness="{StaticResource StandardTopOnlyBorderThicknessValue}"
                 Padding="{StaticResource StandardPaddingThickness}">
             <StackPanel>
-                <TextBlock Text="Управление свойствами колонок" 
+                <TextBlock Text="{extensions:Localize Text_PropertyManagement}"
                            Style="{StaticResource SectionHeaderTextStyle}"
                            FontSize="{StaticResource LargeFontSize}"
                            Margin="0"/>
-                <TextBlock Text="Дважды щелкните по свойству для добавления в таблицу или используйте кнопки действий"
+                <TextBlock Text="{extensions:Localize Text_PropertyInstructions}"
                            Foreground="{StaticResource TextMutedBrush}"
                            Margin="{StaticResource TopSmallMarginThickness}" TextTrimming="CharacterEllipsis"/>
             </StackPanel>
         </Border>
 
-        <!-- Основное содержимое с вкладками -->
+        <!-- Main content with tabs -->
         <TabControl Grid.Row="1" Margin="{StaticResource StandardMarginThickness}">
-            <!-- Вкладка стандартных свойств -->
-            <TabItem Header="Стандартные свойства">
+            <!-- Standard properties tab -->
+            <TabItem Header="{extensions:Localize Text_StandardProperties}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Панель поиска и фильтров -->
-                    <Border Grid.Row="0" 
+                    <!-- Search and filter panel -->
+                    <Border Grid.Row="0"
                             Background="{StaticResource BackgroundQuaternaryBrush}"
                             BorderBrush="{StaticResource BorderLightBrush}"
                             BorderThickness="{StaticResource StandardBorderThicknessValue}"
@@ -81,21 +84,21 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            
+
                             <Grid Grid.Column="0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                
-                                <TextBox x:Name="StandardSearchBox" 
+
+                                <TextBox x:Name="StandardSearchBox"
                                          Grid.Column="0"
                                          Style="{StaticResource BaseTextBoxStyle}"
                                          TextChanged="StandardSearchBox_TextChanged"/>
-                                <TextBlock Text="Поиск по названию..." 
-                                           Foreground="{StaticResource TextMutedBrush}" 
+                                <TextBlock Text="{extensions:Localize Text_SearchByName}"
+                                           Foreground="{StaticResource TextMutedBrush}"
                                            Margin="{StaticResource SmallMarginThickness}"
-                                           IsHitTestVisible="False" VerticalAlignment="Center" 
+                                           IsHitTestVisible="False" VerticalAlignment="Center"
                                            Padding="{StaticResource TextBoxPaddingThickness}">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
@@ -108,29 +111,38 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                
+
                                 <Border Grid.Column="1" Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
-                                    <Button x:Name="ClearStandardSearchButton" 
-                                        Click="ClearStandardSearchButton_Click" 
+                                    <Button x:Name="ClearStandardSearchButton"
+                                        Click="ClearStandardSearchButton_Click"
                                         Style="{StaticResource CloseIconButton}"
                                         IsEnabled="False">
                                     </Button>
                                 </Border>
                             </Grid>
-                            
-                            <ComboBox x:Name="CategoryFilter" 
+
+                            <ComboBox x:Name="CategoryFilter"
                                       Grid.Column="2"
                                       Width="150"
                                       Margin="{StaticResource LeftSmallMarginThickness}"
                                       Style="{StaticResource BaseComboBoxStyle}"
                                       SelectedIndex="0"
                                       SelectionChanged="CategoryFilter_SelectionChanged">
-                                <ComboBoxItem>Все категории</ComboBoxItem>
+                                <ComboBoxItem>
+                                    <ComboBoxItem.Content>
+                                        <Binding Path="CurrentCulture" Source="{x:Static services:LocalizationManager.Instance}">
+                                            <Binding.Converter>
+                                                <converters:LocalizationKeyConverter />
+                                            </Binding.Converter>
+                                            <Binding.ConverterParameter>Filter_AllCategories</Binding.ConverterParameter>
+                                        </Binding>
+                                    </ComboBoxItem.Content>
+                                </ComboBoxItem>
                             </ComboBox>
                         </Grid>
                     </Border>
 
-                    <!-- Список стандартных свойств -->
+                    <!-- Standard properties list -->
                     <ListBox x:Name="StandardPropertiesListBox"
                              Grid.Row="1"
                              ItemsSource="{Binding Source={StaticResource StandardPropertiesSource}}"
@@ -140,8 +152,8 @@
                              Background="{StaticResource BackgroundPrimaryBrush}"
                              BorderThickness="{StaticResource StandardBorderThicknessValue}"
                              MouseDoubleClick="StandardPropertiesListBox_MouseDoubleClick">
-                        
-                        <!-- Группировка по категориям -->
+
+                        <!-- Grouping by categories -->
                         <ListBox.GroupStyle>
                             <GroupStyle>
                                 <GroupStyle.HeaderTemplate>
@@ -160,8 +172,8 @@
                                 </GroupStyle.HeaderTemplate>
                             </GroupStyle>
                         </ListBox.GroupStyle>
-                        
-                        <!-- Шаблон элемента -->
+
+                        <!-- Item template -->
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border x:Name="ItemBorder"
@@ -175,17 +187,17 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        
+
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding ListDisplayName}"
                                                    VerticalAlignment="Center"
                                                    FontSize="{StaticResource StandardFontSize}"/>
-                                        
-                                        <!-- Кнопки действий -->
-                                        <StackPanel Grid.Column="1" 
+
+                                        <!-- Action buttons -->
+                                        <StackPanel Grid.Column="1"
                                                     Orientation="Horizontal">
                                             <Button x:Name="AddPropertyButton"
-                                                    ToolTip="Добавить колонку"
+                                                    ToolTip="{extensions:Localize Button_Add}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="AddPropertyButton_Click"
                                                     Tag="{Binding}">
@@ -200,9 +212,9 @@
                                                     </Style>
                                                 </Button.Style>
                                             </Button>
-                                            
+
                                             <Button x:Name="RemovePropertyButton"
-                                                    ToolTip="Удалить колонку"
+                                                    ToolTip="{extensions:Localize Button_Remove}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="RemovePropertyButton_Click"
                                                     Tag="{Binding}">
@@ -239,8 +251,8 @@
                 </Grid>
             </TabItem>
 
-            <!-- Вкладка пользовательских свойств -->
-            <TabItem Header="Пользовательские свойства">
+            <!-- User-defined properties tab -->
+            <TabItem Header="{extensions:Localize Text_UserProperties}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -248,7 +260,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Панель добавления нового свойства -->
+                    <!-- Add new property panel -->
                     <Border Grid.Row="0"
                             Background="{StaticResource BackgroundQuaternaryBrush}"
                             BorderBrush="{StaticResource BorderLightBrush}"
@@ -261,22 +273,22 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            
+
                             <TextBlock Grid.Column="0"
-                                       Text="Новое свойство:"
+                                       Text="{extensions:Localize Text_NewProperty}"
                                        VerticalAlignment="Center"
                                        FontSize="{StaticResource StandardFontSize}"
                                        Margin="{StaticResource RightStandardMarginThickness}"/>
-                            
+
                             <TextBox x:Name="UserDefinedPropertyTextBox"
                                      Grid.Column="1"
                                      Style="{StaticResource BaseTextBoxStyle}"
                                      TextChanged="UserDefinedPropertyTextBox_TextChanged"
                                      KeyDown="UserDefinedPropertyTextBox_KeyDown"/>
-                            
+
                             <Button x:Name="AddUserDefinedPropertyButton"
                                     Grid.Column="2"
-                                    Content="Добавить"
+                                    Content="{extensions:Localize Button_Add}"
                                     MinWidth="{StaticResource StandardButtonMinWidth}"
                                     Margin="{StaticResource LeftSmallMarginThickness}"
                                     Style="{StaticResource InteractiveActionButtonStyle}"
@@ -285,7 +297,7 @@
                         </Grid>
                     </Border>
 
-                    <!-- Список пользовательских свойств -->
+                    <!-- User-defined properties list -->
                     <ListBox x:Name="UserPropertiesListBox"
                              Grid.Row="1"
                              ItemsSource="{Binding Source={StaticResource UserPropertiesSource}}"
@@ -295,7 +307,7 @@
                              Background="{StaticResource BackgroundPrimaryBrush}"
                              BorderThickness="{StaticResource StandardBorderThicknessValue}"
                              MouseDoubleClick="UserPropertiesListBox_MouseDoubleClick">
-                        
+
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border x:Name="ItemBorder"
@@ -309,16 +321,16 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        
+
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding ListDisplayName}"
                                                    VerticalAlignment="Center"
                                                    FontSize="{StaticResource StandardFontSize}"/>
-                                        
-                                        <!-- Кнопки действий -->
-                                        <StackPanel Grid.Column="1" 
+
+                                        <!-- Action buttons -->
+                                        <StackPanel Grid.Column="1"
                                                     Orientation="Horizontal">
-                                            <Button ToolTip="Добавить колонку"
+                                            <Button ToolTip="{extensions:Localize Button_Add}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="AddUserPropertyButton_Click"
                                                     Tag="{Binding}">
@@ -333,8 +345,8 @@
                                                     </Style>
                                                 </Button.Style>
                                             </Button>
-                                            
-                                            <Button ToolTip="Удалить колонку"
+
+                                            <Button ToolTip="{extensions:Localize Button_Remove}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Click="RemoveUserPropertyButton_Click"
                                                     Tag="{Binding}">
@@ -349,8 +361,8 @@
                                                     </Style>
                                                 </Button.Style>
                                             </Button>
-                                            
-                                            <Button ToolTip="Удалить из реестра"
+
+                                            <Button ToolTip="{extensions:Localize ToolTip_RemoveFromRegistry}"
                                                     Margin="{StaticResource TinyMarginThickness}"
                                                     Style="{StaticResource DeleteFromRegistryIconButton}"
                                                     Click="DeleteUserPropertyButton_Click"
@@ -375,7 +387,7 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <!-- Информационная панель -->
+                    <!-- Information panel -->
                     <Border Grid.Row="2"
                             Background="{StaticResource BackgroundQuaternaryBrush}"
                             BorderBrush="{StaticResource BorderLightBrush}"
@@ -386,26 +398,26 @@
                                    Foreground="{StaticResource TextMutedBrush}"
                                    FontSize="{StaticResource StandardFontSize}">
                             <Run Text="ℹ"/>
-                            <Run Text="Пользовательские свойства читаются из Inventor User Defined Properties."/>
-                            <Run Text="Удаление из реестра полностью удаляет свойство из системы."/>
+                            <Run Text="{extensions:Localize Text_UserPropertiesInfo}"/>
+                            <Run Text="{extensions:Localize Text_RegistryRemovalInfo}"/>
                         </TextBlock>
                     </Border>
                 </Grid>
             </TabItem>
         </TabControl>
 
-        <!-- Нижняя панель с кнопками -->
-        <Border Grid.Row="2" 
+        <!-- Bottom panel with buttons -->
+        <Border Grid.Row="2"
                 Style="{StaticResource DialogBottomBarStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                
-                <!-- Кнопка закрытия -->
+
+                <!-- Close button -->
                 <Button Grid.Column="1"
-                        Content="Закрыть"
+                        Content="{extensions:Localize Button_Close}"
                         MinWidth="{StaticResource StandardButtonMinWidth}"
                         Style="{StaticResource InteractiveActionButtonStyle}"
                         Click="CloseButton_Click"/>

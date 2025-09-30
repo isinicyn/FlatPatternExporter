@@ -6,8 +6,8 @@ using Inventor;
 
 namespace FlatPatternExporter.Core;
 /// <summary>
-/// Класс для централизованного управления доступом к свойствам документов Inventor.
-/// Обеспечивает единый интерфейс для работы с iProperty и обычными свойствами документов.
+/// Class for centralized management of access to Inventor document properties.
+/// Provides a unified interface for working with iProperty and regular document properties.
 /// </summary>
 public class PropertyManager(Document document)
 {
@@ -15,11 +15,11 @@ public class PropertyManager(Document document)
     public static readonly string SheetMetalSubType = "{9C464203-9BAE-11D3-8BAD-0060B0CE6BB4}";
 
     /// <summary>
-    /// Получает маппинг для Inventor Property
+    /// Gets the mapping for Inventor Property
     /// </summary>
     private static (string SetName, string InventorName) GetInventorMapping(string internalName)
     {
-        // Сначала проверяем стандартные свойства
+        // First check standard properties
         if (PropertyMetadataRegistry.Properties.TryGetValue(internalName, out var def))
         {
             if (def.Type == PropertyMetadataRegistry.PropertyType.IProperty)
@@ -27,27 +27,25 @@ public class PropertyManager(Document document)
                 return (def.PropertySetName!, def.InventorPropertyName!);
             }
         }
-        
-        // Проверяем пользовательские свойства по InternalName с префиксом
+
+        // Check user-defined properties by InternalName with prefix
         var userProperty = PropertyMetadataRegistry.GetPropertyByInternalName(internalName);
         if (userProperty != null && userProperty.Type == PropertyMetadataRegistry.PropertyType.UserDefined)
         {
             return (userProperty.PropertySetName!, userProperty.InventorPropertyName!);
         }
-        
-        // Если это UDP_ префикс, но свойство не найдено в реестре, извлекаем оригинальное имя
+        // If this is UDP_ prefix but property not found in registry, extract original name
         if (PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
         {
             var originalName = PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(internalName);
             return ("User Defined Properties", originalName);
         }
-        
-        // Если свойство не найдено - это ошибка в коде
-        throw new ArgumentException($"Неизвестное свойство: {internalName}");
+        // If property not found - this is a code error
+        throw new ArgumentException($"Unknown property: {internalName}");
     }
 
     /// <summary>
-    /// Получает объект свойства по внутреннему имени с использованием централизованной системы метаданных.
+    /// Gets property object by internal name using centralized metadata system.
     /// </summary>
     private Property? GetPropertyObject(string ourName)
     {
@@ -60,16 +58,16 @@ public class PropertyManager(Document document)
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка доступа к свойству '{ourName}': {ex.Message}");
+            Debug.WriteLine($"Property access error '{ourName}': {ex.Message}");
             return null;
         }
     }
 
     /// <summary>
-    /// Получает значение или выражение свойства по внутреннему имени.
+    /// Gets value or expression of property by internal name.
     /// </summary>
-    /// <param name="ourName">Внутреннее имя свойства.</param>
-    /// <param name="getExpression">Если true, возвращает выражение; иначе - значение.</param>
+    /// <param name="ourName">Internal property name.</param>
+    /// <param name="getExpression">If true, returns expression; otherwise - value.</param>
     public string GetMappedProperty(string ourName, bool getExpression = false)
     {
         var prop = GetPropertyObject(ourName);
@@ -84,7 +82,7 @@ public class PropertyManager(Document document)
         {
             result = prop.Value?.ToString() ?? "";
 
-            // Получаем метаданные свойства
+            // Get property metadata
             PropertyMetadataRegistry.PropertyDefinition? definition = null;
             if (PropertyMetadataRegistry.Properties.TryGetValue(ourName, out var def))
             {
@@ -92,13 +90,13 @@ public class PropertyManager(Document document)
             }
             if (definition != null)
             {
-                // Применяем округление для числовых значений через централизованный метод
+                // Apply rounding for numeric values through centralized method
                 if (definition.RequiresRounding && double.TryParse(result, out var numericValue))
                 {
                     result = PropertyMetadataRegistry.FormatValue(ourName, numericValue);
                 }
 
-                // Применяем сопоставления значений
+                // Apply value mappings
                 if (definition.ValueMappings != null && definition.ValueMappings.TryGetValue(result, out var mappedValue))
                 {
                     result = mappedValue;
@@ -110,7 +108,7 @@ public class PropertyManager(Document document)
     }
 
     /// <summary>
-    /// Проверяет, является ли свойство expression-ом по внутреннему имени.
+    /// Checks if property is an expression by internal name.
     /// </summary>
     public bool IsMappedPropertyExpression(string ourName)
     {
@@ -121,7 +119,7 @@ public class PropertyManager(Document document)
     }
 
     /// <summary>
-    /// Устанавливает значение свойства по внутреннему имени.
+    /// Sets property value by internal name.
     /// </summary>
     public void SetMappedProperty(string ourName, object value)
     {
@@ -134,13 +132,13 @@ public class PropertyManager(Document document)
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка установки значения свойства '{ourName}': {ex.Message}");
-            System.Windows.MessageBox.Show($"Не удалось обновить свойство '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            Debug.WriteLine($"Property value set error '{ourName}': {ex.Message}");
+            System.Windows.MessageBox.Show(LocalizationManager.Instance.GetString("Error_PropertyUpdateFailed", ourName), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
     /// <summary>
-    /// Устанавливает выражение свойства по внутреннему имени.
+    /// Sets property expression by internal name.
     /// </summary>
     public void SetMappedPropertyExpression(string ourName, string expression)
     {
@@ -153,15 +151,15 @@ public class PropertyManager(Document document)
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка установки выражения свойства '{ourName}': {ex.Message}");
-            System.Windows.MessageBox.Show($"Не удалось обновить выражение свойства '{ourName}'.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            Debug.WriteLine($"Property expression set error '{ourName}': {ex.Message}");
+            System.Windows.MessageBox.Show(LocalizationManager.Instance.GetString("Error_ExpressionUpdateFailed", ourName), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
-    // === Методы для работы с не-iProperty свойствами ===
+    // === Methods for working with non-iProperty properties ===
 
     /// <summary>
-    /// Получает имя файла без расширения
+    /// Gets file name without extension
     /// </summary>
     public string GetFileName()
     {
@@ -171,13 +169,13 @@ public class PropertyManager(Document document)
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка получения имени файла: {ex.Message}");
+            Debug.WriteLine($"File name retrieval error: {ex.Message}");
             return "";
         }
     }
 
     /// <summary>
-    /// Получает полный путь к файлу
+    /// Gets full file path
     /// </summary>
     public string GetFullFileName()
     {
@@ -187,13 +185,13 @@ public class PropertyManager(Document document)
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка получения полного пути к файлу: {ex.Message}");
+            Debug.WriteLine($"Full file path retrieval error: {ex.Message}");
             return "";
         }
     }
 
     /// <summary>
-    /// Получает имя состояния модели
+    /// Gets model state name
     /// </summary>
     public string GetModelState()
     {
@@ -203,13 +201,13 @@ public class PropertyManager(Document document)
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка получения состояния модели: {ex.Message}");
+            Debug.WriteLine($"Model state retrieval error: {ex.Message}");
             return "";
         }
     }
 
     /// <summary>
-    /// Получает толщину листового металла (только для деталей из листового металла)
+    /// Gets sheet metal thickness (for sheet metal parts only)
     /// </summary>
     public string GetThickness()
     {
@@ -219,22 +217,21 @@ public class PropertyManager(Document document)
             {
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
                 var thicknessParam = smCompDef.Thickness;
-                var thicknessValue = (double)thicknessParam.Value * 10; // Переводим в мм
-                
-                // Используем централизованное форматирование
+                var thicknessValue = (double)thicknessParam.Value * 10; // Convert to mm
+                // Use centralized formatting
                 return PropertyMetadataRegistry.FormatValue("Thickness", thicknessValue);
             }
             return "0.0";
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка получения толщины: {ex.Message}");
+            Debug.WriteLine($"Thickness retrieval error: {ex.Message}");
             return "0.0";
         }
     }
 
     /// <summary>
-    /// Проверяет, имеет ли деталь развертку (только для деталей из листового металла)
+    /// Checks if part has flat pattern (for sheet metal parts only)
     /// </summary>
     public bool HasFlatPattern()
     {
@@ -249,19 +246,19 @@ public class PropertyManager(Document document)
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка проверки наличия развертки: {ex.Message}");
+            Debug.WriteLine($"Flat pattern check error: {ex.Message}");
             return false;
         }
     }
 
     /// <summary>
-    /// Проверяет, является ли состояние модели документа основным (kPrimaryModelStateType = 118017)
+    /// Checks if document model state is primary (kPrimaryModelStateType = 118017)
     /// </summary>
     public bool IsPrimaryModelState()
     {
         try
         {
-            // Получаем активное состояние модели из ComponentDefinition
+            // Get active model state from ComponentDefinition
             if (_document is PartDocument partDoc)
             {
                 var activeModelState = partDoc.ComponentDefinition.ModelStates.ActiveModelState;
@@ -272,13 +269,13 @@ public class PropertyManager(Document document)
                 var activeModelState = asmDoc.ComponentDefinition.ModelStates.ActiveModelState;
                 return activeModelState.ModelStateType == ModelStateTypeEnum.kPrimaryModelStateType;
             }
-            
-            return true; // Для других типов документов считаем основным состоянием
+
+            return true; // For other document types, consider it primary state
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка проверки типа состояния модели: {ex.Message}");
-            return true; // По умолчанию считаем основным состоянием
+            Debug.WriteLine($"Model state type check error: {ex.Message}");
+            return true; // By default, consider it primary state
         }
     }
 

@@ -49,14 +49,14 @@ public class DxfExporter
             if (requireScan && document != lastScannedDocument)
             {
                 context.IsValid = false;
-                context.ErrorMessage = "Активный документ изменился. Пожалуйста, повторите сканирование перед экспортом.";
+                context.ErrorMessage = LocalizationManager.Instance.GetString("Error_DocumentChanged");
                 return context;
             }
 
             if (!PrepareForExport(exportOptions, out var targetDir, out var multiplier))
             {
                 context.IsValid = false;
-                context.ErrorMessage = "Ошибка при подготовке параметров экспорта";
+                context.ErrorMessage = LocalizationManager.Instance.GetString("Error_ExportPreparation");
                 return context;
             }
 
@@ -83,7 +83,7 @@ public class DxfExporter
         catch (Exception ex)
         {
             context.IsValid = false;
-            context.ErrorMessage = $"Ошибка при подготовке экспорта: {ex.Message}";
+            context.ErrorMessage = LocalizationManager.Instance.GetString("Error_ExportPreparationWithMessage", ex.Message);
         }
 
         return context;
@@ -188,7 +188,7 @@ public class DxfExporter
             try
             {
                 partDoc = _documentCache.GetCachedPartDocument(partNumber) ?? _inventorManager.OpenPartDocument(partNumber);
-                if (partDoc == null) throw new Exception("Файл детали не найден или не может быть открыт");
+                if (partDoc == null) throw new Exception(LocalizationManager.Instance.GetString("Error_PartFileNotFound"));
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
                 var material = partData.Material;
@@ -282,7 +282,7 @@ public class DxfExporter
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Ошибка экспорта DXF: {ex.Message}");
+                        Debug.WriteLine($"DXF export error: {ex.Message}");
                     }
                 }
 
@@ -308,7 +308,7 @@ public class DxfExporter
             catch (Exception ex)
             {
                 localSkippedCount++;
-                Debug.WriteLine($"Ошибка обработки детали: {ex.Message}");
+                Debug.WriteLine($"Part processing error: {ex.Message}");
             }
         }
 
@@ -364,8 +364,8 @@ public class DxfExporter
             if (exportOptions.ShowFileLockedDialogs)
             {
                 var result = MessageBox.Show(
-                    $"Файл {filePath} занят другим приложением. Прервать операцию?",
-                    "Предупреждение",
+                    LocalizationManager.Instance.GetString("Warning_FileLocked", filePath),
+                    LocalizationManager.Instance.GetString("MessageBox_Warning"),
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning,
                     MessageBoxDefaultButton.Button2);
@@ -378,8 +378,8 @@ public class DxfExporter
                 while (IsFileLockedInternal(filePath))
                 {
                     var waitResult = MessageBox.Show(
-                        "Ожидание разблокировки файла. Возможно файл открыт в программе просмотра. Закройте файл и нажмите OK.",
-                        "Информация",
+                        LocalizationManager.Instance.GetString("Info_WaitingForFileUnlock"),
+                        LocalizationManager.Instance.GetString("MessageBox_Info"),
                         MessageBoxButtons.OKCancel,
                         MessageBoxIcon.Information,
                         MessageBoxDefaultButton.Button2);

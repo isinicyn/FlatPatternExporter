@@ -12,7 +12,7 @@
                 <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
-            <!-- Глобальные стили по умолчанию -->
+            <!-- Global default styles -->
             <Style TargetType="Window">
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
@@ -30,7 +30,7 @@
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
 
-            <!-- Имплицитные базовые стили для унификации элементов -->
+            <!-- Implicit base styles for element unification -->
             <Style TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}"/>
             <Style TargetType="TextBox" BasedOn="{StaticResource BaseTextBoxStyle}"/>
             <Style TargetType="ComboBox" BasedOn="{StaticResource BaseComboBoxStyle}"/>

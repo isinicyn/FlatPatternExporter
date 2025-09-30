@@ -1,0 +1,1733 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- UI кнопки и элементы управления -->
+  <data name="Button_Scan" xml:space="preserve">
+    <value>Сканировать</value>
+  </data>
+  <data name="Button_Clear" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="Button_Export" xml:space="preserve">
+    <value>Экспорт</value>
+  </data>
+  <data name="Button_About" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="Button_Conflicts" xml:space="preserve">
+    <value>Конфликты</value>
+  </data>
+  <data name="Button_Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="Button_Remove" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Button_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Button_Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Button_Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Button_QuickExport" xml:space="preserve">
+    <value>Быстрый экспорт</value>
+  </data>
+  <data name="Button_ExportSelected" xml:space="preserve">
+    <value>Экспорт выделенных</value>
+  </data>
+  <data name="Button_DeleteSelected" xml:space="preserve">
+    <value>Удалить выделенные</value>
+  </data>
+  <data name="Button_OpenInExplorer" xml:space="preserve">
+    <value>Открыть в проводнике</value>
+  </data>
+  <data name="Button_OpenInInventor" xml:space="preserve">
+    <value>Открыть в Inventor</value>
+  </data>
+
+  <!-- Заголовки и разделы -->
+  <data name="Header_Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="Header_Main" xml:space="preserve">
+    <value>Основные</value>
+  </data>
+  <data name="Header_ComponentProcessing" xml:space="preserve">
+    <value>Обработка компонентов</value>
+  </data>
+  <data name="Header_ComponentFiltering" xml:space="preserve">
+    <value>Фильтрация компонентов</value>
+  </data>
+  <data name="Header_ExportSettings" xml:space="preserve">
+    <value>Настройки экспорта</value>
+  </data>
+  <data name="Header_LayerSettings" xml:space="preserve">
+    <value>Настройки слоев</value>
+  </data>
+  <data name="Header_Properties" xml:space="preserve">
+    <value>Свойства</value>
+  </data>
+  <data name="Header_ConflictDetails" xml:space="preserve">
+    <value>Детали конфликтов</value>
+  </data>
+  <data name="Header_SelectProperties" xml:space="preserve">
+    <value>Выбор свойств</value>
+  </data>
+  <data name="Header_About" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="Header_TemplatePresets" xml:space="preserve">
+    <value>Пресеты шаблонов</value>
+  </data>
+  <data name="Header_FileNaming" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="Header_Language" xml:space="preserve">
+    <value>Язык интерфейса</value>
+  </data>
+
+  <!-- Метки информации о документе -->
+  <data name="Label_DocumentType" xml:space="preserve">
+    <value>Тип документа:</value>
+  </data>
+  <data name="Label_PartNumber" xml:space="preserve">
+    <value>Обозначение:</value>
+  </data>
+  <data name="Label_Description" xml:space="preserve">
+    <value>Описание:</value>
+  </data>
+  <data name="Label_ModelState" xml:space="preserve">
+    <value>Состояние модели:</value>
+  </data>
+
+  <!-- RadioButton опции -->
+  <data name="Radio_ProcessByAssemblyStructure" xml:space="preserve">
+    <value>По структуре сборки</value>
+  </data>
+  <data name="Radio_ProcessByBOM" xml:space="preserve">
+    <value>По спецификации</value>
+  </data>
+  <data name="Radio_ExportToProject" xml:space="preserve">
+    <value>В папку проекта</value>
+  </data>
+  <data name="Radio_ExportToCustom" xml:space="preserve">
+    <value>В выбранную папку</value>
+  </data>
+  <data name="Radio_ExportNearPart" xml:space="preserve">
+    <value>Рядом с деталью</value>
+  </data>
+  <data name="Radio_ExportToSubfolder" xml:space="preserve">
+    <value>В подпапку</value>
+  </data>
+  <data name="Radio_ExportToStructure" xml:space="preserve">
+    <value>По структуре сборки</value>
+  </data>
+
+  <!-- CheckBox опции -->
+  <data name="CheckBox_ExcludeReference" xml:space="preserve">
+    <value>Исключить ссылочные</value>
+  </data>
+  <data name="CheckBox_ExcludePurchased" xml:space="preserve">
+    <value>Исключить покупные</value>
+  </data>
+  <data name="CheckBox_ExcludePhantom" xml:space="preserve">
+    <value>Исключить фантомные</value>
+  </data>
+  <data name="CheckBox_IncludeLibrary" xml:space="preserve">
+    <value>Включить библиотечные</value>
+  </data>
+  <data name="CheckBox_OrganizeByMaterial" xml:space="preserve">
+    <value>Группировать по материалу</value>
+  </data>
+  <data name="CheckBox_EnableSplineReplacement" xml:space="preserve">
+    <value>Замена сплайнов</value>
+  </data>
+  <data name="CheckBox_OptimizeDxf" xml:space="preserve">
+    <value>Оптимизация DXF</value>
+  </data>
+  <data name="CheckBox_GenerateThumbnails" xml:space="preserve">
+    <value>Миниатюры</value>
+  </data>
+
+  <!-- Сообщения об ошибках -->
+  <data name="Error_SettingsLoad" xml:space="preserve">
+    <value>Ошибка при загрузке настроек: {0}</value>
+  </data>
+  <data name="Error_SettingsSave" xml:space="preserve">
+    <value>Ошибка при сохранении настроек: {0}</value>
+  </data>
+  <data name="Error_Operation" xml:space="preserve">
+    <value>Ошибка {0}: {1}</value>
+  </data>
+  <data name="Error_Title" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Error_FileNotFound" xml:space="preserve">
+    <value>Файл, связанный с номером детали {0}, не найден среди открытых.</value>
+  </data>
+  <data name="Error_ExplorerOpen" xml:space="preserve">
+    <value>Ошибка при открытии проводника для файла по пути {0}: {1}</value>
+  </data>
+  <data name="Error_FileNotFoundAtPath" xml:space="preserve">
+    <value>Файл по пути {0}, связанный с номером детали {1}, не найден.</value>
+  </data>
+  <data name="Error_ExportPreparation" xml:space="preserve">
+    <value>Ошибка подготовки экспорта</value>
+  </data>
+  <data name="Error_DxfOptimization" xml:space="preserve">
+    <value>Ошибка оптимизации DXF: {0}</value>
+  </data>
+  <data name="Error_OptimizationNotSupported" xml:space="preserve">
+    <value>Версия AutoCAD {0} не поддерживается для оптимизации</value>
+  </data>
+  <data name="Error_OptimizationVersion" xml:space="preserve">
+    <value>Ошибка оптимизации {0}: {1}</value>
+  </data>
+
+  <!-- Информационные сообщения -->
+  <data name="Info_Title" xml:space="preserve">
+    <value>Информация</value>
+  </data>
+  <data name="Info_Warning" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="Info_VersionNotSupported" xml:space="preserve">
+    <value>Для версии {0} отключены оптимизация DXF и генерация миниатюр.
+
+Данная версия не поддерживается используемой библиотекой.</value>
+  </data>
+  <data name="Info_OperationInterrupted" xml:space="preserve">
+    <value>Процесс {0} был прерван.</value>
+  </data>
+  <data name="Info_ConflictsDetected" xml:space="preserve">
+    <value>Обнаружены конфликты обозначений.
+Общее количество конфликтов: {0}
+
+Обнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.
+
+Используйте кнопку "Конфликты" на панели управления для просмотра деталей конфликтов.</value>
+  </data>
+  <data name="Info_BrokenReferences" xml:space="preserve">
+    <value>В сборке обнаружены компоненты с потерянными ссылками. Некоторые данные могли быть пропущены.</value>
+  </data>
+  <data name="Info_ExportCompleted" xml:space="preserve">
+    <value>Экспорт DXF завершен</value>
+  </data>
+  <data name="Info_QuickExportCompleted" xml:space="preserve">
+    <value>Быстрый экспорт DXF завершен</value>
+  </data>
+  <data name="Info_NoDataForExport" xml:space="preserve">
+    <value>Нет данных для экспорта. Сначала выполните сканирование.</value>
+  </data>
+  <data name="Info_CannotClearDuringOperation" xml:space="preserve">
+    <value>Нельзя очистить список во время выполнения операций.</value>
+  </data>
+  <data name="Info_NoFlatPatterns" xml:space="preserve">
+    <value>Выбранные файлы не содержат разверток.</value>
+  </data>
+  <data name="Info_SomeMissingFlatPatterns" xml:space="preserve">
+    <value>Некоторые выбранные файлы не содержат разверток и будут пропущены. Продолжить?</value>
+  </data>
+  <data name="Info_DocumentNotAvailable" xml:space="preserve">
+    <value>Информация о документе не доступна</value>
+  </data>
+  <data name="Info_PropertyAlreadyAdded" xml:space="preserve">
+    <value>Свойство '{0}' уже добавлено.</value>
+  </data>
+  <data name="Error_NoDocumentOpen" xml:space="preserve">
+    <value>Откройте сборку или деталь для работы с приложением.</value>
+  </data>
+  <data name="Error_InventorConnectionFailed" xml:space="preserve">
+    <value>Не удалось подключиться к Inventor</value>
+  </data>
+  <data name="Error_NoActiveDocument" xml:space="preserve">
+    <value>Нет открытого документа. Откройте сборку или деталь и попробуйте снова.</value>
+  </data>
+
+  <!-- Подтверждения -->
+  <data name="Confirm_DeleteProperty" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить свойство '{0}' из реестра? Это действие нельзя отменить.</value>
+  </data>
+  <data name="Confirm_DeletePropertyTitle" xml:space="preserve">
+    <value>Подтверждение удаления</value>
+  </data>
+  <data name="Confirm_DeleteRows" xml:space="preserve">
+    <value>Вы действительно хотите удалить {0} строк(и)?</value>
+  </data>
+  <data name="Confirm_DeleteRowsTitle" xml:space="preserve">
+    <value>Подтверждение удаления</value>
+  </data>
+
+  <!-- О программе -->
+  <data name="About_ProgramVersion" xml:space="preserve">
+    <value>Версия программы:</value>
+  </data>
+  <data name="About_LastUpdate" xml:space="preserve">
+    <value>Последнее обновление:</value>
+  </data>
+
+  <!-- Статусы операций -->
+  <data name="Status_Interrupted" xml:space="preserve">
+    <value>Прервано ({0})</value>
+  </data>
+  <data name="Status_PartsFound" xml:space="preserve">
+    <value>Найдено листовых деталей: {0} ({1})</value>
+  </data>
+  <data name="Status_Completed" xml:space="preserve">
+    <value>Завершено ({0})</value>
+  </data>
+  <data name="Status_NoDocumentInfo" xml:space="preserve">
+    <value>Информация о документе не доступна</value>
+  </data>
+  <data name="Status_ProcessingParts" xml:space="preserve">
+    <value>Обработка деталей...</value>
+  </data>
+  <data name="Status_ProcessingPartsProgress" xml:space="preserve">
+    <value>Обработка деталей - {0} из {1}</value>
+  </data>
+  <data name="Status_PreparingData" xml:space="preserve">
+    <value>Подготовка данных деталей ({0}/{1})...</value>
+  </data>
+  <data name="Status_RowsDeleted" xml:space="preserve">
+    <value>Удалено {0} строк(и)</value>
+  </data>
+
+  <!-- Названия операций -->
+  <data name="Operation_Scanning" xml:space="preserve">
+    <value>сканирования</value>
+  </data>
+  <data name="Operation_Export" xml:space="preserve">
+    <value>экспорта</value>
+  </data>
+  <data name="Operation_ScanningKey" xml:space="preserve">
+    <value>сканирование</value>
+  </data>
+  <data name="Operation_QuickExport" xml:space="preserve">
+    <value>быстрого экспорта</value>
+  </data>
+  <data name="Operation_ExportSelected" xml:space="preserve">
+    <value>экспорта выделенных деталей</value>
+  </data>
+
+  <!-- Подсказки (ToolTips) -->
+  <data name="ToolTip_ScanButton" xml:space="preserve">
+    <value>Нажмите F5 для быстрого сканирования</value>
+  </data>
+  <data name="ToolTip_ClearButton" xml:space="preserve">
+    <value>Нажмите F8 для быстрой очистки списка</value>
+  </data>
+  <data name="ToolTip_ExportButton" xml:space="preserve">
+    <value>F6 - обычный экспорт с проверкой данных, F9 - быстрый экспорт без сканирования</value>
+  </data>
+
+  <!-- Текст интерфейса -->
+  <data name="Text_AddUserProperty" xml:space="preserve">
+    <value>Добавить пользовательское свойство:</value>
+  </data>
+  <data name="Text_AvailableProperties" xml:space="preserve">
+    <value>Доступные свойства:</value>
+  </data>
+  <data name="Text_SelectedProperties" xml:space="preserve">
+    <value>Выбранные свойства:</value>
+  </data>
+  <data name="Text_ConflictingParts" xml:space="preserve">
+    <value>Конфликтующие детали:</value>
+  </data>
+  <data name="Text_PropertyManagement" xml:space="preserve">
+    <value>Управление свойствами колонок</value>
+  </data>
+  <data name="Text_PropertyInstructions" xml:space="preserve">
+    <value>Дважды щелкните по свойству для добавления в таблицу или используйте кнопки действий</value>
+  </data>
+  <data name="Text_SearchPlaceholder" xml:space="preserve">
+    <value>Поиск по названию...</value>
+  </data>
+  <data name="Text_NewProperty" xml:space="preserve">
+    <value>Новое свойство:</value>
+  </data>
+  <data name="Text_UserPropertiesInfo" xml:space="preserve">
+    <value>Пользовательские свойства читаются из Inventor User Defined Properties.</value>
+  </data>
+  <data name="Text_RemovalWarning" xml:space="preserve">
+    <value>Удаление из реестра полностью удаляет свойство из системы.</value>
+  </data>
+
+  <!-- Заголовки колонок -->
+  <data name="Column_ConflictGroup" xml:space="preserve">
+    <value>Группа конфликта</value>
+  </data>
+  <data name="Column_PartNumber" xml:space="preserve">
+    <value>Обозначение</value>
+  </data>
+  <data name="Column_FilePath" xml:space="preserve">
+    <value>Путь к файлу</value>
+  </data>
+  <data name="Column_ModelState" xml:space="preserve">
+    <value>Состояние модели</value>
+  </data>
+
+  <!-- Заголовки колонок свойств -->
+  <data name="Property_ProcessingStatus_Display" xml:space="preserve">
+    <value>Статус обработки</value>
+  </data>
+  <data name="Property_ProcessingStatus_Column" xml:space="preserve">
+    <value>Обр.</value>
+  </data>
+  <data name="Property_Item_Display" xml:space="preserve">
+    <value>Нумерация</value>
+  </data>
+  <data name="Property_Item_Column" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Property_Quantity_Display" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="Property_Quantity_Column" xml:space="preserve">
+    <value>Кол.</value>
+  </data>
+  <data name="Property_FileName_Display" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="Property_FileName_Column" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="Property_FullFileName_Display" xml:space="preserve">
+    <value>Полное имя файла</value>
+  </data>
+  <data name="Property_FullFileName_Column" xml:space="preserve">
+    <value>Полное имя файла</value>
+  </data>
+  <data name="Property_PartNumber_Display" xml:space="preserve">
+    <value>Обозначение</value>
+  </data>
+  <data name="Property_PartNumber_Column" xml:space="preserve">
+    <value>Обозначение</value>
+  </data>
+  <data name="Property_Description_Display" xml:space="preserve">
+    <value>Наименование</value>
+  </data>
+  <data name="Property_Description_Column" xml:space="preserve">
+    <value>Наименование</value>
+  </data>
+  <data name="Property_Material_Display" xml:space="preserve">
+    <value>Материал</value>
+  </data>
+  <data name="Property_Material_Column" xml:space="preserve">
+    <value>Материал</value>
+  </data>
+  <data name="Property_Thickness_Display" xml:space="preserve">
+    <value>Толщина</value>
+  </data>
+  <data name="Property_Thickness_Column" xml:space="preserve">
+    <value>Толщ.</value>
+  </data>
+  <data name="Property_Area_Display" xml:space="preserve">
+    <value>Площадь</value>
+  </data>
+  <data name="Property_Area_Column" xml:space="preserve">
+    <value>Площадь</value>
+  </data>
+  <data name="Property_Mass_Display" xml:space="preserve">
+    <value>Масса</value>
+  </data>
+  <data name="Property_Mass_Column" xml:space="preserve">
+    <value>Масса</value>
+  </data>
+  <data name="Property_ModelState_Display" xml:space="preserve">
+    <value>Состояние модели</value>
+  </data>
+  <data name="Property_ModelState_Column" xml:space="preserve">
+    <value>Состояние модели</value>
+  </data>
+
+  <!-- Дополнительные сообщения экспорта -->
+  <data name="Info_ExportStatistics" xml:space="preserve">
+    <value>{0}.
+Всего файлов обработано: {1}
+Пропущено (без разверток): {2}
+Всего экспортировано: {3}
+Время выполнения: {4}</value>
+  </data>
+
+  <!-- Ошибки Core -->
+  <data name="Error_ThumbnailGeneration" xml:space="preserve">
+    <value>Ошибка при генерации миниатюр DXF: {0}</value>
+  </data>
+  <data name="Error_ThumbnailObtaining" xml:space="preserve">
+    <value>Ошибка при получении миниатюры: {0}</value>
+  </data>
+  <data name="Error_InventorConnection" xml:space="preserve">
+    <value>Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.</value>
+  </data>
+  <data name="Error_InventorConnectionException" xml:space="preserve">
+    <value>Произошла ошибка при подключении к Inventor: {0}</value>
+  </data>
+  <data name="Error_ProjectDataInit" xml:space="preserve">
+    <value>Ошибка при инициализации данных проекта: {0}</value>
+  </data>
+  <data name="Error_ProjectDataObtaining" xml:space="preserve">
+    <value>Не удалось получить информацию о проекте: {0}</value>
+  </data>
+  <data name="Error_FileNotFoundAtPathDialog" xml:space="preserve">
+    <value>Файл по пути {0} не найден.</value>
+  </data>
+  <data name="Error_FileOpenException" xml:space="preserve">
+    <value>Ошибка при открытии файла по пути {0}: {1}</value>
+  </data>
+  <data name="Error_DocumentNotFoundByPartNumber" xml:space="preserve">
+    <value>Документ с номером детали {0} не найден среди открытых.</value>
+  </data>
+  <data name="Error_ExportParametersPreparation" xml:space="preserve">
+    <value>Ошибка при подготовке параметров экспорта</value>
+  </data>
+  <data name="Error_PartFileNotFoundOrCannotOpen" xml:space="preserve">
+    <value>Файл детали не найден или не может быть открыт</value>
+  </data>
+  <data name="Error_PropertyUpdate" xml:space="preserve">
+    <value>Не удалось обновить свойство '{0}'.</value>
+  </data>
+  <data name="Error_PropertyExpressionUpdate" xml:space="preserve">
+    <value>Не удалось обновить выражение свойства '{0}'.</value>
+  </data>
+
+  <!-- Статусы и операции -->
+  <data name="Status_ScanningComponents" xml:space="preserve">
+    <value>Сканирование компонентов</value>
+  </data>
+  <data name="Status_ScanningBOM" xml:space="preserve">
+    <value>Сканирование спецификации</value>
+  </data>
+
+  <!-- Типы документов -->
+  <data name="DocumentType_Assembly" xml:space="preserve">
+    <value>Сборка</value>
+  </data>
+  <data name="DocumentType_Part" xml:space="preserve">
+    <value>Деталь</value>
+  </data>
+
+  <!-- Сообщения TemplatePresetManager -->
+  <data name="Confirm_DeletePreset" xml:space="preserve">
+    <value>Удалить пресет '{0}'?</value>
+  </data>
+  <data name="Confirm_DeletePresetTitle" xml:space="preserve">
+    <value>Подтверждение удаления</value>
+  </data>
+  <data name="Text_CopySuffix" xml:space="preserve">
+    <value>(копия)</value>
+  </data>
+
+  <!-- Общие сообщения -->
+  <data name="Message_TemplateError" xml:space="preserve">
+    <value>Ошибка в шаблоне</value>
+  </data>
+  <data name="Message_UnknownVersion" xml:space="preserve">
+    <value>Версия неизвестна</value>
+  </data>
+  <data name="Message_DateNotDetermined" xml:space="preserve">
+    <value>Дата не определена</value>
+  </data>
+
+  <!-- Названия языков -->
+  <data name="Language_Russian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+
+  <!-- Дополнительные строки UI -->
+  <data name="UI_ProcessByStructure" xml:space="preserve">
+    <value>По структуре сборки</value>
+  </data>
+  <data name="UI_ProcessByBOM" xml:space="preserve">
+    <value>По спецификации</value>
+  </data>
+  <data name="UI_ExcludeReference" xml:space="preserve">
+    <value>Исключить ссылочные</value>
+  </data>
+  <data name="UI_ExcludePurchased" xml:space="preserve">
+    <value>Исключить покупные</value>
+  </data>
+  <data name="UI_ExcludePhantom" xml:space="preserve">
+    <value>Исключить фантомные</value>
+  </data>
+  <data name="UI_IncludeLibrary" xml:space="preserve">
+    <value>Включить библиотечные</value>
+  </data>
+  <data name="UI_MergeProfiles" xml:space="preserve">
+    <value>Объеденить контуры с полилиниями</value>
+  </data>
+  <data name="UI_RebaseGeometry" xml:space="preserve">
+    <value>Переместить геометрию в первый квадрант</value>
+  </data>
+  <data name="UI_TrimCenterlines" xml:space="preserve">
+    <value>Обрезать осевые линии по контуру</value>
+  </data>
+  <data name="UI_SplineReplacement" xml:space="preserve">
+    <value>Замена сплайнов</value>
+  </data>
+  <data name="UI_ExportPlacement" xml:space="preserve">
+    <value>Размещение экспорта</value>
+  </data>
+  <data name="UI_ChooseFolder" xml:space="preserve">
+    <value>Указать папку перед экспортом</value>
+  </data>
+  <data name="UI_ComponentFolder" xml:space="preserve">
+    <value>Папка компонента</value>
+  </data>
+  <data name="UI_PartFolder" xml:space="preserve">
+    <value>В папке детали</value>
+  </data>
+  <data name="UI_ProjectFolder" xml:space="preserve">
+    <value>Папка проекта</value>
+  </data>
+  <data name="UI_FixedFolder" xml:space="preserve">
+    <value>Фиксированная папка</value>
+  </data>
+  <data name="UI_CreateSubfolder" xml:space="preserve">
+    <value>Создать подпапку</value>
+  </data>
+  <data name="UI_OrganizeByMaterial" xml:space="preserve">
+    <value>Сортировать по материалу</value>
+  </data>
+  <data name="UI_OrganizeByThickness" xml:space="preserve">
+    <value>Сортировать по толщине</value>
+  </data>
+  <data name="UI_PathNotSelected" xml:space="preserve">
+    <value>Путь не выбран</value>
+  </data>
+  <data name="UI_FileNameConfigurator" xml:space="preserve">
+    <value>Включить конфигуратор имени файла</value>
+  </data>
+  <data name="UI_TemplatePresetsManager" xml:space="preserve">
+    <value>Менеджер пресетов шаблонов</value>
+  </data>
+  <data name="UI_DataSources" xml:space="preserve">
+    <value>Источники данных</value>
+  </data>
+  <data name="UI_TemplateAndPreview" xml:space="preserve">
+    <value>Шаблон и предпросмотр</value>
+  </data>
+  <data name="UI_Property" xml:space="preserve">
+    <value>Свойство</value>
+  </data>
+  <data name="UI_Conflicts" xml:space="preserve">
+    <value>Конфликты</value>
+  </data>
+  <data name="UI_Multiplier" xml:space="preserve">
+    <value>Множитель</value>
+  </data>
+  <data name="UI_NoColumnsSelected" xml:space="preserve">
+    <value>Колонки не выбраны</value>
+  </data>
+  <data name="UI_AddColumnsInstruction" xml:space="preserve">
+    <value>Для отображения данных добавьте колонки через кнопку с иконкой добавления</value>
+  </data>
+  <data name="UI_AddColumns" xml:space="preserve">
+    <value>Добавить колонки</value>
+  </data>
+
+  <!-- Контекстные меню -->
+  <data name="ContextMenu_OpenFileLocation" xml:space="preserve">
+    <value>Открыть расположение файла</value>
+  </data>
+  <data name="ContextMenu_OpenSelectedModels" xml:space="preserve">
+    <value>Открыть выбранные модели</value>
+  </data>
+  <data name="ContextMenu_ResetQuantity" xml:space="preserve">
+    <value>Сбросить количество</value>
+  </data>
+  <data name="ContextMenu_RemoveSelectedRows" xml:space="preserve">
+    <value>Удалить выбранные строки</value>
+  </data>
+  <data name="ContextMenu_ClearList" xml:space="preserve">
+    <value>Очистить список</value>
+  </data>
+  <data name="ContextMenu_OpenFile" xml:space="preserve">
+    <value>Открыть файл</value>
+  </data>
+
+  <!-- Подсказки символов -->
+  <data name="ToolTip_Dash" xml:space="preserve">
+    <value>Тире</value>
+  </data>
+  <data name="ToolTip_Underscore" xml:space="preserve">
+    <value>Подчеркивание</value>
+  </data>
+  <data name="ToolTip_Dot" xml:space="preserve">
+    <value>Точка</value>
+  </data>
+  <data name="ToolTip_Space" xml:space="preserve">
+    <value>Пробел</value>
+  </data>
+  <data name="ToolTip_OpenParenthesis" xml:space="preserve">
+    <value>Открывающая скобка</value>
+  </data>
+  <data name="ToolTip_CloseParenthesis" xml:space="preserve">
+    <value>Закрывающая скобка</value>
+  </data>
+  <data name="ToolTip_OpenBracket" xml:space="preserve">
+    <value>Открывающая квадратная скобка</value>
+  </data>
+  <data name="ToolTip_CloseBracket" xml:space="preserve">
+    <value>Закрывающая квадратная скобка</value>
+  </data>
+  <data name="ToolTip_Plus" xml:space="preserve">
+    <value>Плюс</value>
+  </data>
+  <data name="ToolTip_Equals" xml:space="preserve">
+    <value>Знак равенства</value>
+  </data>
+  <data name="ToolTip_Hash" xml:space="preserve">
+    <value>Решетка</value>
+  </data>
+  <data name="ToolTip_CopyVersion" xml:space="preserve">
+    <value>Копировать версию</value>
+  </data>
+  <data name="ToolTip_SelectPreset" xml:space="preserve">
+    <value>Выберите сохраненный пресет шаблона</value>
+  </data>
+  <data name="ToolTip_CreatePreset" xml:space="preserve">
+    <value>Создать новый пресет на основе текущего шаблона</value>
+  </data>
+  <data name="ToolTip_SavePreset" xml:space="preserve">
+    <value>Сохранить текущее содержимое шаблона в выбранный пресет</value>
+  </data>
+  <data name="ToolTip_RenamePreset" xml:space="preserve">
+    <value>Переименовать выбранный пресет</value>
+  </data>
+  <data name="ToolTip_DuplicatePreset" xml:space="preserve">
+    <value>Создать копию выбранного пресета</value>
+  </data>
+  <data name="ToolTip_DeletePreset" xml:space="preserve">
+    <value>Удалить выбранный пресет</value>
+  </data>
+  <data name="ToolTip_PresetName" xml:space="preserve">
+    <value>Введите имя пресета для создания или переименования</value>
+  </data>
+  <data name="ToolTip_AddCustomToken" xml:space="preserve">
+    <value>Добавить введенный текст как кастомный токен</value>
+  </data>
+  <data name="ToolTip_SubfolderInvalid" xml:space="preserve">
+    <value>Недопустимые символы: \ / : * ? " &lt; &gt; |</value>
+  </data>
+
+  <!-- Названия колонок в заголовках таблиц -->
+  <data name="Table_FileName" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="Table_ModelState" xml:space="preserve">
+    <value>Состояние модели</value>
+  </data>
+
+  <!-- Дополнительные элементы -->
+  <data name="Text_StandardProperties" xml:space="preserve">
+    <value>Стандартные свойства</value>
+  </data>
+  <data name="Text_UserProperties" xml:space="preserve">
+    <value>Пользовательские свойства</value>
+  </data>
+  <data name="ToolTip_RemoveFromRegistry" xml:space="preserve">
+    <value>Удалить из реестра</value>
+  </data>
+  <data name="Label_AutoCADVersion" xml:space="preserve">
+    <value>Версия AutoCAD:</value>
+  </data>
+  <data name="UI_OptimizeDxf" xml:space="preserve">
+    <value>Оптимизация размера файла DXF</value>
+  </data>
+  <data name="Label_ReplacementType" xml:space="preserve">
+    <value>Тип замены:</value>
+  </data>
+  <data name="Label_Tolerance" xml:space="preserve">
+    <value>Допуск (мм):</value>
+  </data>
+  <data name="Button_Create" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="Button_Rename" xml:space="preserve">
+    <value>Переименовать</value>
+  </data>
+  <data name="Button_Duplicate" xml:space="preserve">
+    <value>Дублировать</value>
+  </data>
+  <data name="Button_Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Button_Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Label_Multiplier" xml:space="preserve">
+    <value>Множитель</value>
+  </data>
+  <data name="Header_LayerSettingsDescription" xml:space="preserve">
+    <value>Индивидуальная настройка слоев (Отметьте для включения геометрии, оставьте поле пустым для имени слоя по умолчанию)</value>
+  </data>
+  <data name="UI_EnableFileNameConstructor" xml:space="preserve">
+    <value>Включить конфигуратор имени файла</value>
+  </data>
+  <data name="Header_FileName" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="ToolTip_FileNameConstructorHelp" xml:space="preserve">
+    <value>Справка по конструктору имени файла</value>
+  </data>
+  <data name="ToolTip_FileNameInstructionDoubleClick" xml:space="preserve">
+    <value>• Двойной клик по свойству для добавления</value>
+  </data>
+  <data name="ToolTip_FileNameInstructionDrag" xml:space="preserve">
+    <value>• Перетаскивайте элементы в поле шаблона</value>
+  </data>
+  <data name="ToolTip_FileNameInstructionEdit" xml:space="preserve">
+    <value>• Редактируйте текст прямо в поле</value>
+  </data>
+  <data name="ToolTip_FileNameInstructionExample" xml:space="preserve">
+    <value>Пример: {PartNumber}-{Thickness}мм → Деталь123-3мм</value>
+  </data>
+  <data name="Label_Designation" xml:space="preserve">
+    <value>Обозначение:</value>
+  </data>
+  <data name="Text_SavedPresets" xml:space="preserve">
+    <value>Сохраненные пресеты:</value>
+  </data>
+  <data name="Text_NoSavedPresets" xml:space="preserve">
+    <value>Нет сохраненных пресетов. Создайте первый пресет для быстрого доступа к часто используемым шаблонам.</value>
+  </data>
+  <data name="Text_PresetName" xml:space="preserve">
+    <value>Имя пресета:</value>
+  </data>
+  <data name="Text_CustomTextAndSymbols" xml:space="preserve">
+    <value>Произвольный текст и символы:</value>
+  </data>
+  <data name="Text_FileNameTemplate" xml:space="preserve">
+    <value>Шаблон имени файла:</value>
+  </data>
+  <data name="Text_Preview" xml:space="preserve">
+    <value>Предпросмотр:</value>
+  </data>
+  <data name="Text_Search" xml:space="preserve">
+    <value>Поиск...</value>
+  </data>
+  <data name="Text_Status" xml:space="preserve">
+    <value>Статус: </value>
+  </data>
+  <data name="Text_Project" xml:space="preserve">
+    <value>Проект: </value>
+  </data>
+  <data name="Header_DxfExportSettings" xml:space="preserve">
+    <value>Настройки экспорта DXF</value>
+  </data>
+  <data name="Header_ExportPlacement" xml:space="preserve">
+    <value>Размещение экспорта</value>
+  </data>
+  <data name="Header_TemplatePresetsManager" xml:space="preserve">
+    <value>Менеджер пресетов шаблонов</value>
+  </data>
+  <data name="Header_DataSources" xml:space="preserve">
+    <value>Источники данных</value>
+  </data>
+  <data name="Header_TemplateAndPreview" xml:space="preserve">
+    <value>Шаблон и предпросмотр</value>
+  </data>
+  <data name="MenuItem_ExportSelectedDXF" xml:space="preserve">
+    <value>Экспортировать выбранные DXF</value>
+  </data>
+  <data name="ToolTip_EnterCustomText" xml:space="preserve">
+    <value>Введите произвольный текст (тире, пробелы, текст)</value>
+  </data>
+  <data name="ToolTip_IncreaseByone" xml:space="preserve">
+    <value>Увеличить на 1</value>
+  </data>
+  <data name="ToolTip_DecreaseByone" xml:space="preserve">
+    <value>Уменьшить на 1</value>
+  </data>
+  <data name="ToolTip_ResetMultiplier" xml:space="preserve">
+    <value>Сбросить множитель на 1</value>
+  </data>
+  <data name="ToolTip_ProjectPath" xml:space="preserve">
+    <value>Путь к проекту</value>
+  </data>
+  <data name="ToolTip_Multiply" xml:space="preserve">
+    <value>x (для обозначения 'на')</value>
+  </data>
+  <data name="Text_FunctionDisabled" xml:space="preserve">
+    <value>Функция отключена - при экспорте будет использовано обозначение детали</value>
+  </data>
+  <data name="Text_SearchByName" xml:space="preserve">
+    <value>Поиск по названию...</value>
+  </data>
+  <data name="Text_RegistryRemovalInfo" xml:space="preserve">
+    <value>Удаление из реестра полностью удаляет свойство из системы.</value>
+  </data>
+  <data name="Filter_AllCategories" xml:space="preserve">
+    <value>Все категории</value>
+  </data>
+  <data name="Text_ProgramVersion" xml:space="preserve">
+    <value>Версия программы: 1.0.0</value>
+  </data>
+  <data name="Text_Author" xml:space="preserve">
+    <value>Автор: Ivan Sinicyn</value>
+  </data>
+  <data name="Text_License" xml:space="preserve">
+    <value>Лицензия: Свободная</value>
+  </data>
+  <data name="Text_LastUpdate" xml:space="preserve">
+    <value>Последнее обновление: 10/09/2023</value>
+  </data>
+  <data name="Text_AICredits" xml:space="preserve">
+    <value>Создано при поддержке ChatGPT 4o, Claude 3.5 Sonnet, Claude 4 Sonnet, Mistral Large 2</value>
+  </data>
+
+  <!-- UIState strings -->
+  <data name="UIState_Scan" xml:space="preserve">
+    <value>Сканировать</value>
+  </data>
+  <data name="UIState_Cancel" xml:space="preserve">
+    <value>Прервать</value>
+  </data>
+  <data name="UIState_Export" xml:space="preserve">
+    <value>Экспорт</value>
+  </data>
+  <data name="UIState_Cancelling" xml:space="preserve">
+    <value>Прерывание...</value>
+  </data>
+  <data name="UIState_NoDocumentSelected" xml:space="preserve">
+    <value>Документ не выбран</value>
+  </data>
+  <data name="UIState_PreparingScan" xml:space="preserve">
+    <value>Подготовка к сканированию...</value>
+  </data>
+  <data name="UIState_ExportingData" xml:space="preserve">
+    <value>Экспорт данных...</value>
+  </data>
+  <data name="UIState_CancellingExport" xml:space="preserve">
+    <value>Прерывание экспорта...</value>
+  </data>
+  <data name="UIState_ScanningAndPreparing" xml:space="preserve">
+    <value>Сканирование и подготовка данных...</value>
+  </data>
+
+  <!-- MessageBox and status messages -->
+  <data name="MessageBox_Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="MessageBox_Information" xml:space="preserve">
+    <value>Информация</value>
+  </data>
+  <data name="Message_NoFlatPatternsSelected" xml:space="preserve">
+    <value>Выбранные файлы не содержат разверток.</value>
+  </data>
+  <data name="Message_SomeFlatPatternsSkipped" xml:space="preserve">
+    <value>Некоторые выбранные файлы не содержат разверток и будут пропущены. Продолжить?</value>
+  </data>
+  <data name="Status_PreparingPartData" xml:space="preserve">
+    <value>Подготовка данных деталей ({0}/{1})...</value>
+  </data>
+  <data name="Error_TemplateNotFound" xml:space="preserve">
+    <value>Шаблон {0} не найден</value>
+  </data>
+
+  <!-- Additional localization strings -->
+  <data name="Error_PropertyUpdateFailed" xml:space="preserve">
+    <value>Не удалось обновить свойство '{0}'.</value>
+  </data>
+  <data name="Error_ExpressionUpdateFailed" xml:space="preserve">
+    <value>Не удалось обновить выражение свойства '{0}'.</value>
+  </data>
+  <data name="Error_ProjectInfoGet" xml:space="preserve">
+    <value>Не удалось получить информацию о проекте: {0}</value>
+  </data>
+  <data name="Error_FileOpen" xml:space="preserve">
+    <value>Ошибка при открытии файла по пути {0}: {1}</value>
+  </data>
+  <data name="Error_DocumentNotFound" xml:space="preserve">
+    <value>Документ с номером детали {0} не найден среди открытых.</value>
+  </data>
+  <data name="Error_FileNotFoundForPart" xml:space="preserve">
+    <value>Файл, связанный с номером детали {0}, не найден среди открытых.</value>
+  </data>
+  <data name="Warning_ColumnAlreadyExists" xml:space="preserve">
+    <value>Столбец с именем '{0}' уже существует.</value>
+  </data>
+  <data name="Warning_PropertyAlreadyAdded" xml:space="preserve">
+    <value>Свойство '{0}' уже добавлено.</value>
+  </data>
+  <data name="Info_NoOverriddenQuantities" xml:space="preserve">
+    <value>В выбранных элементах нет переопределенных количеств.</value>
+  </data>
+  <data name="MessageBox_Confirmation" xml:space="preserve">
+    <value>Подтверждение</value>
+  </data>
+  <data name="Message_ConfirmDelete" xml:space="preserve">
+    <value>Вы действительно хотите удалить {0} строк(и)?</value>
+  </data>
+  <data name="MessageBox_Warning" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="Error_TemplateError" xml:space="preserve">
+    <value>Ошибка в шаблоне</value>
+  </data>
+  <data name="Error_UnknownTokens" xml:space="preserve">
+    <value>Ошибка в шаблоне - неизвестные токены</value>
+  </data>
+  <data name="Error_DocumentChanged" xml:space="preserve">
+    <value>Активный документ изменился. Пожалуйста, повторите сканирование перед экспортом.</value>
+  </data>
+  <data name="Error_ExportPreparationWithMessage" xml:space="preserve">
+    <value>Ошибка при подготовке экспорта: {0}</value>
+  </data>
+  <data name="Error_PartFileNotFound" xml:space="preserve">
+    <value>Файл детали не найден или не может быть открыт</value>
+  </data>
+  <data name="Error_DxfExport" xml:space="preserve">
+    <value>Ошибка экспорта DXF: {0}</value>
+  </data>
+  <data name="Error_PartProcessing" xml:space="preserve">
+    <value>Ошибка обработки детали: {0}</value>
+  </data>
+  <data name="Info_TemplateNotSet" xml:space="preserve">
+    <value>Не задан шаблон - при экспорте будет использовано значение по умолчанию "Обозначение детали"</value>
+  </data>
+  <data name="Error_FileNameTooLong" xml:space="preserve">
+    <value>Имя файла слишком длинное ({0} символов, максимум 255)</value>
+  </data>
+  <data name="Warning_FileLocked" xml:space="preserve">
+    <value>Файл {0} занят другим приложением. Прервать операцию?</value>
+  </data>
+  <data name="MessageBox_Info" xml:space="preserve">
+    <value>Информация</value>
+  </data>
+  <data name="Info_WaitingForFileUnlock" xml:space="preserve">
+    <value>Ожидание разблокировки файла. Возможно файл открыт в программе просмотра. Закройте файл и нажмите OK.</value>
+  </data>
+  <data name="Status_ComponentProgress" xml:space="preserve">
+    <value>Компонент {0} из {1}</value>
+  </data>
+  <data name="Status_BomRowProgress" xml:space="preserve">
+    <value>Строка {0} из {1}</value>
+  </data>
+  <data name="Validation_InvalidLayerNameCharacters" xml:space="preserve">
+    <value>Недопустимые символы в имени слоя.
+В именах слоев не допускается употребление следующих символов:
+&lt;&gt;/\\":;?*|,=</value>
+  </data>
+  <data name="MessageBox_InputError" xml:space="preserve">
+    <value>Ошибка ввода</value>
+  </data>
+  <data name="SplineReplacement_Lines" xml:space="preserve">
+    <value>Линии</value>
+  </data>
+  <data name="SplineReplacement_Arcs" xml:space="preserve">
+    <value>Дуги</value>
+  </data>
+  <data name="Layer_OuterProfile" xml:space="preserve">
+    <value>Внешний профиль</value>
+  </data>
+  <data name="Layer_InteriorProfiles" xml:space="preserve">
+    <value>Внутренние профили</value>
+  </data>
+  <data name="Layer_BendUp" xml:space="preserve">
+    <value>Гибка вверх</value>
+  </data>
+  <data name="Layer_BendDown" xml:space="preserve">
+    <value>Гибка вниз</value>
+  </data>
+  <data name="Layer_ToolCenterUp" xml:space="preserve">
+    <value>Центр инструмента вверх</value>
+  </data>
+  <data name="Layer_ToolCenterDown" xml:space="preserve">
+    <value>Центр инструмента вниз</value>
+  </data>
+  <data name="Layer_Tangent" xml:space="preserve">
+    <value>Касательная</value>
+  </data>
+  <data name="Layer_RollLines" xml:space="preserve">
+    <value>Линии прокатки</value>
+  </data>
+  <data name="Layer_TangentRollLines" xml:space="preserve">
+    <value>Касательные линии прокатки</value>
+  </data>
+  <data name="Layer_ArcCenters" xml:space="preserve">
+    <value>Центры дуг</value>
+  </data>
+  <data name="Layer_FeatureProfilesUp" xml:space="preserve">
+    <value>Профили элементов вверх</value>
+  </data>
+  <data name="Layer_FeatureProfilesDown" xml:space="preserve">
+    <value>Профили элементов вниз</value>
+  </data>
+  <data name="Layer_UnconsumedSketchConstruction" xml:space="preserve">
+    <value>Неиспользованные конструкции</value>
+  </data>
+  <data name="Layer_UnconsumedSketches" xml:space="preserve">
+    <value>Неиспользованные эскизы</value>
+  </data>
+  <data name="Layer_AltRepFront" xml:space="preserve">
+    <value>Альт. представление спереди</value>
+  </data>
+  <data name="Layer_AltRepBack" xml:space="preserve">
+    <value>Альт. представление сзади</value>
+  </data>
+
+  <!-- Цвета для слоев -->
+  <data name="White" xml:space="preserve">
+    <value>Белый</value>
+  </data>
+  <data name="Red" xml:space="preserve">
+    <value>Красный</value>
+  </data>
+  <data name="Orange" xml:space="preserve">
+    <value>Оранжевый</value>
+  </data>
+  <data name="Yellow" xml:space="preserve">
+    <value>Желтый</value>
+  </data>
+  <data name="Green" xml:space="preserve">
+    <value>Зеленый</value>
+  </data>
+  <data name="Cyan" xml:space="preserve">
+    <value>Голубой</value>
+  </data>
+  <data name="Blue" xml:space="preserve">
+    <value>Синий</value>
+  </data>
+  <data name="Purple" xml:space="preserve">
+    <value>Фиолетовый</value>
+  </data>
+  <data name="DarkGray" xml:space="preserve">
+    <value>Темно-серый</value>
+  </data>
+  <data name="LightGray" xml:space="preserve">
+    <value>Светло-серый</value>
+  </data>
+
+  <!-- Типы линий для слоев -->
+  <data name="Chain" xml:space="preserve">
+    <value>Штрихпунктирная</value>
+  </data>
+  <data name="Continuous" xml:space="preserve">
+    <value>Сплошная</value>
+  </data>
+  <data name="Dash dotted" xml:space="preserve">
+    <value>Штрихпунктирная</value>
+  </data>
+  <data name="Dashed double dotted" xml:space="preserve">
+    <value>Штриховая с двумя точками</value>
+  </data>
+  <data name="Dashed hidden" xml:space="preserve">
+    <value>Штриховая скрытая</value>
+  </data>
+  <data name="Dashed" xml:space="preserve">
+    <value>Штриховая</value>
+  </data>
+  <data name="Dashed triple dotted" xml:space="preserve">
+    <value>Штриховая с тремя точками</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>По умолчанию</value>
+  </data>
+  <data name="Dotted" xml:space="preserve">
+    <value>Пунктирная</value>
+  </data>
+  <data name="Double dash double dotted" xml:space="preserve">
+    <value>Двойная штриховая с двумя точками</value>
+  </data>
+  <data name="Double dashed" xml:space="preserve">
+    <value>Двойная штриховая</value>
+  </data>
+  <data name="Double dashed dotted" xml:space="preserve">
+    <value>Двойная штрихпунктирная</value>
+  </data>
+  <data name="Double dash triple dotted" xml:space="preserve">
+    <value>Двойная штриховая с тремя точками</value>
+  </data>
+  <data name="Long dash dotted" xml:space="preserve">
+    <value>Длинная штрихпунктирная</value>
+  </data>
+  <data name="Long dashed double dotted" xml:space="preserve">
+    <value>Длинная штриховая с двумя точками</value>
+  </data>
+  <data name="Long dash triple dotted" xml:space="preserve">
+    <value>Длинная штриховая с тремя точками</value>
+  </data>
+
+  <!-- PropertyMetadataRegistry: System Properties -->
+  <data name="Property_ProcessingStatus_DisplayName" xml:space="preserve">
+    <value>Статус обработки</value>
+  </data>
+  <data name="Property_ProcessingStatus_ColumnHeader" xml:space="preserve">
+    <value>Обр.</value>
+  </data>
+  <data name="Property_ProcessingStatus_Category" xml:space="preserve">
+    <value>Системные</value>
+  </data>
+
+  <data name="Property_Item_DisplayName" xml:space="preserve">
+    <value>Нумерация</value>
+  </data>
+  <data name="Property_Item_ColumnHeader" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Property_Item_Category" xml:space="preserve">
+    <value>Системные</value>
+  </data>
+
+  <data name="Property_Quantity_DisplayName" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="Property_Quantity_ColumnHeader" xml:space="preserve">
+    <value>Кол.</value>
+  </data>
+  <data name="Property_Quantity_Category" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+
+  <!-- PropertyMetadataRegistry: Document Properties -->
+  <data name="Property_FileName_DisplayName" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="Property_FileName_ColumnHeader" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="Property_FileName_Category" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+
+  <data name="Property_FullFileName_DisplayName" xml:space="preserve">
+    <value>Полное имя файла</value>
+  </data>
+  <data name="Property_FullFileName_ColumnHeader" xml:space="preserve">
+    <value>Полное имя файла</value>
+  </data>
+  <data name="Property_FullFileName_Category" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+
+  <data name="Property_ModelState_DisplayName" xml:space="preserve">
+    <value>Состояние модели</value>
+  </data>
+  <data name="Property_ModelState_ColumnHeader" xml:space="preserve">
+    <value>Состояние модели</value>
+  </data>
+  <data name="Property_ModelState_Category" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+
+  <data name="Property_Thickness_DisplayName" xml:space="preserve">
+    <value>Толщина</value>
+  </data>
+  <data name="Property_Thickness_ColumnHeader" xml:space="preserve">
+    <value>Толщ.</value>
+  </data>
+  <data name="Property_Thickness_Category" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+
+  <data name="Property_HasFlatPattern_DisplayName" xml:space="preserve">
+    <value>Наличие развертки</value>
+  </data>
+  <data name="Property_HasFlatPattern_ColumnHeader" xml:space="preserve">
+    <value>Развертка</value>
+  </data>
+  <data name="Property_HasFlatPattern_Category" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+
+  <data name="Property_Preview_DisplayName" xml:space="preserve">
+    <value>Изображение детали</value>
+  </data>
+  <data name="Property_Preview_ColumnHeader" xml:space="preserve">
+    <value>Изобр. детали</value>
+  </data>
+  <data name="Property_Preview_Category" xml:space="preserve">
+    <value>Документ</value>
+  </data>
+
+  <data name="Property_DxfPreview_DisplayName" xml:space="preserve">
+    <value>Изображение развертки</value>
+  </data>
+  <data name="Property_DxfPreview_ColumnHeader" xml:space="preserve">
+    <value>Изобр. развертки</value>
+  </data>
+  <data name="Property_DxfPreview_Category" xml:space="preserve">
+    <value>Обработка</value>
+  </data>
+
+  <!-- PropertyMetadataRegistry: Summary Information -->
+  <data name="Property_Author_DisplayName" xml:space="preserve">
+    <value>Автор</value>
+  </data>
+  <data name="Property_Author_ColumnHeader" xml:space="preserve">
+    <value>Автор</value>
+  </data>
+  <data name="Property_Author_Category" xml:space="preserve">
+    <value>Автор и редактирование</value>
+  </data>
+
+  <data name="Property_Revision_DisplayName" xml:space="preserve">
+    <value>Ревизия</value>
+  </data>
+  <data name="Property_Revision_ColumnHeader" xml:space="preserve">
+    <value>Ревизия</value>
+  </data>
+  <data name="Property_Revision_Category" xml:space="preserve">
+    <value>Автор и редактирование</value>
+  </data>
+
+  <data name="Property_Title_DisplayName" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="Property_Title_ColumnHeader" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="Property_Title_Category" xml:space="preserve">
+    <value>Автор и редактирование</value>
+  </data>
+
+  <data name="Property_Subject_DisplayName" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="Property_Subject_ColumnHeader" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="Property_Subject_Category" xml:space="preserve">
+    <value>Автор и редактирование</value>
+  </data>
+
+  <data name="Property_Keywords_DisplayName" xml:space="preserve">
+    <value>Ключевые слова</value>
+  </data>
+  <data name="Property_Keywords_ColumnHeader" xml:space="preserve">
+    <value>Ключевые слова</value>
+  </data>
+  <data name="Property_Keywords_Category" xml:space="preserve">
+    <value>Автор и редактирование</value>
+  </data>
+
+  <data name="Property_Comments_DisplayName" xml:space="preserve">
+    <value>Примечание</value>
+  </data>
+  <data name="Property_Comments_ColumnHeader" xml:space="preserve">
+    <value>Примечание</value>
+  </data>
+  <data name="Property_Comments_Category" xml:space="preserve">
+    <value>Автор и редактирование</value>
+  </data>
+
+  <!-- PropertyMetadataRegistry: Document Summary Information -->
+  <data name="Property_Category_DisplayName" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="Property_Category_ColumnHeader" xml:space="preserve">
+    <value>Категория</value>
+  </data>
+  <data name="Property_Category_Category" xml:space="preserve">
+    <value>Организационная информация</value>
+  </data>
+
+  <data name="Property_Manager_DisplayName" xml:space="preserve">
+    <value>Менеджер</value>
+  </data>
+  <data name="Property_Manager_ColumnHeader" xml:space="preserve">
+    <value>Менеджер</value>
+  </data>
+  <data name="Property_Manager_Category" xml:space="preserve">
+    <value>Организационная информация</value>
+  </data>
+
+  <data name="Property_Company_DisplayName" xml:space="preserve">
+    <value>Компания</value>
+  </data>
+  <data name="Property_Company_ColumnHeader" xml:space="preserve">
+    <value>Компания</value>
+  </data>
+  <data name="Property_Company_Category" xml:space="preserve">
+    <value>Организационная информация</value>
+  </data>
+
+  <!-- PropertyMetadataRegistry: Design Tracking Properties -->
+  <data name="Property_PartNumber_DisplayName" xml:space="preserve">
+    <value>Обозначение</value>
+  </data>
+  <data name="Property_PartNumber_ColumnHeader" xml:space="preserve">
+    <value>Обозначение</value>
+  </data>
+  <data name="Property_PartNumber_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_Description_DisplayName" xml:space="preserve">
+    <value>Наименование</value>
+  </data>
+  <data name="Property_Description_ColumnHeader" xml:space="preserve">
+    <value>Наименование</value>
+  </data>
+  <data name="Property_Description_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_Material_DisplayName" xml:space="preserve">
+    <value>Материал</value>
+  </data>
+  <data name="Property_Material_ColumnHeader" xml:space="preserve">
+    <value>Материал</value>
+  </data>
+  <data name="Property_Material_Category" xml:space="preserve">
+    <value>Материал и отделка</value>
+  </data>
+
+  <data name="Property_Project_DisplayName" xml:space="preserve">
+    <value>Проект</value>
+  </data>
+  <data name="Property_Project_ColumnHeader" xml:space="preserve">
+    <value>Проект</value>
+  </data>
+  <data name="Property_Project_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_StockNumber_DisplayName" xml:space="preserve">
+    <value>Инвентарный номер</value>
+  </data>
+  <data name="Property_StockNumber_ColumnHeader" xml:space="preserve">
+    <value>Инвентарный номер</value>
+  </data>
+  <data name="Property_StockNumber_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_CreationTime_DisplayName" xml:space="preserve">
+    <value>Время создания</value>
+  </data>
+  <data name="Property_CreationTime_ColumnHeader" xml:space="preserve">
+    <value>Время создания</value>
+  </data>
+  <data name="Property_CreationTime_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_CostCenter_DisplayName" xml:space="preserve">
+    <value>Сметчик</value>
+  </data>
+  <data name="Property_CostCenter_ColumnHeader" xml:space="preserve">
+    <value>Сметчик</value>
+  </data>
+  <data name="Property_CostCenter_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_CheckedBy_DisplayName" xml:space="preserve">
+    <value>Проверил</value>
+  </data>
+  <data name="Property_CheckedBy_ColumnHeader" xml:space="preserve">
+    <value>Проверил</value>
+  </data>
+  <data name="Property_CheckedBy_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_EngApprovedBy_DisplayName" xml:space="preserve">
+    <value>Нормоконтроль</value>
+  </data>
+  <data name="Property_EngApprovedBy_ColumnHeader" xml:space="preserve">
+    <value>Нормоконтроль</value>
+  </data>
+  <data name="Property_EngApprovedBy_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_UserStatus_DisplayName" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Property_UserStatus_ColumnHeader" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Property_UserStatus_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_CatalogWebLink_DisplayName" xml:space="preserve">
+    <value>Веб-ссылка</value>
+  </data>
+  <data name="Property_CatalogWebLink_ColumnHeader" xml:space="preserve">
+    <value>Веб-ссылка</value>
+  </data>
+  <data name="Property_CatalogWebLink_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_Vendor_DisplayName" xml:space="preserve">
+    <value>Поставщик</value>
+  </data>
+  <data name="Property_Vendor_ColumnHeader" xml:space="preserve">
+    <value>Поставщик</value>
+  </data>
+  <data name="Property_Vendor_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_MfgApprovedBy_DisplayName" xml:space="preserve">
+    <value>Утвердил</value>
+  </data>
+  <data name="Property_MfgApprovedBy_ColumnHeader" xml:space="preserve">
+    <value>Утвердил</value>
+  </data>
+  <data name="Property_MfgApprovedBy_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_DesignStatus_DisplayName" xml:space="preserve">
+    <value>Статус разработки</value>
+  </data>
+  <data name="Property_DesignStatus_ColumnHeader" xml:space="preserve">
+    <value>Статус разработки</value>
+  </data>
+  <data name="Property_DesignStatus_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_Designer_DisplayName" xml:space="preserve">
+    <value>Проектировщик</value>
+  </data>
+  <data name="Property_Designer_ColumnHeader" xml:space="preserve">
+    <value>Проектировщик</value>
+  </data>
+  <data name="Property_Designer_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_Engineer_DisplayName" xml:space="preserve">
+    <value>Инженер</value>
+  </data>
+  <data name="Property_Engineer_ColumnHeader" xml:space="preserve">
+    <value>Инженер</value>
+  </data>
+  <data name="Property_Engineer_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_Authority_DisplayName" xml:space="preserve">
+    <value>Нач. отдела</value>
+  </data>
+  <data name="Property_Authority_ColumnHeader" xml:space="preserve">
+    <value>Нач. отдела</value>
+  </data>
+  <data name="Property_Authority_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <data name="Property_Mass_DisplayName" xml:space="preserve">
+    <value>Масса</value>
+  </data>
+  <data name="Property_Mass_ColumnHeader" xml:space="preserve">
+    <value>Масса</value>
+  </data>
+  <data name="Property_Mass_Category" xml:space="preserve">
+    <value>Физические свойства</value>
+  </data>
+
+  <data name="Property_SurfaceArea_DisplayName" xml:space="preserve">
+    <value>Площадь поверхности</value>
+  </data>
+  <data name="Property_SurfaceArea_ColumnHeader" xml:space="preserve">
+    <value>Площадь поверхности</value>
+  </data>
+  <data name="Property_SurfaceArea_Category" xml:space="preserve">
+    <value>Листовой металл</value>
+  </data>
+
+  <data name="Property_Volume_DisplayName" xml:space="preserve">
+    <value>Объем</value>
+  </data>
+  <data name="Property_Volume_ColumnHeader" xml:space="preserve">
+    <value>Объем</value>
+  </data>
+  <data name="Property_Volume_Category" xml:space="preserve">
+    <value>Физические свойства</value>
+  </data>
+
+  <data name="Property_SheetMetalRule_DisplayName" xml:space="preserve">
+    <value>Правило ЛМ</value>
+  </data>
+  <data name="Property_SheetMetalRule_ColumnHeader" xml:space="preserve">
+    <value>Правило ЛМ</value>
+  </data>
+  <data name="Property_SheetMetalRule_Category" xml:space="preserve">
+    <value>Листовой металл</value>
+  </data>
+
+  <data name="Property_FlatPatternWidth_DisplayName" xml:space="preserve">
+    <value>Ширина развертки</value>
+  </data>
+  <data name="Property_FlatPatternWidth_ColumnHeader" xml:space="preserve">
+    <value>Ширина развертки</value>
+  </data>
+  <data name="Property_FlatPatternWidth_Category" xml:space="preserve">
+    <value>Листовой металл</value>
+  </data>
+
+  <data name="Property_FlatPatternLength_DisplayName" xml:space="preserve">
+    <value>Длина развертки</value>
+  </data>
+  <data name="Property_FlatPatternLength_ColumnHeader" xml:space="preserve">
+    <value>Длина развертки</value>
+  </data>
+  <data name="Property_FlatPatternLength_Category" xml:space="preserve">
+    <value>Листовой металл</value>
+  </data>
+
+  <data name="Property_FlatPatternArea_DisplayName" xml:space="preserve">
+    <value>Площадь</value>
+  </data>
+  <data name="Property_FlatPatternArea_ColumnHeader" xml:space="preserve">
+    <value>Площадь</value>
+  </data>
+  <data name="Property_FlatPatternArea_Category" xml:space="preserve">
+    <value>Листовой металл</value>
+  </data>
+
+  <data name="Property_Appearance_DisplayName" xml:space="preserve">
+    <value>Отделка</value>
+  </data>
+  <data name="Property_Appearance_ColumnHeader" xml:space="preserve">
+    <value>Отделка</value>
+  </data>
+  <data name="Property_Appearance_Category" xml:space="preserve">
+    <value>Материал и отделка</value>
+  </data>
+
+  <data name="Property_Density_DisplayName" xml:space="preserve">
+    <value>Плотность</value>
+  </data>
+  <data name="Property_Density_ColumnHeader" xml:space="preserve">
+    <value>Плотность</value>
+  </data>
+  <data name="Property_Density_Category" xml:space="preserve">
+    <value>Физические свойства</value>
+  </data>
+
+  <data name="Property_LastUpdatedWith_DisplayName" xml:space="preserve">
+    <value>Версия Inventor</value>
+  </data>
+  <data name="Property_LastUpdatedWith_ColumnHeader" xml:space="preserve">
+    <value>Версия Inventor</value>
+  </data>
+  <data name="Property_LastUpdatedWith_Category" xml:space="preserve">
+    <value>Техническая документация</value>
+  </data>
+
+  <!-- PropertyMetadataRegistry: User Defined Properties -->
+  <data name="Property_UserDefined_Prefix" xml:space="preserve">
+    <value>(Пользов.)</value>
+  </data>
+  <data name="Property_UserDefined_Category" xml:space="preserve">
+    <value>Пользовательские свойства</value>
+  </data>
+
+  <!-- Language Names -->
+  <data name="Language_English" xml:space="preserve">
+    <value>Английский</value>
+  </data>
+
+  <!-- Thumbnail -->
+  <data name="Text_NoThumbnail" xml:space="preserve">
+    <value>Нет миниатюры</value>
+  </data>
+
+  <!-- Time Units -->
+  <data name="Time_Minutes_Short" xml:space="preserve">
+    <value>мин.</value>
+  </data>
+  <data name="Time_Seconds_Short" xml:space="preserve">
+    <value>сек.</value>
+  </data>
+
+  <!-- Design Status Values -->
+  <data name="DesignStatus_Development" xml:space="preserve">
+    <value>Разработка</value>
+  </data>
+  <data name="DesignStatus_Approval" xml:space="preserve">
+    <value>Утверждение</value>
+  </data>
+  <data name="DesignStatus_Completed" xml:space="preserve">
+    <value>Завершен</value>
+  </data>
+
+  <!-- Reset Quantity Messages -->
+  <data name="Message_ResetQuantitySingle" xml:space="preserve">
+    <value>Сбросить количество для "{0}" до исходного значения {1}?</value>
+  </data>
+  <data name="Message_ResetQuantityMultiple" xml:space="preserve">
+    <value>Сбросить количество для {0} выбранных элементов до исходных значений?</value>
+  </data>
+
+  <!-- DataGrid ToolTips -->
+  <data name="ToolTip_ExpressionIndicator" xml:space="preserve">
+    <value>Значение задано выражением (Expression)</value>
+  </data>
+  <data name="ToolTip_FlatPatternMissing" xml:space="preserve">
+    <value>Развертка отсутствует</value>
+  </data>
+  <data name="ToolTip_FlatPatternAvailable" xml:space="preserve">
+    <value>Развертка доступна</value>
+  </data>
+</root>

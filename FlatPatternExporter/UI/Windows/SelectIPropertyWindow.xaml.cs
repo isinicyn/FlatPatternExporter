@@ -12,26 +12,27 @@ namespace FlatPatternExporter.UI.Windows;
 public partial class SelectIPropertyWindow : Window
 {
     private readonly PropertyListManager _propertyListManager;
-    private readonly Func<string, bool> _isColumnAdded;
+    private readonly LocalizationManager _localizationManager = LocalizationManager.Instance;
+    private readonly Func<string, bool> _isPropertyAdded;
     private readonly Action<PresetIProperty> _addIPropertyColumn;
     private readonly Action<string> _addUserDefinedColumn;
-    private readonly Action<string, bool> _removeColumn;
+    private readonly Action<string, bool> _removeProperty;
     private bool _isInitialized = false;
 
     public SelectIPropertyWindow(
         ObservableCollection<PresetIProperty> presetIProperties,
-        Func<string, bool> isColumnAdded,
+        Func<string, bool> isPropertyAdded,
         Action<PresetIProperty> addIPropertyColumn,
         Action<string> addUserDefinedColumn,
-        Action<string, bool> removeColumn)
+        Action<string, bool> removeProperty)
     {
         InitializeComponent();
 
         _propertyListManager = new PropertyListManager(presetIProperties);
-        _isColumnAdded = isColumnAdded;
+        _isPropertyAdded = isPropertyAdded;
         _addIPropertyColumn = addIPropertyColumn;
         _addUserDefinedColumn = addUserDefinedColumn;
-        _removeColumn = removeColumn;
+        _removeProperty = removeProperty;
 
         DataContext = this;
 
@@ -58,7 +59,7 @@ public partial class SelectIPropertyWindow : Window
     {
         foreach (var property in StandardProperties.Concat(UserDefinedProperties))
         {
-            property.IsAdded = _isColumnAdded(property.ColumnHeader);
+            property.IsAdded = _isPropertyAdded(property.InventorPropertyName);
         }
     }
 
@@ -153,21 +154,20 @@ public partial class SelectIPropertyWindow : Window
         if (sender is Button button && button.Tag is PresetIProperty property)
         {
             var result = MessageBox.Show(
-                $"Вы уверены, что хотите удалить свойство '{property.ListDisplayName}' из реестра? Это действие нельзя отменить.",
-                "Подтверждение удаления",
+                _localizationManager.GetString("Confirm_DeleteProperty", property.ListDisplayName),
+                _localizationManager.GetString("Confirm_DeletePropertyTitle"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
                 
             if (result == MessageBoxResult.Yes)
             {
-                _removeColumn(property.ColumnHeader, false);
-                
-                var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(property.ColumnHeader);
-                if (!string.IsNullOrEmpty(internalName))
+                _removeProperty(property.InventorPropertyName, false);
+
+                if (!string.IsNullOrEmpty(property.InventorPropertyName))
                 {
-                    PropertyMetadataRegistry.RemoveUserDefinedProperty(internalName);
+                    PropertyMetadataRegistry.RemoveUserDefinedProperty(property.InventorPropertyName);
                 }
-                
+
                 _propertyListManager.RemoveUserDefinedProperty(property);
             }
         }
@@ -186,7 +186,7 @@ public partial class SelectIPropertyWindow : Window
     {
         if (!property.IsAdded)
         {
-            var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(property.ColumnHeader);
+            var internalName = property.InventorPropertyName;
             if (!string.IsNullOrEmpty(internalName) && PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
             {
                 var propertyName = PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(internalName);
@@ -201,7 +201,7 @@ public partial class SelectIPropertyWindow : Window
 
     private void RemovePropertyFromGrid(PresetIProperty property)
     {
-        _removeColumn(property.ColumnHeader, true);
+        _removeProperty(property.InventorPropertyName, true);
         property.IsAdded = false;
     }
 
@@ -225,7 +225,7 @@ public partial class SelectIPropertyWindow : Window
         var newProperty = _propertyListManager.CreateUserDefinedProperty(userDefinedPropertyName);
         if (newProperty == null)
         {
-            MessageBox.Show($"Свойство '{userDefinedPropertyName}' уже добавлено.", "Предупреждение",
+            MessageBox.Show(_localizationManager.GetString("Warning_PropertyAlreadyAdded", userDefinedPropertyName), _localizationManager.GetString("MessageBox_Warning"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }

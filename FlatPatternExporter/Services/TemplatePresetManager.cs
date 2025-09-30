@@ -47,6 +47,8 @@ public class TemplatePreset : INotifyPropertyChanged
 
 public class TemplatePresetManager : INotifyPropertyChanged
 {
+    private readonly LocalizationManager _localizationManager;
+
     public ObservableCollection<TemplatePreset> TemplatePresets { get; } = [];
 
     private TemplatePreset? _selectedTemplatePreset;
@@ -58,6 +60,11 @@ public class TemplatePresetManager : INotifyPropertyChanged
             _selectedTemplatePreset = value;
             OnPropertyChanged();
         }
+    }
+
+    public TemplatePresetManager()
+    {
+        _localizationManager = LocalizationManager.Instance;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -98,7 +105,8 @@ public class TemplatePresetManager : INotifyPropertyChanged
     public void DuplicateSelected()
     {
         var baseName = SelectedTemplatePreset!.Name;
-        var newName = GenerateUniqueName($"{baseName} (копия)");
+        var copySuffix = _localizationManager.GetString("Text_CopySuffix");
+        var newName = GenerateUniqueName($"{baseName} {copySuffix}");
         var duplicate = new TemplatePreset
         {
             Name = newName,
@@ -133,8 +141,8 @@ public class TemplatePresetManager : INotifyPropertyChanged
             return false;
 
         var result = MessageBox.Show(
-            $"Удалить пресет '{SelectedTemplatePreset.Name}'?",
-            "Подтверждение удаления",
+            _localizationManager.GetString("Confirm_DeletePreset", SelectedTemplatePreset.Name),
+            _localizationManager.GetString("Confirm_DeletePresetTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 

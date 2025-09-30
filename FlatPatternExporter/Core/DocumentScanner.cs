@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
+using FlatPatternExporter.Services;
 using Inventor;
 using PropertyManager = FlatPatternExporter.Core.PropertyManager;
 
@@ -169,21 +170,21 @@ public class DocumentScanner
                 {
                     ProcessedItems = processedOccurrences,
                     TotalItems = totalOccurrences,
-                    CurrentOperation = "Сканирование компонентов",
-                    CurrentItem = $"Компонент {processedOccurrences} из {totalOccurrences}"
+                    CurrentOperation = LocalizationManager.Instance.GetString("Status_ScanningComponents"),
+                    CurrentItem = LocalizationManager.Instance.GetString("Status_ComponentProgress", processedOccurrences, totalOccurrences)
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Ошибка при обработке компонента: {ex.Message}");
+                Debug.WriteLine($"Error processing component: {ex.Message}");
 
                 processedOccurrences++;
                 scanProgress?.Report(new ScanProgress
                 {
                     ProcessedItems = processedOccurrences,
                     TotalItems = totalOccurrences,
-                    CurrentOperation = "Сканирование компонентов",
-                    CurrentItem = $"Компонент {processedOccurrences} из {totalOccurrences}"
+                    CurrentOperation = LocalizationManager.Instance.GetString("Status_ScanningComponents"),
+                    CurrentItem = LocalizationManager.Instance.GetString("Status_ComponentProgress", processedOccurrences, totalOccurrences)
                 });
             }
         }
@@ -200,7 +201,7 @@ public class DocumentScanner
         {
             var allBomRows = GetAllBOMRowsRecursively(bom, options);
 
-            Debug.WriteLine($"[ProcessBOM] Всего найдено {allBomRows.Count} строк BOM во всей структуре");
+            Debug.WriteLine($"[ProcessBOM] Total found {allBomRows.Count} BOM rows in entire structure");
 
             var processedRows = 0;
             var totalRows = allBomRows.Count;
@@ -218,25 +219,25 @@ public class DocumentScanner
                     {
                         ProcessedItems = processedRows,
                         TotalItems = totalRows,
-                        CurrentOperation = "Сканирование спецификации",
-                        CurrentItem = $"Строка {processedRows} из {totalRows}"
+                        CurrentOperation = LocalizationManager.Instance.GetString("Status_ScanningBOM"),
+                        CurrentItem = LocalizationManager.Instance.GetString("Status_BomRowProgress", processedRows, totalRows)
                     });
                 }
                 catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
                 {
                     _hasMissingReferences = true;
-                    Debug.WriteLine($"Обнаружен компонент с потерянной ссылкой: {ex.Message}");
+                    Debug.WriteLine($"Detected component with missing reference: {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Ошибка при обработке строки BOM: {ex.Message}");
+                    Debug.WriteLine($"Error processing BOM row: {ex.Message}");
                     _hasMissingReferences = true;
                 }
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Общая ошибка при обработке BOM: {ex.Message}");
+            Debug.WriteLine($"General error processing BOM: {ex.Message}");
             _hasMissingReferences = true;
         }
     }
@@ -300,12 +301,12 @@ public class DocumentScanner
             catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
             {
                 _hasMissingReferences = true;
-                Debug.WriteLine("Ошибка при доступе к BOMRows. Возможно, в сборке есть потерянные ссылки.");
+                Debug.WriteLine("Error accessing BOMRows. Assembly may have missing references.");
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка при рекурсивном получении BOM: {ex.Message}");
+            Debug.WriteLine($"Error recursively getting BOM: {ex.Message}");
         }
 
         return allRows;
@@ -348,7 +349,7 @@ public class DocumentScanner
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка при простой обработке строки BOM: {ex.Message}");
+            Debug.WriteLine($"Error in simple BOM row processing: {ex.Message}");
         }
     }
 

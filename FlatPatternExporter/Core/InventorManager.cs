@@ -33,13 +33,13 @@ public class InventorManager
         catch (COMException)
         {
             MessageBox.Show(
-                "Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.", "Ошибка",
+                LocalizationManager.Instance.GetString("Error_InventorConnection"), LocalizationManager.Instance.GetString("MessageBox_Error"),
                 MessageBoxButton.OK, MessageBoxImage.Error);
             _thisApplication = null;
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Произошла ошибка при подключении к Inventor: " + ex.Message, "Ошибка", MessageBoxButton.OK,
+            MessageBox.Show(LocalizationManager.Instance.GetString("Error_InventorConnection", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK,
                 MessageBoxImage.Error);
             _thisApplication = null;
         }
@@ -62,7 +62,7 @@ public class InventorManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при инициализации данных проекта: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(LocalizationManager.Instance.GetString("Error_ProjectDataInit", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -79,7 +79,7 @@ public class InventorManager
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Не удалось получить информацию о проекте: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(LocalizationManager.Instance.GetString("Error_ProjectInfoGet", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -90,7 +90,7 @@ public class InventorManager
             return new DocumentValidationResult
             {
                 IsValid = false,
-                ErrorMessage = "Не удалось подключиться к Inventor"
+                ErrorMessage = LocalizationManager.Instance.GetString("Error_InventorConnectionFailed")
             };
         }
 
@@ -100,7 +100,7 @@ public class InventorManager
             return new DocumentValidationResult
             {
                 IsValid = false,
-                ErrorMessage = "Нет открытого документа. Пожалуйста, откройте сборку или деталь и попробуйте снова."
+                ErrorMessage = LocalizationManager.Instance.GetString("Error_NoActiveDocument")
             };
         }
 
@@ -116,7 +116,7 @@ public class InventorManager
             return new DocumentValidationResult
             {
                 IsValid = false,
-                ErrorMessage = "Откройте сборку или деталь для работы с приложением."
+                ErrorMessage = LocalizationManager.Instance.GetString("Error_NoDocumentOpen")
             };
         }
 
@@ -125,7 +125,7 @@ public class InventorManager
             Document = doc,
             DocType = docType,
             IsValid = true,
-            DocumentTypeName = docType == DocumentType.Assembly ? "Сборка" : "Деталь"
+            DocumentTypeName = docType == DocumentType.Assembly ? "Assembly" : "Part"
         };
     }
 
@@ -141,7 +141,7 @@ public class InventorManager
     {
         if (!System.IO.File.Exists(filePath))
         {
-            MessageBox.Show($"Файл по пути {filePath} не найден.", "Ошибка",
+            MessageBox.Show(LocalizationManager.Instance.GetString("Error_FileNotFound", filePath), LocalizationManager.Instance.GetString("MessageBox_Error"),
                 MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
@@ -160,7 +160,7 @@ public class InventorManager
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Ошибка при открытии файла по пути {filePath}: {ex.Message}", "Ошибка",
+            MessageBox.Show(LocalizationManager.Instance.GetString("Error_FileOpen", filePath, ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"),
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -178,7 +178,7 @@ public class InventorManager
                     return pd;
             }
 
-        MessageBox.Show($"Документ с номером детали {partNumber} не найден среди открытых.", "Ошибка",
+        MessageBox.Show(LocalizationManager.Instance.GetString("Error_DocumentNotFound", partNumber), LocalizationManager.Instance.GetString("MessageBox_Error"),
             MessageBoxButton.OK, MessageBoxImage.Error);
         return null;
     }
@@ -196,7 +196,7 @@ public class InventorManager
                     return pd.FullFileName;
             }
 
-        MessageBox.Show($"Документ с номером детали {partNumber} не найден среди открытых.", "Ошибка",
+        MessageBox.Show(LocalizationManager.Instance.GetString("Error_DocumentNotFound", partNumber), LocalizationManager.Instance.GetString("MessageBox_Error"),
             MessageBoxButton.OK, MessageBoxImage.Error);
         return null;
     }

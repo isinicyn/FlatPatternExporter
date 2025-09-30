@@ -32,13 +32,13 @@ public partial class ConflictDetailsWindow
     {
         if (sender is MenuItem menuItem)
         {
-            // Находим DataGrid, который содержит данное меню
+            // Find the DataGrid that contains this menu
             var dataGrid = menuItem.GetValue(FrameworkElement.DataContextProperty) as DataGrid;
             if (dataGrid?.SelectedItem is ConflictFileInfo fileInfo)
             {
                 ExecuteOpenFile(fileInfo);
             }
-            // Попробуем найти через PlacementTarget
+            // Try to find via PlacementTarget
             else if (menuItem.Parent is ContextMenu contextMenu && 
                      contextMenu.PlacementTarget is DataGrid targetGrid &&
                      targetGrid.SelectedItem is ConflictFileInfo selectedFile)
@@ -56,7 +56,7 @@ public partial class ConflictDetailsWindow
         }
     }
 
-    // Обработчик кнопки "ОК"
+    // "OK" button handler
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
         DialogResult = true;

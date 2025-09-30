@@ -34,14 +34,11 @@ public class PropertyListManager(ObservableCollection<PresetIProperty> allProper
     {
         foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
         {
-            if (!UserDefinedProperties.Any(p => p.ColumnHeader == userProperty.ColumnHeader))
+            if (!UserDefinedProperties.Any(p => p.InventorPropertyName == userProperty.InternalName))
             {
                 var presetProperty = new PresetIProperty
                 {
-                    ColumnHeader = userProperty.ColumnHeader,
-                    ListDisplayName = userProperty.DisplayName,
                     InventorPropertyName = userProperty.InternalName,
-                    Category = userProperty.Category,
                     IsUserDefined = true
                 };
 
@@ -98,10 +95,7 @@ public class PropertyListManager(ObservableCollection<PresetIProperty> allProper
         {
             var newUserProperty = new PresetIProperty
             {
-                ColumnHeader = userProperty.ColumnHeader,
-                ListDisplayName = userProperty.DisplayName,
-                InventorPropertyName = userProperty.InventorPropertyName ?? userDefinedPropertyName,
-                Category = userProperty.Category,
+                InventorPropertyName = userProperty.InternalName,
                 IsAdded = false,
                 IsUserDefined = true
             };

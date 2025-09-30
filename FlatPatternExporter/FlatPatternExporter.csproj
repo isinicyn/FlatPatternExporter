@@ -12,9 +12,9 @@
 
     <StartupObject>FlatPatternExporter.App</StartupObject>
     
-    <!-- Метаданные приложения -->
+    <!-- Application metadata -->
     <AssemblyTitle>FlatPatternExporter</AssemblyTitle>
-    <AssemblyDescription>Приложение для экспорта разверток деталей из листового металла из Autodesk Inventor</AssemblyDescription>
+    <AssemblyDescription>Application for exporting flat patterns of sheet metal parts from Autodesk Inventor</AssemblyDescription>
     <AssemblyProduct>FlatPatternExporter</AssemblyProduct>
     <AssemblyCopyright>Copyright © 2025</AssemblyCopyright>
   </PropertyGroup>
@@ -28,7 +28,7 @@
   </PropertyGroup>
 
 <PropertyGroup>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- Для x64 -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- For x64 -->
 </PropertyGroup>
 
   <PropertyGroup>
@@ -51,7 +51,7 @@
       <InformationalVersion>$(VersionPrefix).$(VersionSuffix) build:$(CommitHash)</InformationalVersion>
     </PropertyGroup>
     
-    <!-- Добавляем подробное логирование -->
+    <!-- Add detailed logging -->
     <Message Text="VersionPrefix: $(VersionPrefix)" Importance="high" />
     <Message Text="VersionSuffix: $(VersionSuffix)" Importance="high" />
     <Message Text="RevisionNumber: $(RevisionNumber)" Importance="high" />

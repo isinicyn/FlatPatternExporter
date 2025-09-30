@@ -161,13 +161,13 @@ public class PartData : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Проверяет, является ли указанное свойство выражением
+    /// Checks if the specified property is an expression
     /// </summary>
     public bool IsPropertyExpression(string propertyName) =>
         _isExpressionFlags.TryGetValue(propertyName, out var isExpression) && isExpression;
 
     /// <summary>
-    /// Устанавливает состояние выражения для свойства
+    /// Sets the expression state for a property
     /// </summary>
     public void SetPropertyExpressionState(string propertyName, bool isExpression)
     {

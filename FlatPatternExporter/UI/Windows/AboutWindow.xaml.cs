@@ -15,13 +15,13 @@ namespace FlatPatternExporter.UI.Windows
 
         private void SetVersion()
         {
-            VersionTextBlock.Text = "Версия программы: " + VersionInfoService.GetApplicationVersion();
+            VersionTextBlock.Text = LocalizationManager.Instance.GetString("About_ProgramVersion") + " " + VersionInfoService.GetApplicationVersion();
         }
 
-        // Установка даты последнего обновления согласно коммиту
+        // Set the last update date according to commit
         private void SetLastUpdateDate()
         {
-            LastUpdateTextBlock.Text = "Последнее обновление: " + VersionInfoService.GetLastCommitDate();
+            LastUpdateTextBlock.Text = LocalizationManager.Instance.GetString("About_LastUpdate") + " " + VersionInfoService.GetLastCommitDate();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

@@ -35,25 +35,26 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly InventorManager _inventorManager = new();
     private Document? _lastScannedDocument;
 
-    // Сервисы
+    // Services
+    private readonly LocalizationManager _localizationManager = LocalizationManager.Instance;
     private readonly TokenService _tokenService = new();
     private readonly DocumentScanner _documentScanner;
     private readonly ThumbnailGenerator _thumbnailGenerator = new();
     private readonly DxfExporter _dxfExporter;
     private readonly PartDataReader _partDataReader;
 
-    // Данные и коллекции
+    // Data and collections
     private readonly ObservableCollection<PartData> _partsData = [];
     private readonly CollectionViewSource _partsDataView;
-    
-    // Состояние процессов
+
+    // Process state
     private bool _isScanning;
     private bool _isExporting;
     private CancellationTokenSource? _operationCts;
     private int _itemCounter = 1;
     private bool _isUpdatingState;
-    
-    // UI состояние
+
+    // UI state
     private double _scanProgressValue;
     public double ScanProgressValue
     {
@@ -84,40 +85,40 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private string _actualSearchText = string.Empty;
     private readonly DispatcherTimer _searchDelayTimer;
 
-    // Словарь горячих клавиш для централизованной обработки
+    // Hotkey dictionary for centralized handling
     private readonly Dictionary<Key, Func<Task>> _hotKeyActions;
-    
-    // DataGrid управление колонками
+
+    // DataGrid column management
     private AdornerLayer? _adornerLayer;
     private HeaderAdorner? _headerAdorner;
     private bool _isColumnDraggedOutside;
     private DataGridColumn? _reorderingColumn;
-    
-    // Настройки фильтрации деталей
+
+    // Part filtering settings
     private bool _excludeReferenceParts = true;
     private bool _excludePurchasedParts = true;
     private bool _excludePhantomParts = true;
     private bool _includeLibraryComponents = false;
-    
-    // Настройки организации файлов
+
+    // File organization settings
     private bool _organizeByMaterial = false;
     private bool _organizeByThickness = false;
-    
-    // Настройки конструктора имени файла
+
+    // File name constructor settings
     private bool _enableFileNameConstructor = false;
-    
-    // Настройки оптимизации
+
+    // Optimization settings
     private bool _optimizeDxf = false;
-    
-    // Настройки экспорта DXF
+
+    // DXF export settings
     private bool _enableSplineReplacement = false;
     private SplineReplacementType _selectedSplineReplacement = SplineReplacementType.Lines;
-    private AcadVersionType _selectedAcadVersion = AcadVersionType.V2000; // 2000 по умолчанию
+    private AcadVersionType _selectedAcadVersion = AcadVersionType.V2000; // Default: 2000
     private bool _mergeProfilesIntoPolyline = true;
     private bool _rebaseGeometry = true;
     private bool _trimCenterlines = false;
-    
-    // Настройки папок и путей
+
+    // Folder and path settings
     private ExportFolderType _selectedExportFolder = ExportFolderType.ChooseFolder;
     private bool _enableSubfolder = false;
     private string _fixedFolderPath = string.Empty;
@@ -130,34 +131,35 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             FixedFolderPathTextBlock.Text = value.Length > 55 ? $"... {value[^55..]}" : value;
         }
     }
-    
-    // Метод обработки
+
+    // Processing method
     private ProcessingMethod _selectedProcessingMethod = ProcessingMethod.BOM;
-    
-    // Модель состояния
+
+    // Model state
     private bool _isPrimaryModelState = true;
-    
-    // Словарь колонок с шаблонами (все типы)
+
+    // Column templates dictionary (all types)
     private static readonly Dictionary<string, string> ColumnTemplates = InitializeColumnTemplates();
 
     private static Dictionary<string, string> InitializeColumnTemplates()
     {
         var templates = new Dictionary<string, string>();
 
-        // Автоматически добавляем шаблоны для всех свойств из централизованного реестра
+        // Automatically add templates for all properties from the centralized registry
         foreach (var definition in PropertyMetadataRegistry.Properties.Values)
         {
-            var columnName = definition.ColumnHeader.Length > 0 ? definition.ColumnHeader : definition.DisplayName;
-            
-            // Используем уникальный шаблон, если он задан
+            // Use InternalName as key (stable across language changes)
+            var columnKey = definition.InternalName;
+
+            // Use unique template if specified
             if (!string.IsNullOrEmpty(definition.ColumnTemplate))
             {
-                templates[columnName] = definition.ColumnTemplate;
+                templates[columnKey] = definition.ColumnTemplate;
             }
-            // Для редактируемых свойств без уникального шаблона создаем шаблон с FX индикатором
+            // For editable properties without a unique template, create template with FX indicator
             else if (definition.IsEditable)
             {
-                templates[columnName] = $"{definition.InternalName}WithExpressionTemplate";
+                templates[columnKey] = $"{definition.InternalName}WithExpressionTemplate";
             }
         }
 
@@ -166,7 +168,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     public FlatPatternExporterMainWindow()
     {
-        // Инициализация сервисов до InitializeComponent для предотвращения NullReferenceException
+        // Initialize services before InitializeComponent to prevent NullReferenceException
         _inventorManager.InitializeInventor();
         _documentScanner = new Core.DocumentScanner(_inventorManager);
         _dxfExporter = new Core.DxfExporter(_inventorManager, _documentScanner, _documentScanner.DocumentCache, _tokenService);
@@ -174,7 +176,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         InitializeComponent();
 
-        // Инициализация словаря горячих клавиш
+        // Initialize hotkey dictionary
         _hotKeyActions = new Dictionary<Key, Func<Task>>
         {
             [Key.F5] = StartScanAsync,
@@ -183,68 +185,78 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             [Key.F9] = StartQuickExportAsync
         };
 
-        UpdateProjectInfo(); // Инициализация папки проекта при запуске
+        UpdateProjectInfo(); // Initialize project folder on startup
         PartsDataGrid.ItemsSource = _partsData;
         PartsDataGrid.PreviewMouseMove += PartsDataGrid_PreviewMouseMove;
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
         PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
         PartsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
 
-        // Обновляем видимость оверлея при изменении коллекции колонок
+        // Update overlay visibility when column collection changes
         ((INotifyCollectionChanged)PartsDataGrid.Columns).CollectionChanged += (s, e) => UpdateNoColumnsOverlayVisibility();
 
 
-        // Настройка TokenService для работы с визуальным контейнером
+        // Configure TokenService to work with visual container
         TokenService?.SetTokenContainer(TokenContainer);
 
         _partsDataView = new CollectionViewSource { Source = _partsData };
         _partsDataView.Filter += PartsData_Filter;
 
-        // Устанавливаем ItemsSource для DataGrid
+        // Set ItemsSource for DataGrid
         PartsDataGrid.ItemsSource = _partsDataView.View;
 
-        // Настраиваем таймер для задержки поиска
+        // Configure timer for search delay
         _searchDelayTimer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromSeconds(1) // 1 секунда задержки
+            Interval = TimeSpan.FromSeconds(1) // 1 second delay
         };
         _searchDelayTimer.Tick += SearchDelayTimer_Tick;
 
-        // Инициализируем настройки слоев
+        // Initialize layer settings
         LayerSettings = LayerSettingsHelper.InitializeLayerSettings();
         AvailableColors = LayerSettingsHelper.GetAvailableColors();
         LineTypes = LayerSettingsHelper.GetLineTypes();
-        
-        // Инициализируем коллекции для ComboBox
+
+        // Initialize ComboBox collections
         InitializeAcadVersions();
-        InitializeSplineReplacementTypes();
         InitializeAvailableTokens();
 
 
-        // Инициализация предустановленных колонок на основе PropertyMapping
+        // Initialize preset columns based on PropertyMapping
         PresetIProperties = PropertyMetadataRegistry.GetPresetProperties();
 
-        // Устанавливаем DataContext для текущего окна
+        // Set DataContext for current window
         DataContext = this;
 
-        // Добавляем обработчик для горячих клавиш F5 (сканирование), F6 (экспорт), F8 (очистка), F9 (быстрый экспорт)
+        // Add handler for hotkeys F5 (scan), F6 (export), F8 (clear), F9 (quick export)
         KeyDown += MainWindow_KeyDown;
 
         PresetManager.PropertyChanged += PresetManager_PropertyChanged;
         PresetManager.TemplatePresets.CollectionChanged += TemplatePresets_CollectionChanged;
+
+        // Set selected language in ComboBox
+        InitializeLanguageSelection();
+
+        // Subscribe to language change to update button texts and properties
+        _localizationManager.LanguageChanged += (s, e) =>
+        {
+            UpdateButtonTexts();
+            UpdatePresetPropertiesLocalization();
+        };
+
         TokenService!.PropertyChanged += TokenService_PropertyChanged;
 
-        SetUIState(UIState.Initial);
-        
-        // Загружаем настройки при запуске
+        SetUIState(UIState.Initial());
+
+        // Load settings on startup
         LoadSettings();
-        
-        // Инициализируем видимость оверлея
+
+        // Initialize overlay visibility
         UpdateNoColumnsOverlayVisibility();
-        
-        // Инициализируем данные в TokenService
+
+        // Initialize data in TokenService
         _tokenService.UpdatePartsData(_partsData);
-        
+
     }
 
     private void LoadSettings()
@@ -256,7 +268,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Ошибка при загрузке настроек: {ex.Message}", "Ошибка", 
+            MessageBox.Show(_localizationManager.GetString("Error_SettingsLoad", ex.Message), _localizationManager.GetString("Error_Title"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
@@ -270,22 +282,21 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Ошибка при сохранении настроек: {ex.Message}", "Ошибка", 
+            MessageBox.Show(_localizationManager.GetString("Error_SettingsSave", ex.Message), _localizationManager.GetString("Error_Title"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
     public ObservableCollection<LayerSetting> LayerSettings { get; set; }
-    public ObservableCollection<string> AvailableColors { get; set; }
-    public ObservableCollection<string> LineTypes { get; set; }
+    public ObservableCollection<LocalizableItem> AvailableColors { get; set; }
+    public ObservableCollection<LocalizableItem> LineTypes { get; set; }
     public ObservableCollection<PresetIProperty> PresetIProperties { get; set; }
     public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = [];
-    public ObservableCollection<SplineReplacementItem> SplineReplacementTypes { get; set; } = [];
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> AvailableTokens { get; set; } = [];
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> UserDefinedTokens { get; set; } = [];
-    public TemplatePresetManager PresetManager { get; } = new();    
+    public TemplatePresetManager PresetManager { get; } = new();
 
-    // Публичные свойства для привязки данных CheckBox
+    // Public properties for CheckBox data binding
     public bool ExcludeReferenceParts
     {
         get => _excludeReferenceParts;
@@ -424,8 +435,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 {
                     var ver = AcadVersionMapping.GetDisplayName(_selectedAcadVersion);
                     MessageBox.Show(
-                        $"Для версии {ver} отключены оптимизация DXF и генерация миниатюр.\n\nДанная версия не поддерживается используемой библиотекой.",
-                        "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                        _localizationManager.GetString("Info_VersionNotSupported", ver),
+                        _localizationManager.GetString("Info_Title"), MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
         }
@@ -492,7 +503,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _selectedExportFolder = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(IsSubfolderCheckBoxEnabled)); // Уведомляем о изменении IsEnabled
+                OnPropertyChanged(nameof(IsSubfolderCheckBoxEnabled)); // Notify about IsEnabled change
                 UpdateSubfolderOptionsFromProperty();
             }
         }
@@ -511,7 +522,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    // Вычисляемое свойство для IsEnabled чекбокса подпапки
+    // Computed property for subfolder checkbox IsEnabled
     public bool IsSubfolderCheckBoxEnabled => SelectedExportFolder != ExportFolderType.PartFolder;
     
     public bool EnableFileNameConstructor
@@ -529,7 +540,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     public TokenService TokenService => _tokenService;
 
-    // Вычисляемое свойство для доступности оптимизации DXF
+    // Computed property for DXF optimization availability
     public bool IsOptimizeDxfEnabled => AcadVersionMapping.SupportsOptimization(SelectedAcadVersion);
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -738,7 +749,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
 
     /// <summary>
-    /// Централизованное управление состоянием UI
+    /// Centralized UI state management
     /// </summary>
     private void SetUIState(UIState state)
     {
@@ -748,7 +759,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         ScanButton.Content = state.ScanButtonText;
         ExportButton.Content = state.ExportButtonText;
         ProgressLabelRun.Text = state.ProgressText;
-        
+
         if (state.ProgressValue >= 0)
         {
             if (state.UpdateScanProgress)
@@ -756,64 +767,72 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (state.UpdateExportProgress)
                 ExportProgressValue = state.ProgressValue;
         }
-        
+
         _inventorManager.SetInventorUserInterfaceState(state.InventorUIDisabled);
     }
 
     /// <summary>
-    /// Обновление состояния UI после завершения операции
+    /// Update UI state after operation completion
     /// </summary>
     private void SetUIStateAfterOperation(OperationResult result, OperationType operationType)
     {
-        var statusText = result.WasCancelled 
-            ? $"Прервано ({GetElapsedTime(result.ElapsedTime)})"
+        var statusText = result.WasCancelled
+            ? _localizationManager.GetString("Status_Interrupted", GetElapsedTime(result.ElapsedTime))
             : operationType == OperationType.Scan
-                ? $"Найдено листовых деталей: {result.ProcessedCount} ({GetElapsedTime(result.ElapsedTime)})"
-                : $"Завершено ({GetElapsedTime(result.ElapsedTime)})";
+                ? _localizationManager.GetString("Status_PartsFound", result.ProcessedCount, GetElapsedTime(result.ElapsedTime))
+                : _localizationManager.GetString("Status_Completed", GetElapsedTime(result.ElapsedTime));
         
         var state = UIState.CreateAfterOperationState(_partsData.Count > 0, result.WasCancelled, statusText);
         SetUIState(state);
     }
 
     /// <summary>
-    /// Централизованный показ результатов операции пользователю
+    /// Centralized display of operation results to user
     /// </summary>
     private void ShowOperationResult(OperationResult result, OperationType operationType, bool isQuickMode = false)
     {
         if (result.WasCancelled)
         {
-            var operationName = operationType == OperationType.Scan ? "сканирования" : "экспорта";
-            MessageBox.Show($"Процесс {operationName} был прерван.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            var operationName = operationType == OperationType.Scan
+                ? _localizationManager.GetString("Operation_Scanning")
+                : _localizationManager.GetString("Operation_Export");
+            MessageBox.Show(_localizationManager.GetString("Info_OperationInterrupted", operationName),
+                _localizationManager.GetString("Info_Title"), MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
         switch (operationType)
         {
             case OperationType.Scan:
-                // Для сканирования показываем специальные сообщения о конфликтах и ссылках
+                // For scanning, show special messages about conflicts and references
                 if (_documentScanner.ConflictAnalyzer.ConflictCount > 0)
                 {
-                    MessageBox.Show($"Обнаружены конфликты обозначений.\nОбщее количество конфликтов: {_documentScanner.ConflictAnalyzer.ConflictCount}\n\nОбнаружены различные модели или состояния модели с одинаковыми обозначениями. Конфликтующие компоненты исключены из таблицы для предотвращения ошибок.\n\nИспользуйте кнопку \"Конфликты\" на панели управления для просмотра деталей конфликтов.",
-                        "Конфликт обозначений", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(_localizationManager.GetString("Info_ConflictsDetected", _documentScanner.ConflictAnalyzer.ConflictCount),
+                        _localizationManager.GetString("Info_Warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 else if (_documentScanner.HasMissingReferences)
                 {
-                    MessageBox.Show("В сборке обнаружены компоненты с потерянными ссылками. Некоторые данные могли быть пропущены.",
-                        "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(_localizationManager.GetString("Info_BrokenReferences"),
+                        _localizationManager.GetString("Info_Warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 break;
                 
             case OperationType.Export:
-                var exportTitle = isQuickMode ? "Быстрый экспорт DXF завершен" : "Экспорт DXF завершен";
+                var exportTitle = isQuickMode
+                    ? _localizationManager.GetString("Info_QuickExportCompleted")
+                    : _localizationManager.GetString("Info_ExportCompleted");
                 MessageBox.Show(
-                    $"{exportTitle}.\nВсего файлов обработано: {result.ProcessedCount + result.SkippedCount}\nПропущено (без разверток): {result.SkippedCount}\nВсего экспортировано: {result.ProcessedCount}\nВремя выполнения: {GetElapsedTime(result.ElapsedTime)}",
-                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                    this,
+                    _localizationManager.GetString("Info_ExportStatistics", exportTitle,
+                        result.ProcessedCount + result.SkippedCount, result.SkippedCount,
+                        result.ProcessedCount, GetElapsedTime(result.ElapsedTime)),
+                    _localizationManager.GetString("Info_Title"), MessageBoxButton.OK, MessageBoxImage.Information);
                 break;
         }
     }
 
     /// <summary>
-    /// Централизованная обработка ошибок для операций
+    /// Centralized error handling for operations
     /// </summary>
     private static async Task<T> ExecuteWithErrorHandlingAsync<T>(
         Func<Task<T>> operation,
@@ -825,7 +844,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
         catch (OperationCanceledException)
         {
-            // Операция была отменена - возвращаем результат с флагом отмены
+            // Operation was cancelled - return result with cancellation flag
             var result = new T
             {
                 WasCancelled = true
@@ -835,28 +854,28 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         catch (Exception ex)
         {
             var result = new T();
-            result.Errors.Add($"Ошибка {operationName}: {ex.Message}");
+            result.Errors.Add(LocalizationManager.Instance.GetString("Error_Operation", operationName, ex.Message));
             return result;
         }
     }
 
 
     /// <summary>
-    /// Централизованная валидация активного документа с показом ошибки
+    /// Centralized validation of active document with error display
     /// </summary>
     private DocumentValidationResult? ValidateDocumentOrShowError()
     {
         var validation = _inventorManager.ValidateActiveDocument();
         if (!validation.IsValid)
         {
-            MessageBox.Show(validation.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(validation.ErrorMessage, _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return null;
         }
         return validation;
     }
 
     /// <summary>
-    /// Централизованная подготовка контекста экспорта с показом ошибки
+    /// Centralized export context preparation with error display
     /// </summary>
     private async Task<ExportContext?> PrepareExportContextOrShowError(Document document, bool requireScan = true, bool showProgress = false)
     {
@@ -864,8 +883,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var context = await _dxfExporter.PrepareExportContextAsync(document, requireScan, showProgress, _lastScannedDocument, exportOptions);
         if (!context.IsValid)
         {
-            MessageBox.Show(context.ErrorMessage, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            if (context.ErrorMessage.Contains("сканирование"))
+            MessageBox.Show(context.ErrorMessage, _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (context.ErrorMessage.Contains(LocalizationManager.Instance.GetString("Operation_ScanningKey")))
                 MultiplierTextBox.Text = "1";
             return null;
         }
@@ -903,7 +922,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
-    /// Централизованная инициализация операции
+    /// Centralized operation initialization
     /// </summary>
     private void InitializeOperation(UIState operationState, ref bool operationFlag)
     {
@@ -913,7 +932,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
-    /// Централизованное завершение операции
+    /// Centralized operation completion
     /// </summary>
     private void CompleteOperation(OperationResult result, OperationType operationType, ref bool operationFlag, bool isQuickMode = false)
     {
@@ -923,7 +942,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
-    /// Централизованное создание результата экспортной операции
+    /// Centralized creation of export operation result
     /// </summary>
     private OperationResult CreateExportOperationResult(int processedCount, int skippedCount, TimeSpan elapsedTime)
     {
@@ -937,14 +956,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
-    /// Централизованная обработка прерывания экспорта
+    /// Centralized handling of export cancellation
     /// </summary>
     private bool HandleExportCancellation()
     {
         if (_isExporting)
         {
             _operationCts?.Cancel();
-            SetUIState(UIState.CancellingExport);
+            SetUIState(UIState.CancellingExport());
             return true;
         }
         return false;
@@ -952,27 +971,27 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     protected override void OnClosed(EventArgs e)
     {
-        // Отменяем активные операции и освобождаем ресурсы
+        // Cancel active operations and free resources
         _operationCts?.Cancel();
         _operationCts?.Dispose();
-        
-        // Сохраняем настройки при закрытии
+
+        // Save settings on close
         SaveSettings();
-        
+
         base.OnClosed(e);
 
-        // Закрытие всех дочерних окон
+        // Close all child windows
         foreach (Window window in System.Windows.Application.Current.Windows)
             if (window != this)
                 window.Close();
 
-        // Если были созданы дополнительные потоки, убедитесь, что они завершены
+        // If additional threads were created, ensure they are terminated
     }
     private void AddPresetIPropertyButton_Click(object sender, RoutedEventArgs e)
     {
         var selectIPropertyWindow = new SelectIPropertyWindow(
             PresetIProperties,
-            columnHeader => PartsDataGrid.Columns.Any(c => c.Header.ToString() == columnHeader),
+            inventorPropertyName => PartsDataGrid.Columns.Any(c => c.SortMemberPath == inventorPropertyName),
             AddIPropertyColumn,
             AddUserDefinedIPropertyColumn,
             RemoveDataGridColumn);
@@ -981,45 +1000,45 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        // Получаем исходный элемент
+        // Get the original element
         var clickedElement = e.OriginalSource as DependencyObject;
 
-        // Поднимаемся по дереву визуальных элементов
+        // Move up the visual element tree
         while (clickedElement != null && !(clickedElement is Visual || clickedElement is Visual3D))
         {
-            // Проверяем, что это не элемент типа Run
+            // Check that it's not a Run element
             if (clickedElement is Run)
-                // Просто выходим, если наткнулись на Run
+                // Simply exit if we encounter a Run
                 return;
             clickedElement = VisualTreeHelper.GetParent(clickedElement);
         }
 
-        // Получаем источник события
+        // Get event source
         var source = e.OriginalSource as DependencyObject;
 
-        // Ищем DataGrid по иерархии визуальных элементов
+        // Search for DataGrid in the visual element hierarchy
         while (source != null && source is not DataGrid) source = VisualTreeHelper.GetParent(source);
 
-        // Если DataGrid не найден (клик был вне DataGrid), сбрасываем выделение
+        // If DataGrid not found (click was outside DataGrid), clear selection
         if (source == null) PartsDataGrid.UnselectAll();
     }
 
     private void ClearSearchButton_Click(object sender, RoutedEventArgs e)
     {
-        // Очищаем текстовое поле
+        // Clear text field
         SearchTextBox.Text = string.Empty;
         ClearSearchButton.IsEnabled = false;
-        SearchTextBox.Focus(); // Устанавливаем фокус на поле поиска
+        SearchTextBox.Focus(); // Set focus to search field
     }
 
     private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         _actualSearchText = SearchTextBox.Text.Trim().ToLower();
 
-        // Включаем или выключаем кнопку очистки в зависимости от наличия текста
+        // Enable or disable clear button depending on text presence
         ClearSearchButton.IsEnabled = !string.IsNullOrEmpty(_actualSearchText);
 
-        // Перезапуск таймера при изменении текста
+        // Restart timer on text change
         _searchDelayTimer.Stop();
         _searchDelayTimer.Start();
     }
@@ -1028,11 +1047,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         var customText = CustomTextBox.Text;
         if (string.IsNullOrEmpty(customText)) return;
-        
-        // Добавляем текст через TokenService
+
+        // Add text via TokenService
         TokenService?.AddCustomText(customText);
-        
-        // Очищаем поле ввода
+
+        // Clear input field
         CustomTextBox.Text = string.Empty;
     }
 
@@ -1040,7 +1059,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (sender is System.Windows.Controls.Button button && button.Tag is string symbol)
         {
-            // Добавляем символ через TokenService
+            // Add symbol via TokenService
             TokenService?.AddCustomText(symbol);
         }
     }
@@ -1056,7 +1075,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private void SearchDelayTimer_Tick(object? sender, EventArgs e)
     {
         _searchDelayTimer.Stop();
-        _partsDataView.View.Refresh(); // Обновление фильтрации
+        _partsDataView.View.Refresh(); // Update filtering
     }
     private void PartsData_Filter(object sender, FilterEventArgs e)
     {
@@ -1072,36 +1091,36 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             return;
         }
 
-        // Проходим по всем видимым колонкам DataGrid
+        // Iterate through all visible DataGrid columns
         foreach (var column in PartsDataGrid.Columns)
         {
             var columnHeader = column.Header.ToString();
             if (string.IsNullOrEmpty(columnHeader)) continue;
 
-            // Ищем по стандартным свойствам
+            // Search by standard properties
             var metadata = PropertyMetadataRegistry.Properties.Values
                 .FirstOrDefault(p => p.ColumnHeader == columnHeader);
-            
+
             if (metadata != null && !metadata.IsSearchable) continue;
 
             string? searchValue = null;
 
-            // Получаем значение из стандартного свойства
+            // Get value from standard property
             if (metadata != null)
             {
                 var propInfo = typeof(PartData).GetProperty(metadata.InternalName);
                 searchValue = propInfo?.GetValue(partData)?.ToString();
             }
-            // Получаем значение из пользовательского свойства
-            // Находим User Defined Property по ColumnHeader
+            // Get value from user defined property
+            // Find User Defined Property by ColumnHeader
             var userProp = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeader);
             if (userProp != null && partData.UserDefinedProperties.TryGetValue(userProp.InventorPropertyName!, out string? value))
             {
                 searchValue = value;
             }
 
-            // Проверяем совпадение
-            if (!string.IsNullOrEmpty(searchValue) && 
+            // Check match
+            if (!string.IsNullOrEmpty(searchValue) &&
                 searchValue.Contains(_actualSearchText, StringComparison.CurrentCultureIgnoreCase))
             {
                 e.Accepted = true;
@@ -1114,11 +1133,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     public void AddIPropertyColumn(PresetIProperty iProperty)
     {
-        // Проверяем, существует ли уже колонка с таким заголовком
-        if (PartsDataGrid.Columns.Any(c => c.Header.ToString() == iProperty.ColumnHeader))
+        // Check if column with this InventorPropertyName already exists
+        if (PartsDataGrid.Columns.Any(c => c.SortMemberPath == iProperty.InventorPropertyName))
             return;
 
-        // Получаем метаданные свойства для проверки возможности сортировки
+        // Get property metadata to check sortability
         var isSortable = true;
         if (PropertyMetadataRegistry.Properties.TryGetValue(iProperty.InventorPropertyName, out var propertyDef))
         {
@@ -1127,32 +1146,33 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         DataGridColumn column;
 
-        // Проверка колонок с шаблонами
-        if (ColumnTemplates.TryGetValue(iProperty.ColumnHeader, out var templateName))
+        // Check columns with templates (use InventorPropertyName as stable key)
+        if (ColumnTemplates.TryGetValue(iProperty.InventorPropertyName, out var templateName))
         {
             DataTemplate template;
-            
-            // Если это редактируемое свойство с fx индикатором - создаем динамически
+
+            // If this is an editable property with fx indicator - create dynamically
             if (templateName.EndsWith("WithExpressionTemplate"))
             {
-                template = FindResource("EditableWithFxTemplate") as DataTemplate ?? throw new ResourceReferenceKeyNotFoundException("EditableWithFxTemplate не найден", "EditableWithFxTemplate");
+                template = FindResource("EditableWithFxTemplate") as DataTemplate ?? throw new ResourceReferenceKeyNotFoundException("EditableWithFxTemplate not found", "EditableWithFxTemplate");
             }
             else
             {
-                // Для остальных шаблонов ищем в ресурсах
-                template = FindResource(templateName) as DataTemplate ?? throw new ResourceReferenceKeyNotFoundException($"Шаблон {templateName} не найден", templateName);
+                // For other templates, search in resources
+                template = FindResource(templateName) as DataTemplate ?? throw new ResourceReferenceKeyNotFoundException($"Template {templateName} not found", templateName);
             }
-            
+
             var templateColumn = new DataGridTemplateColumn
             {
                 Header = iProperty.ColumnHeader,
                 CellTemplate = template,
-                SortMemberPath = isSortable ? iProperty.InventorPropertyName : null,
+                SortMemberPath = iProperty.InventorPropertyName,
+                CanUserSort = isSortable,
                 IsReadOnly = !templateName.StartsWith("Editable"),
                 ClipboardContentBinding = new Binding(iProperty.InventorPropertyName)
             };
 
-            // Передаём путь свойства через Tag ячейки для универсального шаблона
+            // Pass property path via cell Tag for universal template
             if (templateName.EndsWith("WithExpressionTemplate"))
             {
                 templateColumn.CellStyle = CreateCellTagStyle(iProperty.InventorPropertyName);
@@ -1162,19 +1182,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
         else
         {
-            // Создаем обычную текстовую колонку через централизованный метод
+            // Create regular text column via centralized method
             column = CreateTextColumn(iProperty.ColumnHeader, iProperty.InventorPropertyName, isSortable);
         }
 
-        // Добавляем колонку в конец
+        // Add column to the end
         PartsDataGrid.Columns.Add(column);
 
-        // Обновляем состояние свойств в окне выбора
+        // Update property states in selection window
         var selectIPropertyWindow =
             System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>().FirstOrDefault();
         selectIPropertyWindow?.UpdatePropertyStates();
 
-        // Дозаполняем данные для новой колонки
+        // Fill data for new column
         FillPropertyData(iProperty.InventorPropertyName);
     }
 
@@ -1183,7 +1203,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _reorderingColumn = e.Column;
         _isColumnDraggedOutside = false;
 
-        // Создаем фантомный заголовок используя стиль из XAML
+        // Create phantom header using style from XAML
         var header = new TextBlock
         {
             Text = _reorderingColumn.Header.ToString(),
@@ -1191,12 +1211,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             Style = (Style)FindResource("PhantomColumnHeaderStyle")
         };
 
-        // Создаем и добавляем Adorner
+        // Create and add Adorner
         _adornerLayer = AdornerLayer.GetAdornerLayer(PartsDataGrid);
         _headerAdorner = new HeaderAdorner(PartsDataGrid, header);
         _adornerLayer.Add(_headerAdorner);
 
-        // Изначально размещаем Adorner там, где находится заголовок
+        // Initially place Adorner where the header is located
         UpdateAdornerPosition(e);
     }
 
@@ -1205,22 +1225,22 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (_headerAdorner == null || _reorderingColumn == null)
             return;
 
-        // Обновляем позицию Adorner
+        // Update Adorner position
         UpdateAdornerPosition(null);
 
-        // Получаем текущую позицию мыши относительно DataGrid
+        // Get current mouse position relative to DataGrid
         var position = e.GetPosition(PartsDataGrid);
 
-        // Проверяем, если мышь вышла за границы DataGrid
+        // Check if mouse left DataGrid bounds
         if (position.X > PartsDataGrid.ActualWidth || position.Y < 0 || position.Y > PartsDataGrid.ActualHeight)
         {
             _isColumnDraggedOutside = true;
-            SetAdornerDeleteMode(true); // Переключаем в режим удаления
+            SetAdornerDeleteMode(true); // Switch to delete mode
         }
         else
         {
             _isColumnDraggedOutside = false;
-            SetAdornerDeleteMode(false); // Возвращаем обычный режим
+            SetAdornerDeleteMode(false); // Return to normal mode
         }
     }
 
@@ -1239,7 +1259,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 textBlock.Style = (Style)FindResource("PhantomColumnHeaderStyle");
             }
 
-            // Убираем фиксированные размеры и устанавливаем авторазмеры
+            // Remove fixed sizes and set auto-sizing
             textBlock.Width = double.NaN;
             textBlock.Height = double.NaN;
             textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
@@ -1260,7 +1280,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var columnName = _reorderingColumn.Header.ToString();
             if (string.IsNullOrEmpty(columnName)) return;
 
-            // Используем централизованный метод с removeDataOnly=true для Adorner
+            // Use centralized method with removeDataOnly=true for Adorner
             RemoveDataGridColumn(columnName, removeDataOnly: true);
         }
 
@@ -1273,7 +1293,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _reorderingColumn = null;
         _isColumnDraggedOutside = false;
 
-        // Убираем Adorner
+        // Remove Adorner
         if (_adornerLayer != null && _headerAdorner != null)
         {
             _adornerLayer.Remove(_headerAdorner);
@@ -1286,10 +1306,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (_headerAdorner == null)
             return;
 
-        // Получаем текущую позицию мыши относительно родителя DataGrid
+        // Get current mouse position relative to DataGrid parent
         var position = Mouse.GetPosition(_adornerLayer);
 
-        // Применяем трансформацию для перемещения Adorner
+        // Apply transformation to move Adorner
         _headerAdorner.RenderTransform = new TranslateTransform(
             position.X - _headerAdorner.RenderSize.Width / 2,
             position.Y - _headerAdorner.RenderSize.Height / 1.8
@@ -1298,7 +1318,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
-        // Проверяем, есть ли обработчик для нажатой клавиши
+        // Check if there's a handler for the pressed key
         if (_hotKeyActions.TryGetValue(e.Key, out var action))
         {
             await action();
@@ -1308,75 +1328,76 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private async Task StartScanAsync()
     {
-        // Проверяем, что не идут другие операции
+        // Check that no other operations are running
         if (_isExporting || _isScanning)
             return;
 
-        // Вызываем логику сканирования из ScanButton_Click
+        // Call scanning logic from ScanButton_Click
         await PerformScanOperationAsync();
     }
 
     private async Task PerformScanOperationAsync()
     {
-        // Валидация документа
+        // Document validation
         var validation = ValidateDocumentOrShowError();
         if (validation == null) return;
 
-        // Настройка UI для сканирования
-        InitializeOperation(UIState.Scanning, ref _isScanning);
-        // Сброс флага отсутствующих ссылок выполняется внутри ScanService
+        // Configure UI for scanning
+        InitializeOperation(UIState.Scanning(), ref _isScanning);
+        // Missing references flag reset is performed inside ScanService
 
-        // Прогресс для сканирования структуры сборки
+        // Progress for assembly structure scanning
         var scanProgress = new Progress<ScanProgress>(progress =>
         {
-            var progressState = UIState.Scanning;
+            var progressState = UIState.Scanning();
             progressState.ProgressValue = progress.TotalItems > 0 ? (double)progress.ProcessedItems / progress.TotalItems * 100 : 0;
             progressState.ProgressText = $"{progress.CurrentOperation} - {progress.CurrentItem}";
             SetUIState(progressState);
         });
 
-        // Выполнение сканирования
+        // Execute scanning
         var result = await ExecuteWithErrorHandlingAsync(
             () => ScanDocumentAsync(validation.Document!, updateUI: true, scanProgress, _operationCts!.Token),
-            "сканирования");
+            LocalizationManager.Instance.GetString("Operation_Scanning"));
 
-        // Завершение операции
+        // Complete operation
         CompleteOperation(result, OperationType.Scan, ref _isScanning);
     }
 
     private async Task StartNormalExportAsync()
     {
-        // Проверяем, что не идут другие операции
+        // Check that no other operations are running
         if (_isExporting || _isScanning)
             return;
 
-        // Проверяем, что есть данные для экспорта (как у кнопки)
+        // Check that there's data to export (like button does)
         if (_partsData.Count == 0)
         {
-            MessageBox.Show("Нет данных для экспорта. Сначала выполните сканирование.", "Информация",
+            MessageBox.Show(_localizationManager.GetString("Info_NoDataForExport"),
+                _localizationManager.GetString("Info_Title"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
-        // Выполняем обычный экспорт
+        // Perform normal export
         await PerformNormalExportAsync();
     }
 
     private async Task PerformNormalExportAsync()
     {
-        // Валидация документа
+        // Document validation
         var validation = ValidateDocumentOrShowError();
         if (validation == null) return;
 
-        // Подготовка контекста экспорта (требует предварительного сканирования)
+        // Prepare export context (requires prior scanning)
         var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: true, showProgress: true);
         if (context == null) return;
 
-        // Настройка UI для экспорта
-        InitializeOperation(UIState.Exporting, ref _isExporting);
+        // Configure UI for export
+        InitializeOperation(UIState.Exporting(), ref _isExporting);
         var stopwatch = Stopwatch.StartNew();
 
-        // Выполнение экспорта через централизованную обработку ошибок
+        // Execute export via centralized error handling
         var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.PartNumber)).ToList();
         var exportOptions = CreateExportOptions();
         var result = await ExecuteWithErrorHandlingAsync(async () =>
@@ -1388,29 +1409,30 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
 
             return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
-        }, "экспорта");
+        }, LocalizationManager.Instance.GetString("Operation_Export"));
 
-        // Завершение операции
+        // Complete operation
         CompleteOperation(result, OperationType.Export, ref _isExporting);
     }
 
     private void StartClearList()
     {
-        // Проверяем, что не идут операции экспорта или сканирования
+        // Check that no export or scanning operations are running
         if (_isExporting || _isScanning)
         {
-            MessageBox.Show("Нельзя очистить список во время выполнения операций.", "Информация",
+            MessageBox.Show(_localizationManager.GetString("Info_CannotClearDuringOperation"),
+                _localizationManager.GetString("Info_Title"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
-        // Выполняем очистку через существующий метод
+        // Perform clearing via existing method
         ClearList_Click(this, null!);
     }
 
     private async Task StartQuickExportAsync()
     {
-        // Проверяем, что не идут другие операции
+        // Check that no other operations are running
         if (_isExporting || _isScanning)
             return;
 
@@ -1418,11 +1440,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
-    /// Обновление прогресса экспорта через централизованную систему UI
+    /// Update export progress via centralized UI system
     /// </summary>
     private void UpdateExportProgress(double progressValue)
     {
-        var progressState = UIState.Exporting;
+        var progressState = UIState.Exporting();
         progressState.ProgressValue = progressValue;
         progressState.UpdateExportProgress = true;
         progressState.UpdateScanProgress = false;
@@ -1431,17 +1453,17 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void MultiplierTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
-        // Проверяем текущий текст вместе с новым вводом
+        // Check current text together with new input
         if (sender is not TextBox textBox) return;
         var newText = textBox.Text.Insert(textBox.CaretIndex, e.Text);
 
-        // Проверяем, является ли текст положительным числом больше нуля
+        // Check if text is a positive number greater than zero
         e.Handled = !IsTextAllowed(newText);
     }
 
     private static bool IsTextAllowed(string text)
     {
-        // Регулярное выражение для проверки положительных чисел
+        // Regular expression for checking positive numbers
         return PositiveNumberRegex().IsMatch(text);
     }
 
@@ -1467,7 +1489,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
-    /// Унифицированный метод сканирования документа
+    /// Unified document scanning method
     /// </summary>
     private async Task<OperationResult> ScanDocumentAsync(
         Document document,
@@ -1482,17 +1504,17 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             if (updateUI)
             {
-                // Получаем и отображаем информацию о документе
+                // Get and display document information
                 UpdateDocumentInfo(document);
                 _partsData.Clear();
                 _itemCounter = 1;
             }
-            
+
             ClearConflictData();
 
             var sheetMetalParts = new Dictionary<string, int>();
 
-            // Создаем опции для сканирования
+            // Create scanning options
             var scanOptions = new Core.ScanOptions
             {
                 ExcludeReferenceParts = ExcludeReferenceParts,
@@ -1501,7 +1523,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 IncludeLibraryComponents = IncludeLibraryComponents
             };
 
-            // Используем ScanService для сканирования
+            // Use ScanService for scanning
             var scanResult = await _documentScanner.ScanDocumentAsync(
                 document,
                 SelectedProcessingMethod,
@@ -1512,10 +1534,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             sheetMetalParts = scanResult.SheetMetalParts;
             result.ProcessedCount = scanResult.ProcessedCount;
 
-            // Обработка деталей для UI
+            // Process parts for UI
             if (updateUI && sheetMetalParts.Count > 0)
             {
-                // Анализ конфликтов уже выполнен в ScanService
+                // Conflict analysis already performed in ScanService
                 if (_documentScanner.ConflictAnalyzer.HasConflicts)
                 {
                     await Dispatcher.InvokeAsync(() =>
@@ -1524,11 +1546,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     });
                 }
 
-                // Переключаем прогресс на обработку деталей
+                // Switch progress to part processing
                 await Dispatcher.InvokeAsync(() =>
                 {
-                    var processingState = UIState.Scanning;
-                    processingState.ProgressText = "Обработка деталей...";
+                    var processingState = UIState.Scanning();
+                    processingState.ProgressText = _localizationManager.GetString("Status_ProcessingParts");
                     processingState.ProgressValue = 0;
                     SetUIState(processingState);
                 });
@@ -1559,9 +1581,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                         processedParts++;
                         await Dispatcher.InvokeAsync(() =>
                         {
-                            var progressState = UIState.Scanning;
+                            var progressState = UIState.Scanning();
                             progressState.ProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
-                            progressState.ProgressText = $"Обработка деталей - {processedParts} из {totalParts}";
+                            progressState.ProgressText = _localizationManager.GetString("Status_ProcessingPartsProgress", processedParts, totalParts);
                             SetUIState(progressState);
                         });
                     }
@@ -1598,15 +1620,15 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private async void ScanButton_Click(object sender, RoutedEventArgs e)
     {
-        // Если сканирование уже идет, выполняем прерывание
+        // If scanning is already in progress, perform cancellation
         if (_isScanning)
         {
             _operationCts?.Cancel();
-            SetUIState(UIState.CancellingScan);
+            SetUIState(UIState.CancellingScan());
             return;
         }
 
-        // Выполняем сканирование
+        // Perform scanning
         await PerformScanOperationAsync();
     }
     private void ConflictFilesButton_Click(object sender, RoutedEventArgs e)
@@ -1616,7 +1638,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             return;
         }
 
-        // Создаем и показываем окно с деталями конфликтов
+        // Create and show window with conflict details
         var conflictWindow = new ConflictDetailsWindow(_documentScanner.ConflictAnalyzer.ConflictFileDetails, _inventorManager.OpenInventorDocument)
         {
             Owner = this
@@ -1627,16 +1649,16 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void UpdateSubfolderOptionsFromProperty()
     {
-        // Опция "Рядом с деталью" - чекбокс должен быть отключен
+        // "Next to part" option - checkbox should be disabled
         if (SelectedExportFolder == ExportFolderType.PartFolder)
         {
             EnableSubfolder = false;
         }
-        
-        // Особая логика для ProjectFolder
+
+        // Special logic for ProjectFolder
         if (SelectedExportFolder == ExportFolderType.ProjectFolder)
         {
-            UpdateProjectInfo(); // Устанавливаем информацию о проекте при выборе
+            UpdateProjectInfo(); // Set project information on selection
         }
     }
 
@@ -1652,15 +1674,15 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 if (textBox.Text.Contains(ch))
                 {
                     textBox.Text = textBox.Text.Replace(ch.ToString(), string.Empty);
-                    caretIndex--; // Уменьшаем позицию курсора на 1
+                    caretIndex--; // Decrease cursor position by 1
                 }
         }
 
-        // Возвращаем курсор на правильное место после удаления символов
+        // Return cursor to correct position after character removal
         if (textBox != null)
             textBox.CaretIndex = Math.Max(caretIndex, 0);
     }
-    // Метод для обновления информации о проекте в UI
+    // Method to update project information in UI
     private void UpdateProjectInfo()
     {
         _inventorManager.SetProjectFolderInfo();
@@ -1680,18 +1702,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         );
     }
 
-    private void InitializeSplineReplacementTypes()
-    {
-        SplineReplacementTypes = new ObservableCollection<SplineReplacementItem>(
-            Enum.GetValues<SplineReplacementType>()
-                .Select(type => new SplineReplacementItem
-                {
-                    DisplayName = SplineReplacementMapping.GetDisplayName(type),
-                    Value = type
-                })
-        );
-    }
-
     private void InitializeAvailableTokens()
     {
         AvailableTokens = [];
@@ -1699,32 +1709,32 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         
         RefreshAvailableTokens();
         
-        // Подписываемся на изменения в коллекции пользовательских свойств
+        // Subscribe to changes in user-defined properties collection
         PropertyMetadataRegistry.UserDefinedProperties.CollectionChanged += (s, e) =>
         {
             RefreshAvailableTokens();
         };
     }
-    
+
     private void RefreshAvailableTokens()
     {
         AvailableTokens.Clear();
         UserDefinedTokens.Clear();
-        
-        // Получаем все токенизируемые свойства из централизованного реестра
+
+        // Get all tokenizable properties from centralized registry
         var tokenizableProperties = PropertyMetadataRegistry.GetTokenizableProperties();
-        
-        // Разделяем на стандартные и пользовательские свойства
+
+        // Separate into standard and user-defined properties
         var standardProperties = tokenizableProperties.Where(p => p.Type != PropertyMetadataRegistry.PropertyType.UserDefined).OrderBy(p => p.DisplayName);
         var userDefinedProperties = tokenizableProperties.Where(p => p.Type == PropertyMetadataRegistry.PropertyType.UserDefined).OrderBy(p => p.DisplayName);
-        
-        // Добавляем стандартные свойства
+
+        // Add standard properties
         foreach (var property in standardProperties)
         {
             AvailableTokens.Add(property);
         }
-        
-        // Добавляем пользовательские свойства
+
+        // Add user-defined properties
         foreach (var property in userDefinedProperties)
         {
             UserDefinedTokens.Add(property);
@@ -1732,12 +1742,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
-    /// Очищает все коллекции связанные с конфликтами для изоляции операций
+    /// Clears all collections related to conflicts for operation isolation
     /// </summary>
     private void ClearConflictData()
     {
         _documentScanner.ConflictAnalyzer.Clear();
-        ConflictFilesButton.IsEnabled = false; // Отключаем кнопку при очистке данных
+        ConflictFilesButton.IsEnabled = false; // Disable button when clearing data
     }
 
     private void TokenListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -1760,57 +1770,57 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private async Task ExportWithoutScan()
     {
-        // Очистка таблицы перед началом скрытого экспорта
+        // Clear table before starting hidden export
         ClearList_Click(this, null!);
 
-        // Валидация документа
+        // Document validation
         var validation = ValidateDocumentOrShowError();
         if (validation == null) return;
 
-        // Настройка UI для подготовки быстрого экспорта
-        InitializeOperation(UIState.PreparingQuickExport, ref _isExporting);
+        // Configure UI for quick export preparation
+        InitializeOperation(UIState.PreparingQuickExport(), ref _isExporting);
 
-        // Подготовка контекста экспорта (без требования предварительного сканирования и без отображения прогресса)
+        // Prepare export context (without requiring prior scanning and without showing progress)
         var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: false, showProgress: false);
         if (context == null)
         {
-            // Восстанавливаем состояние при ошибке
-            SetUIState(UIState.CreateAfterOperationState(false, false, "Ошибка подготовки экспорта"));
+            // Restore state on error
+            SetUIState(UIState.CreateAfterOperationState(false, false, _localizationManager.GetString("Error_ExportPreparation")));
             _isExporting = false;
             return;
         }
 
-        // Создаем временный список PartData для экспорта с полными данными (это тоже длительная операция)
+        // Create temporary PartData list for export with full data (this is also a lengthy operation)
         var tempPartsDataList = new List<PartData>();
         var itemCounter = 1;
         var totalParts = context.SheetMetalParts.Count;
 
         foreach (var part in context.SheetMetalParts)
         {
-            // Обновляем прогресс каждые 5 деталей или на важных моментах
+            // Update progress every 5 parts or at important moments
             if (itemCounter % 5 == 1 || itemCounter == totalParts)
             {
-                var progressState = UIState.PreparingQuickExport;
-                progressState.ProgressText = $"Подготовка данных деталей ({itemCounter}/{totalParts})...";
+                var progressState = UIState.PreparingQuickExport();
+                progressState.ProgressText = _localizationManager.GetString("Status_PreparingPartData", itemCounter, totalParts);
                 SetUIState(progressState);
-                await Task.Delay(1); // Минимальная задержка для обновления UI
+                await Task.Delay(1); // Minimal delay for UI update
             }
 
             var partData = await _partDataReader.GetPartDataAsync(part.Key, part.Value * context.Multiplier, itemCounter++, loadThumbnail: false);
             if (partData != null)
             {
-                // Не вызываем SetQuantityInternal повторно - количество уже установлено правильно в GetPartDataAsync
+                // Don't call SetQuantityInternal again - quantity already set correctly in GetPartDataAsync
                 partData.IsMultiplied = context.Multiplier > 1;
                 tempPartsDataList.Add(partData);
             }
         }
 
-        // Переключаемся в состояние экспорта когда РЕАЛЬНО начинается экспорт файлов
-        SetUIState(UIState.Exporting);
+        // Switch to export state when file export ACTUALLY begins
+        SetUIState(UIState.Exporting());
 
         var stopwatch = Stopwatch.StartNew();
 
-        // Выполнение экспорта через централизованную обработку ошибок
+        // Execute export via centralized error handling
         context.GenerateThumbnails = false;
         var exportOptions = CreateExportOptions();
         exportOptions.ShowFileLockedDialogs = true;
@@ -1823,26 +1833,29 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
 
             return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
-        }, "быстрого экспорта");
+        }, "quick export");
 
-        // Завершение операции
+        // Complete operation
         CompleteOperation(result, OperationType.Export, ref _isExporting, isQuickMode: true);
     }
 
     private async void ExportButton_Click(object sender, RoutedEventArgs e)
     {
-        // Если экспорт уже идет, выполняем прерывание
+        // If export is already in progress, perform cancellation
         if (HandleExportCancellation()) return;
 
-        // Выполняем обычный экспорт
+        // Perform normal export
         await PerformNormalExportAsync();
     }
 
     private static string GetElapsedTime(TimeSpan timeSpan)
     {
+        var minutesShort = LocalizationManager.Instance.GetString("Time_Minutes_Short");
+        var secondsShort = LocalizationManager.Instance.GetString("Time_Seconds_Short");
+
         if (timeSpan.TotalMinutes >= 1)
-            return $"{(int)timeSpan.TotalMinutes} мин. {timeSpan.Seconds}.{timeSpan.Milliseconds:D3} сек.";
-        return $"{timeSpan.Seconds}.{timeSpan.Milliseconds:D3} сек.";
+            return $"{(int)timeSpan.TotalMinutes} {minutesShort} {timeSpan.Seconds}.{timeSpan.Milliseconds:D3} {secondsShort}";
+        return $"{timeSpan.Seconds}.{timeSpan.Milliseconds:D3} {secondsShort}";
     }
 
     private async void ExportSelectedDXF_Click(object sender, RoutedEventArgs e)
@@ -1852,7 +1865,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var itemsWithoutFlatPattern = selectedItems.Where(p => !p.HasFlatPattern).ToList();
         if (itemsWithoutFlatPattern.Count == selectedItems.Count)
         {
-            MessageBox.Show("Выбранные файлы не содержат разверток.", "Информация", MessageBoxButton.OK,
+            MessageBox.Show(_localizationManager.GetString("Message_NoFlatPatternsSelected"), _localizationManager.GetString("MessageBox_Information"), MessageBoxButton.OK,
                 MessageBoxImage.Warning);
             return;
         }
@@ -1860,26 +1873,26 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (itemsWithoutFlatPattern.Count > 0)
         {
             var dialogResult =
-                MessageBox.Show("Некоторые выбранные файлы не содержат разверток и будут пропущены. Продолжить?",
-                    "Информация", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                MessageBox.Show(_localizationManager.GetString("Message_SomeFlatPatternsSkipped"),
+                    _localizationManager.GetString("MessageBox_Information"), MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (dialogResult == MessageBoxResult.No) return;
 
             selectedItems = [.. selectedItems.Except(itemsWithoutFlatPattern)];
         }
 
-        // Валидация документа
+        // Document validation
         var validation = ValidateDocumentOrShowError();
         if (validation == null) return;
 
-        // Подготовка контекста экспорта
+        // Prepare export context
         var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: true, showProgress: false);
         if (context == null) return;
 
-        // Настройка UI для экспорта
-        InitializeOperation(UIState.Exporting, ref _isExporting);
+        // Configure UI for export
+        InitializeOperation(UIState.Exporting(), ref _isExporting);
         var stopwatch = Stopwatch.StartNew();
 
-        // Выполнение экспорта через централизованную обработку ошибок
+        // Execute export via centralized error handling
         var exportOptions = CreateExportOptions();
         var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
@@ -1890,9 +1903,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
 
             return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
-        }, "экспорта выделенных деталей");
+        }, "selected parts export");
 
-        // Завершение операции
+        // Complete operation
         CompleteOperation(result, OperationType.Export, ref _isExporting);
     }
 
@@ -1902,13 +1915,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             _partDataReader.UpdateQuantitiesWithMultiplier(_partsData, multiplier);
 
-            // Проверка на null перед изменением состояния кнопки
+            // Check for null before changing button state
             if (ClearMultiplierButton != null)
                 ClearMultiplierButton.IsEnabled = multiplier > 1;
         }
         else
         {
-            // Если введенное значение некорректное, сбрасываем текст на "1" и выключаем кнопку сброса
+            // If entered value is incorrect, reset text to "1" and disable reset button
             MultiplierTextBox.Text = "1";
             _partDataReader.UpdateQuantitiesWithMultiplier(_partsData, 1);
 
@@ -1918,11 +1931,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     private void ClearMultiplierButton_Click(object sender, RoutedEventArgs e)
     {
-        // Сбрасываем множитель на 1
+        // Reset multiplier to 1
         MultiplierTextBox.Text = "1";
         _partDataReader.UpdateQuantitiesWithMultiplier(_partsData, 1);
 
-        // Выключаем кнопку сброса
+        // Disable reset button
         ClearMultiplierButton.IsEnabled = false;
     }
 
@@ -1932,44 +1945,44 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         if (string.IsNullOrEmpty(docInfo.DocumentType))
         {
-            var noDocState = UIState.Initial;
-            noDocState.ProgressText = "Информация о документе не доступна";
+            var noDocState = UIState.Initial();
+            noDocState.ProgressText = _localizationManager.GetString("Status_NoDocumentInfo");
             SetUIState(noDocState);
             DocumentTypeLabel.Text = "";
             PartNumberLabel.Text = "";
             DescriptionLabel.Text = "";
             ModelStateLabel.Text = "";
-            IsPrimaryModelState = true; // Сбрасываем состояние модели по умолчанию
+            IsPrimaryModelState = true; // Reset model state to default
             return;
         }
 
-        // Заполняем отдельные поля в блоке информации о документе
+        // Fill individual fields in document information block
         DocumentTypeLabel.Text = docInfo.DocumentType;
         PartNumberLabel.Text = docInfo.PartNumber;
         DescriptionLabel.Text = docInfo.Description;
         ModelStateLabel.Text = docInfo.ModelState;
 
-        // Устанавливаем свойство для триггера стиля
+        // Set property for style trigger
         IsPrimaryModelState = docInfo.IsPrimaryModelState;
     }
 
     private void ClearList_Click(object sender, RoutedEventArgs e)
     {
-        // Очищаем данные в таблице или любом другом источнике данных
+        // Clear data in table or any other data source
         _partsData.Clear();
         SetUIState(UIState.CreateClearedState());
 
-        // Обнуляем информацию о документе
+        // Reset document information
         UpdateDocumentInfo(null);
 
-        // Обновляем TokenService для отображения placeholder'ов
+        // Update TokenService to display placeholders
         _tokenService.UpdatePartsData(_partsData);
 
-        // Отключаем кнопку "Конфликты" и очищаем список конфликтов
+        // Disable "Conflicts" button and clear conflicts list
         _documentScanner.ConflictAnalyzer.Clear();
         ConflictFilesButton.IsEnabled = false;
 
-        // Очищаем кеш документов
+        // Clear document cache
         _documentScanner.DocumentCache.ClearCache();
     }
 
@@ -1977,8 +1990,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
 
-        var result = MessageBox.Show($"Вы действительно хотите удалить {selectedItems.Count} строк(и)?",
-            "Подтверждение удаления", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        var result = MessageBox.Show(_localizationManager.GetString("Message_ConfirmDelete", selectedItems.Count),
+            _localizationManager.GetString("MessageBox_Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question);
 
         if (result == MessageBoxResult.Yes)
         {
@@ -1993,10 +2006,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
             else
             {
-                // Обновляем TokenService после удаления строк
+                // Update TokenService after removing rows
                 _tokenService.UpdatePartsData(_partsData);
 
-                var deletionState = UIState.CreateAfterOperationState(_partsData.Count > 0, false, $"Удалено {selectedItems.Count} строк(и)");
+                var deletionState = UIState.CreateAfterOperationState(_partsData.Count > 0, false, $"Removed {selectedItems.Count} row(s)");
                 SetUIState(deletionState);
             }
         }
@@ -2006,11 +2019,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (_partsData.Count == 0)
         {
-            e.Handled = true; // Предотвращаем открытие контекстного меню, если таблица пуста
+            e.Handled = true; // Prevent opening context menu if table is empty
             return;
         }
 
-        // Управляем доступностью пунктов меню в зависимости от выделения
+        // Manage menu item availability based on selection
         var hasSelection = PartsDataGrid.SelectedItems.Count > 0;
         var hasSingleSelection = PartsDataGrid.SelectedItems.Count == 1;
         var hasOverriddenSelection = hasSelection && PartsDataGrid.SelectedItems.Cast<PartData>().Any(item => item.IsOverridden);
@@ -2031,15 +2044,15 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var partNumber = item.PartNumber;
             var fullPath = _documentScanner.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorManager.GetPartDocumentFullPath(partNumber);
 
-            // Проверка на null перед использованием fullPath
+            // Check for null before using fullPath
             if (string.IsNullOrEmpty(fullPath))
             {
-                MessageBox.Show($"Файл, связанный с номером детали {partNumber}, не найден среди открытых.", "Ошибка",
+                MessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", partNumber), _localizationManager.GetString("MessageBox_Error"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 continue;
             }
 
-            // Проверка существования файла
+            // Check file existence
             if (System.IO.File.Exists(fullPath))
                 try
                 {
@@ -2048,12 +2061,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при открытии проводника для файла по пути {fullPath}: {ex.Message}",
-                        "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(_localizationManager.GetString("Error_ExplorerOpen", fullPath, ex.Message),
+                        _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             else
-                MessageBox.Show($"Файл по пути {fullPath}, связанный с номером детали {partNumber}, не найден.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(_localizationManager.GetString("Error_FileNotFound", fullPath),
+                    _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -2067,22 +2080,22 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var fullPath = _documentScanner.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorManager.GetPartDocumentFullPath(partNumber);
             var targetModelState = item.ModelState;
 
-            // Проверка на null перед использованием fullPath
+            // Check for null before using fullPath
             if (string.IsNullOrEmpty(fullPath))
             {
-                MessageBox.Show($"Файл, связанный с номером детали {partNumber}, не найден среди открытых.", "Ошибка",
+                MessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", partNumber), _localizationManager.GetString("MessageBox_Error"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 continue;
             }
 
-            // Открываем файл с указанием состояния модели
+            // Open file with specified model state
             _inventorManager.OpenInventorDocument(fullPath, targetModelState);
         }
     }
 
     private void PartsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        // Обновляем предпросмотр с выбранной строкой
+        // Update preview with selected row
         var selectedPart = PartsDataGrid.SelectedItem as PartData;
         _tokenService.UpdatePreviewWithSelectedData(selectedPart);
     }
@@ -2092,75 +2105,79 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _partDataReader.FillPropertyData(_partsData, propertyName);
     }
 
-    private void RemoveUserDefinedIPropertyColumn(string columnHeaderName)
+    private void RemoveUserDefinedIPropertyColumn(string internalName)
     {
-        // Удаление всех данных, связанных с этим User Defined Property
-        // Находим InventorPropertyName для этого columnHeader
-        var userProp = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeaderName);
-        if (userProp != null)
+        // Get property name from InternalName (UDP_PropertyName -> PropertyName)
+        var propertyName = PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(internalName);
+
+        // Remove all data related to this User Defined Property
+        foreach (var partData in _partsData)
         {
-            foreach (var partData in _partsData)
-                if (partData.UserDefinedProperties.ContainsKey(userProp.InventorPropertyName!))
-                    partData.RemoveUserDefinedProperty(userProp.InventorPropertyName!);
+            if (partData.UserDefinedProperties.ContainsKey(propertyName))
+                partData.RemoveUserDefinedProperty(propertyName);
         }
 
-        // Ищем пользовательское свойство по ColumnHeader для удаления из реестра
-        var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeaderName);
-        if (userProperty != null)
-        {
-            PropertyMetadataRegistry.RemoveUserDefinedProperty(userProperty.InternalName);
-        }
+        // Remove from registry
+        PropertyMetadataRegistry.RemoveUserDefinedProperty(internalName);
     }
 
-    private void RemoveUserDefinedIPropertyData(string columnHeaderName)
+    private void RemoveUserDefinedIPropertyData(string internalName)
     {
-        // Удаление только данных UDP из PartData (без удаления из реестра)
-        // Находим InventorPropertyName для этого columnHeader
-        var userProp = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.ColumnHeader == columnHeaderName);
-        if (userProp != null)
+        // Get property name from InternalName (UDP_PropertyName -> PropertyName)
+        var propertyName = PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(internalName);
+
+        // Remove only UDP data from PartData (without removing from registry)
+        foreach (var partData in _partsData)
         {
-            foreach (var partData in _partsData)
-                if (partData.UserDefinedProperties.ContainsKey(userProp.InventorPropertyName!))
-                    partData.RemoveUserDefinedProperty(userProp.InventorPropertyName!);
+            if (partData.UserDefinedProperties.ContainsKey(propertyName))
+                partData.RemoveUserDefinedProperty(propertyName);
         }
     }
 
     /// <summary>
-    /// Централизованный метод для удаления колонки из DataGrid
+    /// Centralized method for removing column from DataGrid
+    /// Can accept either InventorPropertyName or ColumnHeader (for backward compatibility with Adorner drag)
     /// </summary>
-    public void RemoveDataGridColumn(string columnHeaderName, bool removeDataOnly = false)
+    public void RemoveDataGridColumn(string propertyIdentifier, bool removeDataOnly = false)
     {
-        // Удаляем колонку из DataGrid
-        var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == columnHeaderName);
+        // Try to find column by SortMemberPath first (stable identifier)
+        var columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.SortMemberPath == propertyIdentifier);
+
+        // If not found, try by Header (for Adorner drag compatibility)
+        if (columnToRemove == null)
+        {
+            columnToRemove = PartsDataGrid.Columns.FirstOrDefault(c => c.Header.ToString() == propertyIdentifier);
+        }
+
         if (columnToRemove != null)
         {
+            var inventorPropertyName = columnToRemove.SortMemberPath;
             PartsDataGrid.Columns.Remove(columnToRemove);
+
+            // Check if this is a UDP property
+            if (!string.IsNullOrEmpty(inventorPropertyName) && PropertyMetadataRegistry.IsUserDefinedProperty(inventorPropertyName))
+            {
+                if (removeDataOnly)
+                {
+                    // Only remove UDP data (for Adorner)
+                    RemoveUserDefinedIPropertyData(inventorPropertyName);
+                }
+                else
+                {
+                    // Complete UDP removal (for SelectIPropertyWindow)
+                    RemoveUserDefinedIPropertyColumn(inventorPropertyName);
+                }
+            }
         }
 
-        // Проверяем, является ли это UDP свойством
-        var internalName = PropertyMetadataRegistry.GetInternalNameByColumnHeader(columnHeaderName);
-        if (!string.IsNullOrEmpty(internalName) && PropertyMetadataRegistry.IsUserDefinedProperty(internalName))
-        {
-            if (removeDataOnly)
-            {
-                // Только удаляем данные UDP (для Adorner)
-                RemoveUserDefinedIPropertyData(columnHeaderName);
-            }
-            else
-            {
-                // Полное удаление UDP (для SelectIPropertyWindow)
-                RemoveUserDefinedIPropertyColumn(columnHeaderName);
-            }
-        }
-
-        // Обновляем состояние свойств в окне выбора
+        // Update property states in selection window
         var selectIPropertyWindow = System.Windows.Application.Current.Windows.OfType<SelectIPropertyWindow>()
             .FirstOrDefault();
         selectIPropertyWindow?.UpdatePropertyStates();
     }
 
     /// <summary>
-    /// Централизованный метод для создания текстовых колонок DataGrid
+    /// Centralized method for creating text DataGrid columns
     /// </summary>
     private DataGridTextColumn CreateTextColumn(string header, string bindingPath, bool isSortable = true)
     {
@@ -2170,7 +2187,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             Header = header,
             Binding = binding,
-            SortMemberPath = isSortable ? bindingPath : null,
+            SortMemberPath = bindingPath,
+            CanUserSort = isSortable,
             ElementStyle = PartsDataGrid.FindResource("CenteredCellStyle") as Style,
             IsReadOnly = true
         };
@@ -2187,40 +2205,42 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     public void AddUserDefinedIPropertyColumn(string propertyName)
     {
-        // Ищем пользовательское свойство в реестре по оригинальному имени
+        // Find user property in registry by original name
         var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InventorPropertyName == propertyName);
-        var columnHeader = userProperty?.ColumnHeader ?? $"(Пользов.) {propertyName}";
+        var columnHeader = userProperty?.ColumnHeader ?? $"(User) {propertyName}";
+        var internalName = userProperty?.InternalName ?? $"UDP_{propertyName}";
 
-        // Проверяем, существует ли уже колонка с таким заголовком
+        // Check if column with this header already exists
         if (PartsDataGrid.Columns.Any(c => c.Header as string == columnHeader))
         {
-            MessageBox.Show($"Столбец с именем '{columnHeader}' уже существует.", "Предупреждение", MessageBoxButton.OK,
+            MessageBox.Show(_localizationManager.GetString("Warning_ColumnAlreadyExists", columnHeader), _localizationManager.GetString("MessageBox_Warning"), MessageBoxButton.OK,
                 MessageBoxImage.Warning);
             return;
         }
 
-        // Инициализируем пустые значения для всех существующих строк, чтобы избежать KeyNotFoundException
+        // Initialize empty values for all existing rows to avoid KeyNotFoundException
+        // Use propertyName as key (stable, not localized)
         foreach (var partData in _partsData)
         {
-            partData.AddUserDefinedProperty(columnHeader, "");
+            partData.AddUserDefinedProperty(propertyName, "");
         }
 
-        // Создаем колонку с универсальным шаблоном и передаем путь через Tag
-        var template = FindResource("EditableWithFxTemplate") as DataTemplate ?? throw new ResourceReferenceKeyNotFoundException("EditableWithFxTemplate не найден", "EditableWithFxTemplate");
+        // Create column with universal template and pass path via Tag
+        var template = FindResource("EditableWithFxTemplate") as DataTemplate ?? throw new ResourceReferenceKeyNotFoundException("EditableWithFxTemplate not found", "EditableWithFxTemplate");
         var column = new DataGridTemplateColumn
         {
             Header = columnHeader,
             CellTemplate = template,
-            SortMemberPath = $"UserDefinedProperties[{columnHeader}]",
+            SortMemberPath = internalName,
             IsReadOnly = false,
-            ClipboardContentBinding = new Binding($"UserDefinedProperties[{columnHeader}]"),
-            CellStyle = CreateCellTagStyle($"UserDefinedProperties[{columnHeader}]")
+            ClipboardContentBinding = new Binding($"UserDefinedProperties[{propertyName}]"),
+            CellStyle = CreateCellTagStyle($"UserDefinedProperties[{propertyName}]")
         };
 
         PartsDataGrid.Columns.Add(column);
 
-        // Дозаполняем данные для новой колонки
-        FillPropertyData(userProperty?.InternalName ?? $"UDP_{propertyName}");
+        // Fill data for new column
+        FillPropertyData(internalName);
     }
 
     private void AboutButton_Click(object sender, RoutedEventArgs e)
@@ -2254,21 +2274,101 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var overriddenItems = selectedItems.Where(item => item.IsOverridden).ToList();
         if (overriddenItems.Count == 0)
         {
-            MessageBox.Show("В выбранных элементах нет переопределенных количеств.", "Информация",
+            MessageBox.Show(_localizationManager.GetString("Info_NoOverriddenQuantities"), _localizationManager.GetString("MessageBox_Information"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
         var message = overriddenItems.Count == 1
-            ? $"Сбросить количество для \"{overriddenItems[0].PartNumber}\" до исходного значения {overriddenItems[0].OriginalQuantity}?"
-            : $"Сбросить количество для {overriddenItems.Count} выбранных элементов до исходных значений?";
+            ? string.Format(_localizationManager.GetString("Message_ResetQuantitySingle"),
+                overriddenItems[0].PartNumber, overriddenItems[0].OriginalQuantity)
+            : string.Format(_localizationManager.GetString("Message_ResetQuantityMultiple"),
+                overriddenItems.Count);
 
-        var result = MessageBox.Show(message, "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        var result = MessageBox.Show(message, _localizationManager.GetString("MessageBox_Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (result != MessageBoxResult.Yes) return;
 
         foreach (var item in overriddenItems)
         {
             item.Quantity = item.OriginalQuantity;
+        }
+    }
+
+    /// <summary>
+    /// Initialize language selection in ComboBox
+    /// </summary>
+    private void InitializeLanguageSelection()
+    {
+        var currentCulture = _localizationManager.CurrentCulture;
+        var selectedLanguage = SupportedLanguages.All
+            .FirstOrDefault(lang => lang.Culture.Name == currentCulture.Name)
+            ?? SupportedLanguages.Russian;
+
+        LanguageComboBox.SelectedItem = selectedLanguage;
+    }
+
+    /// <summary>
+    /// Language change handler
+    /// </summary>
+    private void LanguageComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (sender is System.Windows.Controls.ComboBox comboBox && comboBox.SelectedItem is LanguageInfo selectedLanguage)
+        {
+            _localizationManager.CurrentCulture = selectedLanguage.Culture;
+        }
+    }
+
+    /// <summary>
+    /// Updates button texts when language changes
+    /// </summary>
+    private void UpdateButtonTexts()
+    {
+        // Update button texts
+        ScanButton.Content = _localizationManager.GetString(_isScanning ? "UIState_Cancel" : "UIState_Scan");
+        ExportButton.Content = _localizationManager.GetString(_isExporting ? "UIState_Cancel" : "UIState_Export");
+
+        // Update status text only if it doesn't contain dynamic data
+        var currentText = ProgressLabelRun.Text;
+        if (string.IsNullOrEmpty(currentText) ||
+            (!currentText.Contains("/") && !currentText.Contains("(") && !currentText.Contains("-")))
+        {
+            // Determine which status text should be displayed
+            if (_isScanning && _operationCts?.IsCancellationRequested == true)
+            {
+                ProgressLabelRun.Text = _localizationManager.GetString("UIState_Cancelling");
+            }
+            else if (_isScanning)
+            {
+                ProgressLabelRun.Text = _localizationManager.GetString("UIState_PreparingScan");
+            }
+            else if (_isExporting && _operationCts?.IsCancellationRequested == true)
+            {
+                ProgressLabelRun.Text = _localizationManager.GetString("UIState_CancellingExport");
+            }
+            else if (_isExporting)
+            {
+                ProgressLabelRun.Text = _localizationManager.GetString("UIState_ExportingData");
+            }
+            else if (_partsData.Count == 0)
+            {
+                ProgressLabelRun.Text = _localizationManager.GetString("UIState_NoDocumentSelected");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates column headers in DataGrid when language changes
+    /// </summary>
+    private void UpdatePresetPropertiesLocalization()
+    {
+        foreach (var column in PartsDataGrid.Columns.Where(c => c.SortMemberPath is string { Length: > 0 }))
+        {
+            var internalName = column.SortMemberPath!;
+            var propertyDef = PropertyMetadataRegistry.GetPropertyByInternalName(internalName);
+            if (propertyDef != null)
+            {
+                column.Header = propertyDef.ColumnHeader;
+            }
         }
     }
 }

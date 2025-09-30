@@ -10,7 +10,7 @@ public class VersionInfoService
     {
         var assembly = Assembly.GetExecutingAssembly();
         var informationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-        return informationalVersion ?? assembly.GetName().Version?.ToString() ?? "Версия неизвестна";
+        return informationalVersion ?? assembly.GetName().Version?.ToString() ?? "Version unknown";
     }
 
     public static string GetLastCommitDate()
@@ -39,9 +39,9 @@ public class VersionInfoService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Ошибка при получении даты последнего коммита: {ex.Message}");
+            Debug.WriteLine($"Error retrieving last commit date: {ex.Message}");
         }
 
-        return "Дата не определена";
+        return "Date not determined";
     }
 }

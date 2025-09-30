@@ -29,6 +29,7 @@ public record InterfaceSettings
     public List<string> ColumnOrder { get; init; } = [];
     public List<string> UserDefinedProperties { get; init; } = [];
     public bool IsExpanded { get; init; }
+    public string SelectedLanguage { get; init; } = "en-US";
 }
 
 public record ComponentFilterSettings
@@ -157,12 +158,10 @@ public static class SettingsManager
     public static ApplicationSettings CreateSettingsFromMainWindow(FlatPatternExporterMainWindow window)
     {
         var columnsInDisplayOrder = window.PartsDataGrid.Columns
-            .Where(c => c.Header is string { Length: > 0 })
+            .Where(c => c.SortMemberPath is string { Length: > 0 })
             .OrderBy(c => c.DisplayIndex)
-            .Select(c => (string)c.Header)
-            .Select(columnHeader => PropertyMetadataRegistry.GetInternalNameByColumnHeader(columnHeader))
+            .Select(c => c.SortMemberPath)
             .Where(internalName => !string.IsNullOrEmpty(internalName))
-            .Cast<string>()
             .ToList();
 
         var templatePresets = window.PresetManager.GetPresetData().ToList();
@@ -190,7 +189,8 @@ public static class SettingsManager
             {
                 ColumnOrder = [..columnsInDisplayOrder],
                 UserDefinedProperties = userDefinedProperties,
-                IsExpanded = window.SettingsExpander?.IsExpanded ?? false
+                IsExpanded = window.SettingsExpander?.IsExpanded ?? false,
+                SelectedLanguage = LocalizationManager.Instance.CurrentCulture.Name
             },
             
             ComponentFilter = new ComponentFilterSettings
@@ -251,6 +251,15 @@ public static class SettingsManager
         if (window.SettingsExpander is not null)
             window.SettingsExpander.IsExpanded = settings.Interface.IsExpanded;
 
+        // Restore language
+        var savedLanguage = SupportedLanguages.All
+            .FirstOrDefault(lang => lang.Code == settings.Interface.SelectedLanguage);
+        if (savedLanguage != null)
+        {
+            LocalizationManager.Instance.CurrentCulture = savedLanguage.Culture;
+            window.LanguageComboBox.SelectedItem = savedLanguage;
+        }
+
         // Component filter settings
         window.ExcludeReferenceParts = settings.ComponentFilter.ExcludeReferenceParts;
         window.ExcludePurchasedParts = settings.ComponentFilter.ExcludePurchasedParts;
@@ -290,8 +299,8 @@ public static class SettingsManager
         window.PresetManager.LoadPresets(settings.FileName.TemplatePresets, settings.FileName.SelectedTemplatePresetIndex);
 
         PropertyMetadataRegistry.UserDefinedProperties.Clear();
-        
-        // Загружаем UDP из сохраненного списка
+
+        // Load UDP from saved list
         foreach (var userProperty in settings.Interface.UserDefinedProperties)
         {
             if (!string.IsNullOrWhiteSpace(userProperty))
@@ -300,10 +309,10 @@ public static class SettingsManager
             }
         }
 
-        // Восстанавливаем колонки только если есть сохраненный порядок
+        // Restore columns only if saved order exists
         if (settings.Interface.ColumnOrder.Count > 0)
         {
-            var presetLookup = window.PresetIProperties.ToLookup(p => PropertyMetadataRegistry.GetInternalNameByColumnHeader(p.ColumnHeader));
+            var presetLookup = window.PresetIProperties.ToLookup(p => p.InventorPropertyName);
 
             var restoredColumns = 0;
             foreach (var internalName in settings.Interface.ColumnOrder.Where(name => !string.IsNullOrWhiteSpace(name)))

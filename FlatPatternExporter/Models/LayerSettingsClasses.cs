@@ -1,12 +1,44 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
+using FlatPatternExporter.Services;
 
 namespace FlatPatternExporter.Models;
     /// <summary>
-    /// Константы для настроек слоев по умолчанию
+    /// Localizable list item with automatic display name updates on language change
+    /// </summary>
+    public class LocalizableItem : INotifyPropertyChanged
+    {
+        private readonly string _key;
+
+        public string Key => _key;
+
+        public string DisplayName => LocalizationManager.Instance.GetString(_key);
+
+        public LocalizableItem(string key)
+        {
+            _key = key;
+            LocalizationManager.Instance.LanguageChanged += OnLanguageChanged;
+        }
+
+        private void OnLanguageChanged(object? sender, EventArgs e)
+        {
+            OnPropertyChanged(nameof(DisplayName));
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    /// <summary>
+    /// Constants for default layer settings
     /// </summary>
     public static class LayerDefaults
     {
@@ -17,7 +49,7 @@ namespace FlatPatternExporter.Models;
     }
 
     /// <summary>
-    /// Модель настроек отдельного слоя с поддержкой уведомлений об изменениях
+    /// Individual layer settings model with change notification support
     /// </summary>
     public class LayerSetting : INotifyPropertyChanged
     {
@@ -85,7 +117,7 @@ namespace FlatPatternExporter.Models;
         }
 
         /// <summary>
-        /// Сбрасывает все настройки слоя к значениям по умолчанию
+        /// Resets all layer settings to default values
         /// </summary>
         public void ResetSettings()
         {
@@ -101,7 +133,7 @@ namespace FlatPatternExporter.Models;
             SelectedLineType != LayerDefaults.DefaultLineType;
 
         /// <summary>
-        /// Проверяет, отличаются ли текущие настройки от значений по умолчанию
+        /// Checks if current settings differ from default values
         /// </summary>
         public bool HasChanges()
         {
@@ -120,7 +152,7 @@ namespace FlatPatternExporter.Models;
     }
 
     /// <summary>
-    /// Статический помощник для работы с цветами, типами линий и настройками слоев
+    /// Static helper for working with colors, line types, and layer settings
     /// </summary>
     public static class LayerSettingsHelper
     {
@@ -179,19 +211,19 @@ namespace FlatPatternExporter.Models;
         ];
 
         /// <summary>
-        /// Конвертирует название цвета в RGB значение
+        /// Converts color name to RGB value
         /// </summary>
         public static string GetColorValue(string colorName) =>
             ColorValues.TryGetValue(colorName, out string? value) ? value : ColorValues["White"];
 
         /// <summary>
-        /// Конвертирует название типа линии в его соответствующее значение
+        /// Converts line type name to its corresponding value
         /// </summary>
         public static string GetLineTypeValue(string lineTypeName) =>
             LineTypeValues.TryGetValue(lineTypeName, out string? value) ? value : LineTypeValues["Default"];
 
         /// <summary>
-        /// Инициализирует коллекцию настроек слоев с предустановленными значениями
+        /// Initializes layer settings collection with preset values
         /// </summary>
         public static ObservableCollection<LayerSetting> InitializeLayerSettings()
         {
@@ -206,25 +238,25 @@ namespace FlatPatternExporter.Models;
         }
 
         /// <summary>
-        /// Возвращает коллекцию доступных цветов
+        /// Returns collection of available colors
         /// </summary>
-        public static ObservableCollection<string> GetAvailableColors() =>
-            new(ColorValues.Keys);
+        public static ObservableCollection<LocalizableItem> GetAvailableColors() =>
+            new(ColorValues.Keys.Select(key => new LocalizableItem(key)));
 
         /// <summary>
-        /// Возвращает коллекцию доступных типов линий
+        /// Returns collection of available line types
         /// </summary>
-        public static ObservableCollection<string> GetLineTypes() =>
-            new(LineTypeValues.Keys);
+        public static ObservableCollection<LocalizableItem> GetLineTypes() =>
+            new(LineTypeValues.Keys.Select(key => new LocalizableItem(key)));
 
         /// <summary>
-        /// Внутренний класс для определения слоев
+        /// Internal class for layer definitions
         /// </summary>
         private readonly record struct LayerDefinition(string DisplayName, string LayerName, bool CanBeHidden = true);
     }
 
     /// <summary>
-    /// Валидатор имен слоев с автоматической очисткой недопустимых символов
+    /// Layer name validator with automatic invalid character sanitization
     /// </summary>
     public static class LayerNameValidator
     {
@@ -233,11 +265,11 @@ namespace FlatPatternExporter.Models;
             '<', '>', '/', '\\', '"', ':', ';', '?', '*', '|', ',', '=' 
         ];
 
-        private const string ValidationMessage = 
-            "Недопустимые символы в имени слоя.\nВ именах слоев не допускается употребление следующих символов:\n<>/\\\":;?*|,=";
+        private static readonly string ValidationMessage =
+            LocalizationManager.Instance.GetString("Validation_InvalidLayerNameCharacters");
 
         /// <summary>
-        /// Очищает строку от недопустимых символов и показывает предупреждение при необходимости
+        /// Cleans string from invalid characters and shows warning when necessary
         /// </summary>
         public static string CleanAndValidate(string input)
         {
@@ -267,13 +299,13 @@ namespace FlatPatternExporter.Models;
         }
 
         /// <summary>
-        /// Отображает диалог с информацией об ошибке валидации
+        /// Displays dialog with validation error information
         /// </summary>
         private static void ShowValidationError()
         {
             System.Windows.MessageBox.Show(
                 ValidationMessage,
-                "Ошибка ввода",
+                LocalizationManager.Instance.GetString("MessageBox_InputError"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
         }

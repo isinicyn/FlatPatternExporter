@@ -2,9 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Дизайн-система: базовые значения -->
+    <!-- Design system: base values -->
 
-    <!-- Размеры и отступы -->
+    <!-- Sizes and margins -->
     <sys:Double x:Key="StandardElementHeight">24</sys:Double>
     <sys:Double x:Key="LargeElementHeight">32</sys:Double>
     <sys:Double x:Key="StandardButtonMinWidth">80</sys:Double>
@@ -18,14 +18,14 @@
     <sys:Double x:Key="SmallMargin">5</sys:Double>
     <sys:Double x:Key="TinyMargin">2</sys:Double>
     <sys:Double x:Key="StandardBorderThickness">1</sys:Double>
-    
-    <!-- Размеры иконок -->
+
+    <!-- Icon sizes -->
     <sys:Double x:Key="SmallIconSize">12</sys:Double>
     <sys:Double x:Key="MediumIconSize">14</sys:Double>
     <sys:Double x:Key="StandardIconSize">16</sys:Double>
     <sys:Double x:Key="LargeIconSize">24</sys:Double>
-    
-    <!-- Размеры кнопок -->
+
+    <!-- Button sizes -->
     <sys:Double x:Key="SmallButtonWidth">30</sys:Double>
     <sys:Double x:Key="LargeSquareButtonSize">75</sys:Double>
     <sys:Double x:Key="SpinnerButtonWidth">20</sys:Double>
@@ -33,7 +33,7 @@
     <sys:Double x:Key="IconButtonSize">24</sys:Double>
     <Thickness x:Key="IconButtonPadding">4</Thickness>
 
-    <!-- Стандартные отступы для элементов -->
+    <!-- Standard margins for elements -->
     <Thickness x:Key="StandardMarginThickness">6</Thickness>
     <Thickness x:Key="SmallMarginThickness">5</Thickness>
     <Thickness x:Key="TinyMarginThickness">2</Thickness>
@@ -44,7 +44,7 @@
     <Thickness x:Key="TextBoxPaddingThickness">2,0,2,0</Thickness>
     <Thickness x:Key="StandardBorderThicknessValue">1</Thickness>
 
-    <!-- Направленные и комбинированные отступы (часто употребимые) -->
+    <!-- Directional and combined margins (commonly used) -->
     <Thickness x:Key="RightSmallMarginThickness">0,0,5,0</Thickness>
     <Thickness x:Key="LeftSmallMarginThickness">5,0,0,0</Thickness>
     <Thickness x:Key="BottomSmallMarginThickness">0,0,0,5</Thickness>
@@ -59,20 +59,20 @@
     <Thickness x:Key="OuterBottomMarginThickness">10,0,10,10</Thickness>
     <Thickness x:Key="SectionHeaderMarginThickness">0,10,0,5</Thickness>
 
-    <!-- Базовый стиль для текстовых блоков (должен быть раньше ссылок на него) -->
+    <!-- Base style for text blocks (must be before references to it) -->
     <Style x:Key="BaseTextBlockStyle" TargetType="TextBlock">
-        <!-- FontSize и Foreground наследуются от Window, VerticalAlignment из глобального стиля TextBlock -->
+        <!-- FontSize and Foreground are inherited from Window, VerticalAlignment from global TextBlock style -->
     </Style>
 
-    <!-- Стиль GroupBox: единые паддинги и заголовок -->
+    <!-- GroupBox style: unified padding and header -->
     <Style x:Key="BaseGroupBoxStyle" TargetType="GroupBox">
-        <!-- Убрали внутренний Padding по умолчанию, чтобы избежать дублирования с Margin первого дочернего контейнера -->
+        <!-- Removed default internal Padding to avoid duplication with Margin of first child container -->
         <Setter Property="Padding" Value="0"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderSecondaryBrush}"/>
         <Setter Property="HeaderTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <TextBlock Text="{Binding}" 
+                    <TextBlock Text="{Binding}"
                                Style="{StaticResource BaseTextBlockStyle}"
                                FontWeight="Bold"
                                Foreground="{StaticResource TextTertiaryBrush}"/>
@@ -81,7 +81,7 @@
         </Setter>
     </Style>
 
-    <!-- Стиль ToolTip: единые шрифты и отступы -->
+    <!-- ToolTip style: unified fonts and padding -->
     <Style x:Key="BaseToolTipStyle" TargetType="ToolTip">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -91,7 +91,7 @@
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
     </Style>
 
-    <!-- Частые маргины для разделителей и сплиттеров -->
+    <!-- Common margins for separators and splitters -->
     <Thickness x:Key="VerticalSeparatorOuterMarginThickness">10,0,10,5</Thickness>
     <Thickness x:Key="VerticalSeparatorCenteredMarginThickness">10,5</Thickness>
     <Thickness x:Key="GridSplitterMarginThickness">0,12,0,5</Thickness>
@@ -112,10 +112,10 @@
     <Thickness x:Key="HorizontalTinyVerticalHairlineMarginThickness">2,1</Thickness>
     <Thickness x:Key="LeftTinyBottomSmallMarginThickness">2,0,0,5</Thickness>
     <Thickness x:Key="VerticalHairlineMarginThickness">0,1,0,1</Thickness>
-    <!-- Специальный отступ для чекбокса в настройке слоёв (компенсация каскадных отступов) -->
+    <!-- Special margin for checkbox in layer settings (compensates for cascading margins) -->
     <Thickness x:Key="CheckBoxOverrideMarginThickness">0,5,5,5</Thickness>
 
-    <!-- Паддинги -->
+    <!-- Paddings -->
     <Thickness x:Key="HorizontalSmallPaddingThickness">5,0</Thickness>
     <Thickness x:Key="LeftSmallPaddingThickness">5,0,0,0</Thickness>
     <Thickness x:Key="LabelInlinePaddingThickness">0,5,5,5</Thickness>
@@ -125,17 +125,17 @@
     <Thickness x:Key="LeftTinyPlusPaddingThickness">4,0,0,0</Thickness>
     <Thickness x:Key="StandardTopOnlyBorderThicknessValue">0,1,0,0</Thickness>
 
-    <!-- Неравномерная толщина рамки -->
+    <!-- Non-uniform border thickness -->
     <Thickness x:Key="StandardTopBorderThicknessValue">1,1,1,0</Thickness>
 
-    <!-- Заголовки секций: текст -->
+    <!-- Section headers: text -->
     <Style x:Key="SectionHeaderTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Margin" Value="{StaticResource SectionHeaderMarginThickness}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}"/>
     </Style>
 
-    <!-- Заголовок в оверлеях -->
+    <!-- Header in overlays -->
     <Style x:Key="OverlayTitleTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="16"/>
@@ -144,7 +144,7 @@
         <Setter Property="HorizontalAlignment" Value="Center"/>
     </Style>
 
-    <!-- Подсказка в оверлеях -->
+    <!-- Hint in overlays -->
     <Style x:Key="OverlayHintTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
         <Setter Property="FontSize" Value="{StaticResource LargeFontSize}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
@@ -154,10 +154,10 @@
         <Setter Property="MaxWidth" Value="400"/>
     </Style>
 
-    
-    <!-- Базовые стили элементов управления -->
 
-    <!-- Базовый стиль для всех элементов -->
+    <!-- Base styles for controls -->
+
+    <!-- Base style for all elements -->
     <Style x:Key="BaseControlStyle" TargetType="FrameworkElement">
         <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
         <Setter Property="Margin" Value="{StaticResource TinyMarginThickness}"/>
@@ -166,7 +166,7 @@
 
 
 
-    <!-- Базовый стиль для текстовых полей -->
+    <!-- Base style for text boxes -->
     <Style x:Key="BaseTextBoxStyle" TargetType="TextBox">
         <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
@@ -179,7 +179,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
-    <!-- Базовый стиль для комбобоксов -->
+    <!-- Base style for combo boxes -->
     <Style x:Key="BaseComboBoxStyle" TargetType="ComboBox">
         <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
@@ -192,7 +192,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
-    <!-- Базовый стиль для чекбоксов -->
+    <!-- Base style for checkboxes -->
     <Style x:Key="BaseCheckBoxStyle" TargetType="CheckBox">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="Margin" Value="{StaticResource SmallMarginThickness}"/>
@@ -200,7 +200,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- Базовый стиль для радиокнопок -->
+    <!-- Base style for radio buttons -->
     <Style x:Key="BaseRadioButtonStyle" TargetType="RadioButton">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="Margin" Value="{StaticResource SmallMarginThickness}"/>
@@ -208,7 +208,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- Базовый стиль для лейблов -->
+    <!-- Base style for labels -->
     <Style x:Key="BaseLabelStyle" TargetType="Label">
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -216,7 +216,7 @@
         <Setter Property="Padding" Value="{StaticResource SmallPaddingThickness}"/>
     </Style>
 
-    <!-- Глобальные стили для TabControl -->
+    <!-- Global styles for TabControl -->
     <Style TargetType="TabControl">
         <Setter Property="Padding" Value="5"/>
     </Style>
@@ -239,7 +239,7 @@
     </Style>
 
 
-    <!-- Стиль для элементов ListBox без стандартной подсветки -->
+    <!-- Style for ListBox items without standard highlighting -->
     <Style x:Key="CustomListBoxItemStyle" TargetType="ListBoxItem">
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -266,7 +266,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Стили для блока информации о документе -->
+    <!-- Styles for document info block -->
     <Style x:Key="DocumentInfoLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Margin" Value="0,0,3,0"/>
@@ -286,7 +286,7 @@
     </Style>
 
 
-    <!-- Универсальный стиль для токенов в виде блоков -->
+    <!-- Universal style for tokens as blocks -->
     <Style x:Key="TokenBlockStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
@@ -299,12 +299,12 @@
                 <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
             </Trigger>
-            <!-- Стиль для кастомных токенов -->
+            <!-- Style for custom tokens -->
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="CustomText">
                 <Setter Property="Background" Value="{DynamicResource TokenCustomBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource TokenCustomBorderBrush}"/>
             </DataTrigger>
-            <!-- Стиль для пользовательских свойств -->
+            <!-- Style for user-defined properties -->
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="UserDefined">
                 <Setter Property="Background" Value="{DynamicResource TokenUserDefinedBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource TokenUserDefinedBorderBrush}"/>
@@ -312,7 +312,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Стиль для текста внутри токенов -->
+    <!-- Style for text inside tokens -->
     <Style x:Key="TokenTextStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="11"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -320,7 +320,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- Стиль для токенов в ListBox (наследует от универсального) -->
+    <!-- Style for tokens in ListBox (inherits from universal) -->
     <Style x:Key="TokenItemStyle" TargetType="ListBoxItem">
         <Setter Property="Template">
             <Setter.Value>
@@ -338,7 +338,7 @@
         </Setter>
     </Style>
 
-    <!-- Стиль для ListBox с токенами -->
+    <!-- Style for ListBox with tokens -->
     <Style x:Key="TokenListBoxStyle" TargetType="ListBox">
         <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
@@ -372,7 +372,7 @@
     </Style>
 
 
-    <!-- Базовый стиль для разделителей -->
+    <!-- Base style for separators -->
     <Style x:Key="BaseSeparatorStyle" TargetType="Separator">
         <Setter Property="Template">
             <Setter.Value>
@@ -384,21 +384,21 @@
         <Setter Property="Margin" Value="{StaticResource SmallMarginThickness}"/>
     </Style>
 
-    <!-- Стиль для вертикального разделителя -->
+    <!-- Style for vertical separator -->
     <Style x:Key="VerticalSeparatorStyle" TargetType="Separator" BasedOn="{StaticResource BaseSeparatorStyle}">
         <Setter Property="Width" Value="1"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Stretch"/>
     </Style>
 
-    <!-- Стиль для горизонтального разделителя -->
+    <!-- Style for horizontal separator -->
     <Style x:Key="HorizontalSeparatorStyle" TargetType="Separator" BasedOn="{StaticResource BaseSeparatorStyle}">
         <Setter Property="Height" Value="1"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- Стиль для предпросмотра имени файла -->
+    <!-- Style for file name preview -->
     <Style x:Key="FileNamePreviewBorderStyle" TargetType="Border">
         <Setter Property="MinHeight" Value="{StaticResource StandardElementHeight}"/>
         <Setter Property="Padding" Value="8,4"/>
@@ -406,7 +406,7 @@
         <Setter Property="Background" Value="{DynamicResource PreviewWarningBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Style.Triggers>
-            <!-- Триггеры валидации (работают только когда функция включена и шаблон не пустой) -->
+            <!-- Validation triggers (work only when function is enabled and template is not empty) -->
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding EnableFileNameConstructor}" Value="True"/>
@@ -427,7 +427,7 @@
                     <Setter Property="BorderBrush" Value="{DynamicResource PreviewWarningBorderBrush}"/>
                 </MultiDataTrigger.Setters>
             </MultiDataTrigger>
-            <!-- Приоритетные триггеры: нейтральный вид когда функция отключена или шаблон пустой (ПОСЛЕДНИЕ - высший приоритет) -->
+            <!-- Priority triggers: neutral appearance when function is disabled or template is empty (LAST - highest priority) -->
             <DataTrigger Binding="{Binding EnableFileNameConstructor}" Value="False">
                 <Setter Property="Background" Value="{DynamicResource PreviewWarningBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
@@ -439,13 +439,13 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Стиль для текста предпросмотра имени файла -->
+    <!-- Style for file name preview text -->
     <Style x:Key="FileNamePreviewTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
         <Setter Property="FontFamily" Value="Consolas"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     </Style>
 
-    <!-- Стили для элементов конструктора имени файла -->
+    <!-- Styles for file name constructor elements -->
     <Style x:Key="FileNameInputTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource BaseTextBoxStyle}">
         <Setter Property="Width" Value="200"/>
     </Style>
@@ -453,7 +453,7 @@
     <Style x:Key="PresetComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource BaseComboBoxStyle}"/>
 
 
-    <!-- Простой стиль для TreeView -->
+    <!-- Simple style for TreeView -->
     <Style x:Key="ConflictTreeViewStyle" TargetType="TreeView">
         <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
@@ -461,7 +461,7 @@
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
     </Style>
 
-    <!-- Простой стиль для TreeViewItem -->
+    <!-- Simple style for TreeViewItem -->
     <Style x:Key="ConflictTreeViewItemStyle" TargetType="TreeViewItem">
         <Setter Property="IsExpanded" Value="True"/>
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
@@ -473,7 +473,7 @@
             </Trigger>
         </Style.Triggers>
         <Style.Resources>
-            <!-- Стиль для TextBlock внутри TreeViewItem -->
+            <!-- Style for TextBlock inside TreeViewItem -->
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                 <Style.Triggers>
@@ -483,7 +483,7 @@
                 </Style.Triggers>
             </Style>
 
-            <!-- Стиль для TextBlock дочерних элементов (файлов) -->
+            <!-- Style for TextBlock of child elements (files) -->
             <Style TargetType="TextBlock" x:Key="FileTextBlockStyle" BasedOn="{StaticResource {x:Type TextBlock}}">
                 <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
                 <Style.Triggers>
@@ -496,7 +496,7 @@
     </Style>
 
 
-    <!-- Стиль для StatusBar -->
+    <!-- Style for StatusBar -->
     <Style x:Key="BaseStatusBarStyle" TargetType="StatusBar">
         <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -506,13 +506,13 @@
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
     </Style>
 
-    <!-- Стиль для StatusBarItem -->
+    <!-- Style for StatusBarItem -->
     <Style x:Key="BaseStatusBarItemStyle" TargetType="StatusBarItem">
         <Setter Property="Padding" Value="10,2"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- Низ диалогов: панель с кнопками -->
+    <!-- Bottom of dialogs: panel with buttons -->
     <Style x:Key="DialogBottomBarStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource BackgroundTertiaryBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderSecondaryBrush}"/>
@@ -520,12 +520,12 @@
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
     </Style>
 
-    <!-- Стиль для Expander с прямыми углами -->
+    <!-- Style for Expander with square corners -->
     <Style x:Key="SquareExpanderStyle" TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}">
         <Setter Property="BorderBrush" Value="{StaticResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="Background" Value="{StaticResource BackgroundSecondaryBrush}"/>
-        <!-- Убрали Padding, чтобы избежать наложения с Margin корневых контейнеров вкладок -->
+        <!-- Removed Padding to avoid overlap with Margin of root tab containers -->
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -548,7 +548,7 @@
                                                     <ColumnDefinition Width="20"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Path x:Name="Arrow" 
+                                                <Path x:Name="Arrow"
                                                       Grid.Column="0"
                                                       Data="M0,0 L4,4 L8,0 Z"
                                                       Fill="{DynamicResource TextSecondaryBrush}"
@@ -559,7 +559,7 @@
                                                         <RotateTransform Angle="0"/>
                                                     </Path.RenderTransform>
                                                 </Path>
-                                                <ContentPresenter Grid.Column="1" 
+                                                <ContentPresenter Grid.Column="1"
                                                                   VerticalAlignment="Center"
                                                                   HorizontalAlignment="Left"/>
                                             </Grid>

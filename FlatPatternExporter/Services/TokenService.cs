@@ -21,13 +21,13 @@ public class TokenElement
     public string GetDisplayName()
     {
         if (IsCustomText) return Name;
-        
-        // Сначала ищем в предопределенных свойствах
+
+        // First search in predefined properties
         var property = PropertyMetadataRegistry.Properties.Values
             .FirstOrDefault(p => p.IsTokenizable && p.TokenName == Name);
         if (property != null) return property.DisplayName;
-        
-        // Затем ищем в пользовательских свойствах (TokenName содержит префикс UDP_)
+
+        // Then search in user-defined properties (TokenName contains UDP_ prefix)
         var userProperty = PropertyMetadataRegistry.UserDefinedProperties
             .FirstOrDefault(p => p.IsTokenizable && p.TokenName == Name);
         if (userProperty != null) return userProperty.DisplayName;
@@ -58,16 +58,39 @@ public partial class TokenService : INotifyPropertyChanged
     {
         _partsData = [];
         _tokenResolvers = BuildTokenResolvers();
-        
-        // Подписываемся на изменения в коллекции пользовательских свойств
+
+        // Subscribe to changes in user-defined properties collection
         PropertyMetadataRegistry.UserDefinedProperties.CollectionChanged += (s, e) =>
         {
             RefreshTokenResolvers();
         };
+
+        // Subscribe to language changes to update token display names
+        LocalizationManager.Instance.LanguageChanged += OnLanguageChanged;
     }
-    
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        UpdateTokenDisplayNames();
+        UpdatePreview(); // Update preview to refresh localized messages
+    }
+
+    private void UpdateTokenDisplayNames()
+    {
+        if (_tokenContainer == null) return;
+
+        for (int i = 0; i < _tokenElements.Count && i < _tokenContainer.Children.Count; i++)
+        {
+            var tokenElement = _tokenElements[i];
+            if (tokenElement.VisualElement?.Child is TextBlock textBlock)
+            {
+                textBlock.Text = tokenElement.GetDisplayName();
+            }
+        }
+    }
+
     /// <summary>
-    /// Обновляет резолверы токенов при изменении пользовательских свойств
+    /// Updates token resolvers when user-defined properties change
     /// </summary>
     public void RefreshTokenResolvers()
     {
@@ -84,15 +107,17 @@ public partial class TokenService : INotifyPropertyChanged
         {
             var tokenName = prop.TokenName;
             if (string.IsNullOrEmpty(tokenName)) continue;
-            
-            // Для User Defined Properties используем другой подход
+
+            // For User Defined Properties use a different approach
             if (prop.Type == PropertyMetadataRegistry.PropertyType.UserDefined)
             {
-                // User Defined Properties хранятся в словаре UserDefinedProperties
+                // User Defined Properties are stored in UserDefinedProperties dictionary
+                // Use InventorPropertyName as stable key (not localized ColumnHeader)
+                var propertyName = prop.InventorPropertyName ?? "";
                 resolvers[tokenName] = partData =>
                 {
-                    if (partData.UserDefinedProperties != null && 
-                        partData.UserDefinedProperties.TryGetValue(prop.ColumnHeader, out var value))
+                    if (partData.UserDefinedProperties != null &&
+                        partData.UserDefinedProperties.TryGetValue(propertyName, out var value))
                     {
                         return value?.ToString() ?? "";
                     }
@@ -101,11 +126,11 @@ public partial class TokenService : INotifyPropertyChanged
             }
             else
             {
-                // Находим свойство в PartData
+                // Find property in PartData
                 var property = partDataType.GetProperty(prop.InternalName);
                 if (property == null || !property.CanRead) continue;
-                
-                // Создаем резолвер
+
+                // Create resolver
                 resolvers[tokenName] = partData =>
                 {
                     var value = property.GetValue(partData);
@@ -124,11 +149,11 @@ public partial class TokenService : INotifyPropertyChanged
 
         var tokenCache = new Dictionary<string, string>();
         var result = template;
-        
-        // Если нет данных детали, возвращаем шаблон с placeholder'ами
+
+        // If there is no part data, return template with placeholders
         bool usePlaceholders = partData == null || string.IsNullOrEmpty(partData.PartNumber);
 
-        // Обрабатываем обычные токены
+        // Process regular tokens
         result = TokenRegex().Replace(result, match =>
         {
             var token = match.Groups[1].Value;
@@ -137,7 +162,7 @@ public partial class TokenService : INotifyPropertyChanged
             {
                 if (usePlaceholders)
                 {
-                    // Если нет данных, возвращаем placeholder
+                    // If no data, return placeholder
                     var prop = PropertyMetadataRegistry.Properties.Values
                         .FirstOrDefault(p => p.IsTokenizable && p.TokenName == token) ??
                         PropertyMetadataRegistry.UserDefinedProperties
@@ -159,10 +184,10 @@ public partial class TokenService : INotifyPropertyChanged
             return value;
         });
 
-        // Обрабатываем кастомные токены
+        // Process custom tokens
         result = CustomTextRegex().Replace(result, match =>
         {
-            return match.Groups[1].Value; // Возвращаем текст как есть
+            return match.Groups[1].Value; // Return text as is
         });
 
         return SanitizeFileName(result);
@@ -173,11 +198,11 @@ public partial class TokenService : INotifyPropertyChanged
         if (string.IsNullOrEmpty(template))
             return false;
 
-        // Проверяем обычные токены
+        // Validate regular tokens
         var tokenMatches = TokenRegex().Matches(template);
         var validTokens = tokenMatches.All(match => _tokenResolvers.ContainsKey(match.Groups[1].Value));
-        
-        // Кастомные токены всегда валидны (не нуждаются в разрешении)
+
+        // Custom tokens are always valid (do not need resolution)
         return validTokens;
     }
 
@@ -190,7 +215,7 @@ public partial class TokenService : INotifyPropertyChanged
         }
         catch
         {
-            return "Ошибка в шаблоне";
+            return LocalizationManager.Instance.GetString("Error_TemplateError");
         }
     }
 
@@ -198,46 +223,46 @@ public partial class TokenService : INotifyPropertyChanged
     {
         if (string.IsNullOrEmpty(fileNameTemplate))
         {
-            return ("Не задан шаблон - при экспорте будет использовано значение по умолчанию \"Обозначение детали\"", true);
+            return (LocalizationManager.Instance.GetString("Info_TemplateNotSet"), true);
         }
 
         var isValid = ValidateTemplate(fileNameTemplate);
         if (!isValid)
         {
-            return ("Ошибка в шаблоне - неизвестные токены", false);
+            return (LocalizationManager.Instance.GetString("Error_UnknownTokens"), false);
         }
 
         var sampleData = CreateSamplePartData(partsData, selectedData);
         var preview = PreviewTemplate(fileNameTemplate, sampleData);
-        
-        if (preview == "Ошибка в шаблоне")
+
+        if (preview == LocalizationManager.Instance.GetString("Error_TemplateError"))
         {
             return (preview, false);
         }
-        
+
         if (preview.Length > 255)
         {
-            return ($"Имя файла слишком длинное ({preview.Length} символов, максимум 255)", false);
+            return (LocalizationManager.Instance.GetString("Error_FileNameTooLong", preview.Length), false);
         }
-        
+
         return ($"{preview}.dxf", true);
     }
 
     public static PartData? CreateSamplePartData(IList<PartData> partsData, PartData? selectedData = null)
     {
-        // Используем выбранную деталь, если она передана
+        // Use selected part if provided
         if (selectedData != null)
         {
             return selectedData;
         }
-        
-        // Иначе используем данные первой детали из списка, если есть
+
+        // Otherwise use data from first part in list if available
         if (partsData.Count > 0)
         {
             return partsData[0];
         }
 
-        // Иначе возвращаем null для отображения placeholder'ов
+        // Otherwise return null to display placeholders
         return null;
     }
 

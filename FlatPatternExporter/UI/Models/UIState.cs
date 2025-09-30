@@ -1,11 +1,13 @@
+﻿using FlatPatternExporter.Services;
+
 namespace FlatPatternExporter.UI.Models;
 
 public class UIState
 {
-    private const string SCAN_BUTTON_TEXT = "Сканировать";
-    private const string CANCEL_BUTTON_TEXT = "Прервать";
-    private const string EXPORT_BUTTON_TEXT = "Экспорт";
-    public const string CANCELLING_TEXT = "Прерывание...";
+    private static string SCAN_BUTTON_TEXT => LocalizationManager.Instance.GetString("UIState_Scan");
+    private static string CANCEL_BUTTON_TEXT => LocalizationManager.Instance.GetString("UIState_Cancel");
+    private static string EXPORT_BUTTON_TEXT => LocalizationManager.Instance.GetString("UIState_Export");
+    public static string CANCELLING_TEXT => LocalizationManager.Instance.GetString("UIState_Cancelling");
 
     public bool ScanEnabled { get; set; }
     public bool ExportEnabled { get; set; }
@@ -18,84 +20,84 @@ public class UIState
     public bool UpdateScanProgress { get; set; } = true;
     public bool UpdateExportProgress { get; set; } = true;
 
-    public static UIState Initial => new()
+    public static UIState Initial() => new()
     {
         ScanEnabled = true,
         ExportEnabled = false,
         ClearEnabled = false,
         ScanButtonText = SCAN_BUTTON_TEXT,
         ExportButtonText = EXPORT_BUTTON_TEXT,
-        ProgressText = "Документ не выбран",
+        ProgressText = LocalizationManager.Instance.GetString("UIState_NoDocumentSelected"),
         ProgressValue = 0,
         InventorUIDisabled = false,
         UpdateScanProgress = true,
         UpdateExportProgress = true
     };
 
-    public static UIState Scanning => new()
+    public static UIState Scanning() => new()
     {
         ScanEnabled = true,
         ExportEnabled = false,
         ClearEnabled = false,
         ScanButtonText = CANCEL_BUTTON_TEXT,
         ExportButtonText = EXPORT_BUTTON_TEXT,
-        ProgressText = "Подготовка к сканированию...",
+        ProgressText = LocalizationManager.Instance.GetString("UIState_PreparingScan"),
         ProgressValue = 0,
         InventorUIDisabled = true,
         UpdateScanProgress = true,
         UpdateExportProgress = false
     };
 
-    public static UIState CancellingScan => new()
+    public static UIState CancellingScan() => new()
     {
         ScanEnabled = false,
         ScanButtonText = CANCELLING_TEXT,
         ExportEnabled = false,
         ExportButtonText = EXPORT_BUTTON_TEXT,
         ClearEnabled = false,
-        ProgressText = "Прерывание...",
+        ProgressText = LocalizationManager.Instance.GetString("UIState_Cancelling"),
         ProgressValue = 0,
         InventorUIDisabled = true,
         UpdateScanProgress = true,
         UpdateExportProgress = false
     };
 
-    public static UIState Exporting => new()
+    public static UIState Exporting() => new()
     {
         ScanEnabled = false,
         ExportEnabled = true,
         ClearEnabled = false,
         ScanButtonText = SCAN_BUTTON_TEXT,
         ExportButtonText = CANCEL_BUTTON_TEXT,
-        ProgressText = "Экспорт данных...",
+        ProgressText = LocalizationManager.Instance.GetString("UIState_ExportingData"),
         ProgressValue = 0,
         InventorUIDisabled = true,
         UpdateScanProgress = false,
         UpdateExportProgress = true
     };
 
-    public static UIState CancellingExport => new()
+    public static UIState CancellingExport() => new()
     {
         ScanEnabled = false,
         ScanButtonText = SCAN_BUTTON_TEXT,
         ExportEnabled = false,
         ExportButtonText = CANCELLING_TEXT,
         ClearEnabled = false,
-        ProgressText = "Прерывание экспорта...",
+        ProgressText = LocalizationManager.Instance.GetString("UIState_CancellingExport"),
         ProgressValue = 0,
         InventorUIDisabled = true,
         UpdateScanProgress = false,
         UpdateExportProgress = true
     };
 
-    public static UIState PreparingQuickExport => new()
+    public static UIState PreparingQuickExport() => new()
     {
         ScanEnabled = false,
         ScanButtonText = SCAN_BUTTON_TEXT,
         ExportEnabled = true,
         ExportButtonText = CANCEL_BUTTON_TEXT,
         ClearEnabled = false,
-        ProgressText = "Сканирование и подготовка данных...",
+        ProgressText = LocalizationManager.Instance.GetString("UIState_ScanningAndPreparing"),
         ProgressValue = 0,
         InventorUIDisabled = true,
         UpdateScanProgress = false,

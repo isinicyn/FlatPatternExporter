@@ -1,22 +1,87 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using FlatPatternExporter.Models;
 
 namespace FlatPatternExporter.Services;
 
 /// <summary>
-/// Централизованная система метаданных свойств документов Inventor
+/// Centralized metadata system for Inventor document properties
 /// </summary>
 public static class PropertyMetadataRegistry
 {
     /// <summary>
-    /// Класс метаданных для одного свойства
+    /// Metadata class for a single property
     /// </summary>
-    public class PropertyDefinition
+    public class PropertyDefinition : INotifyPropertyChanged
     {
-        public required string InternalName { get; init; }
-        public required string DisplayName { get; init; }
-        public string ColumnHeader { get; init; } = "";
-        public string Category { get; init; } = "";
+        private string? _localizationKeyPrefix;
+        private string? _displayName;
+        private string? _columnHeader;
+        private string? _category;
+        private string _internalName = "";
+
+        public PropertyDefinition()
+        {
+            LocalizationManager.Instance.LanguageChanged += OnLanguageChanged;
+        }
+
+        protected PropertyDefinition(string internalName)
+        {
+            _internalName = internalName;
+            LocalizationManager.Instance.LanguageChanged += OnLanguageChanged;
+        }
+
+        private void OnLanguageChanged(object? sender, EventArgs e)
+        {
+            OnPropertyChanged(nameof(DisplayName));
+            OnPropertyChanged(nameof(ColumnHeader));
+            OnPropertyChanged(nameof(Category));
+            OnPropertyChanged(nameof(PlaceholderValue));
+        }
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string InternalName
+        {
+            get => _internalName;
+            init => _internalName = value;
+        }
+
+        public string? LocalizationKeyPrefix
+        {
+            get => _localizationKeyPrefix;
+            init => _localizationKeyPrefix = value;
+        }
+
+        public virtual string DisplayName
+        {
+            get => !string.IsNullOrEmpty(LocalizationKeyPrefix)
+                ? LocalizationManager.Instance.GetString($"{LocalizationKeyPrefix}_DisplayName")
+                : _displayName ?? "";
+            init => _displayName = value;
+        }
+
+        public virtual string ColumnHeader
+        {
+            get => !string.IsNullOrEmpty(LocalizationKeyPrefix)
+                ? LocalizationManager.Instance.GetString($"{LocalizationKeyPrefix}_ColumnHeader")
+                : _columnHeader ?? "";
+            init => _columnHeader = value;
+        }
+
+        public virtual string Category
+        {
+            get => !string.IsNullOrEmpty(LocalizationKeyPrefix)
+                ? LocalizationManager.Instance.GetString($"{LocalizationKeyPrefix}_Category")
+                : _category ?? "";
+            init => _category = value;
+        }
+
         public PropertyType Type { get; init; }
         public string? PropertySetName { get; init; }
         public string? InventorPropertyName { get; init; }
@@ -28,45 +93,39 @@ public static class PropertyMetadataRegistry
         public bool IsSortable { get; init; } = true;
         public bool IsSearchable { get; init; } = true;
         public bool IsTokenizable { get; init; } = false;
-        
-        // Вычисляемые свойства
-        // TokenName для UDP содержит префикс для уникальности (UDP_Author != Author)
+
         public string TokenName => IsTokenizable ? InternalName : "";
         public string PlaceholderValue => IsTokenizable ? $"{{{DisplayName}}}" : "";
     }
 
     /// <summary>
-    /// Тип свойства
+    /// Property type
     /// </summary>
     public enum PropertyType
     {
-        IProperty,        // Стандартное свойство Inventor
-        Document,         // Свойство документа (не iProperty)
-        System,          // Системное свойство приложения
-        UserDefined      // Пользовательское свойство iProperty
+        IProperty,        // Standard Inventor property
+        Document,         // Document property (not iProperty)
+        System,          // Application system property
+        UserDefined      // User-defined iProperty
     }
 
     /// <summary>
-    /// Основной реестр всех свойств
+    /// Main registry of all properties
     /// </summary>
     public static readonly Dictionary<string, PropertyDefinition> Properties = new()
     {
-        // ===== Системные свойства приложения =====
+        // ===== Application system properties =====
         ["ProcessingStatus"] = new PropertyDefinition
         {
             InternalName = "ProcessingStatus",
-            DisplayName = "Статус обработки",
-            ColumnHeader = "Обр.",
-            Category = "Системные",
+            LocalizationKeyPrefix = "Property_ProcessingStatus",
             Type = PropertyType.System,
             ColumnTemplate = "ProcessingStatusTemplate"
         },
         ["Item"] = new PropertyDefinition
         {
             InternalName = "Item",
-            DisplayName = "Нумерация",
-            ColumnHeader = "ID",
-            Category = "Системные",
+            LocalizationKeyPrefix = "Property_Item",
             Type = PropertyType.System,
             ColumnTemplate = "IDWithFlatPatternIndicatorTemplate",
             IsSearchable = false
@@ -74,46 +133,36 @@ public static class PropertyMetadataRegistry
         ["Quantity"] = new PropertyDefinition
         {
             InternalName = "Quantity",
-            DisplayName = "Количество",
-            ColumnHeader = "Кол.",
-            Category = "Количество",
+            LocalizationKeyPrefix = "Property_Quantity",
             Type = PropertyType.System,
             ColumnTemplate = "EditableQuantityTemplate",
             IsTokenizable = true
         },
-        
-        // ===== Свойства документа (не iProperty) =====
+
+        // ===== Document properties (not iProperty) =====
         ["FileName"] = new PropertyDefinition
         {
             InternalName = "FileName",
-            DisplayName = "Имя файла",
-            ColumnHeader = "Имя файла",
-            Category = "Документ",
+            LocalizationKeyPrefix = "Property_FileName",
             Type = PropertyType.Document
         },
         ["FullFileName"] = new PropertyDefinition
         {
             InternalName = "FullFileName",
-            DisplayName = "Полное имя файла",
-            ColumnHeader = "Полное имя файла",
-            Category = "Документ",
+            LocalizationKeyPrefix = "Property_FullFileName",
             Type = PropertyType.Document
         },
         ["ModelState"] = new PropertyDefinition
         {
             InternalName = "ModelState",
-            DisplayName = "Состояние модели",
-            ColumnHeader = "Состояние модели",
-            Category = "Документ",
+            LocalizationKeyPrefix = "Property_ModelState",
             Type = PropertyType.Document,
             IsTokenizable = true
         },
         ["Thickness"] = new PropertyDefinition
         {
             InternalName = "Thickness",
-            DisplayName = "Толщина",
-            ColumnHeader = "Толщина",
-            Category = "Документ",
+            LocalizationKeyPrefix = "Property_Thickness",
             Type = PropertyType.Document,
             RequiresRounding = true,
             RoundingDecimals = 1,
@@ -122,19 +171,14 @@ public static class PropertyMetadataRegistry
         ["HasFlatPattern"] = new PropertyDefinition
         {
             InternalName = "HasFlatPattern",
-            DisplayName = "Наличие развертки",
-            ColumnHeader = "Развертка",
-            Category = "Документ",
+            LocalizationKeyPrefix = "Property_HasFlatPattern",
             Type = PropertyType.Document,
-            IsSortable = true,
             IsSearchable = false
         },
         ["Preview"] = new PropertyDefinition
         {
             InternalName = "Preview",
-            DisplayName = "Изображение детали",
-            ColumnHeader = "Изобр. детали",
-            Category = "Документ",
+            LocalizationKeyPrefix = "Property_Preview",
             Type = PropertyType.Document,
             ColumnTemplate = "PartImageTemplate",
             IsSortable = false,
@@ -143,9 +187,7 @@ public static class PropertyMetadataRegistry
         ["DxfPreview"] = new PropertyDefinition
         {
             InternalName = "DxfPreview",
-            DisplayName = "Изображение развертки",
-            ColumnHeader = "Изобр. развертки",
-            Category = "Обработка",
+            LocalizationKeyPrefix = "Property_DxfPreview",
             Type = PropertyType.Document,
             ColumnTemplate = "DxfImageTemplate",
             IsSortable = false,
@@ -156,9 +198,7 @@ public static class PropertyMetadataRegistry
         ["Author"] = new PropertyDefinition
         {
             InternalName = "Author",
-            DisplayName = "Автор",
-            ColumnHeader = "Автор",
-            Category = "Автор и редактирование",
+            LocalizationKeyPrefix = "Property_Author",
             Type = PropertyType.IProperty,
             PropertySetName = "Summary Information",
             InventorPropertyName = "Author",
@@ -168,9 +208,7 @@ public static class PropertyMetadataRegistry
         ["Revision"] = new PropertyDefinition
         {
             InternalName = "Revision",
-            DisplayName = "Ревизия",
-            ColumnHeader = "Ревизия",
-            Category = "Автор и редактирование",
+            LocalizationKeyPrefix = "Property_Revision",
             Type = PropertyType.IProperty,
             PropertySetName = "Summary Information",
             InventorPropertyName = "Revision Number",
@@ -180,9 +218,7 @@ public static class PropertyMetadataRegistry
         ["Title"] = new PropertyDefinition
         {
             InternalName = "Title",
-            DisplayName = "Название",
-            ColumnHeader = "Название",
-            Category = "Автор и редактирование",
+            LocalizationKeyPrefix = "Property_Title",
             Type = PropertyType.IProperty,
             PropertySetName = "Summary Information",
             InventorPropertyName = "Title",
@@ -191,9 +227,7 @@ public static class PropertyMetadataRegistry
         ["Subject"] = new PropertyDefinition
         {
             InternalName = "Subject",
-            DisplayName = "Тема",
-            ColumnHeader = "Тема",
-            Category = "Автор и редактирование",
+            LocalizationKeyPrefix = "Property_Subject",
             Type = PropertyType.IProperty,
             PropertySetName = "Summary Information",
             InventorPropertyName = "Subject",
@@ -202,9 +236,7 @@ public static class PropertyMetadataRegistry
         ["Keywords"] = new PropertyDefinition
         {
             InternalName = "Keywords",
-            DisplayName = "Ключевые слова",
-            ColumnHeader = "Ключевые слова",
-            Category = "Автор и редактирование",
+            LocalizationKeyPrefix = "Property_Keywords",
             Type = PropertyType.IProperty,
             PropertySetName = "Summary Information",
             InventorPropertyName = "Keywords",
@@ -213,9 +245,7 @@ public static class PropertyMetadataRegistry
         ["Comments"] = new PropertyDefinition
         {
             InternalName = "Comments",
-            DisplayName = "Примечание",
-            ColumnHeader = "Примечание",
-            Category = "Автор и редактирование",
+            LocalizationKeyPrefix = "Property_Comments",
             Type = PropertyType.IProperty,
             PropertySetName = "Summary Information",
             InventorPropertyName = "Comments",
@@ -226,9 +256,7 @@ public static class PropertyMetadataRegistry
         ["Category"] = new PropertyDefinition
         {
             InternalName = "Category",
-            DisplayName = "Категория",
-            ColumnHeader = "Категория",
-            Category = "Организационная информация",
+            LocalizationKeyPrefix = "Property_Category",
             Type = PropertyType.IProperty,
             PropertySetName = "Document Summary Information",
             InventorPropertyName = "Category",
@@ -237,9 +265,7 @@ public static class PropertyMetadataRegistry
         ["Manager"] = new PropertyDefinition
         {
             InternalName = "Manager",
-            DisplayName = "Менеджер",
-            ColumnHeader = "Менеджер",
-            Category = "Организационная информация",
+            LocalizationKeyPrefix = "Property_Manager",
             Type = PropertyType.IProperty,
             PropertySetName = "Document Summary Information",
             InventorPropertyName = "Manager",
@@ -248,9 +274,7 @@ public static class PropertyMetadataRegistry
         ["Company"] = new PropertyDefinition
         {
             InternalName = "Company",
-            DisplayName = "Компания",
-            ColumnHeader = "Компания",
-            Category = "Организационная информация",
+            LocalizationKeyPrefix = "Property_Company",
             Type = PropertyType.IProperty,
             PropertySetName = "Document Summary Information",
             InventorPropertyName = "Company",
@@ -261,9 +285,7 @@ public static class PropertyMetadataRegistry
         ["PartNumber"] = new PropertyDefinition
         {
             InternalName = "PartNumber",
-            DisplayName = "Обозначение",
-            ColumnHeader = "Обозначение",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_PartNumber",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Part Number",
@@ -273,9 +295,7 @@ public static class PropertyMetadataRegistry
         ["Description"] = new PropertyDefinition
         {
             InternalName = "Description",
-            DisplayName = "Наименование",
-            ColumnHeader = "Наименование",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_Description",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Description",
@@ -285,9 +305,7 @@ public static class PropertyMetadataRegistry
         ["Material"] = new PropertyDefinition
         {
             InternalName = "Material",
-            DisplayName = "Материал",
-            ColumnHeader = "Материал",
-            Category = "Материал и отделка",
+            LocalizationKeyPrefix = "Property_Material",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Material",
@@ -296,9 +314,7 @@ public static class PropertyMetadataRegistry
         ["Project"] = new PropertyDefinition
         {
             InternalName = "Project",
-            DisplayName = "Проект",
-            ColumnHeader = "Проект",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_Project",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Project",
@@ -308,9 +324,7 @@ public static class PropertyMetadataRegistry
         ["StockNumber"] = new PropertyDefinition
         {
             InternalName = "StockNumber",
-            DisplayName = "Инвентарный номер",
-            ColumnHeader = "Инвентарный номер",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_StockNumber",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Stock Number",
@@ -319,9 +333,7 @@ public static class PropertyMetadataRegistry
         ["CreationTime"] = new PropertyDefinition
         {
             InternalName = "CreationTime",
-            DisplayName = "Время создания",
-            ColumnHeader = "Время создания",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_CreationTime",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Creation Time"
@@ -329,9 +341,7 @@ public static class PropertyMetadataRegistry
         ["CostCenter"] = new PropertyDefinition
         {
             InternalName = "CostCenter",
-            DisplayName = "Сметчик",
-            ColumnHeader = "Сметчик",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_CostCenter",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Cost Center",
@@ -340,9 +350,7 @@ public static class PropertyMetadataRegistry
         ["CheckedBy"] = new PropertyDefinition
         {
             InternalName = "CheckedBy",
-            DisplayName = "Проверил",
-            ColumnHeader = "Проверил",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_CheckedBy",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Checked By",
@@ -351,9 +359,7 @@ public static class PropertyMetadataRegistry
         ["EngApprovedBy"] = new PropertyDefinition
         {
             InternalName = "EngApprovedBy",
-            DisplayName = "Нормоконтроль",
-            ColumnHeader = "Нормоконтроль",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_EngApprovedBy",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Engr Approved By",
@@ -362,9 +368,7 @@ public static class PropertyMetadataRegistry
         ["UserStatus"] = new PropertyDefinition
         {
             InternalName = "UserStatus",
-            DisplayName = "Статус",
-            ColumnHeader = "Статус",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_UserStatus",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "User Status",
@@ -373,9 +377,7 @@ public static class PropertyMetadataRegistry
         ["CatalogWebLink"] = new PropertyDefinition
         {
             InternalName = "CatalogWebLink",
-            DisplayName = "Веб-ссылка",
-            ColumnHeader = "Веб-ссылка",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_CatalogWebLink",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Catalog Web Link",
@@ -384,9 +386,7 @@ public static class PropertyMetadataRegistry
         ["Vendor"] = new PropertyDefinition
         {
             InternalName = "Vendor",
-            DisplayName = "Поставщик",
-            ColumnHeader = "Поставщик",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_Vendor",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Vendor",
@@ -395,9 +395,7 @@ public static class PropertyMetadataRegistry
         ["MfgApprovedBy"] = new PropertyDefinition
         {
             InternalName = "MfgApprovedBy",
-            DisplayName = "Утвердил",
-            ColumnHeader = "Утвердил",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_MfgApprovedBy",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Mfg Approved By",
@@ -406,26 +404,22 @@ public static class PropertyMetadataRegistry
         ["DesignStatus"] = new PropertyDefinition
         {
             InternalName = "DesignStatus",
-            DisplayName = "Статус разработки",
-            ColumnHeader = "Статус разработки",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_DesignStatus",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Design Status",
             IsEditable = true,
             ValueMappings = new Dictionary<string, string>
             {
-                ["1"] = "Разработка",
-                ["2"] = "Утверждение",
-                ["3"] = "Завершен"
+                ["1"] = LocalizationManager.Instance.GetString("DesignStatus_Development"),
+                ["2"] = LocalizationManager.Instance.GetString("DesignStatus_Approval"),
+                ["3"] = LocalizationManager.Instance.GetString("DesignStatus_Completed")
             }
         },
         ["Designer"] = new PropertyDefinition
         {
             InternalName = "Designer",
-            DisplayName = "Проектировщик",
-            ColumnHeader = "Проектировщик",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_Designer",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Designer",
@@ -434,9 +428,7 @@ public static class PropertyMetadataRegistry
         ["Engineer"] = new PropertyDefinition
         {
             InternalName = "Engineer",
-            DisplayName = "Инженер",
-            ColumnHeader = "Инженер",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_Engineer",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Engineer",
@@ -445,9 +437,7 @@ public static class PropertyMetadataRegistry
         ["Authority"] = new PropertyDefinition
         {
             InternalName = "Authority",
-            DisplayName = "Нач. отдела",
-            ColumnHeader = "Нач. отдела",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_Authority",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Authority",
@@ -456,9 +446,7 @@ public static class PropertyMetadataRegistry
         ["Mass"] = new PropertyDefinition
         {
             InternalName = "Mass",
-            DisplayName = "Масса",
-            ColumnHeader = "Масса",
-            Category = "Физические свойства",
+            LocalizationKeyPrefix = "Property_Mass",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Mass",
@@ -469,9 +457,7 @@ public static class PropertyMetadataRegistry
         ["SurfaceArea"] = new PropertyDefinition
         {
             InternalName = "SurfaceArea",
-            DisplayName = "Площадь поверхности",
-            ColumnHeader = "Площадь поверхности",
-            Category = "Листовой металл",
+            LocalizationKeyPrefix = "Property_SurfaceArea",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "SurfaceArea",
@@ -481,9 +467,7 @@ public static class PropertyMetadataRegistry
         ["Volume"] = new PropertyDefinition
         {
             InternalName = "Volume",
-            DisplayName = "Объем",
-            ColumnHeader = "Объем",
-            Category = "Физические свойства",
+            LocalizationKeyPrefix = "Property_Volume",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Volume",
@@ -493,9 +477,7 @@ public static class PropertyMetadataRegistry
         ["SheetMetalRule"] = new PropertyDefinition
         {
             InternalName = "SheetMetalRule",
-            DisplayName = "Правило ЛМ",
-            ColumnHeader = "Правило ЛМ",
-            Category = "Листовой металл",
+            LocalizationKeyPrefix = "Property_SheetMetalRule",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Sheet Metal Rule"
@@ -503,9 +485,7 @@ public static class PropertyMetadataRegistry
         ["FlatPatternWidth"] = new PropertyDefinition
         {
             InternalName = "FlatPatternWidth",
-            DisplayName = "Ширина развертки",
-            ColumnHeader = "Ширина развертки",
-            Category = "Листовой металл",
+            LocalizationKeyPrefix = "Property_FlatPatternWidth",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Flat Pattern Width",
@@ -516,9 +496,7 @@ public static class PropertyMetadataRegistry
         ["FlatPatternLength"] = new PropertyDefinition
         {
             InternalName = "FlatPatternLength",
-            DisplayName = "Длина развертки",
-            ColumnHeader = "Длина развертки",
-            Category = "Листовой металл",
+            LocalizationKeyPrefix = "Property_FlatPatternLength",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Flat Pattern Length",
@@ -529,9 +507,7 @@ public static class PropertyMetadataRegistry
         ["FlatPatternArea"] = new PropertyDefinition
         {
             InternalName = "FlatPatternArea",
-            DisplayName = "Площадь развертки",
-            ColumnHeader = "Площадь развертки",
-            Category = "Листовой металл",
+            LocalizationKeyPrefix = "Property_FlatPatternArea",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Flat Pattern Area",
@@ -542,9 +518,7 @@ public static class PropertyMetadataRegistry
         ["Appearance"] = new PropertyDefinition
         {
             InternalName = "Appearance",
-            DisplayName = "Отделка",
-            ColumnHeader = "Отделка",
-            Category = "Материал и отделка",
+            LocalizationKeyPrefix = "Property_Appearance",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Appearance"
@@ -552,9 +526,7 @@ public static class PropertyMetadataRegistry
         ["Density"] = new PropertyDefinition
         {
             InternalName = "Density",
-            DisplayName = "Плотность",
-            ColumnHeader = "Плотность",
-            Category = "Физические свойства",
+            LocalizationKeyPrefix = "Property_Density",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Density",
@@ -564,9 +536,7 @@ public static class PropertyMetadataRegistry
         ["LastUpdatedWith"] = new PropertyDefinition
         {
             InternalName = "LastUpdatedWith",
-            DisplayName = "Версия Inventor",
-            ColumnHeader = "Версия Inventor",
-            Category = "Техническая документация",
+            LocalizationKeyPrefix = "Property_LastUpdatedWith",
             Type = PropertyType.IProperty,
             PropertySetName = "Design Tracking Properties",
             InventorPropertyName = "Last Updated With"
@@ -574,31 +544,46 @@ public static class PropertyMetadataRegistry
     };
 
     /// <summary>
-    /// Коллекция пользовательских свойств
+    /// Collection of user-defined properties
     /// </summary>
     public static readonly ObservableCollection<PropertyDefinition> UserDefinedProperties = [];
 
     /// <summary>
-    /// Создает определение пользовательского свойства
+    /// Creates a user-defined property definition
     /// </summary>
     public static PropertyDefinition CreateUserDefinedPropertyDefinition(string propertyName)
     {
-        return new PropertyDefinition
-        {
-            InternalName = $"UDP_{propertyName}",
-            DisplayName = propertyName,
-            ColumnHeader = $"(Пользов.) {propertyName}",
-            Category = "Пользовательские свойства",
-            Type = PropertyType.UserDefined,
-            PropertySetName = "User Defined Properties",
-            InventorPropertyName = propertyName,
-            IsEditable = true,
-            IsTokenizable = true
-        };
+        return new UserDefinedPropertyDefinition(propertyName);
     }
 
     /// <summary>
-    /// Добавляет пользовательское свойство в реестр
+    /// Special PropertyDefinition for user-defined properties with dynamic localization
+    /// </summary>
+    private class UserDefinedPropertyDefinition : PropertyDefinition
+    {
+        private readonly string _propertyName;
+
+        public UserDefinedPropertyDefinition(string propertyName) : base($"UDP_{propertyName}")
+        {
+            _propertyName = propertyName;
+            Type = PropertyType.UserDefined;
+            PropertySetName = "User Defined Properties";
+            InventorPropertyName = propertyName;
+            IsEditable = true;
+            IsTokenizable = true;
+        }
+
+        public override string DisplayName => _propertyName;
+
+        public override string ColumnHeader =>
+            $"{LocalizationManager.Instance.GetString("Property_UserDefined_Prefix")} {_propertyName}";
+
+        public override string Category =>
+            LocalizationManager.Instance.GetString("Property_UserDefined_Category");
+    }
+
+    /// <summary>
+    /// Adds a user-defined property to the registry
     /// </summary>
     public static void AddUserDefinedProperty(string propertyName)
     {
@@ -611,7 +596,7 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Удаляет пользовательское свойство из реестра по InternalName
+    /// Removes a user-defined property from the registry by InternalName
     /// </summary>
     public static void RemoveUserDefinedProperty(string internalName)
     {
@@ -623,7 +608,7 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Получает все свойства, которые могут использоваться как токены
+    /// Gets all properties that can be used as tokens
     /// </summary>
     public static IEnumerable<PropertyDefinition> GetTokenizableProperties()
     {
@@ -632,7 +617,7 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Получает список всех токенизируемых свойств
+    /// Gets a list of all tokenizable properties
     /// </summary>
     public static Dictionary<string, string> GetAvailableTokens()
     {
@@ -651,7 +636,7 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Централизованное форматирование числовых значений согласно метаданным
+    /// Centralized formatting of numeric values according to metadata
     /// </summary>
     public static string FormatValue(string propertyName, object? value)
     {
@@ -668,7 +653,7 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Получает InternalName по ColumnHeader из всех доступных свойств
+    /// Gets InternalName by ColumnHeader from all available properties
     /// </summary>
     public static string? GetInternalNameByColumnHeader(string columnHeader)
     {
@@ -681,7 +666,7 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Получает PropertyDefinition по InternalName из всех доступных свойств
+    /// Gets PropertyDefinition by InternalName from all available properties
     /// </summary>
     public static PropertyDefinition? GetPropertyByInternalName(string internalName)
     {
@@ -692,7 +677,7 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Проверяет, является ли InternalName пользовательским свойством
+    /// Checks if InternalName is a user-defined property
     /// </summary>
     public static bool IsUserDefinedProperty(string internalName)
     {
@@ -700,7 +685,7 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Извлекает Inventor имя из InternalName пользовательского свойства
+    /// Extracts Inventor name from InternalName of user-defined property
     /// </summary>
     public static string GetInventorNameFromUserDefinedInternalName(string internalName)
     {
@@ -708,33 +693,27 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Получает список предустановленных свойств iProperty из централизованной системы метаданных
+    /// Gets a list of preset iProperties from the centralized metadata system
     /// </summary>
     public static ObservableCollection<PresetIProperty> GetPresetProperties()
     {
         var presetProperties = new ObservableCollection<PresetIProperty>();
 
-        // Добавляем стандартные свойства
+        // Add standard properties
         foreach (var prop in Properties.Values.OrderBy(p => p.Category).ThenBy(p => p.DisplayName))
         {
             presetProperties.Add(new PresetIProperty
             {
-                ColumnHeader = prop.ColumnHeader.Length > 0 ? prop.ColumnHeader : prop.DisplayName,
-                ListDisplayName = prop.DisplayName,
-                InventorPropertyName = prop.InternalName,
-                Category = prop.Category
+                InventorPropertyName = prop.InternalName
             });
         }
 
-        // Добавляем пользовательские свойства
+        // Add user-defined properties
         foreach (var userProp in UserDefinedProperties.OrderBy(p => p.DisplayName))
         {
             presetProperties.Add(new PresetIProperty
             {
-                ColumnHeader = userProp.ColumnHeader.Length > 0 ? userProp.ColumnHeader : userProp.DisplayName,
-                ListDisplayName = userProp.DisplayName,
-                InventorPropertyName = userProp.InternalName,
-                Category = userProp.Category
+                InventorPropertyName = userProp.InternalName
             });
         }
 
@@ -742,12 +721,12 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
-    /// Возвращает коллекцию всех редактируемых свойств из реестра
+    /// Returns a collection of all editable properties from the registry
     /// </summary>
     public static IEnumerable<string> GetEditableProperties()
     {
-        // Возвращаем только известные редактируемые свойства из реестра
-        // Пользовательские свойства не включаются, так как они добавляются динамически
+        // Return only known editable properties from the registry
+        // User-defined properties are not included as they are added dynamically
         return Properties.Values
             .Where(p => p.IsEditable)
             .Select(p => p.InternalName);

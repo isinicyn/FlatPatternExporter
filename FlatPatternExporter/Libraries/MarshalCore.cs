@@ -32,7 +32,7 @@ internal static class NativeMethods
         [MarshalAs(UnmanagedType.Interface)] out object ppunk);
 }
 
-// .Net Core does not have Marshal.GetActiveObject so copy its implementation from .Net framework
+// .Net Core does not have Marshal.GetActiveObject so copy its implementation from .Net Framework
 internal class MarshalCore
 {
     [SecurityCritical]
@@ -40,8 +40,7 @@ internal class MarshalCore
     {
         Guid clsid;
 
-        // Call CLSIDFromProgIDEx first then fall back on CLSIDFromProgID if
-        // CLSIDFromProgIDEx doesn't exist.
+        // Call CLSIDFromProgIDEx first then fall back on CLSIDFromProgID if CLSIDFromProgIDEx doesn't exist
         try
         {
             NativeMethods.CLSIDFromProgIDEx(progID, out clsid);

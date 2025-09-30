@@ -1,26 +1,27 @@
 ﻿using netDxf.Header;
+using FlatPatternExporter.Services;
 
 namespace FlatPatternExporter.Enums;
 
 public enum ExportFolderType
 {
-    ChooseFolder = 0,      // Указать папку в процессе экспорта
-    ComponentFolder = 1,   // Папка компонента
-    PartFolder = 2,        // Рядом с деталью
-    ProjectFolder = 3,     // Папка проекта
-    FixedFolder = 4        // Фиксированная папка
+    ChooseFolder = 0,      // Choose folder during export
+    ComponentFolder = 1,   // Component folder
+    PartFolder = 2,        // Next to part
+    ProjectFolder = 3,     // Project folder
+    FixedFolder = 4        // Fixed folder
 }
 
 public enum ProcessingMethod
 {
-    Traverse = 0,          // Перебор
-    BOM = 1               // Спецификация
+    Traverse = 0,          // Traverse
+    BOM = 1               // Bill of Materials
 }
 
 public enum SplineReplacementType
 {
-    Lines = 0,            // Линии
-    Arcs = 1              // Дуги
+    Lines = 0,            // Lines
+    Arcs = 1              // Arcs
 }
 
 public enum AcadVersionType
@@ -30,15 +31,15 @@ public enum AcadVersionType
     V2010 = 2,           // 2010
     V2007 = 3,           // 2007
     V2004 = 4,           // 2004
-    V2000 = 5,           // 2000 (по умолчанию)
+    V2000 = 5,           // 2000 (default)
     R12 = 6              // R12
 }
 
 public enum ProcessingStatus
 {
-    NotProcessed,   // Не обработан (прозрачный)
-    Success,        // Успешно экспортирован (зеленый)
-    Error          // Ошибка экспорта (красный)
+    NotProcessed,   // Not processed (transparent)
+    Success,        // Successfully exported (green)
+    Error          // Export error (red)
 }
 
 public enum DocumentType
@@ -78,11 +79,10 @@ public static class AcadVersionMapping
 
 public static class SplineReplacementMapping
 {
-    private static readonly Dictionary<SplineReplacementType, string> Map = new()
+    public static string GetDisplayName(SplineReplacementType type) => type switch
     {
-        { SplineReplacementType.Lines, "Линии" },
-        { SplineReplacementType.Arcs, "Дуги" }
+        SplineReplacementType.Lines => LocalizationManager.Instance.GetString("SplineReplacement_Lines"),
+        SplineReplacementType.Arcs => LocalizationManager.Instance.GetString("SplineReplacement_Arcs"),
+        _ => type.ToString()
     };
-
-    public static string GetDisplayName(SplineReplacementType type) => Map[type];
 }

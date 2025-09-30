@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:FlatPatternExporter.Services"
-        Title="Детали конфликта обозначений" 
+        xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions"
+        Title="{extensions:Localize Header_ConflictDetails}" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="CanResize" 
         Width="900"
@@ -17,13 +18,13 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Основное содержимое -->
+        <!-- Main content -->
         <ScrollViewer Grid.Row="0" 
                       Margin="{StaticResource StandardPaddingThickness}"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel>
-                <!-- Общий заголовок для всех таблиц -->
+                <!-- Common header for all tables -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="150"/>
@@ -36,7 +37,7 @@
                             BorderBrush="{StaticResource BorderLightBrush}"
                             BorderThickness="1,1,1,1"
                             Margin="0,0,5,0">
-                        <TextBlock Text="Обозначение"
+                        <TextBlock Text="{extensions:Localize Column_PartNumber}"
                                    FontSize="{StaticResource StandardFontSize}"
                                    FontWeight="Bold"
                                    Foreground="{DynamicResource TextSecondaryBrush}"
@@ -56,7 +57,7 @@
                                 Height="{StaticResource LargeElementHeight}"
                                 BorderBrush="{StaticResource BorderLightBrush}"
                                 BorderThickness="1,1,0,1">
-                            <TextBlock Text="Имя файла"
+                            <TextBlock Text="{extensions:Localize Table_FileName}"
                                        FontSize="{StaticResource StandardFontSize}"
                                        FontWeight="Bold"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
@@ -70,7 +71,7 @@
                                 Height="{StaticResource LargeElementHeight}"
                                 BorderBrush="{StaticResource BorderLightBrush}"
                                 BorderThickness="1,1,1,1">
-                            <TextBlock Text="Состояние модели"
+                            <TextBlock Text="{extensions:Localize Table_ModelState}"
                                        FontSize="{StaticResource StandardFontSize}"
                                        FontWeight="Bold"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
@@ -80,8 +81,8 @@
                         </Border>
                     </Grid>
                 </Grid>
-                
-                <!-- Контейнер с таблицами -->
+
+                <!-- Container with tables -->
                 <ItemsControl ItemsSource="{Binding ConflictGroups}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -90,8 +91,7 @@
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            
-                            <!-- Блок с обозначением -->
+                            <!-- Block with part number -->
                             <Border Grid.Column="0"
                                     Background="{StaticResource BackgroundPrimaryBrush}" 
                                     BorderBrush="{StaticResource BorderPrimaryBrush}"
@@ -104,8 +104,8 @@
                                            TextAlignment="Center"
                                            TextWrapping="Wrap"/>
                             </Border>
-                            
-                            <!-- Таблица для группы -->
+
+                            <!-- Table for group -->
                             <DataGrid Grid.Column="1"
                                       ItemsSource="{Binding Files}"
                                       AutoGenerateColumns="False"
@@ -132,11 +132,11 @@
                                       CanUserSortColumns="False">
                                 <DataGrid.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Открыть файл" Click="OpenFileMenuItem_Click"/>
+                                        <MenuItem Header="{extensions:Localize ContextMenu_OpenFile}" Click="OpenFileMenuItem_Click"/>
                                     </ContextMenu>
                                 </DataGrid.ContextMenu>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Имя файла" 
+                                    <DataGridTextColumn Header="{extensions:Localize Table_FileName}" 
                                                         Binding="{Binding FileNameOnly}" 
                                                         Width="2*">
                                         <DataGridTextColumn.ElementStyle>
@@ -145,7 +145,7 @@
                                             </Style>
                                         </DataGridTextColumn.ElementStyle>
                                     </DataGridTextColumn>
-                                    <DataGridTextColumn Header="Состояние модели" 
+                                    <DataGridTextColumn Header="{extensions:Localize Table_ModelState}" 
                                                         Binding="{Binding ModelState}" 
                                                         Width="*">
                                         <DataGridTextColumn.ElementStyle>
@@ -161,10 +161,10 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Кнопки -->
+        <!-- Buttons -->
         <Border Grid.Row="1" Style="{StaticResource DialogBottomBarStyle}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="ОК" 
+                <Button Content="{extensions:Localize Button_OK}"
                         Style="{StaticResource FileNameActionButtonStyle}"
                         Click="OkButton_Click"/>
             </StackPanel>

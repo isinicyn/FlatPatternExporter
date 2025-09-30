@@ -46,7 +46,8 @@ public class PartDataReader
         foreach (var userDefinedProperty in PropertyMetadataRegistry.UserDefinedProperties)
         {
             var value = mgr.GetMappedProperty(userDefinedProperty.InternalName);
-            partData.UserDefinedProperties[userDefinedProperty.ColumnHeader] = value;
+            var propertyName = userDefinedProperty.InventorPropertyName ?? "";
+            partData.UserDefinedProperties[propertyName] = value;
         }
 
         if (loadThumbnail)
@@ -95,7 +96,8 @@ public class PartDataReader
             foreach (var userProperty in PropertyMetadataRegistry.UserDefinedProperties)
             {
                 var isExpression = mgr.IsMappedPropertyExpression(userProperty.InternalName);
-                partData.SetPropertyExpressionState($"UserDefinedProperties[{userProperty.ColumnHeader}]", isExpression);
+                var propertyName = userProperty.InventorPropertyName ?? "";
+                partData.SetPropertyExpressionState($"UserDefinedProperties[{propertyName}]", isExpression);
             }
         }
         finally
@@ -116,8 +118,10 @@ public class PartDataReader
             return;
         }
 
-        var userProperty = PropertyMetadataRegistry.UserDefinedProperties.FirstOrDefault(p => p.InternalName == propertyName);
-        var columnHeader = userProperty?.ColumnHeader ?? propertyName;
+        // For user-defined properties, extract the actual property name from InternalName
+        var actualPropertyName = PropertyMetadataRegistry.IsUserDefinedProperty(propertyName)
+            ? PropertyMetadataRegistry.GetInventorNameFromUserDefinedInternalName(propertyName)
+            : propertyName;
 
         foreach (var partData in partsData)
         {
@@ -126,10 +130,10 @@ public class PartDataReader
             {
                 var mgr = new PropertyManager((Document)partDoc);
                 var value = mgr.GetMappedProperty(propertyName) ?? "";
-                partData.AddUserDefinedProperty(columnHeader, value);
+                partData.AddUserDefinedProperty(actualPropertyName, value);
 
                 var isExpression = mgr.IsMappedPropertyExpression(propertyName);
-                partData.SetPropertyExpressionState($"UserDefinedProperties[{columnHeader}]", isExpression);
+                partData.SetPropertyExpressionState($"UserDefinedProperties[{actualPropertyName}]", isExpression);
             }
         }
     }
@@ -161,7 +165,7 @@ public class PartDataReader
         var mgr = new PropertyManager(doc);
         return new DocumentInfo
         {
-            DocumentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? "Сборка" : "Деталь",
+            DocumentType = doc.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject ? LocalizationManager.Instance.GetString("DocumentType_Assembly") : LocalizationManager.Instance.GetString("DocumentType_Part"),
             PartNumber = mgr.GetMappedProperty("PartNumber"),
             Description = mgr.GetMappedProperty("Description"),
             ModelState = mgr.GetModelState(),

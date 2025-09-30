@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using DxfRenderer;
 using FlatPatternExporter.Converters;
+using FlatPatternExporter.Services;
 using Inventor;
 using Svg.Skia;
 using MessageBox = System.Windows.MessageBox;
@@ -14,7 +15,7 @@ namespace FlatPatternExporter.Core;
 public class ThumbnailGenerator
 {
     /// <summary>
-    /// Конвертирует SVG строку в BitmapImage
+    /// Converts SVG string to BitmapImage
     /// </summary>
     public static BitmapImage? ConvertSvgToBitmapImage(string svgContent)
     {
@@ -62,20 +63,20 @@ public class ThumbnailGenerator
 
     public BitmapImage? GenerateDxfThumbnails(string dxfDirectory, string partNumber, Dispatcher dispatcher)
     {
-        var searchPattern = partNumber + "*.dxf"; // Шаблон поиска
+        var searchPattern = partNumber + "*.dxf"; // Search pattern
         var dxfFiles = Directory.GetFiles(dxfDirectory, searchPattern);
 
         if (dxfFiles.Length == 0) return null;
 
         try
         {
-            var dxfFilePath = dxfFiles[0]; // Берем первый найденный файл, соответствующий шаблону
+            var dxfFilePath = dxfFiles[0]; // Take the first file matching the pattern
             var generator = new DxfThumbnailGenerator();
             var svg = generator.GenerateSvg(dxfFilePath);
 
             BitmapImage? bitmapImage = null;
 
-            // Конвертируем SVG в BitmapImage
+            // Convert SVG to BitmapImage
             dispatcher.Invoke(() =>
             {
                 bitmapImage = ConvertSvgToBitmapImage(svg);
@@ -87,7 +88,7 @@ public class ThumbnailGenerator
         {
             dispatcher.Invoke(() =>
             {
-                MessageBox.Show($"Ошибка при генерации миниатюр DXF: {ex.Message}", "Ошибка", MessageBoxButton.OK,
+                MessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailGeneration", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
                     MessageBoxImage.Error);
             });
             return null;
@@ -127,7 +128,7 @@ public class ThumbnailGenerator
         {
             dispatcher.Invoke(() =>
             {
-                MessageBox.Show("Ошибка при получении миниатюры: " + ex.Message, "Ошибка", MessageBoxButton.OK,
+                MessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailObtaining", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
                     MessageBoxImage.Error);
             });
             return null!;

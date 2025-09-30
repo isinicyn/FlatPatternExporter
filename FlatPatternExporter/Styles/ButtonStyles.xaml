@@ -2,20 +2,20 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- ===================================================================================== -->
-    <!-- ========================== 1. БАЗОВЫЕ ШАБЛОНЫ (ControlTemplate) ===================== -->
+    <!-- ========================== 1. BASE TEMPLATES (ControlTemplate) ====================== -->
     <!-- ===================================================================================== -->
     <!--
-        Эти ресурсы определяют только структуру и внешний вид кнопок, но не их поведение.
-        Они переиспользуются в стилях ниже.
+        These resources define only the structure and appearance of buttons, but not their behavior.
+        They are reused in the styles below.
     -->
 
-    <!-- Базовый шаблон для стандартных кнопок с текстом -->
+    <!-- Base template for standard buttons with text -->
     <ControlTemplate x:Key="BaseInteractiveButtonTemplate" TargetType="Button">
         <Border Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
                 Padding="{TemplateBinding Padding}">
-            <ContentPresenter HorizontalAlignment="Center" 
+            <ContentPresenter HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               Content="{TemplateBinding Content}"
                               TextBlock.Foreground="{TemplateBinding Foreground}"
@@ -23,7 +23,7 @@
         </Border>
     </ControlTemplate>
 
-    <!-- Шаблон для кнопок-иконок -->
+    <!-- Template for icon buttons -->
     <ControlTemplate x:Key="IconButtonTemplate" TargetType="Button">
         <Border x:Name="Border"
                 Background="{TemplateBinding Background}"
@@ -41,9 +41,9 @@
             </Viewbox>
         </Border>
     </ControlTemplate>
-    
+
     <!-- ===================================================================================== -->
-    <!-- ============================= 5. СТИЛИ ДЛЯ ИКОНОК (PATH) ============================ -->
+    <!-- ============================= 5. STYLES FOR ICONS (PATH) =========================== -->
     <!-- ===================================================================================== -->
 
     <Style x:Key="AddIconStyle" TargetType="Path">
@@ -57,7 +57,7 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    
+
     <Style x:Key="DeleteFromRegistryIconStyle" TargetType="Path">
         <Setter Property="Data" Value="{StaticResource DeleteFromRegistryIconGeometry}"/>
         <Setter Property="Fill" Value="{DynamicResource ErrorBrush}"/>
@@ -68,7 +68,7 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    
+
     <Style x:Key="CloseIconStyle" TargetType="Path">
         <Setter Property="Data" Value="{StaticResource CloseIconGeometry}"/>
         <Setter Property="Stroke" Value="{DynamicResource ErrorBrush}"/>
@@ -95,14 +95,14 @@
     </Style>
 
     <!-- ===================================================================================== -->
-    <!-- ============================ 2. БАЗОВЫЕ СТИЛИ (ОСНОВА) ============================== -->
+    <!-- ============================ 2. BASE STYLES (FOUNDATION) ============================ -->
     <!-- ===================================================================================== -->
     <!--
-        Определяют общие свойства для разных ТИПОВ кнопок (текстовые, иконки).
-        Не содержат триггеров для интерактивных состояний (наведение, нажатие).
+        Define common properties for different TYPES of buttons (text, icons).
+        Do not contain triggers for interactive states (hover, press).
     -->
 
-    <!-- Основа для всех кнопок с ТЕКСТОМ -->
+    <!-- Foundation for all buttons with TEXT -->
     <Style x:Key="BaseActionButtonStyle" TargetType="Button">
         <Setter Property="Height" Value="{StaticResource StandardElementHeight}"/>
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
@@ -116,7 +116,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
-    <!-- Основа для всех кнопок с ИКОНКАМИ -->
+    <!-- Foundation for all buttons with ICONS -->
     <Style x:Key="BaseIconButtonStyle" TargetType="Button">
         <Setter Property="Template" Value="{StaticResource IconButtonTemplate}"/>
         <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
@@ -126,16 +126,16 @@
     </Style>
 
     <!-- ===================================================================================== -->
-    <!-- ======================= 3. ИНТЕРАКТИВНЫЕ СТИЛИ (ПОВЕДЕНИЕ) ======================== -->
+    <!-- ======================= 3. INTERACTIVE STYLES (BEHAVIOR) ========================== -->
     <!-- ===================================================================================== -->
     <!--
-        Эти стили наследуются от базовых и добавляют триггеры для разных "настроений"
-        взаимодействия: нейтрального, деструктивного и позитивного.
+        These styles inherit from base styles and add triggers for different "moods"
+        of interaction: neutral, destructive, and positive.
     -->
 
-    <!-- 3.1. Стили для кнопок с ТЕКСТОМ -->
+    <!-- 3.1. Styles for buttons with TEXT -->
 
-    <!-- Нейтральное поведение для текстовых кнопок -->
+    <!-- Neutral behavior for text buttons -->
     <Style x:Key="InteractiveActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}">
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template" Value="{StaticResource BaseInteractiveButtonTemplate}"/>
@@ -157,7 +157,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Деструктивное поведение для текстовых кнопок -->
+    <!-- Destructive behavior for text buttons -->
     <Style x:Key="DestructiveActionButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseActionButtonStyle}">
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template" Value="{StaticResource BaseInteractiveButtonTemplate}"/>
@@ -179,9 +179,9 @@
         </Style.Triggers>
     </Style>
 
-    <!-- 3.2. Стили для кнопок с ИКОНКАМИ -->
+    <!-- 3.2. Styles for buttons with ICONS -->
 
-    <!-- Нейтральное поведение для кнопок-иконок -->
+    <!-- Neutral behavior for icon buttons -->
     <Style x:Key="InteractiveIconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseIconButtonStyle}">
         <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
@@ -202,7 +202,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Деструктивное поведение для кнопок-иконок -->
+    <!-- Destructive behavior for icon buttons -->
     <Style x:Key="DestructiveIconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseIconButtonStyle}">
         <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
@@ -223,7 +223,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Позитивное поведение для кнопок-иконок -->
+    <!-- Positive behavior for icon buttons -->
     <Style x:Key="PositiveIconButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseIconButtonStyle}">
         <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
@@ -245,14 +245,14 @@
     </Style>
 
     <!-- ===================================================================================== -->
-    <!-- ======================== 4. КОНКРЕТНЫЕ И СПЕЦИАЛЬНЫЕ СТИЛИ ========================= -->
+    <!-- ======================== 4. SPECIFIC AND SPECIAL STYLES ============================ -->
     <!-- ===================================================================================== -->
     <!--
-        Финальные стили, которые используются в приложении.
-        Они наследуются от интерактивных стилей, переопределяя или добавляя свойства.
+        Final styles that are used in the application.
+        They inherit from interactive styles, overriding or adding properties.
     -->
 
-    <!-- Специализированные кнопки с иконками -->
+    <!-- Specialized buttons with icons -->
     <Style x:Key="AddIconButton" TargetType="Button" BasedOn="{StaticResource PositiveIconButtonStyle}">
         <Setter Property="ContentTemplate">
             <Setter.Value>
@@ -294,14 +294,14 @@
         </Setter>
     </Style>
 
-    <!-- Кнопка для удаления пресета -->
+    <!-- Button for deleting preset -->
     <Style x:Key="PresetDeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource DestructiveActionButtonStyle}">
         <Setter Property="MinWidth" Value="{StaticResource StandardButtonMinWidth}"/>
         <Setter Property="Margin" Value="5,0,0,0"/>
         <Setter Property="Background" Value="{DynamicResource TokenBackgroundBrush}"/>
     </Style>
 
-    <!-- Кнопки для спиннера -->
+    <!-- Buttons for spinner -->
     <Style x:Key="SpinnerButtonStyle" TargetType="Button" BasedOn="{StaticResource InteractiveActionButtonStyle}">
         <Setter Property="Width" Value="{StaticResource SpinnerButtonWidth}"/>
         <Setter Property="Height" Value="{StaticResource SpinnerButtonHeight}"/>
@@ -309,13 +309,13 @@
         <Setter Property="FontSize" Value="6"/>
     </Style>
 
-    <!-- Кнопки-символы в конструкторе имени файла -->
+    <!-- Symbol buttons in filename constructor -->
     <Style x:Key="SymbolButtonStyle" TargetType="Button" BasedOn="{StaticResource InteractiveActionButtonStyle}">
         <Setter Property="Width" Value="{StaticResource StandardElementHeight}"/>
         <Setter Property="Margin" Value="0,0,3,0"/>
     </Style>
 
-    <!-- Кнопка-предупреждение -->
+    <!-- Warning button -->
     <Style x:Key="WarningButtonStyle" TargetType="Button" BasedOn="{StaticResource InteractiveActionButtonStyle}">
         <Setter Property="MinWidth" Value="{StaticResource StandardButtonMinWidth}"/>
         <Style.Triggers>
@@ -324,8 +324,8 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    
-    <!-- Крупная квадратная кнопка -->
+
+    <!-- Large square button -->
     <Style x:Key="LargeSquareButtonStyle" TargetType="Button" BasedOn="{StaticResource InteractiveActionButtonStyle}">
         <Setter Property="Width" Value="{StaticResource LargeSquareButtonSize}"/>
         <Setter Property="Height" Value="{StaticResource LargeSquareButtonSize}"/>
@@ -333,16 +333,16 @@
         <Setter Property="Margin" Value="0"/>
     </Style>
 
-    <!-- Семантические псевдонимы -->
+    <!-- Semantic aliases -->
     <Style x:Key="LeftMarginActionButtonStyle" TargetType="Button" BasedOn="{StaticResource InteractiveActionButtonStyle}">
         <Setter Property="MinWidth" Value="{StaticResource StandardButtonMinWidth}"/>
         <Setter Property="Margin" Value="5,0,0,0"/>
     </Style>
     <Style x:Key="FileNameActionButtonStyle" TargetType="Button" BasedOn="{StaticResource LeftMarginActionButtonStyle}"/>
 
-    <!-- Уникальные стили со сложными шаблонами -->
+    <!-- Unique styles with complex templates -->
 
-    <!-- Стиль для кнопки на оверлее -->
+    <!-- Style for overlay button -->
     <Style x:Key="OverlayButtonStyle" TargetType="Button">
         <Setter Property="Padding" Value="{StaticResource ButtonPaddingThickness}"/>
         <Setter Property="FontSize" Value="{StaticResource LargeFontSize}"/>
@@ -374,7 +374,7 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Стиль для кнопки с прогресс-баром -->
+    <!-- Style for button with progress bar -->
     <Style x:Key="BaseProgressButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
@@ -383,21 +383,21 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid>
-                        <Border x:Name="Border" 
-                            Background="{TemplateBinding Background}" 
-                            BorderBrush="{TemplateBinding BorderBrush}" 
+                        <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="0">
                             <Grid>
-                                <ProgressBar x:Name="PART_ProgressBar" 
+                                <ProgressBar x:Name="PART_ProgressBar"
                                        Background="{DynamicResource TransparentBrush}"
                                        Foreground="{DynamicResource ProgressBarBrush}"
                                        BorderThickness="0"
-                                       Minimum="0" 
-                                       Maximum="100" 
+                                       Minimum="0"
+                                       Maximum="100"
                                        Value="{TemplateBinding Tag}"/>
                                 <ContentPresenter x:Name="ContentPresenter"
-                                            HorizontalAlignment="Center" 
+                                            HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             Content="{TemplateBinding Content}"
                                             TextBlock.Foreground="{TemplateBinding Foreground}"
@@ -423,7 +423,7 @@
         </Setter>
     </Style>
 
-    <!-- Крупная квадратная прогресс-кнопка -->
+    <!-- Large square progress button -->
     <Style x:Key="LargeSquareProgressButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseProgressButtonStyle}">
         <Setter Property="Width" Value="{StaticResource LargeSquareButtonSize}"/>
         <Setter Property="Height" Value="{StaticResource LargeSquareButtonSize}"/>
@@ -431,5 +431,5 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
-    
+
 </ResourceDictionary>

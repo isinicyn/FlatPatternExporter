@@ -15,7 +15,7 @@ public static class DxfOptimizer
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Ошибка оптимизации DXF: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"DXF optimization error: {ex.Message}");
         }
     }
 
@@ -26,7 +26,7 @@ public static class DxfOptimizer
             var dxfVersion = AcadVersionMapping.GetDxfVersion(version);
             if (!dxfVersion.HasValue)
             {
-                System.Diagnostics.Debug.WriteLine($"Версия AutoCAD {AcadVersionMapping.GetDisplayName(version)} не поддерживается для оптимизации");
+                System.Diagnostics.Debug.WriteLine($"AutoCAD version {AcadVersionMapping.GetDisplayName(version)} is not supported for optimization");
                 return;
             }
 
@@ -40,7 +40,7 @@ public static class DxfOptimizer
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Ошибка оптимизации {AcadVersionMapping.GetDisplayName(version)}: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Optimization error for {AcadVersionMapping.GetDisplayName(version)}: {ex.Message}");
         }
     }
 }

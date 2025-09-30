@@ -9,7 +9,7 @@
         <converters:LineTypeToGeometryConverter x:Key="LineTypeToGeometryConverter"/>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" Margin="{StaticResource VerticalTinyMarginThickness}">
-        <CheckBox Content="{Binding Pseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
+        <CheckBox Content="{Binding LocalizedPseudonym, RelativeSource={RelativeSource AncestorType=local:LayerSettingControl}}"
           IsChecked="{Binding IsChecked, Mode=TwoWay}"
           Width="180" VerticalContentAlignment="Center"
           IsEnabled="{Binding IsEnabled}"
@@ -40,7 +40,8 @@
         </Grid>
         <ComboBox Width="90"
                   ItemsSource="{Binding DataContext.AvailableColors, RelativeSource={RelativeSource AncestorType=Window}}"
-                  SelectedItem="{Binding SelectedColor, Mode=TwoWay}"
+                  SelectedValue="{Binding SelectedColor, Mode=TwoWay}"
+                  SelectedValuePath="Key"
                   IsEnabled="{Binding IsOptionsEnabled}" VerticalContentAlignment="Center">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
@@ -50,16 +51,17 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Ellipse Grid.Column="0" Width="16" Height="16"
-                                 Fill="{Binding Converter={StaticResource ColorToBrushConverter}}"
+                                 Fill="{Binding Key, Converter={StaticResource ColorToBrushConverter}}"
                                  Margin="{StaticResource RightTinyPlusMarginThickness}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Grid.Column="1" Text="{Binding DisplayName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
         <ComboBox Width="120"
                   ItemsSource="{Binding DataContext.LineTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                  SelectedItem="{Binding SelectedLineType, Mode=TwoWay}"
+                  SelectedValue="{Binding SelectedLineType, Mode=TwoWay}"
+                  SelectedValuePath="Key"
                   IsEnabled="{Binding IsOptionsEnabled}"
                   Margin="{StaticResource LeftSmallMarginThickness}" VerticalContentAlignment="Center">
             <ComboBox.ItemTemplate>
@@ -70,9 +72,9 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Path Grid.Column="0" Stroke="{StaticResource TextSecondaryBrush}" StrokeThickness="1.5"
-                              Data="{Binding Converter={StaticResource LineTypeToGeometryConverter}}"
+                              Data="{Binding Key, Converter={StaticResource LineTypeToGeometryConverter}}"
                               Width="50" Height="16" VerticalAlignment="Center" Margin="{StaticResource RightTinyPlusMarginThickness}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding}" Style="{StaticResource BaseTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Grid.Column="1" Text="{Binding DisplayName}" Style="{StaticResource BaseTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </DataTemplate>
             </ComboBox.ItemTemplate>

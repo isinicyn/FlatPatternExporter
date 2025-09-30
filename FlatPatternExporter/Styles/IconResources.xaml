@@ -1,21 +1,21 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- SVG иконки -->
-    
-    <!-- SVG иконка добавления - простой плюс -->
+    <!-- SVG icons -->
+
+    <!-- SVG add icon - simple plus -->
     <Geometry x:Key="AddIconGeometry">M12,6 L12,18 M6,12 L18,12</Geometry>
-    
-    <!-- SVG иконка таблицы для оверлея -->
+
+    <!-- SVG table icon for overlay -->
     <Geometry x:Key="TableIconGeometry">M3 9v6.8c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874c.427.218.987.218 2.105.218h11.606c1.118 0 1.677 0 2.104-.218.377-.192.683-.498.875-.874.218-.428.218-.986.218-2.104V11M3 9v-.8c0-1.12 0-1.68.218-2.108.192-.377.497-.682.874-.874C4.52 5 5.08 5 6.2 5h6.3M3 9h9.5M6 15h4m5.5-7.5h5M18 5v5</Geometry>
-    
-    <!-- SVG иконка копирования -->
+
+    <!-- SVG copy icon -->
     <Geometry x:Key="CopyIconGeometry">M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2H9z M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2</Geometry>
-    
-    <!-- SVG иконка удаления из реестра -->
+
+    <!-- SVG delete from registry icon -->
     <Geometry x:Key="DeleteFromRegistryIconGeometry">M24 30H4a2.002 2.002 0 0 1-2-2v-6a2.002 2.002 0 0 1 2-2h20a2.002 2.002 0 0 1 2 2v6a2.002 2.002 0 0 1-2 2zM4 22h-.002L4 28h20v-6zM30 3.41L28.59 2L25 5.59L21.41 2L20 3.41L23.59 7L20 10.59L21.41 12L25 8.41L28.59 12L30 10.59L26.41 7L30 3.41z M4 14V8h14V6H4a2.002 2.002 0 0 0-2 2v6a2.002 2.002 0 0 0 2 2h22v-2Z</Geometry>
-    
-    <!-- SVG иконка закрытия/удаления (крестик) -->
+
+    <!-- SVG close/delete icon (cross) -->
     <Geometry x:Key="CloseIconGeometry">M18 6 6 18M6 6l12 12</Geometry>
 
 </ResourceDictionary>

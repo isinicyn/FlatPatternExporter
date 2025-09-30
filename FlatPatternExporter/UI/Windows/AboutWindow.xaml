@@ -1,7 +1,8 @@
 ﻿<Window x:Class="FlatPatternExporter.UI.Windows.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="О программе FPEx" 
+        xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions"
+        Title="{extensions:Localize Header_About}" 
         Width="450"
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize" 
@@ -14,49 +15,49 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Основная информация -->
+        <!-- Main information -->
         <StackPanel Grid.Row="0" Margin="{StaticResource StandardPaddingThickness}">
-            <GroupBox Header="Информация о программе" Margin="{StaticResource BottomLargeMarginThickness}">
+            <GroupBox Header="{extensions:Localize Header_About}" Margin="{StaticResource BottomLargeMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <DockPanel Margin="{StaticResource BottomSmallMarginThickness}">
                         <TextBlock x:Name="VersionTextBlock" 
-                                   Text="Версия программы: 1.0.0" 
+                                   Text="{extensions:Localize Text_ProgramVersion}" 
                                    Style="{StaticResource BaseTextBlockStyle}"/>
                         <Button Style="{StaticResource CopyIconButton}" 
                                 Margin="{StaticResource SmallMarginThickness}" 
                                 Click="CopyVersionToClipboard_Click" 
-                                ToolTip="Копировать версию" HorizontalAlignment="Right">
+                                ToolTip="{extensions:Localize ToolTip_CopyVersion}" HorizontalAlignment="Right">
                             
                         </Button>
                     </DockPanel>
 
-                    <TextBlock Text="Автор: Ivan Sinicyn" 
+                    <TextBlock Text="{extensions:Localize Text_Author}" 
                                Style="{StaticResource BaseTextBlockStyle}" 
                                Margin="{StaticResource BottomHairlineMarginThickness}"/>
                     <TextBlock Text="Email: isinicyn@gmail.com" 
                                Style="{StaticResource BaseTextBlockStyle}" 
                                Margin="{StaticResource BottomHairlineMarginThickness}"/>
-                    <TextBlock Text="Лицензия: Свободная" 
+                    <TextBlock Text="{extensions:Localize Text_License}" 
                                Style="{StaticResource BaseTextBlockStyle}" 
                                Margin="{StaticResource BottomHairlineMarginThickness}"/>
                     <TextBlock x:Name="LastUpdateTextBlock" 
-                               Text="Последнее обновление: 10/09/2023" 
+                               Text="{extensions:Localize Text_LastUpdate}" 
                                Style="{StaticResource BaseTextBlockStyle}" 
                                Margin="{StaticResource BottomHairlineMarginThickness}"/>
                 </StackPanel>
             </GroupBox>
 
-            <TextBlock Text="Создано при поддержке ChatGPT 4o, Claude 3.5 Sonnet, Claude 4 Sonnet, Mistral Large 2" 
+            <TextBlock Text="{extensions:Localize Text_AICredits}" 
                        FontSize="{StaticResource SmallFontSize}" 
                        Foreground="{StaticResource TextMutedBrush}" 
                        TextWrapping="Wrap"
                        HorizontalAlignment="Left"/>
         </StackPanel>
 
-        <!-- Кнопки -->
+        <!-- Buttons -->
         <Border Grid.Row="1" Style="{StaticResource DialogBottomBarStyle}">
-            <Button Content="Закрыть" 
-                    HorizontalAlignment="Right" 
+            <Button Content="{extensions:Localize Button_Close}"
+                    HorizontalAlignment="Right"
                     Style="{StaticResource FileNameActionButtonStyle}"
                     Click="CloseButton_Click"/>
         </Border>

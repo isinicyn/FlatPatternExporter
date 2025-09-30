@@ -49,7 +49,6 @@ FlatPatternExporter/
     ├── Models/                         # Модели данных
     │   ├── LayerSettingsClasses.cs     # Модели настроек слоев с INotifyPropertyChanged
     │   ├── AcadVersionItem.cs          # Модель для версий AutoCAD
-    │   ├── SplineReplacementItem.cs    # Модель для замены сплайнов
     │   ├── PartData.cs                 # Основная модель данных детали
     │   ├── PresetIProperty.cs          # Модель предустановленных свойств
     │   ├── ScanProgress.cs             # Модель прогресса сканирования
@@ -63,7 +62,8 @@ FlatPatternExporter/
     │   ├── SettingsManager.cs          # Персистентность настроек
     │   ├── TemplatePresetManager.cs    # Управление пресетами шаблонов
     │   ├── VersionInfoService.cs       # Получение версии приложения и коммитов
-    │   └── PropertyListManager.cs      # Управление списками свойств с фильтрацией
+    │   ├── PropertyListManager.cs      # Управление списками свойств с фильтрацией
+    │   └── LocalizationManager.cs      # Управление локализацией приложения
     │
     ├── Utilities/                      # Утилиты
     │   └── DxfOptimizer.cs             # Оптимизация DXF файлов
@@ -86,9 +86,12 @@ FlatPatternExporter/
     │   ├── ColorToBrushConverter.cs            # Конвертация названия цвета в SolidColorBrush
     │   ├── LineTypeToGeometryConverter.cs      # Визуализация типов линий в LayerSettings
     │   ├── EnumToBooleanConverter.cs           # Универсальная привязка enum к RadioButton
+    │   ├── EnumToDisplayNameConverter.cs       # Конвертер enum значений в локализованные имена
     │   ├── DynamicPropertyValueConverter.cs    # Извлечение значений свойств по имени пути
     │   ├── PropertyExpressionByNameConverter.cs # Определение видимости fx индикатора
-    │   └── IPictureDispConverter.cs            # Преобразование IPictureDisp в System.Drawing.Image
+    │   ├── IPictureDispConverter.cs            # Преобразование IPictureDisp в System.Drawing.Image
+    │   ├── LocalizationConverter.cs            # Конвертер для локализации по значению
+    │   └── LocalizationKeyConverter.cs         # Конвертер для локализации по ключу в параметре
     │
     ├── Styles/                         # XAML стили
     │   ├── ColorResources.xaml
@@ -96,6 +99,13 @@ FlatPatternExporter/
     │   ├── ButtonStyles.xaml
     │   ├── DataGridStyles.xaml
     │   └── GeneralStyles.xaml
+    │
+    ├── Extensions/                     # Расширения разметки XAML
+    │   └── LocalizeExtension.cs        # Расширение разметки для локализации в XAML
+    │
+    ├── Resources/                      # Ресурсы локализации
+    │   ├── Strings.resx                # Строковые ресурсы (английский, по умолчанию)
+    │   └── Strings.ru.resx             # Строковые ресурсы (русский)
     │
     └── Properties/                     # Свойства проекта
         ├── launchSettings.json
@@ -161,7 +171,6 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 **Models/ - Модели данных (namespace: FlatPatternExporter.Models):**
 - `LayerSettingsClasses` - модели настроек слоев (LayerSetting, LayerDefaults, валидаторы)
 - `AcadVersionItem` - модель для версий AutoCAD в ComboBox
-- `SplineReplacementItem` - модель для типов замены сплайнов в ComboBox
 - `PartData` - основная модель данных детали с INotifyPropertyChanged
 - `PresetIProperty` - модель предустановленных свойств с INotifyPropertyChanged
 - `ScanProgress` - модель прогресса сканирования
@@ -176,6 +185,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `TemplatePresetManager` - управление пресетами шаблонов
 - `VersionInfoService` - получение версии приложения и информации о коммитах
 - `PropertyListManager` - управление списками свойств с фильтрацией и состоянием
+- `LocalizationManager` - управление локализацией приложения с поддержкой русского и английского языков
 
 **Utilities/ - Утилиты (namespace: FlatPatternExporter.Utilities):**
 - `DxfOptimizer` - оптимизация DXF файлов для различных версий AutoCAD
@@ -203,9 +213,12 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `ColorToBrushConverter` - конвертация названия цвета в SolidColorBrush
 - `LineTypeToGeometryConverter` - визуализация типов линий в LayerSettings
 - `EnumToBooleanConverter` - универсальная привязка enum к RadioButton
+- `EnumToDisplayNameConverter` - конвертер enum значений в локализованные имена
 - `DynamicPropertyValueConverter` - извлечение значений свойств по имени пути
 - `PropertyExpressionByNameConverter` - определение видимости fx индикатора
 - `IPictureDispConverter` - преобразование IPictureDisp в System.Drawing.Image
+- `LocalizationConverter` - конвертация строковых ключей в локализованные значения
+- `LocalizationKeyConverter` - конвертация ключей из параметра конвертера в локализованные значения
 
 ### Структура пространств имен
 Проект следует конвенции .NET по соответствию пространств имен структуре папок:
@@ -219,7 +232,9 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `FlatPatternExporter.Utilities` - утилиты в папке Utilities/
 - `FlatPatternExporter.UI.Windows` - все окна в папке UI/Windows/
 - `FlatPatternExporter.UI.Controls` - пользовательские элементы в UI/Controls/
+- `FlatPatternExporter.UI.Models` - модели состояния UI в папке UI/Models/
 - `FlatPatternExporter.Converters` - WPF конвертеры в Converters/
+- `FlatPatternExporter.Extensions` - расширения разметки XAML в Extensions/
 - `DxfRenderer` - независимая библиотека рендеринга DXF (Libraries/DxfRenderer.cs)
 - `DefineEdge` - независимая библиотека COM interop (Libraries/MarshalCore.cs)
 
@@ -381,6 +396,25 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `ElementName` binding для связи между элементами
 - Отсутствие обработчиков событий `Checked`/`Unchecked`
 - Отсутствие прямых обращений к UI элементам из code-behind
+
+### Система локализации
+Поддержка мультиязычного интерфейса через централизованную систему локализации:
+
+**Архитектура локализации:**
+- `LocalizationManager` - синглтон для управления переключением языков
+- Поддержка английского (по умолчанию) и русского языков
+- Динамическое переключение языка интерфейса в runtime
+- Ресурсные файлы: `Strings.resx` (английский), `Strings.ru.resx` (русский)
+
+**Компоненты системы:**
+- `LocalizeExtension` - расширение разметки для удобного использования в XAML
+- `LocalizationConverter` - конвертер для привязки по значению ключа
+- `LocalizationKeyConverter` - конвертер для привязки по параметру
+- Интеграция с `INotifyPropertyChanged` для автоматического обновления UI
+
+**Использование в коде:**
+- C#: `LocalizationManager.Instance.GetString("ключ")`
+- XAML: `{ext:Localize ключ}` или через конвертеры в привязках
 
 ## Заметки по разработке
 
