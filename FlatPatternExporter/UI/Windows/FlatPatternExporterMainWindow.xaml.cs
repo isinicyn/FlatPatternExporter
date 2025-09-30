@@ -1828,7 +1828,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             var processedCount = 0;
             var skippedCount = 0;
-            var exportProgress = new Progress<double>(p => { });
+            var exportProgress = new Progress<double>(UpdateExportProgress);
             await Task.Run(() => _dxfExporter.ExportDXF(tempPartsDataList, context.TargetDirectory, context.Multiplier,
                 exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
 
