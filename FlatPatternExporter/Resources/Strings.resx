@@ -834,11 +834,8 @@ Execution time: {4}</value>
   <data name="ToolTip_FileNameInstructionDoubleClick" xml:space="preserve">
     <value>• Double-click a property to add it</value>
   </data>
-  <data name="ToolTip_FileNameInstructionDrag" xml:space="preserve">
-    <value>• Drag elements into the template field</value>
-  </data>
-  <data name="ToolTip_FileNameInstructionEdit" xml:space="preserve">
-    <value>• Edit text directly in the field</value>
+  <data name="ToolTip_FileNameInstructionDoubleClickRemove" xml:space="preserve">
+    <value>• Double-click a property in the template to remove it</value>
   </data>
   <data name="ToolTip_FileNameInstructionExample" xml:space="preserve">
     <value>Example: {PartNumber}-{Thickness}mm → Part123-3mm</value>

@@ -834,11 +834,8 @@
   <data name="ToolTip_FileNameInstructionDoubleClick" xml:space="preserve">
     <value>• Двойной клик по свойству для добавления</value>
   </data>
-  <data name="ToolTip_FileNameInstructionDrag" xml:space="preserve">
-    <value>• Перетаскивайте элементы в поле шаблона</value>
-  </data>
-  <data name="ToolTip_FileNameInstructionEdit" xml:space="preserve">
-    <value>• Редактируйте текст прямо в поле</value>
+  <data name="ToolTip_FileNameInstructionDoubleClickRemove" xml:space="preserve">
+    <value>• Двойной клик по свойству в шаблоне для удаления</value>
   </data>
   <data name="ToolTip_FileNameInstructionExample" xml:space="preserve">
     <value>Пример: {PartNumber}-{Thickness}мм → Деталь123-3мм</value>

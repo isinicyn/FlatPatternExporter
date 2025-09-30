@@ -286,8 +286,7 @@
                                         <StackPanel>
                                 <TextBlock Text="{extensions:Localize ToolTip_FileNameConstructorHelp}" FontWeight="Bold" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                             <TextBlock Text="{extensions:Localize ToolTip_FileNameInstructionDoubleClick}"/>
-                                            <TextBlock Text="{extensions:Localize ToolTip_FileNameInstructionDrag}"/>
-                                            <TextBlock Text="{extensions:Localize ToolTip_FileNameInstructionEdit}"/>
+                                            <TextBlock Text="{extensions:Localize ToolTip_FileNameInstructionDoubleClickRemove}"/>
                                             <TextBlock Text="{extensions:Localize ToolTip_FileNameInstructionExample}" FontStyle="Italic" Margin="{StaticResource TopSmallMarginThickness}"/>
                                         </StackPanel>
                                     </ToolTip>

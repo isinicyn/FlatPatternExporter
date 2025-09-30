@@ -410,7 +410,10 @@ public partial class TokenService : INotifyPropertyChanged
 
         border.MouseDown += (s, e) =>
         {
-            if (e.RightButton == MouseButtonState.Pressed) RemoveTokenByIndex(index);
+            if (e.ClickCount == 2)
+            {
+                RemoveTokenByIndex(index);
+            }
         };
 
         _tokenContainer.Children.Add(border);
@@ -419,12 +422,12 @@ public partial class TokenService : INotifyPropertyChanged
     private void RemoveTokenByIndex(int index)
     {
         if (index < 0 || index >= _tokenElements.Count) return;
-        
+
         var tokenElement = _tokenElements[index];
-        var tokenText = tokenElement.IsCustomText 
+        var tokenText = tokenElement.IsCustomText
             ? $"{{CUSTOM:{tokenElement.Name}}}"
             : $"{{{tokenElement.Name}}}";
-        
+
         var newTemplate = _fileNameTemplate.Remove(tokenElement.StartIndex, tokenText.Length);
         FileNameTemplate = newTemplate;
     }
