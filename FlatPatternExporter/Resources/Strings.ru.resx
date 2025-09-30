@@ -1730,7 +1730,7 @@
   <data name="ToolTip_FlatPatternAvailable" xml:space="preserve">
     <value>Развертка доступна</value>
   </data>
-  <data name="Text_DefaultValuePlaceholder" xml:space="preserve">
+  <data name="Text_SubstitutionPlaceholder" xml:space="preserve">
     <value>Подстановка если пусто...</value>
   </data>
 </root>

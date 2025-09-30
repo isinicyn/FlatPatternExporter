@@ -50,10 +50,10 @@ public class PropertyListManager(ObservableCollection<PresetIProperty> allProper
                         IsUserDefined = true
                     };
 
-                    // Restore default value if exists
-                    if (PropertyMetadataRegistry.PropertyDefaultValues.TryGetValue(userProperty.InternalName, out var defaultValue))
+                    // Restore substitution value if exists
+                    if (PropertyMetadataRegistry.PropertySubstitutions.TryGetValue(userProperty.InternalName, out var substitution))
                     {
-                        presetProperty.DefaultValue = defaultValue;
+                        presetProperty.SubstitutionValue = substitution;
                     }
 
                     _allProperties.Add(presetProperty);

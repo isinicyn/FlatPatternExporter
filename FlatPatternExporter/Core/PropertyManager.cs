@@ -73,10 +73,10 @@ public class PropertyManager(Document document)
         var prop = GetPropertyObject(ourName);
         if (prop == null)
         {
-            // If property not found, check for default value
-            if (!getExpression && PropertyMetadataRegistry.PropertyDefaultValues.TryGetValue(ourName, out var defaultValue))
+            // If property not found, check for substitution value
+            if (!getExpression && PropertyMetadataRegistry.PropertySubstitutions.TryGetValue(ourName, out var substitution))
             {
-                return defaultValue;
+                return substitution;
             }
             return "";
         }
@@ -111,10 +111,10 @@ public class PropertyManager(Document document)
                 }
             }
 
-            // Apply default value if result is empty
-            if (string.IsNullOrEmpty(result) && PropertyMetadataRegistry.PropertyDefaultValues.TryGetValue(ourName, out var defaultValue))
+            // Apply substitution value if result is empty
+            if (string.IsNullOrEmpty(result) && PropertyMetadataRegistry.PropertySubstitutions.TryGetValue(ourName, out var substitution))
             {
-                result = defaultValue;
+                result = substitution;
             }
         }
 

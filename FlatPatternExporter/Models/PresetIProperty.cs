@@ -6,28 +6,28 @@ namespace FlatPatternExporter.Models;
 public class PresetIProperty : INotifyPropertyChanged
 {
     private bool _isAdded;
-    private string _defaultValue = string.Empty;
+    private string _substitutionValue = string.Empty;
 
     public string InventorPropertyName { get; set; } = string.Empty;
     public bool IsUserDefined { get; set; } = false;
 
-    public string DefaultValue
+    public string SubstitutionValue
     {
-        get => _defaultValue;
+        get => _substitutionValue;
         set
         {
-            if (_defaultValue != value)
+            if (_substitutionValue != value)
             {
-                _defaultValue = value;
-                OnPropertyChanged(nameof(DefaultValue));
+                _substitutionValue = value;
+                OnPropertyChanged(nameof(SubstitutionValue));
 
                 if (string.IsNullOrEmpty(value))
                 {
-                    PropertyMetadataRegistry.PropertyDefaultValues.Remove(InventorPropertyName);
+                    PropertyMetadataRegistry.PropertySubstitutions.Remove(InventorPropertyName);
                 }
                 else
                 {
-                    PropertyMetadataRegistry.PropertyDefaultValues[InventorPropertyName] = value;
+                    PropertyMetadataRegistry.PropertySubstitutions[InventorPropertyName] = value;
                 }
             }
         }

@@ -28,7 +28,7 @@ public record InterfaceSettings
 {
     public List<string> ColumnOrder { get; init; } = [];
     public List<string> UserDefinedProperties { get; init; } = [];
-    public Dictionary<string, string> PropertyDefaultValues { get; init; } = [];
+    public Dictionary<string, string> PropertySubstitutions { get; init; } = [];
     public bool IsExpanded { get; init; }
     public string SelectedLanguage { get; init; } = "en-US";
 }
@@ -184,9 +184,9 @@ public static class SettingsManager
             .Where(name => !string.IsNullOrEmpty(name))
             .ToList();
 
-        var propertyDefaultValues = window.PresetIProperties
-            .Where(p => !string.IsNullOrEmpty(p.DefaultValue))
-            .ToDictionary(p => p.InventorPropertyName, p => p.DefaultValue);
+        var propertySubstitutions = window.PresetIProperties
+            .Where(p => !string.IsNullOrEmpty(p.SubstitutionValue))
+            .ToDictionary(p => p.InventorPropertyName, p => p.SubstitutionValue);
 
         return new ApplicationSettings
         {
@@ -194,7 +194,7 @@ public static class SettingsManager
             {
                 ColumnOrder = [..columnsInDisplayOrder],
                 UserDefinedProperties = userDefinedProperties,
-                PropertyDefaultValues = propertyDefaultValues,
+                PropertySubstitutions = propertySubstitutions,
                 IsExpanded = window.SettingsExpander?.IsExpanded ?? false,
                 SelectedLanguage = LocalizationManager.Instance.CurrentCulture.Name
             },
@@ -315,19 +315,19 @@ public static class SettingsManager
             }
         }
 
-        // Restore property default values directly to registry
-        PropertyMetadataRegistry.PropertyDefaultValues.Clear();
-        foreach (var kvp in settings.Interface.PropertyDefaultValues)
+        // Restore property substitutions directly to registry
+        PropertyMetadataRegistry.PropertySubstitutions.Clear();
+        foreach (var kvp in settings.Interface.PropertySubstitutions)
         {
-            PropertyMetadataRegistry.PropertyDefaultValues[kvp.Key] = kvp.Value;
+            PropertyMetadataRegistry.PropertySubstitutions[kvp.Key] = kvp.Value;
         }
 
-        // Apply default values to existing PresetIProperties
+        // Apply substitutions to existing PresetIProperties
         foreach (var property in window.PresetIProperties)
         {
-            if (PropertyMetadataRegistry.PropertyDefaultValues.TryGetValue(property.InventorPropertyName, out var defaultValue))
+            if (PropertyMetadataRegistry.PropertySubstitutions.TryGetValue(property.InventorPropertyName, out var substitution))
             {
-                property.DefaultValue = defaultValue;
+                property.SubstitutionValue = substitution;
             }
         }
 

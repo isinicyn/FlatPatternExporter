@@ -209,10 +209,10 @@
                                                 </Style>
                                             </Grid.Style>
 
-                                            <TextBox Text="{Binding DefaultValue, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding SubstitutionValue, UpdateSourceTrigger=PropertyChanged}"
                                                      Style="{StaticResource BaseTextBoxStyle}"
                                                      FontSize="{StaticResource StandardFontSize}"/>
-                                            <TextBlock Text="{extensions:Localize Text_DefaultValuePlaceholder}"
+                                            <TextBlock Text="{extensions:Localize Text_SubstitutionPlaceholder}"
                                                        Foreground="{StaticResource TextMutedBrush}"
                                                        Margin="{StaticResource SmallMarginThickness}"
                                                        IsHitTestVisible="False"
@@ -222,7 +222,7 @@
                                                     <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding DefaultValue}" Value="">
+                                                            <DataTrigger Binding="{Binding SubstitutionValue}" Value="">
                                                                 <Setter Property="Visibility" Value="Visible"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -381,10 +381,10 @@
                                                 </Style>
                                             </Grid.Style>
 
-                                            <TextBox Text="{Binding DefaultValue, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding SubstitutionValue, UpdateSourceTrigger=PropertyChanged}"
                                                      Style="{StaticResource BaseTextBoxStyle}"
                                                      FontSize="{StaticResource StandardFontSize}"/>
-                                            <TextBlock Text="{extensions:Localize Text_DefaultValuePlaceholder}"
+                                            <TextBlock Text="{extensions:Localize Text_SubstitutionPlaceholder}"
                                                        Foreground="{StaticResource TextMutedBrush}"
                                                        Margin="{StaticResource SmallMarginThickness}"
                                                        IsHitTestVisible="False"
@@ -394,7 +394,7 @@
                                                     <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding DefaultValue}" Value="">
+                                                            <DataTrigger Binding="{Binding SubstitutionValue}" Value="">
                                                                 <Setter Property="Visibility" Value="Visible"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
