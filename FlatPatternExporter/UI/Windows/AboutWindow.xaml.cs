@@ -10,18 +10,13 @@ namespace FlatPatternExporter.UI.Windows
         {
             InitializeComponent();
             SetVersion();
-            SetLastUpdateDate();
         }
 
         private void SetVersion()
         {
-            VersionTextBlock.Text = LocalizationManager.Instance.GetString("About_ProgramVersion") + " " + VersionInfoService.GetApplicationVersion();
-        }
-
-        // Set the last update date according to commit
-        private void SetLastUpdateDate()
-        {
-            LastUpdateTextBlock.Text = LocalizationManager.Instance.GetString("About_LastUpdate") + " " + VersionInfoService.GetLastCommitDate();
+            var version = VersionInfoService.GetApplicationVersion();
+            var lastUpdate = VersionInfoService.GetLastCommitDate();
+            VersionTextBlock.Text = $"{LocalizationManager.Instance.GetString("About_ProgramVersion")} {version} ({lastUpdate})";
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

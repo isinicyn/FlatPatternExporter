@@ -930,8 +930,8 @@ Execution time: {4}</value>
   <data name="Text_LastUpdate" xml:space="preserve">
     <value>Last update: 10/09/2023</value>
   </data>
-  <data name="Text_AICredits" xml:space="preserve">
-    <value>Created with support from ChatGPT 4o, Claude 3.5 Sonnet, Claude 4 Sonnet, Mistral Large 2</value>
+  <data name="Header_AISupport" xml:space="preserve">
+    <value>AI-Powered Vibe Coding</value>
   </data>
 
   <!-- UIState strings -->

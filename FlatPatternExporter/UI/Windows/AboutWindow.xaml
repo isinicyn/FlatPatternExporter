@@ -22,7 +22,7 @@
                     <DockPanel Margin="{StaticResource BottomSmallMarginThickness}">
                         <TextBlock x:Name="VersionTextBlock" 
                                    Text="{extensions:Localize Text_ProgramVersion}" 
-                                   Style="{StaticResource BaseTextBlockStyle}"/>
+                                   Style="{StaticResource BaseTextBlockStyle}" VerticalAlignment="Center"/>
                         <Button Style="{StaticResource CopyIconButton}" 
                                 Margin="{StaticResource SmallMarginThickness}" 
                                 Click="CopyVersionToClipboard_Click" 
@@ -31,27 +31,26 @@
                         </Button>
                     </DockPanel>
 
-                    <TextBlock Text="{extensions:Localize Text_Author}" 
-                               Style="{StaticResource BaseTextBlockStyle}" 
+                    <TextBlock Text="{extensions:Localize Text_Author}"
+                               Style="{StaticResource BaseTextBlockStyle}"
                                Margin="{StaticResource BottomHairlineMarginThickness}"/>
-                    <TextBlock Text="Email: isinicyn@gmail.com" 
-                               Style="{StaticResource BaseTextBlockStyle}" 
+                    <TextBlock Text="Email: isinicyn@gmail.com"
+                               Style="{StaticResource BaseTextBlockStyle}"
                                Margin="{StaticResource BottomHairlineMarginThickness}"/>
-                    <TextBlock Text="{extensions:Localize Text_License}" 
-                               Style="{StaticResource BaseTextBlockStyle}" 
-                               Margin="{StaticResource BottomHairlineMarginThickness}"/>
-                    <TextBlock x:Name="LastUpdateTextBlock" 
-                               Text="{extensions:Localize Text_LastUpdate}" 
-                               Style="{StaticResource BaseTextBlockStyle}" 
+                    <TextBlock Text="{extensions:Localize Text_License}"
+                               Style="{StaticResource BaseTextBlockStyle}"
                                Margin="{StaticResource BottomHairlineMarginThickness}"/>
                 </StackPanel>
             </GroupBox>
 
-            <TextBlock Text="{extensions:Localize Text_AICredits}" 
-                       FontSize="{StaticResource SmallFontSize}" 
-                       Foreground="{StaticResource TextMutedBrush}" 
-                       TextWrapping="Wrap"
-                       HorizontalAlignment="Left"/>
+            <GroupBox Header="{extensions:Localize Header_AISupport}">
+                <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
+                    <TextBlock Text="ChatGPT 4o, Claude 3.5 Sonnet, Claude 4 Sonnet, Claude 4.1 Opus, Claude 4.5 Sonnet, Mistral Large 2"
+                               FontSize="{StaticResource SmallFontSize}"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </GroupBox>
         </StackPanel>
 
         <!-- Buttons -->

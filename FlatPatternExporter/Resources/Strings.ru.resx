@@ -930,8 +930,8 @@
   <data name="Text_LastUpdate" xml:space="preserve">
     <value>Последнее обновление: 10/09/2023</value>
   </data>
-  <data name="Text_AICredits" xml:space="preserve">
-    <value>Создано при поддержке ChatGPT 4o, Claude 3.5 Sonnet, Claude 4 Sonnet, Mistral Large 2</value>
+  <data name="Header_AISupport" xml:space="preserve">
+    <value>AI поддержка Vibe кодинга</value>
   </data>
 
   <!-- UIState strings -->
