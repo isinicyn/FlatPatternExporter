@@ -57,7 +57,17 @@
                    Width="16"
                    Height="16"
                    Margin="10,0,8,0"
-                   VerticalAlignment="Center"/>
+                   VerticalAlignment="Center">
+                <Image.Style>
+                    <Style TargetType="Image">
+                        <Style.Triggers>
+                            <Trigger Property="Source" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Image.Style>
+            </Image>
 
             <!-- Window title -->
             <TextBlock Grid.Column="1"
@@ -67,7 +77,18 @@
                        FontWeight="Normal"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
-                       TextTrimming="CharacterEllipsis"/>
+                       TextTrimming="CharacterEllipsis">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="0"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=Icon}" Value="{x:Null}">
+                                <Setter Property="Margin" Value="10,0,0,0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
 
             <!-- Window buttons -->
             <StackPanel Grid.Column="2"
