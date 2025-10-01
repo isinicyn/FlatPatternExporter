@@ -45,10 +45,10 @@
     <SolidColorBrush x:Key="TokenCustomBackgroundBrush" Color="#1A2A3A"/>
     <SolidColorBrush x:Key="TokenCustomBorderBrush" Color="#569CD6"/>
     <SolidColorBrush x:Key="TokenUserDefinedBackgroundBrush" Color="#2D2512"/>
-    <SolidColorBrush x:Key="TokenUserDefinedBorderBrush" Color="#CE9178"/>
+    <StaticResource x:Key="TokenUserDefinedBorderBrush" ResourceKey="WarningBrush"/>
     <SolidColorBrush x:Key="PreviewValidBackgroundBrush" Color="#1A2E1A"/>
     <SolidColorBrush x:Key="PreviewValidBorderBrush" Color="#3E5A3E"/>
-    <SolidColorBrush x:Key="PreviewWarningBackgroundBrush" Color="#2D2512"/>
+    <StaticResource x:Key="PreviewWarningBackgroundBrush" ResourceKey="TokenUserDefinedBackgroundBrush"/>
     <SolidColorBrush x:Key="PreviewWarningBorderBrush" Color="#5A4A2E"/>
 
     <!-- Backgrounds for red shades (deletion, errors) -->
@@ -72,7 +72,7 @@
     <StaticResource x:Key="ProcessingStatusErrorBrush" ResourceKey="ErrorBrush"/>
 
     <!-- Colors for different quantity states -->
-    <SolidColorBrush x:Key="QuantityOverriddenBrush" Color="#F48771"/>
+    <StaticResource x:Key="QuantityOverriddenBrush" ResourceKey="ErrorBrush"/>
     <SolidColorBrush x:Key="QuantityMultipliedBrush" Color="#569CD6"/>
 
     <!-- Status bar background -->

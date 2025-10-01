@@ -95,10 +95,16 @@ FlatPatternExporter/
     │
     ├── Styles/                         # XAML стили
     │   ├── ColorResources.xaml
+    │   ├── DarkTheme.xaml
     │   ├── IconResources.xaml
+    │   ├── DesignTokens.xaml
+    │   ├── BaseControlStyles.xaml
     │   ├── ButtonStyles.xaml
     │   ├── DataGridStyles.xaml
-    │   └── GeneralStyles.xaml
+    │   ├── SpecializedControlStyles.xaml
+    │   ├── DocumentInfoStyles.xaml
+    │   ├── ThemeControlStyles.xaml
+    │   └── ScrollBarStyles.xaml
     │
     ├── Extensions/                     # Расширения разметки XAML
     │   └── LocalizeExtension.cs        # Расширение разметки для локализации в XAML
@@ -203,11 +209,17 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
   - `UIState` - управление состоянием интерфейса (кнопки, прогресс, текст)
 
 **Стили и ресурсы**:
-- `ColorResources.xaml` - Централизованные цветовые ресурсы приложения
-- `IconResources.xaml` - Централизованные SVG иконки и геометрия
-- `ButtonStyles.xaml` - Специализированные стили кнопок с иконками
+- `ColorResources.xaml` - Цветовые ресурсы светлой темы
+- `DarkTheme.xaml` - Цветовые ресурсы тёмной темы
+- `IconResources.xaml` - SVG иконки и геометрия
+- `DesignTokens.xaml` - Токены дизайна (размеры, отступы, Thickness)
+- `BaseControlStyles.xaml` - Базовые стили для TextBox, ComboBox, CheckBox, RadioButton, Label
+- `ButtonStyles.xaml` - Стили кнопок с иконками
 - `DataGridStyles.xaml` - Стили для DataGrid элементов
-- `GeneralStyles.xaml` - Общие стили приложения
+- `SpecializedControlStyles.xaml` - Специализированные стили (ListBox, TreeView, Token, Separator)
+- `DocumentInfoStyles.xaml` - Стили для заголовков и информации о документе
+- `ThemeControlStyles.xaml` - Тема-зависимые стили для системных контролов
+- `ScrollBarStyles.xaml` - Стили для ScrollBar и Slider
 
 **Converters/ - WPF конвертеры (namespace: FlatPatternExporter.Converters):**
 - `ColorToBrushConverter` - конвертация названия цвета в SolidColorBrush

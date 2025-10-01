@@ -8,10 +8,23 @@
                 <!-- Theme: ColorResources.xaml (Light) or DarkTheme.xaml (Dark) -->
                 <!-- Default theme loaded here, will be overridden by saved settings -->
                 <ResourceDictionary Source="Styles/ColorResources.xaml"/>
+
+                <!-- Design tokens and base resources -->
+                <ResourceDictionary Source="Styles/DesignTokens.xaml"/>
                 <ResourceDictionary Source="Styles/IconResources.xaml"/>
-                <ResourceDictionary Source="Styles/GeneralStyles.xaml"/>
+
+                <!-- Base control styles -->
+                <ResourceDictionary Source="Styles/BaseControlStyles.xaml"/>
                 <ResourceDictionary Source="Styles/ButtonStyles.xaml"/>
                 <ResourceDictionary Source="Styles/DataGridStyles.xaml"/>
+
+                <!-- Specialized and application-specific styles -->
+                <ResourceDictionary Source="Styles/SpecializedControlStyles.xaml"/>
+                <ResourceDictionary Source="Styles/DocumentInfoStyles.xaml"/>
+
+                <!-- Theme-aware control styles -->
+                <ResourceDictionary Source="Styles/ThemeControlStyles.xaml"/>
+                <ResourceDictionary Source="Styles/ScrollBarStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Global default styles -->
@@ -21,13 +34,13 @@
                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                 <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
             </Style>
-            
+
             <Style TargetType="UserControl">
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
             </Style>
-            
+
             <Style TargetType="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
@@ -42,239 +55,6 @@
             <Style TargetType="Label" BasedOn="{StaticResource BaseLabelStyle}"/>
             <Style TargetType="GroupBox" BasedOn="{StaticResource BaseGroupBoxStyle}"/>
             <Style TargetType="ToolTip" BasedOn="{StaticResource BaseToolTipStyle}"/>
-
-            <!-- Additional controls for theme support -->
-            <Style TargetType="ScrollViewer">
-                <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
-            </Style>
-
-            <Style TargetType="ListBox">
-                <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-            </Style>
-
-            <Style TargetType="ListView">
-                <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-            </Style>
-
-            <Style TargetType="TreeView">
-                <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-            </Style>
-
-            <Style TargetType="DataGrid">
-                <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-                <Setter Property="RowBackground" Value="{DynamicResource EvenRowBrush}"/>
-                <Setter Property="AlternatingRowBackground" Value="{DynamicResource OddRowBrush}"/>
-                <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource GridLinesBrush}"/>
-                <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource GridLinesBrush}"/>
-            </Style>
-
-            <Style TargetType="Expander">
-                <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-            </Style>
-
-
-            <Style TargetType="StatusBar">
-                <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-            </Style>
-
-            <Style TargetType="Separator">
-                <Setter Property="Background" Value="{DynamicResource SeparatorBrush}"/>
-            </Style>
-
-            <Style TargetType="ProgressBar">
-                <Setter Property="Background" Value="{DynamicResource BackgroundTertiaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-            </Style>
-
-            <Style TargetType="Menu">
-                <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-            </Style>
-
-            <Style TargetType="ContextMenu">
-                <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-            </Style>
-
-            <Style TargetType="MenuItem">
-                <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-            </Style>
-
-            <Style TargetType="ComboBoxItem">
-                <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ComboBoxItem">
-                            <Border Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Padding="{TemplateBinding Padding}">
-                                <ContentPresenter />
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsHighlighted" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
-                                </Trigger>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <Style TargetType="ListBoxItem">
-                <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ListBoxItem">
-                            <Border Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Padding="{TemplateBinding Padding}">
-                                <ContentPresenter />
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
-                                </Trigger>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <Style TargetType="TreeViewItem">
-                <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-            </Style>
-
-            <!-- Popup style for ComboBox dropdown -->
-            <Style TargetType="{x:Type Popup}">
-                <Setter Property="AllowsTransparency" Value="True"/>
-            </Style>
-
-            <!-- ScrollBar styling for dark theme -->
-            <Style TargetType="ScrollBar">
-                <Setter Property="Background" Value="{DynamicResource BackgroundTertiaryBrush}"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ScrollBar">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-
-                                <!-- Up/Left Button -->
-                                <RepeatButton Grid.Row="0"
-                                              Height="18"
-                                              Command="ScrollBar.LineUpCommand"
-                                              Background="{DynamicResource BackgroundSecondaryBrush}"
-                                              BorderBrush="{DynamicResource BorderPrimaryBrush}"
-                                              BorderThickness="0">
-                                    <Path Fill="{DynamicResource TextSecondaryBrush}"
-                                          Data="M 0 4 L 4 0 L 8 4 Z"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                                </RepeatButton>
-
-                                <!-- Track -->
-                                <Track Grid.Row="1" Name="PART_Track" IsDirectionReversed="True">
-                                    <Track.DecreaseRepeatButton>
-                                        <RepeatButton Command="ScrollBar.PageUpCommand"
-                                                      Background="Transparent"
-                                                      BorderThickness="0">
-                                            <RepeatButton.Template>
-                                                <ControlTemplate TargetType="RepeatButton">
-                                                    <Border Background="Transparent"/>
-                                                </ControlTemplate>
-                                            </RepeatButton.Template>
-                                        </RepeatButton>
-                                    </Track.DecreaseRepeatButton>
-                                    <Track.Thumb>
-                                        <Thumb Background="{DynamicResource BorderPrimaryBrush}"
-                                               BorderBrush="{DynamicResource BorderSecondaryBrush}"
-                                               BorderThickness="1">
-                                            <Thumb.Template>
-                                                <ControlTemplate TargetType="Thumb">
-                                                    <Border Background="{TemplateBinding Background}"
-                                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                                            CornerRadius="0"/>
-                                                </ControlTemplate>
-                                            </Thumb.Template>
-                                        </Thumb>
-                                    </Track.Thumb>
-                                    <Track.IncreaseRepeatButton>
-                                        <RepeatButton Command="ScrollBar.PageDownCommand"
-                                                      Background="Transparent"
-                                                      BorderThickness="0">
-                                            <RepeatButton.Template>
-                                                <ControlTemplate TargetType="RepeatButton">
-                                                    <Border Background="Transparent"/>
-                                                </ControlTemplate>
-                                            </RepeatButton.Template>
-                                        </RepeatButton>
-                                    </Track.IncreaseRepeatButton>
-                                </Track>
-
-                                <!-- Down/Right Button -->
-                                <RepeatButton Grid.Row="2"
-                                              Height="18"
-                                              Command="ScrollBar.LineDownCommand"
-                                              Background="{DynamicResource BackgroundSecondaryBrush}"
-                                              BorderBrush="{DynamicResource BorderPrimaryBrush}"
-                                              BorderThickness="0">
-                                    <Path Fill="{DynamicResource TextSecondaryBrush}"
-                                          Data="M 0 0 L 4 4 L 8 0 Z"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                                </RepeatButton>
-                            </Grid>
-
-                            <ControlTemplate.Triggers>
-                                <!-- Horizontal ScrollBar -->
-                                <Trigger Property="Orientation" Value="Horizontal">
-                                    <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False"/>
-                                    <Setter Property="LayoutTransform">
-                                        <Setter.Value>
-                                            <RotateTransform Angle="-90"/>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <!-- Slider styling -->
-            <Style TargetType="Slider">
-                <Setter Property="Background" Value="{DynamicResource BackgroundTertiaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
-            </Style>
 
         </ResourceDictionary>
     </Application.Resources>

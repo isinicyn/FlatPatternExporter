@@ -1,0 +1,98 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Design system: base values and tokens -->
+
+    <!-- Sizes and margins -->
+    <sys:Double x:Key="StandardElementHeight">24</sys:Double>
+    <sys:Double x:Key="LargeElementHeight">32</sys:Double>
+    <sys:Double x:Key="StandardButtonMinWidth">80</sys:Double>
+    <sys:Double x:Key="StandardFontSize">11</sys:Double>
+    <sys:Double x:Key="SmallFontSize">10</sys:Double>
+    <sys:Double x:Key="LargeFontSize">12</sys:Double>
+    <sys:Double x:Key="StandardPadding">10</sys:Double>
+    <sys:Double x:Key="SmallPadding">5</sys:Double>
+    <sys:Double x:Key="LargePadding">15</sys:Double>
+    <sys:Double x:Key="StandardMargin">10</sys:Double>
+    <sys:Double x:Key="SmallMargin">5</sys:Double>
+    <sys:Double x:Key="TinyMargin">2</sys:Double>
+    <sys:Double x:Key="StandardBorderThickness">1</sys:Double>
+
+    <!-- Icon sizes -->
+    <sys:Double x:Key="SmallIconSize">12</sys:Double>
+    <sys:Double x:Key="MediumIconSize">14</sys:Double>
+    <sys:Double x:Key="StandardIconSize">16</sys:Double>
+    <sys:Double x:Key="LargeIconSize">24</sys:Double>
+
+    <!-- Button sizes -->
+    <sys:Double x:Key="SmallButtonWidth">30</sys:Double>
+    <sys:Double x:Key="LargeSquareButtonSize">75</sys:Double>
+    <sys:Double x:Key="SpinnerButtonWidth">20</sys:Double>
+    <sys:Double x:Key="SpinnerButtonHeight">12</sys:Double>
+    <sys:Double x:Key="IconButtonSize">24</sys:Double>
+    <Thickness x:Key="IconButtonPadding">4</Thickness>
+
+    <!-- Standard margins for elements -->
+    <Thickness x:Key="StandardMarginThickness">6</Thickness>
+    <Thickness x:Key="SmallMarginThickness">5</Thickness>
+    <Thickness x:Key="TinyMarginThickness">2</Thickness>
+    <Thickness x:Key="StandardPaddingThickness">10,5</Thickness>
+    <Thickness x:Key="SmallPaddingThickness">5,2</Thickness>
+    <Thickness x:Key="ButtonPaddingThickness">12,6</Thickness>
+    <Thickness x:Key="ControlPaddingThickness">6,4</Thickness>
+    <Thickness x:Key="TextBoxPaddingThickness">2,0,2,0</Thickness>
+    <Thickness x:Key="StandardBorderThicknessValue">1</Thickness>
+
+    <!-- Directional and combined margins (commonly used) -->
+    <Thickness x:Key="RightSmallMarginThickness">0,0,5,0</Thickness>
+    <Thickness x:Key="LeftSmallMarginThickness">5,0,0,0</Thickness>
+    <Thickness x:Key="BottomSmallMarginThickness">0,0,0,5</Thickness>
+    <Thickness x:Key="BottomLargeMarginThickness">0,0,0,15</Thickness>
+    <Thickness x:Key="HorizontalSmallMarginThickness">5,0</Thickness>
+    <Thickness x:Key="VerticalSmallMarginThickness">0,5</Thickness>
+    <Thickness x:Key="VerticalTinyMarginThickness">0,2</Thickness>
+    <Thickness x:Key="SectionContentMarginThickness">10,5,10,5</Thickness>
+    <Thickness x:Key="UniformStandardMarginThickness">10</Thickness>
+    <Thickness x:Key="RightStandardMarginThickness">0,0,10,0</Thickness>
+    <Thickness x:Key="OuterTopMarginThickness">10,10,10,0</Thickness>
+    <Thickness x:Key="OuterBottomMarginThickness">10,0,10,10</Thickness>
+    <Thickness x:Key="SectionHeaderMarginThickness">0,10,0,5</Thickness>
+
+    <!-- Common margins for separators and splitters -->
+    <Thickness x:Key="VerticalSeparatorOuterMarginThickness">10,0,10,5</Thickness>
+    <Thickness x:Key="VerticalSeparatorCenteredMarginThickness">10,5</Thickness>
+    <Thickness x:Key="GridSplitterMarginThickness">0,12,0,5</Thickness>
+    <Thickness x:Key="HorizontalStandardMarginThickness">10,0,10,0</Thickness>
+    <Thickness x:Key="LeftTinyMarginThickness">2,0,0,0</Thickness>
+    <Thickness x:Key="RightTinyPlusMarginThickness">0,0,4,0</Thickness>
+    <Thickness x:Key="RightSmallPlusMarginThickness">0,0,6,0</Thickness>
+    <Thickness x:Key="RightMediumMarginThickness">0,0,8,0</Thickness>
+    <Thickness x:Key="RightLargeMarginThickness">0,0,15,0</Thickness>
+    <Thickness x:Key="TopSmallMarginThickness">0,5,0,0</Thickness>
+    <Thickness x:Key="BottomXLargeMarginThickness">0,0,0,20</Thickness>
+    <Thickness x:Key="BottomSmallPlusMarginThickness">0,0,0,8</Thickness>
+    <Thickness x:Key="BottomMediumMarginThickness">0,0,0,10</Thickness>
+    <Thickness x:Key="BottomHairlineMarginThickness">0,0,0,1</Thickness>
+    <Thickness x:Key="LeftTinyRightStandardMarginThickness">2,0,10,0</Thickness>
+    <Thickness x:Key="GroupHeaderBorderMarginThickness">5,2,2,0</Thickness>
+    <Thickness x:Key="HorizontalTinyMarginThickness">2,0</Thickness>
+    <Thickness x:Key="HorizontalTinyVerticalHairlineMarginThickness">2,1</Thickness>
+    <Thickness x:Key="LeftTinyBottomSmallMarginThickness">2,0,0,5</Thickness>
+    <Thickness x:Key="VerticalHairlineMarginThickness">0,1,0,1</Thickness>
+    <Thickness x:Key="CheckBoxOverrideMarginThickness">0,5,5,5</Thickness>
+
+    <!-- Paddings -->
+    <Thickness x:Key="HorizontalSmallPaddingThickness">5,0</Thickness>
+    <Thickness x:Key="LeftSmallPaddingThickness">5,0,0,0</Thickness>
+    <Thickness x:Key="LabelInlinePaddingThickness">0,5,5,5</Thickness>
+    <Thickness x:Key="SmallRectPaddingThickness">5,3</Thickness>
+    <Thickness x:Key="UniformTinyPaddingThickness">2</Thickness>
+    <Thickness x:Key="UniformSmallPaddingThickness">4</Thickness>
+    <Thickness x:Key="LeftTinyPlusPaddingThickness">4,0,0,0</Thickness>
+    <Thickness x:Key="StandardTopOnlyBorderThicknessValue">0,1,0,0</Thickness>
+
+    <!-- Non-uniform border thickness -->
+    <Thickness x:Key="StandardTopBorderThicknessValue">1,1,1,0</Thickness>
+
+</ResourceDictionary>

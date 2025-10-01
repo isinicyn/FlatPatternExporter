@@ -364,7 +364,7 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
+                <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BorderTertiaryBrush}"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
