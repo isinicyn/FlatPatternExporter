@@ -210,7 +210,8 @@
                                   Stroke="{DynamicResource TextSecondaryBrush}"
                                   StrokeThickness="2"
                                   Visibility="Collapsed"
-                                  Margin="2"/>
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
                         </Border>
                         <ContentPresenter Margin="4,0,0,0"
                                           VerticalAlignment="Center"

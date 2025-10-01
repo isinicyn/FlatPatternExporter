@@ -19,7 +19,7 @@
 
         <!-- Main information -->
         <StackPanel Grid.Row="0" Margin="{StaticResource StandardPaddingThickness}">
-            <GroupBox Header="{extensions:Localize Header_About}" Margin="{StaticResource BottomLargeMarginThickness}">
+            <GroupBox Header="{extensions:Localize Header_About}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <DockPanel Margin="{StaticResource BottomSmallMarginThickness}">
                         <TextBlock x:Name="VersionTextBlock" 
@@ -62,7 +62,7 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="{extensions:Localize Header_AISupport}">
+            <GroupBox Header="{extensions:Localize Header_AISupport}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <TextBlock FontSize="{StaticResource SmallFontSize}"
                                Foreground="{DynamicResource TextMutedBrush}"
@@ -78,7 +78,7 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="{extensions:Localize Header_OpenSourceLibraries}" Margin="{StaticResource TopSmallMarginThickness}">
+            <GroupBox Header="{extensions:Localize Header_OpenSourceLibraries}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <TextBlock FontSize="{StaticResource SmallFontSize}"
                                Foreground="{DynamicResource TextMutedBrush}"
