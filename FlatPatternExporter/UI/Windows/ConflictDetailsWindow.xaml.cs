@@ -6,7 +6,7 @@ using FlatPatternExporter.Models;
 namespace FlatPatternExporter.UI.Windows;
 
 
-public partial class ConflictDetailsWindow : CustomChromeWindow
+public partial class ConflictDetailsWindow : Window
 {
     private readonly Action<string, string>? _openDocumentAction;
     public List<ConflictPartNumberGroup> ConflictGroups { get; set; } = [];

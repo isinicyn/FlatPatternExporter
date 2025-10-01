@@ -4,7 +4,7 @@ using Clipboard = System.Windows.Clipboard;
 
 namespace FlatPatternExporter.UI.Windows
 {
-    public partial class AboutWindow : CustomChromeWindow
+    public partial class AboutWindow : Window
     {
         public AboutWindow()
         {

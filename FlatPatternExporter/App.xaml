@@ -1,6 +1,7 @@
 ﻿<Application x:Class="FlatPatternExporter.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
              StartupUri="UI/Windows/FlatPatternExporterMainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -25,9 +26,6 @@
                 <!-- Theme-aware control styles -->
                 <ResourceDictionary Source="Styles/ThemeControlStyles.xaml"/>
                 <ResourceDictionary Source="Styles/ScrollBarStyles.xaml"/>
-
-                <!-- Window chrome styles -->
-                <ResourceDictionary Source="Styles/WindowChromeStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Global default styles -->
@@ -37,6 +35,14 @@
                 <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                 <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
             </Style>
+
+            <!-- Shared WindowChrome configuration -->
+            <shell:WindowChrome x:Key="CustomWindowChrome"
+                                ResizeBorderThickness="5"
+                                CaptionHeight="0"
+                                CornerRadius="0"
+                                GlassFrameThickness="0"
+                                UseAeroCaptionButtons="False"/>
 
             <Style TargetType="UserControl">
                 <Setter Property="FontFamily" Value="Segoe UI"/>
