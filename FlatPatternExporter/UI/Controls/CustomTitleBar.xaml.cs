@@ -63,6 +63,16 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
         set => SetValue(ShowMaximizeButtonProperty, value);
     }
 
+    public static readonly DependencyProperty ContentAreaProperty =
+        DependencyProperty.Register(nameof(ContentArea), typeof(object), typeof(CustomTitleBar),
+            new PropertyMetadata(null));
+
+    public object? ContentArea
+    {
+        get => GetValue(ContentAreaProperty);
+        set => SetValue(ContentAreaProperty, value);
+    }
+
     #endregion
 
     #region Event Handlers

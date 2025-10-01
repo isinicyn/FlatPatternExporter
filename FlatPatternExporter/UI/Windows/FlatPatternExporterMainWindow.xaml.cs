@@ -43,6 +43,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly DxfExporter _dxfExporter;
     private readonly PartDataReader _partDataReader;
 
+    // UI elements
+    public System.Windows.Controls.Primitives.ToggleButton? ThemeToggleButton { get; private set; }
+
     // Data and collections
     private readonly ObservableCollection<PartData> _partsData = [];
     private readonly CollectionViewSource _partsDataView;
@@ -175,6 +178,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _partDataReader = new Core.PartDataReader(_inventorManager, _documentScanner, _thumbnailGenerator, Dispatcher);
 
         InitializeComponent();
+
+        // Initialize theme toggle button from ContentArea
+        ThemeToggleButton = TitleBar.ContentArea as System.Windows.Controls.Primitives.ToggleButton;
 
         // Initialize hotkey dictionary
         _hotKeyActions = new Dictionary<Key, Func<Task>>
@@ -2318,12 +2324,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    private void ThemeRadioButton_Checked(object sender, RoutedEventArgs e)
+    private void ThemeToggleButton_Changed(object sender, RoutedEventArgs e)
     {
-        if (sender is not System.Windows.Controls.RadioButton radioButton || radioButton.Tag is not string theme)
-            return;
+        if (ThemeToggleButton is null) return;
 
-        var themeFileName = theme == "Light" ? "ColorResources.xaml" : "DarkTheme.xaml";
+        var isDarkTheme = ThemeToggleButton.IsChecked == true;
+        var themeFileName = isDarkTheme ? "DarkTheme.xaml" : "ColorResources.xaml";
         var themeUri = new Uri($"Styles/{themeFileName}", UriKind.Relative);
 
         var mergedDictionaries = System.Windows.Application.Current.Resources.MergedDictionaries;

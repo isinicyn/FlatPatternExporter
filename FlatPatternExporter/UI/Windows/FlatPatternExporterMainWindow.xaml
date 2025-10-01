@@ -30,9 +30,16 @@
         </Grid.RowDefinitions>
 
         <!-- Row 0: Custom title bar -->
-        <local:CustomTitleBar Grid.Row="0"
+        <local:CustomTitleBar x:Name="TitleBar"
+                              Grid.Row="0"
                               Title="FPEx"
-                              Icon="/FPExport.ico"/>
+                              Icon="/FPExport.ico">
+            <local:CustomTitleBar.ContentArea>
+                <ToggleButton Style="{StaticResource ThemeToggleButtonStyle}"
+                              Checked="ThemeToggleButton_Changed"
+                              Unchecked="ThemeToggleButton_Changed"/>
+            </local:CustomTitleBar.ContentArea>
+        </local:CustomTitleBar>
 
         <!-- Row 1: Top panel -->
         <Grid Grid.Row="1" Margin="{StaticResource OuterTopMarginThickness}">
@@ -527,25 +534,6 @@
                                           DisplayMemberPath="DisplayName"
                                           Width="150"
                                           SelectionChanged="LanguageComboBox_SelectionChanged"/>
-                            </StackPanel>
-                        </GroupBox>
-
-                        <!-- Theme selection group -->
-                        <GroupBox Header="{extensions:Localize Header_Theme}" Margin="{StaticResource RightStandardMarginThickness}">
-                            <StackPanel Orientation="Vertical" Margin="{StaticResource SectionContentMarginThickness}">
-                                <RadioButton x:Name="LightThemeRadioButton"
-                                             Content="{extensions:Localize Theme_Light}"
-                                             GroupName="Theme"
-                                             Checked="ThemeRadioButton_Checked"
-                                             Tag="Light"
-                                             IsChecked="True"
-                                             Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                <RadioButton x:Name="DarkThemeRadioButton"
-                                             Content="{extensions:Localize Theme_Dark}"
-                                             GroupName="Theme"
-                                             Checked="ThemeRadioButton_Checked"
-                                             Tag="Dark"
-                                             Margin="{StaticResource BottomSmallMarginThickness}"/>                                
                             </StackPanel>
                         </GroupBox>
                     </WrapPanel>

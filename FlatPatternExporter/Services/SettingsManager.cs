@@ -199,7 +199,7 @@ public static class SettingsManager
                 PropertySubstitutions = propertySubstitutions,
                 IsExpanded = window.SettingsExpander?.IsExpanded ?? false,
                 SelectedLanguage = LocalizationManager.Instance.CurrentCulture.Name,
-                SelectedTheme = window.DarkThemeRadioButton?.IsChecked == true ? "Dark" : "Light"
+                SelectedTheme = window.ThemeToggleButton?.IsChecked == true ? "Dark" : "Light"
             },
             
             ComponentFilter = new ComponentFilterSettings
@@ -287,17 +287,9 @@ public static class SettingsManager
             mergedDictionaries.Insert(index, new ResourceDictionary { Source = themeUri });
         }
 
-        // Set RadioButton state after applying theme
-        if (settings.Interface.SelectedTheme == "Light")
-        {
-            if (window.LightThemeRadioButton is not null)
-                window.LightThemeRadioButton.IsChecked = true;
-        }
-        else
-        {
-            if (window.DarkThemeRadioButton is not null)
-                window.DarkThemeRadioButton.IsChecked = true;
-        }
+        // Set ToggleButton state after applying theme
+        if (window.ThemeToggleButton is not null)
+            window.ThemeToggleButton.IsChecked = settings.Interface.SelectedTheme == "Dark";
 
         // Component filter settings
         window.ExcludeReferenceParts = settings.ComponentFilter.ExcludeReferenceParts;

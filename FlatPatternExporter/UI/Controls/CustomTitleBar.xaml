@@ -49,6 +49,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- Window icon -->
@@ -90,8 +91,13 @@
                 </TextBlock.Style>
             </TextBlock>
 
+            <!-- Content area for custom controls -->
+            <ContentPresenter Grid.Column="2"
+                              Content="{Binding ElementName=TitleBarControl, Path=ContentArea}"
+                              VerticalAlignment="Center"/>
+
             <!-- Window buttons -->
-            <StackPanel Grid.Column="2"
+            <StackPanel Grid.Column="3"
                         Orientation="Horizontal">
 
                 <!-- Minimize button -->
