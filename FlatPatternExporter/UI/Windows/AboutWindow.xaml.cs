@@ -16,7 +16,7 @@ namespace FlatPatternExporter.UI.Windows
         {
             var version = VersionInfoService.GetApplicationVersion();
             var lastUpdate = VersionInfoService.GetLastCommitDate();
-            VersionTextBlock.Text = $"{LocalizationManager.Instance.GetString("About_ProgramVersion")} {version} ({lastUpdate})";
+            VersionTextBlock.Text = $"{version} ({lastUpdate})";
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

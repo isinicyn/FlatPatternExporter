@@ -31,20 +31,25 @@
 
         <!-- Main information -->
         <StackPanel Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}">
-            <GroupBox Header="{extensions:Localize Header_About}" Margin="{StaticResource VerticalSmallMarginThickness}">
+            <GroupBox Header="{extensions:Localize Header_ProgramVersion}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <DockPanel Margin="{StaticResource BottomSmallMarginThickness}">
-                        <TextBlock x:Name="VersionTextBlock" 
-                                   Text="{extensions:Localize Text_ProgramVersion}" 
-                                   Style="{StaticResource BaseTextBlockStyle}" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold"/>
-                        <Button Style="{StaticResource CopyIconButton}" 
-                                Margin="{StaticResource SmallMarginThickness}" 
-                                Click="CopyVersionToClipboard_Click" 
-                                ToolTip="{extensions:Localize ToolTip_CopyVersion}" HorizontalAlignment="Right">
-                            
-                        </Button>
-                    </DockPanel>
+                        <Button Style="{StaticResource CopyIconButton}"
+                                DockPanel.Dock="Right"
+                                Margin="{StaticResource SmallMarginThickness}"
+                                Click="CopyVersionToClipboard_Click"
+                                ToolTip="{extensions:Localize ToolTip_CopyVersion}">
 
+                        </Button>
+                        <TextBlock x:Name="VersionTextBlock"
+                                   TextAlignment="Center"
+                                   Style="{StaticResource BaseTextBlockStyle}" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold"/>
+                    </DockPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="{extensions:Localize Header_Author}" Margin="{StaticResource VerticalSmallMarginThickness}">
+                <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <Grid Margin="{StaticResource BottomHairlineMarginThickness}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>

@@ -137,6 +137,12 @@
   <data name="Header_About" xml:space="preserve">
     <value>About</value>
   </data>
+  <data name="Header_ProgramVersion" xml:space="preserve">
+    <value>Program Version</value>
+  </data>
+  <data name="Header_Author" xml:space="preserve">
+    <value>Author</value>
+  </data>
   <data name="Header_TemplatePresets" xml:space="preserve">
     <value>Template Presets</value>
   </data>
