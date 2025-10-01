@@ -179,8 +179,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         InitializeComponent();
 
-        // Initialize theme toggle button from ContentArea
-        ThemeToggleButton = TitleBar.ContentArea as System.Windows.Controls.Primitives.ToggleButton;
+        // Initialize theme toggle button from ContentArea StackPanel
+        if (TitleBar.ContentArea is StackPanel stackPanel)
+        {
+            ThemeToggleButton = stackPanel.Children.OfType<System.Windows.Controls.Primitives.ToggleButton>().FirstOrDefault();
+        }
 
         // Initialize hotkey dictionary
         _hotKeyActions = new Dictionary<Key, Func<Task>>

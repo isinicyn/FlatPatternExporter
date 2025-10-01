@@ -35,21 +35,21 @@
                               Title="FPEx"
                               Icon="/FPExport.ico">
             <local:CustomTitleBar.ContentArea>
-                <ToggleButton Style="{StaticResource ThemeToggleButtonStyle}"
-                              Checked="ThemeToggleButton_Changed"
-                              Unchecked="ThemeToggleButton_Changed"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource TitleBarIconButtonStyle}"
+                            Tag="{StaticResource InfoIconGeometry}"
+                            Click="AboutButton_Click"/>
+                    <ToggleButton Style="{StaticResource ThemeToggleButtonStyle}"
+                                  Checked="ThemeToggleButton_Changed"
+                                  Unchecked="ThemeToggleButton_Changed"/>
+                </StackPanel>
             </local:CustomTitleBar.ContentArea>
         </local:CustomTitleBar>
 
         <!-- Row 1: Top panel -->
         <Grid Grid.Row="1" Margin="{StaticResource OuterTopMarginThickness}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
             <!-- Controls aligned to the left -->
-            <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Top">
                 <Button x:Name="ScanButton" Content="{extensions:Localize Button_Scan}" Click="ScanButton_Click" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareProgressButtonStyle}" Tag="{Binding ScanProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTip="{extensions:Localize ToolTip_ScanButton}" RenderTransformOrigin="0,0"/>
                 <Button x:Name="ClearButton" Content="{extensions:Localize Button_Clear}" Click="ClearList_Click" IsEnabled="True" Margin="{StaticResource RightStandardMarginThickness}" Style="{StaticResource LargeSquareButtonStyle}" ToolTip="{extensions:Localize ToolTip_ClearButton}"/>
                 <Button x:Name="ExportButton" Content="{extensions:Localize Button_Export}" Click="ExportButton_Click" IsEnabled="False" Style="{StaticResource LargeSquareProgressButtonStyle}" Tag="{Binding ExportProgressValue, RelativeSource={RelativeSource AncestorType=Window}}" ToolTipService.ShowOnDisabled="True" ToolTip="{extensions:Localize ToolTip_ExportButton}" Margin="{StaticResource RightStandardMarginThickness}"/>
@@ -83,11 +83,6 @@
                     </Grid>
                 </Border>
             </WrapPanel>
-
-            <!-- Controls aligned to the right -->
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
-                <Button Content="{extensions:Localize Button_About}" Click="AboutButton_Click" VerticalAlignment="Top" Style="{StaticResource LargeSquareButtonStyle}"/>
-            </StackPanel>
         </Grid>
 
         <!-- Row 2: Settings -->

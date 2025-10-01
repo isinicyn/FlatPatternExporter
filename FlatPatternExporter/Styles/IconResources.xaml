@@ -24,4 +24,7 @@
     <!-- SVG sun icon (dark theme) - circle with rays (24x24 viewBox) -->
     <Geometry x:Key="SunIconGeometry">M 12 1 L 12 3 M 12 21 L 12 23 M 3.22 3.22 L 4.64 4.64 M 19.36 19.36 L 20.78 20.78 M 1 12 L 3 12 M 21 12 L 23 12 M 3.22 20.78 L 4.64 19.36 M 19.36 4.64 L 20.78 3.22 M 12 7 A 5 5 0 1 1 12 17 A 5 5 0 1 1 12 7</Geometry>
 
+    <!-- SVG info icon - circle with i (24x24 viewBox) -->
+    <Geometry x:Key="InfoIconGeometry">M 12 2 A 10 10 0 1 1 12 22 A 10 10 0 1 1 12 2 M 12 11 L 12 17 M 12 7 L 12 8</Geometry>
+
 </ResourceDictionary>
