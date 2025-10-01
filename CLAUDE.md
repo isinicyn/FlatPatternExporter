@@ -76,6 +76,7 @@ FlatPatternExporter/
     │   │   └── SelectIPropertyWindow.xaml(.cs)
     │   │
     │   ├── Controls/                   # Пользовательские элементы
+    │   │   ├── CustomTitleBar.xaml(.cs)
     │   │   ├── LayerSettingControl.xaml(.cs)
     │   │   └── HeaderAdorner.cs        # UI компонент для drag&drop колонок
     │   │
@@ -203,6 +204,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
   - `ConflictDetailsWindow` - окно конфликтов с инжекцией делегата открытия документов
   - `SelectIPropertyWindow` - окно выбора свойств с полной инжекцией зависимостей
 - **Controls/ (namespace: FlatPatternExporter.UI.Controls)**: пользовательские элементы управления
+  - `CustomTitleBar` - переиспользуемый компонент кастомного заголовка окна с поддержкой WindowChrome
   - `LayerSettingControl` - контрол настройки слоя DXF
   - `HeaderAdorner` - UI компонент для визуализации drag&drop колонок DataGrid
 - **Models/ (namespace: FlatPatternExporter.UI.Models)**: модели состояния UI
@@ -427,6 +429,40 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 **Использование в коде:**
 - C#: `LocalizationManager.Instance.GetString("ключ")`
 - XAML: `{ext:Localize ключ}` или через конвертеры в привязках
+
+### Система кастомных заголовков окон
+Все окна приложения используют единообразный кастомный заголовок через переиспользуемый компонент:
+
+**Архитектура:**
+- `CustomTitleBar` (UserControl) - автономный компонент заголовка с полной инкапсуляцией логики
+- Централизованная конфигурация `WindowChrome` через именованный ресурс в App.xaml
+- Интеграция с родительским окном через `Window.GetWindow(this)`
+
+**Функциональные возможности:**
+- Гибкая настройка через DependencyProperty (`Title`, `Icon`, `ShowMinimizeButton`, `ShowMaximizeButton`)
+- Автоматическая обработка drag'n'drop для перемещения окна
+- Двойной клик по заголовку для maximize/restore
+- Автоматическое обновление иконки кнопки maximize/restore при изменении состояния окна
+- Поддержка плавных системных анимаций Windows (DWM композиция)
+- Aero Snap функциональность через WindowChrome
+
+**Интеграция в окна:**
+```xaml
+<Window shell:WindowChrome.WindowChrome="{StaticResource CustomWindowChrome}" ...>
+    <Border>
+        <Grid>
+            <CustomTitleBar Title="Заголовок" ShowMinimizeButton="False"/>
+            <!-- Содержимое окна -->
+        </Grid>
+    </Border>
+</Window>
+```
+
+**Преимущества:**
+- Полная видимость в design-time режиме Visual Studio
+- Hardware rendering без использования `AllowsTransparency`
+- Централизованное управление настройками WindowChrome
+- Переиспользуемость компонента во всех окнах приложения
 
 ## Заметки по разработке
 
