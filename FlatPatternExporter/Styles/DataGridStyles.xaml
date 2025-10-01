@@ -152,14 +152,14 @@
                     <Style TargetType="TextBlock" BasedOn="{StaticResource CenteredCellStyle}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsOverridden}" Value="True">
-                                <Setter Property="Foreground" Value="{DynamicResource QuantityOverriddenBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
                             </DataTrigger>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsOverridden}" Value="False"/>
                                     <Condition Binding="{Binding IsMultiplied}" Value="True"/>
                                 </MultiDataTrigger.Conditions>
-                                <Setter Property="Foreground" Value="{DynamicResource QuantityMultipliedBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
                             </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>

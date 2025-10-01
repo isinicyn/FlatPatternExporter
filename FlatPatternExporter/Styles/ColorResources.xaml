@@ -71,10 +71,6 @@
     <StaticResource x:Key="ProcessingStatusSuccessBrush" ResourceKey="SuccessBrush"/>
     <StaticResource x:Key="ProcessingStatusErrorBrush" ResourceKey="ErrorBrush"/>
 
-    <!-- Colors for different quantity states -->
-    <StaticResource x:Key="QuantityOverriddenBrush" ResourceKey="ErrorBrush"/>
-    <StaticResource x:Key="QuantityMultipliedBrush" ResourceKey="AccentBrush"/>
-
     <!-- Status bar background -->
     <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#0078D4"/>
 
