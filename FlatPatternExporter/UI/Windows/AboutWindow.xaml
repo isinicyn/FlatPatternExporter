@@ -1,7 +1,9 @@
-﻿<Window x:Class="FlatPatternExporter.UI.Windows.AboutWindow"
+﻿<windows:CustomChromeWindow x:Class="FlatPatternExporter.UI.Windows.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:windows="clr-namespace:FlatPatternExporter.UI.Windows"
         xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions"
+        Style="{StaticResource CustomWindowStyle}"
         Title="{extensions:Localize Header_About}"
         Width="450"
         WindowStartupLocation="CenterScreen"
@@ -99,5 +101,5 @@
                     Click="CloseButton_Click"/>
         </Border>
     </Grid>
-</Window>
+</windows:CustomChromeWindow>
 

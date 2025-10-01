@@ -29,7 +29,7 @@ using TextBox = System.Windows.Controls.TextBox;
 
 namespace FlatPatternExporter.UI.Windows;
 
-public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChanged
+public partial class FlatPatternExporterMainWindow : CustomChromeWindow, INotifyPropertyChanged
 {
     // Inventor API
     private readonly InventorManager _inventorManager = new();

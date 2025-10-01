@@ -25,6 +25,9 @@
                 <!-- Theme-aware control styles -->
                 <ResourceDictionary Source="Styles/ThemeControlStyles.xaml"/>
                 <ResourceDictionary Source="Styles/ScrollBarStyles.xaml"/>
+
+                <!-- Window chrome styles -->
+                <ResourceDictionary Source="Styles/WindowChromeStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Global default styles -->

@@ -64,7 +64,7 @@
 
 
   <ItemGroup>
-    <Content Include="FPExport.ico" />
+    <Resource Include="FPExport.ico" />
   </ItemGroup>
 
   <ItemGroup>

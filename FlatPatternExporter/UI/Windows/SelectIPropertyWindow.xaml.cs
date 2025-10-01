@@ -9,7 +9,7 @@ using Button = System.Windows.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter.UI.Windows;
-public partial class SelectIPropertyWindow : Window
+public partial class SelectIPropertyWindow : CustomChromeWindow
 {
     private readonly PropertyListManager _propertyListManager;
     private readonly LocalizationManager _localizationManager = LocalizationManager.Instance;
