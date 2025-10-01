@@ -207,25 +207,25 @@
 
     <!-- DataGrid styles -->
     <Style x:Key="DataGridRowStyle" TargetType="DataGridRow">
-        <Setter Property="Background" Value="{StaticResource EvenRowBrush}" />
+        <Setter Property="Background" Value="{DynamicResource EvenRowBrush}" />
         <Style.Triggers>
             <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                <Setter Property="Background" Value="{StaticResource OddRowBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource OddRowBrush}"/>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{StaticResource HighlightBrush}"/>
-                <Setter Property="Foreground" Value="{StaticResource HighlightTextBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource HighlightBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource HighlightTextBrush}"/>
             </Trigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsSelected" Value="True"/>
                     <Condition Property="Selector.IsSelectionActive" Value="False"/>
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{StaticResource HighlightBrush}"/>
-                <Setter Property="Foreground" Value="{StaticResource HighlightTextBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource HighlightBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource HighlightTextBrush}"/>
             </MultiTrigger>
         </Style.Triggers>
     </Style>
@@ -240,7 +240,7 @@
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="ContextMenu" Value="{x:Null}"/>
     </Style>
@@ -248,7 +248,7 @@
     <!-- Style for row headers -->
     <Style x:Key="DataGridRowHeaderStyle" TargetType="DataGridRowHeader">
         <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,1,1"/>
         <Setter Property="Width" Value="15"/>
         <Setter Property="ContextMenu" Value="{x:Null}"/>
@@ -279,7 +279,7 @@
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="Foreground" Value="{StaticResource HighlightTextBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource HighlightTextBrush}"/>
                 <Setter Property="BorderBrush" Value="Transparent"/>
             </Trigger>
         </Style.Triggers>
@@ -329,7 +329,7 @@
                         <DataGridColumnHeader x:Name="PART_FillerColumnHeader" 
                                               IsHitTestVisible="False" 
                                               BorderThickness="0,0,0,1"
-                                              BorderBrush="{StaticResource BorderLightBrush}"
+                                              BorderBrush="{DynamicResource BorderLightBrush}"
                                               Background="{DynamicResource SelectionBackgroundBrush}"/>
                         <ItemsPresenter/>
                     </Grid>

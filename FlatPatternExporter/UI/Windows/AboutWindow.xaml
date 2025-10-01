@@ -2,11 +2,13 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions"
-        Title="{extensions:Localize Header_About}" 
+        Title="{extensions:Localize Header_About}"
         Width="450"
-        WindowStartupLocation="CenterScreen" 
-        ResizeMode="NoResize" 
-        SizeToContent="Height">
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        SizeToContent="Height"
+        Background="{DynamicResource BackgroundPrimaryBrush}"
+        Foreground="{DynamicResource TextSecondaryBrush}">
 
 
     <Grid SnapsToDevicePixels="True">
@@ -63,7 +65,7 @@
             <GroupBox Header="{extensions:Localize Header_AISupport}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <TextBlock FontSize="{StaticResource SmallFontSize}"
-                               Foreground="{StaticResource TextMutedBrush}"
+                               Foreground="{DynamicResource TextMutedBrush}"
                                TextWrapping="Wrap">
                         <Run Text="• ChatGPT 4o" FontWeight="SemiBold"/><LineBreak/>
                         <Run Text="• Mistral Large 2" FontWeight="SemiBold"/><LineBreak/>
@@ -79,7 +81,7 @@
             <GroupBox Header="{extensions:Localize Header_OpenSourceLibraries}" Margin="{StaticResource TopSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <TextBlock FontSize="{StaticResource SmallFontSize}"
-                               Foreground="{StaticResource TextMutedBrush}"
+                               Foreground="{DynamicResource TextMutedBrush}"
                                TextWrapping="Wrap">
                         <Run Text="• netDxf.netstandard 3.0.1 (MIT License)" FontWeight="SemiBold"/><LineBreak/>
                         <Run Text="• Svg.Skia 3.2.1 (MIT License)" FontWeight="SemiBold"/><LineBreak/>

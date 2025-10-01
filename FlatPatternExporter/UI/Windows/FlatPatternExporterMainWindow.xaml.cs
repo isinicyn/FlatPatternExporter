@@ -2318,6 +2318,28 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
+    private void ThemeRadioButton_Checked(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.RadioButton radioButton || radioButton.Tag is not string theme)
+            return;
+
+        var themeFileName = theme == "Light" ? "ColorResources.xaml" : "DarkTheme.xaml";
+        var themeUri = new Uri($"Styles/{themeFileName}", UriKind.Relative);
+
+        var mergedDictionaries = System.Windows.Application.Current.Resources.MergedDictionaries;
+
+        var existingTheme = mergedDictionaries.FirstOrDefault(d =>
+            d.Source?.OriginalString.Contains("ColorResources.xaml") == true ||
+            d.Source?.OriginalString.Contains("DarkTheme.xaml") == true);
+
+        if (existingTheme != null)
+        {
+            var index = mergedDictionaries.IndexOf(existingTheme);
+            mergedDictionaries.RemoveAt(index);
+            mergedDictionaries.Insert(index, new ResourceDictionary { Source = themeUri });
+        }
+    }
+
     /// <summary>
     /// Updates button texts when language changes
     /// </summary>

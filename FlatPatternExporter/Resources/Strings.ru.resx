@@ -146,6 +146,15 @@
   <data name="Header_Language" xml:space="preserve">
     <value>Язык интерфейса</value>
   </data>
+  <data name="Header_Theme" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="Theme_Light" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="Theme_Dark" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
 
   <!-- Метки информации о документе -->
   <data name="Label_DocumentType" xml:space="preserve">

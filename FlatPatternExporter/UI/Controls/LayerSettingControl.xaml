@@ -21,7 +21,7 @@
                      IsEnabled="{Binding IsOptionsEnabled}"
                      TextChanged="CustomTextBox_TextChanged"/>
             <TextBlock Text="{Binding LayerName}"
-                       Foreground="{StaticResource TextTransparentMutedBrush}"
+                       Foreground="{DynamicResource TextTransparentMutedBrush}"
                        IsHitTestVisible="False"
                        Margin="{StaticResource SmallMarginThickness}"
                        Padding="{StaticResource TextBoxPaddingThickness}"
@@ -71,7 +71,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Path Grid.Column="0" Stroke="{StaticResource TextSecondaryBrush}" StrokeThickness="1.5"
+                        <Path Grid.Column="0" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="1.5"
                               Data="{Binding Key, Converter={StaticResource LineTypeToGeometryConverter}}"
                               Width="50" Height="16" VerticalAlignment="Center" Margin="{StaticResource RightTinyPlusMarginThickness}"/>
                         <TextBlock Grid.Column="1" Text="{Binding DisplayName}" Style="{StaticResource BaseTextBlockStyle}" TextTrimming="CharacterEllipsis"/>

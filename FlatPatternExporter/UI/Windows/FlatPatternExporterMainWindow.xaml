@@ -11,7 +11,9 @@
         PreviewMouseLeftButtonDown="MainWindow_PreviewMouseLeftButtonDown"
         Title="FPEx"
         MinHeight="600" MinWidth="1745"
-        WindowStartupLocation="CenterScreen" SnapsToDevicePixels="True">
+        WindowStartupLocation="CenterScreen" SnapsToDevicePixels="True"
+        Background="{DynamicResource BackgroundPrimaryBrush}"
+        Foreground="{DynamicResource TextSecondaryBrush}">
 
 
     <Grid>
@@ -37,7 +39,7 @@
 
 
                 <Border Margin="{StaticResource RightStandardMarginThickness}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="350"
-                        BorderBrush="{StaticResource BorderSecondaryBrush}" BorderThickness="{StaticResource StandardBorderThicknessValue}" Background="{StaticResource BackgroundTertiaryBrush}" Padding="{StaticResource SmallPaddingThickness}" Height="75">
+                        BorderBrush="{DynamicResource BorderSecondaryBrush}" BorderThickness="{StaticResource StandardBorderThicknessValue}" Background="{DynamicResource BackgroundTertiaryBrush}" Padding="{StaticResource SmallPaddingThickness}" Height="75">
                     <Grid VerticalAlignment="Center">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -199,7 +201,7 @@
                                 <!-- Right column -->
                                 <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Top">
                                     <CheckBox x:Name="EnableSubfolderCheckBox" Content="{extensions:Localize UI_CreateSubfolder}" IsChecked="{Binding EnableSubfolder, Mode=TwoWay}" IsEnabled="{Binding IsSubfolderCheckBoxEnabled}" ToolTip="{extensions:Localize ToolTip_SubfolderInvalid}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <TextBox x:Name="SubfolderNameTextBox" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Stretch" Background="{StaticResource BackgroundSecondaryBrush}" Margin="{StaticResource BottomSmallMarginThickness}" Style="{StaticResource BaseTextBoxStyle}"/>
+                                    <TextBox x:Name="SubfolderNameTextBox" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Stretch" Background="{DynamicResource BackgroundSecondaryBrush}" Margin="{StaticResource BottomSmallMarginThickness}" Style="{StaticResource BaseTextBoxStyle}"/>
                                     <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="{extensions:Localize UI_OrganizeByMaterial}" IsChecked="{Binding OrganizeByMaterial, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                     <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="{extensions:Localize UI_OrganizeByThickness}" IsChecked="{Binding OrganizeByThickness, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                 </StackPanel>
@@ -211,8 +213,8 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Button x:Name="SelectFixedFolderButton" Grid.Column="0" Content="..." Width="{StaticResource SmallButtonWidth}" Click="SelectFixedFolderButton_Click" Style="{StaticResource InteractiveActionButtonStyle}" Margin="{StaticResource LeftTinyRightStandardMarginThickness}" />
-                    <Border Grid.Column="1" Background="{StaticResource BackgroundSecondaryBrush}"
-                        BorderBrush="{StaticResource BorderPrimaryBrush}"
+                    <Border Grid.Column="1" Background="{DynamicResource BackgroundSecondaryBrush}"
+                        BorderBrush="{DynamicResource BorderPrimaryBrush}"
                         BorderThickness="{StaticResource StandardBorderThicknessValue}"
                         Height="{StaticResource StandardElementHeight}"
                         Padding="{StaticResource HorizontalSmallPaddingThickness}">
@@ -230,7 +232,7 @@
                 </TabItem>
                 <TabItem Header="{extensions:Localize Header_LayerSettings}">
                     <GroupBox Header="{extensions:Localize Header_LayerSettingsDescription}" Margin="{StaticResource UniformStandardMarginThickness}">
-                        <Grid Background="{StaticResource BackgroundPrimaryBrush}">
+                        <Grid Background="{DynamicResource BackgroundPrimaryBrush}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -278,7 +280,7 @@
                                   Margin="{StaticResource RightMediumMarginThickness}" VerticalContentAlignment="Center" Padding="4,0,0,0"/>
                             <TextBlock Text="ℹ"
                                    FontSize="{StaticResource LargeFontSize}"
-                                   Foreground="{StaticResource TextDisabledBrush}"
+                                   Foreground="{DynamicResource TextDisabledBrush}"
                                    Cursor="Help"
                                    Margin="{StaticResource RightLargeMarginThickness}" VerticalAlignment="Center">
                                 <TextBlock.ToolTip>
@@ -329,8 +331,8 @@
 
                                         <Border x:Name="EmptyStatePanel"
                                                 Grid.Column="0"
-                                                Background="{StaticResource BackgroundSecondaryBrush}"
-                                                BorderBrush="{StaticResource BorderSecondaryBrush}"
+                                                Background="{DynamicResource BackgroundSecondaryBrush}"
+                                                BorderBrush="{DynamicResource BorderSecondaryBrush}"
                                                 BorderThickness="{StaticResource StandardBorderThicknessValue}"
                                                 Padding="{StaticResource StandardPaddingThickness}"
                                                 Margin="{StaticResource BottomSmallMarginThickness}"
@@ -399,7 +401,7 @@
                                 </StackPanel>
                             </GroupBox>
 
-                            <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
+                            <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{DynamicResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
 
                             <!-- Middle column: Data sources -->
                             <GroupBox Grid.Column="2" Header="{extensions:Localize Header_DataSources}" Margin="{StaticResource HorizontalSmallMarginThickness}">
@@ -464,15 +466,15 @@
                                 </StackPanel>
                             </GroupBox>
 
-                            <GridSplitter Grid.Column="3" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{StaticResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
+                            <GridSplitter Grid.Column="3" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{DynamicResource StatusBarBackgroundBrush}" Margin="{StaticResource GridSplitterMarginThickness}"/>
 
                             <!-- Right column: Template and preview -->
                             <GroupBox Grid.Column="4" Header="{extensions:Localize Header_TemplateAndPreview}" Margin="{StaticResource LeftSmallMarginThickness}">
                                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                                     <TextBlock Text="{extensions:Localize Text_FileNameTemplate}" Style="{StaticResource SectionHeaderTextStyle}"/>
                                     <Border x:Name="FileNameTemplateTokenBox"
-                                            Background="{StaticResource BackgroundPrimaryBrush}"
-                                            BorderBrush="{StaticResource BorderPrimaryBrush}"
+                                            Background="{DynamicResource BackgroundPrimaryBrush}"
+                                            BorderBrush="{DynamicResource BorderPrimaryBrush}"
                                             BorderThickness="{StaticResource StandardBorderThicknessValue}"
                                             MinHeight="{StaticResource LargeElementHeight}"
                                             Padding="{StaticResource TinyMarginThickness}">
@@ -493,7 +495,7 @@
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding EnableFileNameConstructor}" Value="False">
                                                             <Setter Property="Text" Value="{extensions:Localize Text_FunctionDisabled}"/>
-                                                            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -517,6 +519,25 @@
                                           SelectionChanged="LanguageComboBox_SelectionChanged"/>
                             </StackPanel>
                         </GroupBox>
+
+                        <!-- Theme selection group -->
+                        <GroupBox Header="{extensions:Localize Header_Theme}" Margin="{StaticResource RightStandardMarginThickness}">
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource SectionContentMarginThickness}">
+                                <RadioButton x:Name="LightThemeRadioButton"
+                                             Content="{extensions:Localize Theme_Light}"
+                                             GroupName="Theme"
+                                             Checked="ThemeRadioButton_Checked"
+                                             Tag="Light"
+                                             IsChecked="True"
+                                             Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                <RadioButton x:Name="DarkThemeRadioButton"
+                                             Content="{extensions:Localize Theme_Dark}"
+                                             GroupName="Theme"
+                                             Checked="ThemeRadioButton_Checked"
+                                             Tag="Dark"
+                                             Margin="{StaticResource BottomSmallMarginThickness}"/>                                
+                            </StackPanel>
+                        </GroupBox>
                     </WrapPanel>
                 </TabItem>
             </TabControl>
@@ -531,8 +552,8 @@
 
             <!-- Search and multiplier controls -->
             <Border Grid.Row="0"
-                    Background="{StaticResource BackgroundPrimaryBrush}"
-                    BorderBrush="{StaticResource BorderPrimaryBrush}"
+                    Background="{DynamicResource BackgroundPrimaryBrush}"
+                    BorderBrush="{DynamicResource BorderPrimaryBrush}"
                     BorderThickness="{StaticResource StandardTopBorderThicknessValue}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -549,7 +570,7 @@
                                  Style="{StaticResource BaseTextBoxStyle}"
                                  TextChanged="SearchTextBox_TextChanged"/>
                             <TextBlock Text="{extensions:Localize Text_Search}"
-                                   Foreground="{StaticResource TextDisabledBrush}"
+                                   Foreground="{DynamicResource TextDisabledBrush}"
                                    Margin="{StaticResource SmallMarginThickness}"
                                    IsHitTestVisible="False" VerticalAlignment="Center" Padding="{StaticResource TextBoxPaddingThickness}">
                                 <TextBlock.Style>
@@ -586,7 +607,7 @@
                                       Margin="{StaticResource RightTinyPlusMarginThickness}" SnapsToDevicePixels="True"/>
                                 <TextBlock Text="{extensions:Localize UI_Property}"
                                            VerticalAlignment="Center"
-                                           Foreground="{StaticResource TextSecondaryBrush}"/>
+                                           Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                         </Button>
 
@@ -644,12 +665,12 @@
                       CanUserAddRows="False"
                       RowHeight="45"
                       GridLinesVisibility="None"
-                      Background="{StaticResource BackgroundPrimaryBrush}"
+                      Background="{DynamicResource BackgroundPrimaryBrush}"
                       VerticalAlignment="Top"
-                      BorderBrush="{StaticResource BorderPrimaryBrush}"
+                      BorderBrush="{DynamicResource BorderPrimaryBrush}"
                       BorderThickness="{StaticResource StandardBorderThicknessValue}"
-                      HorizontalGridLinesBrush="{StaticResource GridLinesBrush}"
-                      VerticalGridLinesBrush="{StaticResource GridLinesBrush}"
+                      HorizontalGridLinesBrush="{DynamicResource GridLinesBrush}"
+                      VerticalGridLinesBrush="{DynamicResource GridLinesBrush}"
                       SelectionMode="Extended"
                       ClipboardCopyMode="IncludeHeader"
                       AlternationCount="2"
@@ -684,8 +705,8 @@
 
                 <!-- Overlay for no columns case -->
                 <Border x:Name="NoColumnsOverlay"
-                    Background="{StaticResource BackgroundPrimaryBrush}"
-                    BorderBrush="{StaticResource BorderPrimaryBrush}"
+                    Background="{DynamicResource BackgroundPrimaryBrush}"
+                    BorderBrush="{DynamicResource BorderPrimaryBrush}"
                     BorderThickness="{StaticResource StandardBorderThicknessValue}"
                     Visibility="Collapsed">
                     <StackPanel VerticalAlignment="Center"
@@ -710,7 +731,7 @@
                                   Margin="{StaticResource RightSmallPlusMarginThickness}"/>
                                 <TextBlock Text="{extensions:Localize UI_AddColumns}"
                                        VerticalAlignment="Center"
-                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>

@@ -13,7 +13,9 @@
     ResizeMode="CanResize"
     WindowStartupLocation="CenterScreen"
     MinWidth="400"
-    MinHeight="450" Width="560">
+    MinHeight="450" Width="560"
+    Background="{DynamicResource BackgroundPrimaryBrush}"
+    Foreground="{DynamicResource TextSecondaryBrush}">
 
     <Window.Resources>
         <!-- CollectionViewSource for standard properties with grouping -->
@@ -46,8 +48,8 @@
 
         <!-- Header and general information -->
         <Border Grid.Row="0"
-                Background="{StaticResource BackgroundSecondaryBrush}"
-                BorderBrush="{StaticResource BorderLightBrush}"
+                Background="{DynamicResource BackgroundSecondaryBrush}"
+                BorderBrush="{DynamicResource BorderLightBrush}"
                 BorderThickness="{StaticResource StandardTopOnlyBorderThicknessValue}"
                 Padding="{StaticResource StandardPaddingThickness}">
             <StackPanel>
@@ -56,7 +58,7 @@
                            FontSize="{StaticResource LargeFontSize}"
                            Margin="0"/>
                 <TextBlock Text="{extensions:Localize Text_PropertyInstructions}"
-                           Foreground="{StaticResource TextMutedBrush}"
+                           Foreground="{DynamicResource TextMutedBrush}"
                            Margin="{StaticResource TopSmallMarginThickness}" TextTrimming="CharacterEllipsis"/>
             </StackPanel>
         </Border>
@@ -73,8 +75,8 @@
 
                     <!-- Search and filter panel -->
                     <Border Grid.Row="0"
-                            Background="{StaticResource BackgroundQuaternaryBrush}"
-                            BorderBrush="{StaticResource BorderLightBrush}"
+                            Background="{DynamicResource BackgroundQuaternaryBrush}"
+                            BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="{StaticResource StandardBorderThicknessValue}"
                             Margin="{StaticResource BottomSmallMarginThickness}"
                             Padding="{StaticResource StandardPaddingThickness}">
@@ -96,7 +98,7 @@
                                          Style="{StaticResource BaseTextBoxStyle}"
                                          TextChanged="StandardSearchBox_TextChanged"/>
                                 <TextBlock Text="{extensions:Localize Text_SearchByName}"
-                                           Foreground="{StaticResource TextMutedBrush}"
+                                           Foreground="{DynamicResource TextMutedBrush}"
                                            Margin="{StaticResource SmallMarginThickness}"
                                            IsHitTestVisible="False" VerticalAlignment="Center"
                                            Padding="{StaticResource TextBoxPaddingThickness}">
@@ -148,8 +150,8 @@
                              ItemsSource="{Binding Source={StaticResource StandardPropertiesSource}}"
                              ItemContainerStyle="{StaticResource CustomListBoxItemStyle}"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                             BorderBrush="{StaticResource BorderLightBrush}"
-                             Background="{StaticResource BackgroundPrimaryBrush}"
+                             BorderBrush="{DynamicResource BorderLightBrush}"
+                             Background="{DynamicResource BackgroundPrimaryBrush}"
                              BorderThickness="{StaticResource StandardBorderThicknessValue}"
                              MouseDoubleClick="StandardPropertiesListBox_MouseDoubleClick">
 
@@ -158,14 +160,14 @@
                             <GroupStyle>
                                 <GroupStyle.HeaderTemplate>
                                     <DataTemplate>
-                                        <Border Background="{StaticResource BackgroundTertiaryBrush}"
-                                                BorderBrush="{StaticResource BorderSecondaryBrush}"
+                                        <Border Background="{DynamicResource BackgroundTertiaryBrush}"
+                                                BorderBrush="{DynamicResource BorderSecondaryBrush}"
                                                 BorderThickness="{StaticResource StandardTopOnlyBorderThicknessValue}"
                                                 Margin="{StaticResource TopSmallMarginThickness}"
                                                 Padding="{StaticResource SmallRectPaddingThickness}">
                                             <TextBlock Text="{Binding Name}"
                                                        FontWeight="SemiBold"
-                                                       Foreground="{StaticResource TextTertiaryBrush}"
+                                                       Foreground="{DynamicResource TextTertiaryBrush}"
                                                        FontSize="{StaticResource StandardFontSize}"/>
                                         </Border>
                                     </DataTemplate>
@@ -177,8 +179,8 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border x:Name="ItemBorder"
-                                        Background="{StaticResource BackgroundPrimaryBrush}"
-                                        BorderBrush="{StaticResource BorderLightBrush}"
+                                        Background="{DynamicResource BackgroundPrimaryBrush}"
+                                        BorderBrush="{DynamicResource BorderLightBrush}"
                                         BorderThickness="{StaticResource StandardBorderThicknessValue}"
                                         Padding="{StaticResource SmallRectPaddingThickness}"
                                         Margin="{StaticResource TinyMarginThickness}">
@@ -213,7 +215,7 @@
                                                      Style="{StaticResource BaseTextBoxStyle}"
                                                      FontSize="{StaticResource StandardFontSize}"/>
                                             <TextBlock Text="{extensions:Localize Text_SubstitutionPlaceholder}"
-                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       Foreground="{DynamicResource TextMutedBrush}"
                                                        Margin="{StaticResource SmallMarginThickness}"
                                                        IsHitTestVisible="False"
                                                        VerticalAlignment="Center"
@@ -273,11 +275,11 @@
                                         <Style TargetType="Border">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsAdded}" Value="True">
-                                                    <Setter Property="Background" Value="{StaticResource SelectionBackgroundBrush}"/>
-                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                    <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
-                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -300,8 +302,8 @@
 
                     <!-- Add new property panel -->
                     <Border Grid.Row="0"
-                            Background="{StaticResource BackgroundQuaternaryBrush}"
-                            BorderBrush="{StaticResource BorderLightBrush}"
+                            Background="{DynamicResource BackgroundQuaternaryBrush}"
+                            BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="{StaticResource StandardBorderThicknessValue}"
                             Margin="{StaticResource BottomSmallMarginThickness}"
                             Padding="{StaticResource StandardPaddingThickness}">
@@ -341,16 +343,16 @@
                              ItemsSource="{Binding Source={StaticResource UserPropertiesSource}}"
                              ItemContainerStyle="{StaticResource CustomListBoxItemStyle}"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                             BorderBrush="{StaticResource BorderLightBrush}"
-                             Background="{StaticResource BackgroundPrimaryBrush}"
+                             BorderBrush="{DynamicResource BorderLightBrush}"
+                             Background="{DynamicResource BackgroundPrimaryBrush}"
                              BorderThickness="{StaticResource StandardBorderThicknessValue}"
                              MouseDoubleClick="UserPropertiesListBox_MouseDoubleClick">
 
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border x:Name="ItemBorder"
-                                        Background="{StaticResource BackgroundPrimaryBrush}"
-                                        BorderBrush="{StaticResource BorderLightBrush}"
+                                        Background="{DynamicResource BackgroundPrimaryBrush}"
+                                        BorderBrush="{DynamicResource BorderLightBrush}"
                                         BorderThickness="{StaticResource StandardBorderThicknessValue}"
                                         Padding="{StaticResource SmallRectPaddingThickness}"
                                         Margin="{StaticResource TinyMarginThickness}">
@@ -385,7 +387,7 @@
                                                      Style="{StaticResource BaseTextBoxStyle}"
                                                      FontSize="{StaticResource StandardFontSize}"/>
                                             <TextBlock Text="{extensions:Localize Text_SubstitutionPlaceholder}"
-                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       Foreground="{DynamicResource TextMutedBrush}"
                                                        Margin="{StaticResource SmallMarginThickness}"
                                                        IsHitTestVisible="False"
                                                        VerticalAlignment="Center"
@@ -449,11 +451,11 @@
                                         <Style TargetType="Border">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsAdded}" Value="True">
-                                                    <Setter Property="Background" Value="{StaticResource SelectionBackgroundBrush}"/>
-                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                    <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
-                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -465,13 +467,13 @@
 
                     <!-- Information panel -->
                     <Border Grid.Row="2"
-                            Background="{StaticResource BackgroundQuaternaryBrush}"
-                            BorderBrush="{StaticResource BorderLightBrush}"
+                            Background="{DynamicResource BackgroundQuaternaryBrush}"
+                            BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="{StaticResource StandardBorderThicknessValue}"
                             Margin="{StaticResource TopSmallMarginThickness}"
                             Padding="{StaticResource StandardPaddingThickness}">
                         <TextBlock TextWrapping="Wrap"
-                                   Foreground="{StaticResource TextMutedBrush}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
                                    FontSize="{StaticResource StandardFontSize}">
                             <Run Text="ℹ"/>
                             <Run Text="{extensions:Localize Text_UserPropertiesInfo}"/>

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Windows;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.UI.Windows;
@@ -31,6 +32,7 @@ public record InterfaceSettings
     public Dictionary<string, string> PropertySubstitutions { get; init; } = [];
     public bool IsExpanded { get; init; }
     public string SelectedLanguage { get; init; } = "en-US";
+    public string SelectedTheme { get; init; } = "Dark";
 }
 
 public record ComponentFilterSettings
@@ -196,7 +198,8 @@ public static class SettingsManager
                 UserDefinedProperties = userDefinedProperties,
                 PropertySubstitutions = propertySubstitutions,
                 IsExpanded = window.SettingsExpander?.IsExpanded ?? false,
-                SelectedLanguage = LocalizationManager.Instance.CurrentCulture.Name
+                SelectedLanguage = LocalizationManager.Instance.CurrentCulture.Name,
+                SelectedTheme = window.DarkThemeRadioButton?.IsChecked == true ? "Dark" : "Light"
             },
             
             ComponentFilter = new ComponentFilterSettings
@@ -264,6 +267,36 @@ public static class SettingsManager
         {
             LocalizationManager.Instance.CurrentCulture = savedLanguage.Culture;
             window.LanguageComboBox.SelectedItem = savedLanguage;
+        }
+
+        // Restore theme
+        var themeFileName = settings.Interface.SelectedTheme == "Light"
+            ? "ColorResources.xaml"
+            : "DarkTheme.xaml";
+        var themeUri = new Uri($"Styles/{themeFileName}", UriKind.Relative);
+
+        var mergedDictionaries = System.Windows.Application.Current.Resources.MergedDictionaries;
+        var existingTheme = mergedDictionaries.FirstOrDefault(d =>
+            d.Source?.OriginalString.Contains("ColorResources.xaml") == true ||
+            d.Source?.OriginalString.Contains("DarkTheme.xaml") == true);
+
+        if (existingTheme != null)
+        {
+            var index = mergedDictionaries.IndexOf(existingTheme);
+            mergedDictionaries.RemoveAt(index);
+            mergedDictionaries.Insert(index, new ResourceDictionary { Source = themeUri });
+        }
+
+        // Set RadioButton state after applying theme
+        if (settings.Interface.SelectedTheme == "Light")
+        {
+            if (window.LightThemeRadioButton is not null)
+                window.LightThemeRadioButton.IsChecked = true;
+        }
+        else
+        {
+            if (window.DarkThemeRadioButton is not null)
+                window.DarkThemeRadioButton.IsChecked = true;
         }
 
         // Component filter settings
