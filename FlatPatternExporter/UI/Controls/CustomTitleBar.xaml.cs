@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,12 +9,16 @@ namespace FlatPatternExporter.UI.Controls;
 public partial class CustomTitleBar : System.Windows.Controls.UserControl
 {
     private Window? _parentWindow;
+    private bool _isMouseDown;
+    private System.Windows.Point _startPosition;
 
     public CustomTitleBar()
     {
         InitializeComponent();
         Loaded += CustomTitleBar_Loaded;
         MouseLeftButtonDown += CustomTitleBar_MouseLeftButtonDown;
+        MouseMove += CustomTitleBar_MouseMove;
+        MouseLeftButtonUp += CustomTitleBar_MouseLeftButtonUp;
     }
 
     #region Dependency Properties
@@ -77,14 +82,48 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
     {
         if (_parentWindow == null) return;
 
-        if (e.ClickCount == 1)
-        {
-            _parentWindow.DragMove();
-        }
-        else if (e.ClickCount == 2 && ShowMaximizeButton)
+        if (e.ClickCount == 2 && ShowMaximizeButton)
         {
             ToggleMaximizeRestore();
+            _isMouseDown = false;
         }
+        else if (e.ClickCount == 1)
+        {
+            _isMouseDown = true;
+            _startPosition = e.GetPosition(this);
+        }
+    }
+
+    private void CustomTitleBar_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (!_isMouseDown || _parentWindow == null || e.LeftButton != MouseButtonState.Pressed)
+            return;
+
+        var currentPosition = e.GetPosition(this);
+        var diff = currentPosition - _startPosition;
+
+        if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+            Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+        {
+            _isMouseDown = false;
+
+            if (_parentWindow.WindowState == WindowState.Maximized)
+            {
+                var relativePosition = _startPosition.X / ActualWidth;
+
+                _parentWindow.WindowState = WindowState.Normal;
+
+                _parentWindow.Left = currentPosition.X - (_parentWindow.RestoreBounds.Width * relativePosition);
+                _parentWindow.Top = currentPosition.Y - (_startPosition.Y * 0.5);
+            }
+
+            _parentWindow.DragMove();
+        }
+    }
+
+    private void CustomTitleBar_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _isMouseDown = false;
     }
 
     private void MinimizeButton_Click(object sender, RoutedEventArgs e)
