@@ -242,7 +242,7 @@
                                 <!-- Right column -->
                                 <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Top">
                                     <CheckBox x:Name="EnableSubfolderCheckBox" Content="{extensions:Localize UI_CreateSubfolder}" IsChecked="{Binding EnableSubfolder, Mode=TwoWay}" IsEnabled="{Binding IsSubfolderCheckBoxEnabled}" ToolTip="{extensions:Localize ToolTip_SubfolderInvalid}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <TextBox x:Name="SubfolderNameTextBox" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Stretch" Background="{DynamicResource BackgroundSecondaryBrush}" Margin="{StaticResource BottomSmallMarginThickness}" Style="{StaticResource BaseTextBoxStyle}"/>
+                                    <TextBox x:Name="SubfolderNameTextBox" IsEnabled="{Binding EnableSubfolder}" TextChanged="SubfolderNameTextBox_TextChanged" HorizontalAlignment="Stretch" Margin="{StaticResource BottomSmallMarginThickness}" Style="{StaticResource BaseTextBoxStyle}"/>
                                     <CheckBox x:Name="OrganizeByMaterialCheckBox" Content="{extensions:Localize UI_OrganizeByMaterial}" IsChecked="{Binding OrganizeByMaterial, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                     <CheckBox x:Name="OrganizeByThicknessCheckBox" Content="{extensions:Localize UI_OrganizeByThickness}" IsChecked="{Binding OrganizeByThickness, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                 </StackPanel>
