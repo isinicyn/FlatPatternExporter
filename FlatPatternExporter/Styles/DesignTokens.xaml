@@ -95,4 +95,7 @@
     <!-- Non-uniform border thickness -->
     <Thickness x:Key="StandardTopBorderThicknessValue">1,1,1,0</Thickness>
 
+    <!-- Opacity values -->
+    <sys:Double x:Key="DisabledOpacity">0.75</sys:Double>
+
 </ResourceDictionary>

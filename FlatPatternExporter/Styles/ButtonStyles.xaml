@@ -152,6 +152,7 @@
                 <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}"/>
+                <Setter Property="Opacity" Value="{StaticResource DisabledOpacity}"/>
                 <Setter Property="Cursor" Value="Arrow"/>
             </Trigger>
         </Style.Triggers>
@@ -174,6 +175,7 @@
                 <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
                 <Setter Property="Foreground" Value="{DynamicResource TextDisabledBrush}"/>
+                <Setter Property="Opacity" Value="{StaticResource DisabledOpacity}"/>
                 <Setter Property="Cursor" Value="Arrow"/>
             </Trigger>
         </Style.Triggers>
@@ -196,7 +198,7 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
-                <Setter Property="Opacity" Value="0.5"/>
+                <Setter Property="Opacity" Value="{StaticResource DisabledOpacity}"/>
                 <Setter Property="Cursor" Value="Arrow"/>
             </Trigger>
         </Style.Triggers>
@@ -217,7 +219,7 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
-                <Setter Property="Opacity" Value="0.5"/>
+                <Setter Property="Opacity" Value="{StaticResource DisabledOpacity}"/>
                 <Setter Property="Cursor" Value="Arrow"/>
             </Trigger>
         </Style.Triggers>
@@ -238,7 +240,7 @@
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
-                <Setter Property="Opacity" Value="0.5"/>
+                <Setter Property="Opacity" Value="{StaticResource DisabledOpacity}"/>
                 <Setter Property="Cursor" Value="Arrow"/>
             </Trigger>
         </Style.Triggers>
@@ -416,6 +418,7 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
                             <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+                            <Setter TargetName="Border" Property="Opacity" Value="{StaticResource DisabledOpacity}"/>
                             <Setter TargetName="ContentPresenter" Property="TextBlock.Foreground" Value="{DynamicResource TextDisabledBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
