@@ -43,7 +43,8 @@
 
     <Border Background="{DynamicResource BackgroundPrimaryBrush}"
             BorderBrush="{DynamicResource BorderPrimaryBrush}"
-            BorderThickness="1">
+            BorderThickness="1"
+            CornerRadius="{StaticResource StandardCornerRadiusValue}">
         <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -193,6 +194,7 @@
                                         Background="{DynamicResource BackgroundPrimaryBrush}"
                                         BorderBrush="{DynamicResource BorderLightBrush}"
                                         BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                                        CornerRadius="{StaticResource SmallCornerRadiusValue}"
                                         Padding="{StaticResource SmallRectPaddingThickness}"
                                         Margin="{StaticResource TinyMarginThickness}">
                                     <Grid>
@@ -365,6 +367,7 @@
                                         Background="{DynamicResource BackgroundPrimaryBrush}"
                                         BorderBrush="{DynamicResource BorderLightBrush}"
                                         BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                                        CornerRadius="{StaticResource SmallCornerRadiusValue}"
                                         Padding="{StaticResource SmallRectPaddingThickness}"
                                         Margin="{StaticResource TinyMarginThickness}">
                                     <Grid>

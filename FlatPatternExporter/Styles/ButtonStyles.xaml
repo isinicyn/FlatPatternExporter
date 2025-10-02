@@ -14,6 +14,7 @@
         <Border Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{StaticResource StandardCornerRadiusValue}"
                 Padding="{TemplateBinding Padding}">
             <ContentPresenter HorizontalAlignment="Center"
                               VerticalAlignment="Center"
@@ -29,6 +30,7 @@
                 Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{StaticResource SmallCornerRadiusValue}"
                 Width="{StaticResource IconButtonSize}"
                 Height="{StaticResource IconButtonSize}">
             <Viewbox Margin="{StaticResource IconButtonPadding}"
@@ -356,7 +358,8 @@
                 <ControlTemplate TargetType="Button">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource StandardCornerRadiusValue}">
                         <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           Margin="{TemplateBinding Padding}"/>
@@ -389,7 +392,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="0">
+                            CornerRadius="{StaticResource StandardCornerRadiusValue}">
                             <Grid>
                                 <ProgressBar x:Name="PART_ProgressBar"
                                        Background="{DynamicResource TransparentBrush}"

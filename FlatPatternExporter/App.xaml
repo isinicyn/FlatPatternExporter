@@ -39,7 +39,6 @@
             <!-- Shared WindowChrome configuration -->
             <shell:WindowChrome x:Key="CustomWindowChrome"
                                 CaptionHeight="0"
-                                CornerRadius="10"
                                 UseAeroCaptionButtons="False"/>
 
             <Style TargetType="UserControl">

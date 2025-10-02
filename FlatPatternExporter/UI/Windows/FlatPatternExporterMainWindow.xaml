@@ -19,7 +19,8 @@
 
     <Border Background="{DynamicResource BackgroundPrimaryBrush}"
             BorderBrush="{DynamicResource BorderPrimaryBrush}"
-            BorderThickness="1">
+            BorderThickness="1"
+            CornerRadius="{StaticResource StandardCornerRadiusValue}">
         <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -57,7 +58,7 @@
 
 
                 <Border Margin="{StaticResource RightStandardMarginThickness}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="350"
-                        BorderBrush="{DynamicResource BorderSecondaryBrush}" BorderThickness="{StaticResource StandardBorderThicknessValue}" Background="{DynamicResource BackgroundTertiaryBrush}" Padding="{StaticResource SmallPaddingThickness}" Height="75">
+                        BorderBrush="{DynamicResource BorderSecondaryBrush}" BorderThickness="{StaticResource StandardBorderThicknessValue}" CornerRadius="{StaticResource StandardCornerRadiusValue}" Background="{DynamicResource BackgroundTertiaryBrush}" Padding="{StaticResource SmallPaddingThickness}" Height="75">
                     <Grid VerticalAlignment="Center">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -256,6 +257,7 @@
                     <Border Grid.Column="1" Background="{DynamicResource BackgroundSecondaryBrush}"
                         BorderBrush="{DynamicResource BorderPrimaryBrush}"
                         BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                        CornerRadius="{StaticResource StandardCornerRadiusValue}"
                         Height="{StaticResource StandardElementHeight}"
                         Padding="{StaticResource HorizontalSmallPaddingThickness}">
                                         <TextBlock x:Name="FixedFolderPathTextBlock"
@@ -374,6 +376,7 @@
                                                 Background="{DynamicResource BackgroundSecondaryBrush}"
                                                 BorderBrush="{DynamicResource BorderSecondaryBrush}"
                                                 BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                                                CornerRadius="{StaticResource StandardCornerRadiusValue}"
                                                 Padding="{StaticResource StandardPaddingThickness}"
                                                 Margin="{StaticResource BottomSmallMarginThickness}"
                                                 MaxHeight="140"
@@ -516,6 +519,7 @@
                                             Background="{DynamicResource BackgroundPrimaryBrush}"
                                             BorderBrush="{DynamicResource BorderPrimaryBrush}"
                                             BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                                            CornerRadius="{StaticResource StandardCornerRadiusValue}"
                                             MinHeight="{StaticResource LargeElementHeight}"
                                             Padding="{StaticResource TinyMarginThickness}">
                                         <WrapPanel x:Name="TokenContainer"
@@ -575,7 +579,8 @@
             <Border Grid.Row="0"
                     Background="{DynamicResource BackgroundPrimaryBrush}"
                     BorderBrush="{DynamicResource BorderPrimaryBrush}"
-                    BorderThickness="{StaticResource StandardTopBorderThicknessValue}">
+                    BorderThickness="{StaticResource StandardTopBorderThicknessValue}"
+                    CornerRadius="3,3,0,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -729,6 +734,7 @@
                     Background="{DynamicResource BackgroundPrimaryBrush}"
                     BorderBrush="{DynamicResource BorderPrimaryBrush}"
                     BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                    CornerRadius="{StaticResource StandardCornerRadiusValue}"
                     Visibility="Collapsed">
                     <StackPanel VerticalAlignment="Center"
                             HorizontalAlignment="Center">

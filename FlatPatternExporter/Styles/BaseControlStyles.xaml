@@ -28,7 +28,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="0"
+                                CornerRadius="{StaticResource StandardCornerRadiusValue}"
                                 Margin="-1">
                         </Border>
                         <Border Grid.Row="0"
@@ -57,6 +57,19 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource SmallCornerRadiusValue}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- Base style for text boxes -->
@@ -70,6 +83,20 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource StandardCornerRadiusValue}">
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- Base style for combo boxes -->
@@ -95,7 +122,8 @@
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Border Background="{TemplateBinding Background}"
                                             BorderBrush="{TemplateBinding BorderBrush}"
-                                            BorderThickness="{TemplateBinding BorderThickness}">
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="{StaticResource StandardCornerRadiusValue}">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition/>
@@ -149,7 +177,8 @@
                                 <Border x:Name="DropDownBorder"
                                         Background="{DynamicResource BackgroundSecondaryBrush}"
                                         BorderBrush="{DynamicResource BorderPrimaryBrush}"
-                                        BorderThickness="1">
+                                        BorderThickness="1"
+                                        CornerRadius="{StaticResource StandardCornerRadiusValue}">
                                     <ScrollViewer Margin="0" SnapsToDevicePixels="True">
                                         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
                                     </ScrollViewer>
@@ -204,6 +233,7 @@
                                 Background="{DynamicResource BackgroundPrimaryBrush}"
                                 BorderBrush="{DynamicResource BorderPrimaryBrush}"
                                 BorderThickness="1"
+                                CornerRadius="{StaticResource SmallCornerRadiusValue}"
                                 VerticalAlignment="Center">
                             <Path x:Name="CheckMark"
                                   Data="M 0 4 L 3 7 L 8 0"
@@ -287,6 +317,30 @@
         <Setter Property="Padding" Value="5"/>
         <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabControl">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TabPanel Grid.Row="0"
+                                  IsItemsHost="True"
+                                  Background="Transparent"
+                                  Margin="5,0,0,0"/>
+                        <Border Grid.Row="1"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{StaticResource StandardCornerRadiusValue}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter ContentSource="SelectedContent"/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="TabItem">
@@ -303,6 +357,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="1,1,1,0"
+                            CornerRadius="3,3,0,0"
                             Padding="{TemplateBinding Padding}"
                             Height="{TemplateBinding Height}"
                             Margin="-2,2,-2,0">

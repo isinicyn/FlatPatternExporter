@@ -98,4 +98,10 @@
     <!-- Opacity values -->
     <sys:Double x:Key="DisabledOpacity">0.75</sys:Double>
 
+    <!-- Corner radius values -->
+    <sys:Double x:Key="StandardCornerRadius">3</sys:Double>
+    <sys:Double x:Key="SmallCornerRadius">1</sys:Double>
+    <CornerRadius x:Key="StandardCornerRadiusValue">3</CornerRadius>
+    <CornerRadius x:Key="SmallCornerRadiusValue">1</CornerRadius>
+
 </ResourceDictionary>

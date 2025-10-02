@@ -184,10 +184,11 @@
 
     <!-- Template for processing status column -->
     <DataTemplate x:Key="ProcessingStatusTemplate">
-        <Border Width="10" Height="10" 
-                BorderBrush="{DynamicResource TextDisabledBrush}" 
-                BorderThickness="{StaticResource StandardBorderThicknessValue}" 
-                HorizontalAlignment="Center" 
+        <Border Width="10" Height="10"
+                BorderBrush="{DynamicResource TextDisabledBrush}"
+                BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                CornerRadius="{StaticResource SmallCornerRadiusValue}"
+                HorizontalAlignment="Center"
                 VerticalAlignment="Center">
             <Border.Style>
                 <Style TargetType="Border">
