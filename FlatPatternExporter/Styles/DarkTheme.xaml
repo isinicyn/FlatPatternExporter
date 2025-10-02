@@ -68,8 +68,8 @@
     <SolidColorBrush x:Key="ProgressBarBrush" Color="#404EC9B0"/>
 
     <!-- Colors for processing statuses -->
-    <StaticResource x:Key="ProcessingStatusSuccessBrush" ResourceKey="SuccessBrush"/>
-    <StaticResource x:Key="ProcessingStatusErrorBrush" ResourceKey="ErrorBrush"/>
+    <SolidColorBrush x:Key="ProcessingStatusSuccessBrush" Color="#4EC9B0"/>
+    <SolidColorBrush x:Key="ProcessingStatusErrorBrush" Color="#F48771"/>
 
     <!-- Status bar background -->
     <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#007ACC"/>

@@ -45,11 +45,11 @@
     <SolidColorBrush x:Key="TokenCustomBackgroundBrush" Color="#E1F0FF"/>
     <StaticResource x:Key="TokenCustomBorderBrush" ResourceKey="AccentBrush"/>
     <SolidColorBrush x:Key="TokenUserDefinedBackgroundBrush" Color="#FFF4E5"/>
-    <StaticResource x:Key="TokenUserDefinedBorderBrush" ResourceKey="WarningBrush"/>
+    <SolidColorBrush x:Key="TokenUserDefinedBorderBrush" Color="#E67E22"/>
     <SolidColorBrush x:Key="PreviewValidBackgroundBrush" Color="#D5F4E6"/>
-    <StaticResource x:Key="PreviewValidBorderBrush" ResourceKey="SuccessBrush"/>
-    <StaticResource x:Key="PreviewWarningBackgroundBrush" ResourceKey="TokenUserDefinedBackgroundBrush"/>
-    <StaticResource x:Key="PreviewWarningBorderBrush" ResourceKey="WarningBrush"/>
+    <SolidColorBrush x:Key="PreviewValidBorderBrush" Color="#16A085"/>
+    <SolidColorBrush x:Key="PreviewWarningBackgroundBrush" Color="#FFF4E5"/>
+    <SolidColorBrush x:Key="PreviewWarningBorderBrush" Color="#E67E22"/>
 
     <!-- Backgrounds for red shades (deletion, errors) -->
     <SolidColorBrush x:Key="RedLightBackgroundBrush" Color="#FADBD8"/>
@@ -68,8 +68,8 @@
     <SolidColorBrush x:Key="ProgressBarBrush" Color="#6016A085"/>
 
     <!-- Colors for processing statuses -->
-    <StaticResource x:Key="ProcessingStatusSuccessBrush" ResourceKey="SuccessBrush"/>
-    <StaticResource x:Key="ProcessingStatusErrorBrush" ResourceKey="ErrorBrush"/>
+    <SolidColorBrush x:Key="ProcessingStatusSuccessBrush" Color="#16A085"/>
+    <SolidColorBrush x:Key="ProcessingStatusErrorBrush" Color="#E74C3C"/>
 
     <!-- Status bar background -->
     <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#0078D4"/>
