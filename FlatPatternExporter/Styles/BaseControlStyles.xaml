@@ -316,7 +316,7 @@
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Panel.ZIndex" Value="100"/>
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
-                            <Setter TargetName="Border" Property="Margin" Value="-2,0,-2,0"/>
+                            <Setter TargetName="Border" Property="Margin" Value="-2,0,-2,-1"/>
                             <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
