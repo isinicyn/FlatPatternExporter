@@ -32,8 +32,9 @@
         <!-- Row 0: Custom title bar -->
         <local:CustomTitleBar x:Name="TitleBar"
                               Grid.Row="0"
-                              Title="FPEx"
-                              Icon="/FPExport.ico">
+                              Title="Flat Pattern Exporter 2026"
+                              Icon="/FPExport.ico"
+                              TitleAlignment="Center">
             <local:CustomTitleBar.ContentArea>
                 <StackPanel Orientation="Horizontal">
                     <Button Style="{StaticResource TitleBarIconButtonStyle}"

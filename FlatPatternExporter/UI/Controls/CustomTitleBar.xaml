@@ -72,12 +72,13 @@
 
             <!-- Window title -->
             <TextBlock Grid.Column="1"
+                       x:Name="TitleTextBlock"
                        Text="{Binding ElementName=TitleBarControl, Path=Title}"
                        Foreground="{DynamicResource TextSecondaryBrush}"
                        FontSize="{DynamicResource StandardFontSize}"
                        FontWeight="Normal"
                        VerticalAlignment="Center"
-                       HorizontalAlignment="Left"
+                       HorizontalAlignment="{Binding ElementName=TitleBarControl, Path=TitleAlignment}"
                        TextTrimming="CharacterEllipsis">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">

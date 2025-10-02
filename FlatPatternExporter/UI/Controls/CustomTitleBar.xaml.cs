@@ -73,6 +73,16 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
         set => SetValue(ContentAreaProperty, value);
     }
 
+    public static readonly DependencyProperty TitleAlignmentProperty =
+        DependencyProperty.Register(nameof(TitleAlignment), typeof(System.Windows.HorizontalAlignment), typeof(CustomTitleBar),
+            new PropertyMetadata(System.Windows.HorizontalAlignment.Left));
+
+    public System.Windows.HorizontalAlignment TitleAlignment
+    {
+        get => (System.Windows.HorizontalAlignment)GetValue(TitleAlignmentProperty);
+        set => SetValue(TitleAlignmentProperty, value);
+    }
+
     #endregion
 
     #region Event Handlers
