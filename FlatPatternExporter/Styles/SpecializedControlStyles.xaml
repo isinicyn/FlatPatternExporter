@@ -142,7 +142,7 @@
     <!-- Style for file name preview -->
     <Style x:Key="FileNamePreviewBorderStyle" TargetType="Border">
         <Setter Property="MinHeight" Value="{StaticResource StandardElementHeight}"/>
-        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="Padding" Value="8"/>
         <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
         <Setter Property="Background" Value="{DynamicResource PreviewWarningBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
@@ -182,6 +182,7 @@
     <Style x:Key="FileNamePreviewTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
         <Setter Property="FontFamily" Value="Consolas"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
     <!-- Styles for file name constructor elements -->
