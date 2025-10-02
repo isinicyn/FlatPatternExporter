@@ -38,10 +38,8 @@
 
             <!-- Shared WindowChrome configuration -->
             <shell:WindowChrome x:Key="CustomWindowChrome"
-                                ResizeBorderThickness="5"
                                 CaptionHeight="0"
-                                CornerRadius="0"
-                                GlassFrameThickness="0"
+                                CornerRadius="10"
                                 UseAeroCaptionButtons="False"/>
 
             <Style TargetType="UserControl">
