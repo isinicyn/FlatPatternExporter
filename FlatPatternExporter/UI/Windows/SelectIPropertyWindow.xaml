@@ -114,7 +114,7 @@
                                            Foreground="{DynamicResource TextMutedBrush}"
                                            Margin="{StaticResource SmallMarginThickness}"
                                            IsHitTestVisible="False" VerticalAlignment="Center"
-                                           Padding="{StaticResource TextBoxPaddingThickness}">
+                                           Padding="{StaticResource PlaceholderPaddingThickness}">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
                                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -238,7 +238,7 @@
                                                        Margin="{StaticResource SmallMarginThickness}"
                                                        IsHitTestVisible="False"
                                                        VerticalAlignment="Center"
-                                                       Padding="{StaticResource TextBoxPaddingThickness}">
+                                                       Padding="{StaticResource PlaceholderPaddingThickness}">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -412,7 +412,7 @@
                                                        Margin="{StaticResource SmallMarginThickness}"
                                                        IsHitTestVisible="False"
                                                        VerticalAlignment="Center"
-                                                       Padding="{StaticResource TextBoxPaddingThickness}">
+                                                       Padding="{StaticResource PlaceholderPaddingThickness}">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
                                                         <Setter Property="Visibility" Value="Collapsed"/>

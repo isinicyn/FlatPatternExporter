@@ -598,7 +598,7 @@
                             <TextBlock Text="{extensions:Localize Text_Search}"
                                    Foreground="{DynamicResource TextDisabledBrush}"
                                    Margin="{StaticResource SmallMarginThickness}"
-                                   IsHitTestVisible="False" VerticalAlignment="Center" Padding="{StaticResource TextBoxPaddingThickness}">
+                                   IsHitTestVisible="False" VerticalAlignment="Center" Padding="{StaticResource PlaceholderPaddingThickness}">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
                                         <Setter Property="Visibility" Value="Collapsed"/>

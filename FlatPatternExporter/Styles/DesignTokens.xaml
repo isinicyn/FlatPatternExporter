@@ -42,6 +42,7 @@
     <Thickness x:Key="ButtonPaddingThickness">12,6</Thickness>
     <Thickness x:Key="ControlPaddingThickness">6,4</Thickness>
     <Thickness x:Key="TextBoxPaddingThickness">2,0,2,0</Thickness>
+    <Thickness x:Key="PlaceholderPaddingThickness">4,0,4,0</Thickness>
     <Thickness x:Key="StandardBorderThicknessValue">1</Thickness>
 
     <!-- Directional and combined margins (commonly used) -->

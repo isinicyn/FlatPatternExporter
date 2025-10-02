@@ -24,7 +24,7 @@
                        Foreground="{DynamicResource TextTransparentMutedBrush}"
                        IsHitTestVisible="False"
                        Margin="{StaticResource SmallMarginThickness}"
-                       Padding="{StaticResource TextBoxPaddingThickness}"
+                       Padding="{StaticResource PlaceholderPaddingThickness}"
                        TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
