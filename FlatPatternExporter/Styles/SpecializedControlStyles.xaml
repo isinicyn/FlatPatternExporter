@@ -98,6 +98,7 @@
                             CornerRadius="{StaticResource StandardCornerRadiusValue}"
                             Padding="{StaticResource UniformTinyPaddingThickness}">
                         <ScrollViewer Focusable="False"
+                                      CanContentScroll="False"
                                       HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                                       VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
                             <ItemsPresenter />
