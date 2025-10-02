@@ -333,6 +333,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TabPanel Grid.Row="0"
+                                  Panel.ZIndex="1"
                                   IsItemsHost="True"
                                   Background="Transparent"
                                   Margin="5,0,0,0"/>
