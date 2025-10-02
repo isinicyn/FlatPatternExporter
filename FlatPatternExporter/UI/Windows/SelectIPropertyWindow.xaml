@@ -62,7 +62,8 @@
         <Border Grid.Row="1"
                 Background="{DynamicResource BackgroundSecondaryBrush}"
                 BorderBrush="{DynamicResource BorderLightBrush}"
-                Padding="{StaticResource StandardPaddingThickness}" BorderThickness="0,0,0,1">
+                BorderThickness="0,0,0,1"
+                Padding="{StaticResource StandardPaddingThickness}">
             <StackPanel>
                 <TextBlock Text="{extensions:Localize Text_PropertyManagement}"
                            Style="{StaticResource SectionHeaderTextStyle}"
@@ -89,6 +90,7 @@
                             Background="{DynamicResource BackgroundQuaternaryBrush}"
                             BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                            CornerRadius="{StaticResource StandardCornerRadiusValue}"
                             Margin="{StaticResource BottomSmallMarginThickness}"
                             Padding="{StaticResource StandardPaddingThickness}">
                         <Grid>
@@ -125,7 +127,11 @@
                                     </TextBlock.Style>
                                 </TextBlock>
 
-                                <Border Grid.Column="1" Width="{StaticResource StandardElementHeight}" Height="{StaticResource StandardElementHeight}" Margin="{StaticResource TinyMarginThickness}">
+                                <Border Grid.Column="1"
+                                        Width="{StaticResource StandardElementHeight}"
+                                        Height="{StaticResource StandardElementHeight}"
+                                        CornerRadius="{StaticResource SmallCornerRadiusValue}"
+                                        Margin="{StaticResource TinyMarginThickness}">
                                     <Button x:Name="ClearStandardSearchButton"
                                         Click="ClearStandardSearchButton_Click"
                                         Style="{StaticResource CloseIconButton}"
@@ -174,6 +180,7 @@
                                         <Border Background="{DynamicResource BackgroundTertiaryBrush}"
                                                 BorderBrush="{DynamicResource BorderSecondaryBrush}"
                                                 BorderThickness="{StaticResource StandardTopOnlyBorderThicknessValue}"
+                                                CornerRadius="{StaticResource SmallCornerRadiusValue}"
                                                 Margin="{StaticResource TopSmallMarginThickness}"
                                                 Padding="{StaticResource SmallRectPaddingThickness}">
                                             <TextBlock Text="{Binding Name}"
@@ -317,6 +324,7 @@
                             Background="{DynamicResource BackgroundQuaternaryBrush}"
                             BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                            CornerRadius="{StaticResource StandardCornerRadiusValue}"
                             Margin="{StaticResource BottomSmallMarginThickness}"
                             Padding="{StaticResource StandardPaddingThickness}">
                         <Grid>
@@ -483,6 +491,7 @@
                             Background="{DynamicResource BackgroundQuaternaryBrush}"
                             BorderBrush="{DynamicResource BorderLightBrush}"
                             BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                            CornerRadius="{StaticResource StandardCornerRadiusValue}"
                             Margin="{StaticResource TopSmallMarginThickness}"
                             Padding="{StaticResource StandardPaddingThickness}">
                         <TextBlock TextWrapping="Wrap"
