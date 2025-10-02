@@ -150,40 +150,67 @@
                                 <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" Margin="{StaticResource VerticalSeparatorOuterMarginThickness}" UseLayoutRounding="True"/>
 
                                 <!-- Spline replacement -->
-                                <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                    <CheckBox x:Name="EnableSplineReplacementCheckBox" Content="{extensions:Localize UI_SplineReplacement}" IsChecked="{Binding EnableSplineReplacement, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <DockPanel Margin="{StaticResource BottomSmallMarginThickness}" HorizontalAlignment="Stretch">
-                                        <Label Content="{extensions:Localize Label_ReplacementType}" VerticalAlignment="Center" Padding="{StaticResource LabelInlinePaddingThickness}" DockPanel.Dock="Left"/>
-                                        <ComboBox x:Name="SplineReplacementComboBox"
-                                                  HorizontalAlignment="Stretch"
-                                                  IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}"
-                                                  Style="{StaticResource BaseComboBoxStyle}"
-                                                  Margin="{StaticResource LeftTinyMarginThickness}"
-                                                  SelectedValue="{Binding SelectedSplineReplacement, Mode=TwoWay}">
-                                            <ComboBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <TextBlock>
-                                                        <TextBlock.Text>
-                                                            <MultiBinding>
-                                                                <MultiBinding.Converter>
-                                                                    <converters:EnumToDisplayNameConverter/>
-                                                                </MultiBinding.Converter>
-                                                                <Binding/>
-                                                                <Binding Path="CurrentCulture" Source="{x:Static services:LocalizationManager.Instance}"/>
-                                                            </MultiBinding>
-                                                        </TextBlock.Text>
-                                                    </TextBlock>
-                                                </DataTemplate>
-                                            </ComboBox.ItemTemplate>
-                                            <enums:SplineReplacementType>Lines</enums:SplineReplacementType>
-                                            <enums:SplineReplacementType>Arcs</enums:SplineReplacementType>
-                                        </ComboBox>
-                                    </DockPanel>
-                                    <DockPanel Margin="{StaticResource BottomSmallMarginThickness}" HorizontalAlignment="Stretch">
-                                        <Label Content="{extensions:Localize Label_Tolerance}" VerticalAlignment="Center" Padding="{StaticResource LabelInlinePaddingThickness}" DockPanel.Dock="Left"/>
-                                        <TextBox x:Name="SplineToleranceTextBox" HorizontalAlignment="Stretch" IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}" Margin="2,2,0,2"/>
-                                    </DockPanel>
-                                </StackPanel>
+                                <Grid Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <CheckBox x:Name="EnableSplineReplacementCheckBox"
+                                              Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                              Content="{extensions:Localize UI_SplineReplacement}"
+                                              IsChecked="{Binding EnableSplineReplacement, Mode=TwoWay}"
+                                              Margin="{StaticResource BottomSmallMarginThickness}"/>
+
+                                    <Label Grid.Row="1" Grid.Column="0"
+                                           Content="{extensions:Localize Label_ReplacementType}"
+                                           VerticalAlignment="Center"
+                                           Padding="{StaticResource LabelInlinePaddingThickness}"
+                                           Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <ComboBox x:Name="SplineReplacementComboBox"
+                                              Grid.Row="1" Grid.Column="1"
+                                              Width="65"
+                                              HorizontalAlignment="Left"
+                                              IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}"
+                                              Style="{StaticResource BaseComboBoxStyle}"
+                                              Margin="{StaticResource BottomSmallMarginThickness}"
+                                              SelectedValue="{Binding SelectedSplineReplacement, Mode=TwoWay}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
+                                                    <TextBlock.Text>
+                                                        <MultiBinding>
+                                                            <MultiBinding.Converter>
+                                                                <converters:EnumToDisplayNameConverter/>
+                                                            </MultiBinding.Converter>
+                                                            <Binding/>
+                                                            <Binding Path="CurrentCulture" Source="{x:Static services:LocalizationManager.Instance}"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                        <enums:SplineReplacementType>Lines</enums:SplineReplacementType>
+                                        <enums:SplineReplacementType>Arcs</enums:SplineReplacementType>
+                                    </ComboBox>
+
+                                    <Label Grid.Row="2" Grid.Column="0"
+                                           Content="{extensions:Localize Label_Tolerance}"
+                                           VerticalAlignment="Center"
+                                           Padding="{StaticResource LabelInlinePaddingThickness}"
+                                           Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <TextBox x:Name="SplineToleranceTextBox"
+                                             Grid.Row="2" Grid.Column="1"
+                                             Width="65"
+                                             HorizontalAlignment="Left"
+                                             IsEnabled="{Binding IsChecked, ElementName=EnableSplineReplacementCheckBox}"
+                                             Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                </Grid>
                             </Grid>
                         </GroupBox>
 
