@@ -76,7 +76,7 @@
 
     <!-- Brushes for DataGrid row alternation -->
     <SolidColorBrush x:Key="EvenRowBrush" Color="#1E1E1E"/>
-    <SolidColorBrush x:Key="OddRowBrush" Color="#333337"/>
+    <SolidColorBrush x:Key="OddRowBrush" Color="#252526"/>
     <SolidColorBrush x:Key="HighlightBrush" Color="#37373D"/>
     <SolidColorBrush x:Key="HighlightTextBrush" Color="#FFFFFF"/>
 
