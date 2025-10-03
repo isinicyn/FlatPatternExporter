@@ -113,15 +113,20 @@ public class DocumentScanner
         var filteredOccurrences = new List<ComponentOccurrence>();
         foreach (ComponentOccurrence occ in occurrences)
         {
-            if (occ.Suppressed) continue;
-
-            if (occ.Definition is VirtualComponentDefinition) continue;
-
             try
             {
+                if (occ.Suppressed) continue;
+
+                if (occ.Definition is VirtualComponentDefinition) continue;
+
                 var fullFileName = GetFullFileName(occ);
                 if (!ShouldExcludeComponent(occ.BOMStructure, fullFileName, options))
                     filteredOccurrences.Add(occ);
+            }
+            catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
+            {
+                _hasMissingReferences = true;
+                Debug.WriteLine($"Detected component with missing reference: {ex.Message}");
             }
             catch
             {
