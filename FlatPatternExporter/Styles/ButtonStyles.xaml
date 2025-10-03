@@ -469,10 +469,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
                     <Border Background="{TemplateBinding Background}"
-                            BorderThickness="0">
+                            BorderThickness="0"
+                            CornerRadius="{StaticResource StandardCornerRadiusValue}">
                         <Border BorderThickness="1"
                                 BorderBrush="{DynamicResource BorderPrimaryBrush}"
-                                CornerRadius="{StaticResource SmallCornerRadiusValue}">
+                                CornerRadius="{StaticResource StandardCornerRadiusValue}">
                             <Viewbox Width="16" Height="16"
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Center">
@@ -513,10 +514,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Border Background="{TemplateBinding Background}"
-                            BorderThickness="0">
+                            BorderThickness="0"
+                            CornerRadius="{StaticResource StandardCornerRadiusValue}">
                         <Border BorderThickness="1"
                                 BorderBrush="{DynamicResource BorderPrimaryBrush}"
-                                CornerRadius="{StaticResource SmallCornerRadiusValue}">
+                                CornerRadius="{StaticResource StandardCornerRadiusValue}">
                             <Viewbox Width="16" Height="16"
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Center">
