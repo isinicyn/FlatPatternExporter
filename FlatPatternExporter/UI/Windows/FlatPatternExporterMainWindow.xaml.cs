@@ -821,7 +821,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 }
                 else if (_documentScanner.HasMissingReferences)
                 {
-                    MessageBox.Show(_localizationManager.GetString("Info_BrokenReferences"),
+                    var messageKey = result.ProcessingMethod == ProcessingMethod.BOM
+                        ? "Info_BrokenReferences_BOM"
+                        : "Info_BrokenReferences_Traverse";
+                    MessageBox.Show(_localizationManager.GetString(messageKey),
                         _localizationManager.GetString("Info_Warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 break;
@@ -1542,6 +1545,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
             sheetMetalParts = scanResult.SheetMetalParts;
             result.ProcessedCount = scanResult.ProcessedCount;
+            result.ProcessingMethod = scanResult.ProcessingMethod;
 
             // Process parts for UI
             if (updateUI && sheetMetalParts.Count > 0)

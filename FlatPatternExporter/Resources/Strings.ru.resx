@@ -283,8 +283,11 @@
 
 Используйте кнопку "Конфликты" на панели управления для просмотра деталей конфликтов.</value>
   </data>
-  <data name="Info_BrokenReferences" xml:space="preserve">
-    <value>В сборке обнаружены компоненты с потерянными ссылками. Некоторые данные могли быть пропущены.</value>
+  <data name="Info_BrokenReferences_BOM" xml:space="preserve">
+    <value>В сборке обнаружены компоненты с потерянными ссылками. Обработка спецификации требует восстановления всех ссылок. Пожалуйста, исправьте потерянные ссылки и повторите попытку или воспользуйтесь другим методом обработки компонентов.</value>
+  </data>
+  <data name="Info_BrokenReferences_Traverse" xml:space="preserve">
+    <value>Компоненты с потерянными ссылками пропущены при обходе, остальные успешно обработаны.</value>
   </data>
   <data name="Info_ExportCompleted" xml:space="preserve">
     <value>Экспорт DXF завершен</value>

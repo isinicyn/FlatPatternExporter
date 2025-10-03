@@ -283,8 +283,11 @@ Different models or model states with identical designations found. Conflicting 
 
 Use the "Conflicts" button on the control panel to view conflict details.</value>
   </data>
-  <data name="Info_BrokenReferences" xml:space="preserve">
-    <value>Components with broken references detected in assembly. Some data may have been skipped.</value>
+  <data name="Info_BrokenReferences_BOM" xml:space="preserve">
+    <value>Components with missing references detected in assembly. BOM processing requires all references to be valid. Please resolve missing references and try again, or use a different component processing method.</value>
+  </data>
+  <data name="Info_BrokenReferences_Traverse" xml:space="preserve">
+    <value>Components with missing references were skipped during traversal, the remaining components were processed successfully.</value>
   </data>
   <data name="Info_ExportCompleted" xml:space="preserve">
     <value>DXF Export Completed</value>

@@ -34,7 +34,10 @@ public class DocumentScanner
         CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
-        var result = new ScanResult();
+        var result = new ScanResult
+        {
+            ProcessingMethod = processingMethod
+        };
 
         try
         {
@@ -406,6 +409,7 @@ public class ScanResult
     public TimeSpan ElapsedTime { get; set; }
     public bool WasCancelled { get; set; }
     public bool HasMissingReferences { get; set; }
+    public ProcessingMethod ProcessingMethod { get; set; }
     public List<string> Errors { get; set; } = [];
 }
 
