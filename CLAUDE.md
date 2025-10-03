@@ -106,6 +106,7 @@ FlatPatternExporter/
     │   ├── SpecializedControlStyles.xaml
     │   ├── DocumentInfoStyles.xaml
     │   ├── ThemeControlStyles.xaml
+    │   ├── ContextMenuStyles.xaml
     │   └── ScrollBarStyles.xaml
     │
     ├── Extensions/                     # Расширения разметки XAML
@@ -223,6 +224,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `SpecializedControlStyles.xaml` - Специализированные стили (ListBox, TreeView, Token, Separator)
 - `DocumentInfoStyles.xaml` - Стили для заголовков и информации о документе
 - `ThemeControlStyles.xaml` - Тема-зависимые стили для системных контролов
+- `ContextMenuStyles.xaml` - Стили для контекстного меню и пунктов меню
 - `ScrollBarStyles.xaml` - Стили для ScrollBar и Slider
 
 **Converters/ - WPF конвертеры (namespace: FlatPatternExporter.Converters):**

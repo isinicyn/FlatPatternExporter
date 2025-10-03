@@ -25,6 +25,7 @@
 
                 <!-- Theme-aware control styles -->
                 <ResourceDictionary Source="Styles/ThemeControlStyles.xaml"/>
+                <ResourceDictionary Source="Styles/ContextMenuStyles.xaml"/>
                 <ResourceDictionary Source="Styles/ScrollBarStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 

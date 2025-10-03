@@ -80,22 +80,6 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
     </Style>
 
-    <Style TargetType="Menu">
-        <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-    </Style>
-
-    <Style TargetType="ContextMenu">
-        <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
-    </Style>
-
-    <Style TargetType="MenuItem">
-        <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-    </Style>
-
     <Style TargetType="ComboBoxItem">
         <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
