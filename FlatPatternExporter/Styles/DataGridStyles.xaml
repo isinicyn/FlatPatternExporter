@@ -304,7 +304,7 @@
 
     <!-- Style for column headers -->
     <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
-        <Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource BackgroundTertiaryBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="Height" Value="{StaticResource LargeElementHeight}"/>
         <Setter Property="FontSize" Value="{StaticResource StandardFontSize}"/>
@@ -398,11 +398,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="DataGridColumnHeadersPresenter">
                     <Grid>
-                        <DataGridColumnHeader x:Name="PART_FillerColumnHeader" 
-                                              IsHitTestVisible="False" 
+                        <DataGridColumnHeader x:Name="PART_FillerColumnHeader"
+                                              IsHitTestVisible="False"
                                               BorderThickness="0,0,0,1"
                                               BorderBrush="{DynamicResource BorderLightBrush}"
-                                              Background="{DynamicResource SelectionBackgroundBrush}"/>
+                                              Background="{DynamicResource BackgroundTertiaryBrush}"/>
                         <ItemsPresenter/>
                     </Grid>
                 </ControlTemplate>
