@@ -63,7 +63,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{StaticResource SmallCornerRadiusValue}"
+                            CornerRadius="{StaticResource StandardCornerRadiusValue}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter />
                     </Border>
