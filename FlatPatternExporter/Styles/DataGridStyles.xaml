@@ -74,7 +74,16 @@
             </Border.OpacityMask>
             <Image Source="{Binding Preview}"
                    HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+                   VerticalAlignment="Center">
+                <Image.ToolTip>
+                    <ToolTip Style="{StaticResource BaseToolTipStyle}" Padding="0">
+                        <Image Source="{Binding Preview}"
+                               MaxWidth="200"
+                               MaxHeight="200"
+                               Stretch="Uniform"/>
+                    </ToolTip>
+                </Image.ToolTip>
+            </Image>
         </Border>
     </DataTemplate>
 
@@ -106,7 +115,16 @@
                 </Border.OpacityMask>
                 <Image HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       Source="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}"/>
+                       Source="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}">
+                    <Image.ToolTip>
+                        <ToolTip Style="{StaticResource BaseToolTipStyle}" Padding="0">
+                            <Image Source="{Binding PlacementTarget.Source, RelativeSource={RelativeSource AncestorType=ToolTip}}"
+                                   MaxWidth="200"
+                                   MaxHeight="200"
+                                   Stretch="Uniform"/>
+                        </ToolTip>
+                    </Image.ToolTip>
+                </Image>
             </Border>
             <TextBlock>
                 <TextBlock.Style>

@@ -8,7 +8,7 @@ namespace DxfRenderer;
 
 public abstract class BaseRenderer
 {
-    public const int DefaultThumbnailSize = 100;
+    public const int DefaultThumbnailSize = 200;
     protected const double BoundsPadding = 0.9;
     protected const int SplineSubdivisions = 50;
     protected const double MinGeometrySize = 0.05;
