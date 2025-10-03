@@ -873,6 +873,15 @@
   <data name="Text_FileNameTemplate" xml:space="preserve">
     <value>Шаблон имени файла:</value>
   </data>
+  <data name="Legend_StandardToken" xml:space="preserve">
+    <value>Стандартные свойства</value>
+  </data>
+  <data name="Legend_CustomText" xml:space="preserve">
+    <value>Произвольный текст</value>
+  </data>
+  <data name="Legend_UserDefined" xml:space="preserve">
+    <value>Пользовательские свойства</value>
+  </data>
   <data name="Text_Preview" xml:space="preserve">
     <value>Предпросмотр:</value>
   </data>

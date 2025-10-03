@@ -64,6 +64,22 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
+    <!-- Token legend styles -->
+    <Style x:Key="TokenLegendColorBox" TargetType="Border">
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource SmallCornerRadiusValue}"/>
+        <Setter Property="Width" Value="12"/>
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,4,0"/>
+    </Style>
+
+    <Style x:Key="TokenLegendText" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
     <!-- Style for tokens in ListBox -->
     <Style x:Key="TokenItemStyle" TargetType="ListBoxItem">
         <Setter Property="Template">

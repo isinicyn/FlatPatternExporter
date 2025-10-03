@@ -524,6 +524,35 @@
                                                    VerticalAlignment="Center"/>
                                     </Border>
 
+                                    <!-- Color legend -->
+                                    <WrapPanel Orientation="Horizontal" Margin="0,8,0,0" HorizontalAlignment="Left">
+                                        <!-- Standard token -->
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
+                                            <Border Style="{StaticResource TokenLegendColorBox}"
+                                                    Background="{DynamicResource TokenBackgroundBrush}"
+                                                    BorderBrush="{DynamicResource BorderPrimaryBrush}"/>
+                                            <TextBlock Style="{StaticResource TokenLegendText}"
+                                                       Text="{extensions:Localize Legend_StandardToken}"/>
+                                        </StackPanel>
+
+                                        <!-- Custom text token -->
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
+                                            <Border Style="{StaticResource TokenLegendColorBox}"
+                                                    Background="{DynamicResource TokenCustomBackgroundBrush}"
+                                                    BorderBrush="{DynamicResource TokenCustomBorderBrush}"/>
+                                            <TextBlock Style="{StaticResource TokenLegendText}"
+                                                       Text="{extensions:Localize Legend_CustomText}"/>
+                                        </StackPanel>
+
+                                        <!-- User-defined token -->
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Style="{StaticResource TokenLegendColorBox}"
+                                                    Background="{DynamicResource TokenUserDefinedBackgroundBrush}"
+                                                    BorderBrush="{DynamicResource TokenUserDefinedBorderBrush}"/>
+                                            <TextBlock Style="{StaticResource TokenLegendText}"
+                                                       Text="{extensions:Localize Legend_UserDefined}"/>
+                                        </StackPanel>
+                                    </WrapPanel>
 
                                     <!-- Result preview -->
                                     <TextBlock Text="{extensions:Localize Text_Preview}" Style="{StaticResource SectionHeaderTextStyle}"/>

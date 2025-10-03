@@ -873,6 +873,15 @@ Execution time: {4}</value>
   <data name="Text_FileNameTemplate" xml:space="preserve">
     <value>File name template:</value>
   </data>
+  <data name="Legend_StandardToken" xml:space="preserve">
+    <value>Standard properties</value>
+  </data>
+  <data name="Legend_CustomText" xml:space="preserve">
+    <value>Custom text</value>
+  </data>
+  <data name="Legend_UserDefined" xml:space="preserve">
+    <value>User-defined properties</value>
+  </data>
   <data name="Text_Preview" xml:space="preserve">
     <value>Preview:</value>
   </data>
