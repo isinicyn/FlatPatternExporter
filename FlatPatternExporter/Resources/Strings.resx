@@ -945,6 +945,9 @@ Execution time: {4}</value>
   <data name="Text_LicenseValue" xml:space="preserve">
     <value>Free</value>
   </data>
+  <data name="Header_License" xml:space="preserve">
+    <value>License</value>
+  </data>
   <data name="Text_LastUpdate" xml:space="preserve">
     <value>Last update: 10/09/2023</value>
   </data>

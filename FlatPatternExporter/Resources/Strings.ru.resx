@@ -945,6 +945,9 @@
   <data name="Text_LicenseValue" xml:space="preserve">
     <value>Свободная</value>
   </data>
+  <data name="Header_License" xml:space="preserve">
+    <value>Лицензия</value>
+  </data>
   <data name="Text_LastUpdate" xml:space="preserve">
     <value>Последнее обновление: 10/09/2023</value>
   </data>

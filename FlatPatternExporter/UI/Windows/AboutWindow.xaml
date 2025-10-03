@@ -50,6 +50,17 @@
                 </StackPanel>
             </GroupBox>
 
+            <GroupBox Header="{extensions:Localize Header_License}" Margin="{StaticResource VerticalSmallMarginThickness}">
+                <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
+                    <TextBlock Text="{extensions:Localize Text_LicenseValue}"
+                               TextAlignment="Center"
+                               Style="{StaticResource BaseTextBlockStyle}"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Margin="{StaticResource BottomSmallMarginThickness}"/>
+                </StackPanel>
+            </GroupBox>
+
             <GroupBox Header="{extensions:Localize Header_Author}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <Grid Margin="{StaticResource BottomHairlineMarginThickness}">
@@ -58,7 +69,6 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
@@ -76,11 +86,6 @@
                                    Style="{StaticResource BaseTextBlockStyle}"
                                    Cursor="Hand"
                                    MouseLeftButtonDown="EmailTextBlock_MouseLeftButtonDown"/>
-
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{extensions:Localize Text_LicenseLabel}"
-                                   Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{extensions:Localize Text_LicenseValue}"
-                                   Style="{StaticResource BaseTextBlockStyle}"/>
                     </Grid>
                 </StackPanel>
             </GroupBox>
