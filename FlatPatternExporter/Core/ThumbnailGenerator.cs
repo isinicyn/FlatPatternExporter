@@ -61,16 +61,12 @@ public class ThumbnailGenerator
         }
     }
 
-    public BitmapImage? GenerateDxfThumbnails(string dxfDirectory, string partNumber, Dispatcher dispatcher)
+    public BitmapImage? GenerateDxfThumbnails(string dxfFilePath, Dispatcher dispatcher)
     {
-        var searchPattern = partNumber + "*.dxf"; // Search pattern
-        var dxfFiles = Directory.GetFiles(dxfDirectory, searchPattern);
-
-        if (dxfFiles.Length == 0) return null;
+        if (!System.IO.File.Exists(dxfFilePath)) return null;
 
         try
         {
-            var dxfFilePath = dxfFiles[0]; // Take the first file matching the pattern
             var generator = new DxfThumbnailGenerator();
             var svg = generator.GenerateSvg(dxfFilePath);
 

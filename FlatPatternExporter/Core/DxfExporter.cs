@@ -291,7 +291,7 @@ public class DxfExporter
                 if (exportSuccess && generateThumbnails && thumbnailGenerator != null &&
                     AcadVersionMapping.SupportsOptimization(exportOptions.SelectedAcadVersion))
                 {
-                    var dxfPreview = thumbnailGenerator.GenerateDxfThumbnails(thicknessDir, partNumber, Dispatcher.CurrentDispatcher);
+                    var dxfPreview = thumbnailGenerator.GenerateDxfThumbnails(filePath, Dispatcher.CurrentDispatcher);
                     if (dxfPreview != null)
                     {
                         partData.DxfPreview = dxfPreview;
