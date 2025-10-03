@@ -41,9 +41,9 @@
     <SolidColorBrush x:Key="SelectionBackgroundBrush" Color="#ECECEC"/>
 
     <!-- Special backgrounds -->
-    <StaticResource x:Key="TokenBackgroundBrush" ResourceKey="BackgroundTertiaryBrush"/>
+    <SolidColorBrush x:Key="TokenBackgroundBrush" Color="#F0F0F0"/>
     <SolidColorBrush x:Key="TokenCustomBackgroundBrush" Color="#E1F0FF"/>
-    <StaticResource x:Key="TokenCustomBorderBrush" ResourceKey="AccentBrush"/>
+    <SolidColorBrush x:Key="TokenCustomBorderBrush" Color="#0078D4"/>
     <SolidColorBrush x:Key="TokenUserDefinedBackgroundBrush" Color="#FFF4E5"/>
     <SolidColorBrush x:Key="TokenUserDefinedBorderBrush" Color="#E67E22"/>
     <SolidColorBrush x:Key="PreviewValidBackgroundBrush" Color="#D5F4E6"/>

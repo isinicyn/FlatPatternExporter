@@ -41,14 +41,14 @@
     <SolidColorBrush x:Key="SelectionBackgroundBrush" Color="#37373D"/>
 
     <!-- Special backgrounds -->
-    <StaticResource x:Key="TokenBackgroundBrush" ResourceKey="BackgroundTertiaryBrush"/>
+    <SolidColorBrush x:Key="TokenBackgroundBrush" Color="#2D2D30"/>
     <SolidColorBrush x:Key="TokenCustomBackgroundBrush" Color="#1A2A3A"/>
     <SolidColorBrush x:Key="TokenCustomBorderBrush" Color="#569CD6"/>
     <SolidColorBrush x:Key="TokenUserDefinedBackgroundBrush" Color="#2D2512"/>
-    <StaticResource x:Key="TokenUserDefinedBorderBrush" ResourceKey="WarningBrush"/>
+    <SolidColorBrush x:Key="TokenUserDefinedBorderBrush" Color="#CE9178"/>
     <SolidColorBrush x:Key="PreviewValidBackgroundBrush" Color="#1A2E1A"/>
     <SolidColorBrush x:Key="PreviewValidBorderBrush" Color="#3E5A3E"/>
-    <StaticResource x:Key="PreviewWarningBackgroundBrush" ResourceKey="TokenUserDefinedBackgroundBrush"/>
+    <SolidColorBrush x:Key="PreviewWarningBackgroundBrush" Color="#2D2512"/>
     <SolidColorBrush x:Key="PreviewWarningBorderBrush" Color="#5A4A2E"/>
 
     <!-- Backgrounds for red shades (deletion, errors) -->
