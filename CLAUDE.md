@@ -41,7 +41,8 @@ FlatPatternExporter/
     │
     ├── Libraries/                      # Внешние независимые библиотеки
     │   ├── DxfRenderer.cs              # Библиотека рендеринга DXF файлов
-    │   └── MarshalCore.cs              # Отдельная библиотека COM interop
+    │   ├── MarshalCore.cs              # Отдельная библиотека COM interop
+    │   └── TooltipNotificationService.cs # Библиотека всплывающих уведомлений
     │
     ├── Enums/                          # Перечисления
     │   └── CommonEnums.cs              # Базовые enum и маппинги
@@ -63,8 +64,7 @@ FlatPatternExporter/
     │   ├── TemplatePresetManager.cs    # Управление пресетами шаблонов
     │   ├── VersionInfoService.cs       # Получение версии приложения и коммитов
     │   ├── PropertyListManager.cs      # Управление списками свойств с фильтрацией
-    │   ├── LocalizationManager.cs      # Управление локализацией приложения
-    │   └── TooltipNotificationService.cs # Сервис временных всплывающих уведомлений
+    │   └── LocalizationManager.cs      # Управление локализацией приложения
     │
     ├── Utilities/                      # Утилиты
     │   └── DxfOptimizer.cs             # Оптимизация DXF файлов
@@ -172,6 +172,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 **Libraries/ - Внешние независимые библиотеки:**
 - `DxfRenderer` - библиотека рендеринга DXF файлов (namespace: DxfRenderer)
 - `MarshalCore` - COM interop библиотека (namespace: DefineEdge)
+- `TooltipNotificationService` - библиотека всплывающих уведомлений (namespace: WpfToolkit)
 
 **Enums/ - Перечисления (namespace: FlatPatternExporter.Enums):**
 - `CommonEnums` - базовые перечисления (ExportFolderType, ProcessingMethod, ProcessingStatus, AcadVersionType, DocumentType и др.)
@@ -194,7 +195,6 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `VersionInfoService` - получение версии приложения и информации о коммитах
 - `PropertyListManager` - управление списками свойств с фильтрацией и состоянием
 - `LocalizationManager` - управление локализацией приложения с поддержкой русского и английского языков
-- `TooltipNotificationService` - отображение временных всплывающих уведомлений через ToolTip
 
 **Utilities/ - Утилиты (namespace: FlatPatternExporter.Utilities):**
 - `DxfOptimizer` - оптимизация DXF файлов для различных версий AutoCAD
@@ -253,9 +253,10 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `FlatPatternExporter.Extensions` - расширения разметки XAML в Extensions/
 - `DxfRenderer` - независимая библиотека рендеринга DXF (Libraries/DxfRenderer.cs)
 - `DefineEdge` - независимая библиотека COM interop (Libraries/MarshalCore.cs)
+- `WpfToolkit` - независимая библиотека WPF компонентов (Libraries/TooltipNotificationService.cs)
 
 **Зависимости между пространствами имен:**
-- `UI.Windows` → `Core`, `Enums`, `Models`, `Services`, `Utilities`, `UI.Controls`, `UI.Models`
+- `UI.Windows` → `Core`, `Enums`, `Models`, `Services`, `Utilities`, `UI.Controls`, `UI.Models`, `WpfToolkit`
 - `UI.Controls` → `Models`
 - `UI.Models` → отсутствуют внешние зависимости
 - `Core` → `Enums`, `Models`, `Services`
@@ -264,6 +265,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `Converters` → `Models`
 - `Models` → `Enums`
 - `Libraries` → `Services` для внешних типов
+- `WpfToolkit` → отсутствуют внешние зависимости
 
 ### Управление версиями
 Проект использует версионирование на основе Git в процессе сборки:

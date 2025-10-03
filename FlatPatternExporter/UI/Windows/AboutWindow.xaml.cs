@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using FlatPatternExporter.Services;
+using WpfToolkit;
 using Clipboard = System.Windows.Clipboard;
 
 namespace FlatPatternExporter.UI.Windows
@@ -27,7 +28,8 @@ namespace FlatPatternExporter.UI.Windows
         private void CopyVersionToClipboard_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetText(VersionTextBlock.Text);
-            TooltipNotificationService.ShowCopiedNotification(CopyButton);
+            var message = LocalizationManager.Instance.GetString("Text_Copied");
+            TooltipNotificationService.ShowTemporaryTooltip(CopyButton, message);
         }
     }
 }

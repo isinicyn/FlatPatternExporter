@@ -3,7 +3,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using ToolTip = System.Windows.Controls.ToolTip;
 
-namespace FlatPatternExporter.Services;
+namespace WpfToolkit;
 
 /// <summary>
 /// Service for displaying temporary tooltip notifications
@@ -71,20 +71,5 @@ public static class TooltipNotificationService
 
         _activeTimers[element] = timer;
         timer.Start();
-    }
-
-    /// <summary>
-    /// Shows "Copied!" notification with localization
-    /// </summary>
-    /// <param name="element">Element on which the ToolTip will be displayed</param>
-    /// <param name="durationSeconds">Display duration in seconds (default 1.5)</param>
-    /// <param name="placement">ToolTip placement (default Bottom)</param>
-    public static void ShowCopiedNotification(
-        FrameworkElement element,
-        double durationSeconds = 1.5,
-        PlacementMode placement = PlacementMode.Bottom)
-    {
-        var message = LocalizationManager.Instance.GetString("Text_Copied");
-        ShowTemporaryTooltip(element, message, durationSeconds, placement);
     }
 }
