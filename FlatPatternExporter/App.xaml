@@ -39,7 +39,23 @@
             <!-- Shared WindowChrome configuration -->
             <shell:WindowChrome x:Key="CustomWindowChrome"
                                 CaptionHeight="0"
+                                ResizeBorderThickness="7"
                                 UseAeroCaptionButtons="False"/>
+
+            <!-- Window root border style with maximized state handling -->
+            <Style x:Key="WindowRootBorderStyle" TargetType="Border">
+                <Setter Property="Background" Value="{DynamicResource BackgroundPrimaryBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius" Value="{StaticResource StandardCornerRadiusValue}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                        <Setter Property="Margin" Value="7"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="CornerRadius" Value="0"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
 
             <Style TargetType="UserControl">
                 <Setter Property="FontFamily" Value="Segoe UI"/>

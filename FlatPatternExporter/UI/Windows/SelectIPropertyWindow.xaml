@@ -41,10 +41,7 @@
         </CollectionViewSource>
     </Window.Resources>
 
-    <Border Background="{DynamicResource BackgroundPrimaryBrush}"
-            BorderBrush="{DynamicResource BorderPrimaryBrush}"
-            BorderThickness="1"
-            CornerRadius="{StaticResource StandardCornerRadiusValue}">
+    <Border Style="{StaticResource WindowRootBorderStyle}">
         <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
