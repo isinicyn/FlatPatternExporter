@@ -61,10 +61,21 @@
     
     <!-- Template for "Part Image" column -->
     <DataTemplate x:Key="PartImageTemplate">
-        <Image Source="{Binding Preview}" 
-               Margin="{StaticResource VerticalHairlineMarginThickness}" 
-               HorizontalAlignment="Center" 
-               VerticalAlignment="Center"/>
+        <Border Margin="{StaticResource VerticalHairlineMarginThickness}">
+            <Border.OpacityMask>
+                <VisualBrush>
+                    <VisualBrush.Visual>
+                        <Border Background="Black"
+                                CornerRadius="{StaticResource StandardCornerRadiusValue}"
+                                Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Border}}"
+                                Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Border}}"/>
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Border.OpacityMask>
+            <Image Source="{Binding Preview}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+        </Border>
     </DataTemplate>
 
     <!-- Base style for TextBlock "No Thumbnail" -->
@@ -82,9 +93,21 @@
     <!-- Centralized template for DXF images -->
     <ControlTemplate x:Key="DxfImageContainerTemplate" TargetType="ContentControl">
         <Grid Margin="{StaticResource VerticalHairlineMarginThickness}">
-            <Image HorizontalAlignment="Center" 
-                   VerticalAlignment="Center"
-                   Source="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}"/>
+            <Border>
+                <Border.OpacityMask>
+                    <VisualBrush>
+                        <VisualBrush.Visual>
+                            <Border Background="Black"
+                                    CornerRadius="{StaticResource StandardCornerRadiusValue}"
+                                    Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Border}}"
+                                    Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Border}}"/>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Border.OpacityMask>
+                <Image HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Source="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}"/>
+            </Border>
             <TextBlock>
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource NoThumbnailTextStyle}">
