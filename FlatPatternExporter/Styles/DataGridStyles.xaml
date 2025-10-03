@@ -61,7 +61,7 @@
     
     <!-- Template for "Part Image" column -->
     <DataTemplate x:Key="PartImageTemplate">
-        <Border Margin="{StaticResource VerticalHairlineMarginThickness}">
+        <Border Margin="{StaticResource VerticalSmallMarginThickness}">
             <Border.OpacityMask>
                 <VisualBrush>
                     <VisualBrush.Visual>
@@ -116,7 +116,7 @@
 
     <!-- Centralized template for DXF images -->
     <ControlTemplate x:Key="DxfImageContainerTemplate" TargetType="ContentControl">
-        <Grid Margin="{StaticResource VerticalHairlineMarginThickness}">
+        <Grid Margin="{StaticResource VerticalSmallMarginThickness}">
             <Border>
                 <Border.OpacityMask>
                     <VisualBrush>
