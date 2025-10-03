@@ -133,7 +133,7 @@
                                       IsReadOnly="True"
                                       CanUserAddRows="False"
                                       CanUserDeleteRows="False"
-                                      RowHeight="45"
+                                      MinRowHeight="{StaticResource LargeElementHeight}"
                                       GridLinesVisibility="None"
                                       Background="{DynamicResource BackgroundPrimaryBrush}"
                                       BorderThickness="0"

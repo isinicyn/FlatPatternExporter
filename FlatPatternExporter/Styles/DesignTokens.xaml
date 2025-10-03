@@ -25,6 +25,9 @@
     <sys:Double x:Key="StandardIconSize">16</sys:Double>
     <sys:Double x:Key="LargeIconSize">24</sys:Double>
 
+    <!-- DataGrid image sizes -->
+    <sys:Double x:Key="DataGridImageSize">50</sys:Double>
+
     <!-- Button sizes -->
     <sys:Double x:Key="SmallButtonWidth">30</sys:Double>
     <sys:Double x:Key="LargeSquareButtonSize">75</sys:Double>

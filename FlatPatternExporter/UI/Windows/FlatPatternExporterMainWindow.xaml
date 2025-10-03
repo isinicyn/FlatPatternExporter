@@ -689,7 +689,7 @@
                       AutoGenerateColumns="False"
                       IsReadOnly="False"
                       CanUserAddRows="False"
-                      RowHeight="45"
+                      MinRowHeight="{StaticResource LargeElementHeight}"
                       GridLinesVisibility="None"
                       Background="{DynamicResource BackgroundPrimaryBrush}"
                       VerticalAlignment="Top"

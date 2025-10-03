@@ -73,6 +73,9 @@
                 </VisualBrush>
             </Border.OpacityMask>
             <Image Source="{Binding Preview}"
+                   MaxWidth="{StaticResource DataGridImageSize}"
+                   MaxHeight="{StaticResource DataGridImageSize}"
+                   Stretch="Uniform"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center">
                 <Image.ToolTip>
@@ -125,7 +128,10 @@
                         </VisualBrush.Visual>
                     </VisualBrush>
                 </Border.OpacityMask>
-                <Image HorizontalAlignment="Center"
+                <Image MaxWidth="{StaticResource DataGridImageSize}"
+                       MaxHeight="{StaticResource DataGridImageSize}"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Source="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}">
                     <Image.ToolTip>
