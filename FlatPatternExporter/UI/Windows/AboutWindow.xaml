@@ -35,7 +35,8 @@
             <GroupBox Header="{extensions:Localize Header_ProgramVersion}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <DockPanel Margin="{StaticResource BottomSmallMarginThickness}">
-                        <Button Style="{StaticResource CopyIconButton}"
+                        <Button x:Name="CopyButton"
+                                Style="{StaticResource CopyIconButton}"
                                 DockPanel.Dock="Right"
                                 Margin="{StaticResource SmallMarginThickness}"
                                 Click="CopyVersionToClipboard_Click"

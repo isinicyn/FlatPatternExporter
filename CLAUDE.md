@@ -63,7 +63,8 @@ FlatPatternExporter/
     │   ├── TemplatePresetManager.cs    # Управление пресетами шаблонов
     │   ├── VersionInfoService.cs       # Получение версии приложения и коммитов
     │   ├── PropertyListManager.cs      # Управление списками свойств с фильтрацией
-    │   └── LocalizationManager.cs      # Управление локализацией приложения
+    │   ├── LocalizationManager.cs      # Управление локализацией приложения
+    │   └── TooltipNotificationService.cs # Сервис временных всплывающих уведомлений
     │
     ├── Utilities/                      # Утилиты
     │   └── DxfOptimizer.cs             # Оптимизация DXF файлов
@@ -193,6 +194,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `VersionInfoService` - получение версии приложения и информации о коммитах
 - `PropertyListManager` - управление списками свойств с фильтрацией и состоянием
 - `LocalizationManager` - управление локализацией приложения с поддержкой русского и английского языков
+- `TooltipNotificationService` - отображение временных всплывающих уведомлений через ToolTip
 
 **Utilities/ - Утилиты (namespace: FlatPatternExporter.Utilities):**
 - `DxfOptimizer` - оптимизация DXF файлов для различных версий AutoCAD

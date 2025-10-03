@@ -1751,4 +1751,7 @@
   <data name="Text_SubstitutionPlaceholder" xml:space="preserve">
     <value>Подстановка если пусто...</value>
   </data>
+  <data name="Text_Copied" xml:space="preserve">
+    <value>Скопировано!</value>
+  </data>
 </root>

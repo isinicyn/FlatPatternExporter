@@ -27,6 +27,7 @@ namespace FlatPatternExporter.UI.Windows
         private void CopyVersionToClipboard_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetText(VersionTextBlock.Text);
+            TooltipNotificationService.ShowCopiedNotification(CopyButton);
         }
     }
 }
