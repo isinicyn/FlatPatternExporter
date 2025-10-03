@@ -31,5 +31,12 @@ namespace FlatPatternExporter.UI.Windows
             var message = LocalizationManager.Instance.GetString("Text_Copied");
             TooltipNotificationService.ShowTemporaryTooltip(CopyButton, message);
         }
+
+        private void EmailTextBlock_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Clipboard.SetText(EmailTextBlock.Text);
+            var message = LocalizationManager.Instance.GetString("Text_Copied");
+            TooltipNotificationService.ShowTemporaryTooltip(EmailTextBlock, message);
+        }
     }
 }

@@ -70,8 +70,12 @@
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Email:"
                                    Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="isinicyn@gmail.com"
-                                   Style="{StaticResource BaseTextBlockStyle}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1"
+                                   x:Name="EmailTextBlock"
+                                   Text="isinicyn@gmail.com"
+                                   Style="{StaticResource BaseTextBlockStyle}"
+                                   Cursor="Hand"
+                                   MouseLeftButtonDown="EmailTextBlock_MouseLeftButtonDown"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="{extensions:Localize Text_LicenseLabel}"
                                    Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}"/>
