@@ -462,25 +462,29 @@
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Focusable" Value="False"/>
-        <Setter Property="Width" Value="32"/>
-        <Setter Property="Height" Value="32"/>
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
         <Setter Property="Margin" Value="0,0,8,0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
                     <Border Background="{TemplateBinding Background}"
                             BorderThickness="0">
-                        <Viewbox Width="16" Height="16"
-                                 HorizontalAlignment="Center"
-                                 VerticalAlignment="Center">
-                            <Path x:Name="ThemeIcon"
-                                  Data="{StaticResource MoonIconGeometry}"
-                                  Stroke="{TemplateBinding Foreground}"
-                                  StrokeThickness="1.5"
-                                  StrokeLineJoin="Round"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"/>
-                        </Viewbox>
+                        <Border BorderThickness="1"
+                                BorderBrush="{DynamicResource BorderPrimaryBrush}"
+                                CornerRadius="{StaticResource SmallCornerRadiusValue}">
+                            <Viewbox Width="16" Height="16"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center">
+                                <Path x:Name="ThemeIcon"
+                                      Data="{StaticResource MoonIconGeometry}"
+                                      Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="1.5"
+                                      StrokeLineJoin="Round"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"/>
+                            </Viewbox>
+                        </Border>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
@@ -501,8 +505,8 @@
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Focusable" Value="False"/>
-        <Setter Property="Width" Value="32"/>
-        <Setter Property="Height" Value="32"/>
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
         <Setter Property="Margin" Value="0,0,8,0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
@@ -510,16 +514,20 @@
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Border Background="{TemplateBinding Background}"
                             BorderThickness="0">
-                        <Viewbox Width="16" Height="16"
-                                 HorizontalAlignment="Center"
-                                 VerticalAlignment="Center">
-                            <Path Data="{TemplateBinding Tag}"
-                                  Stroke="{TemplateBinding Foreground}"
-                                  StrokeThickness="1.5"
-                                  StrokeLineJoin="Round"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round"/>
-                        </Viewbox>
+                        <Border BorderThickness="1"
+                                BorderBrush="{DynamicResource BorderPrimaryBrush}"
+                                CornerRadius="{StaticResource SmallCornerRadiusValue}">
+                            <Viewbox Width="16" Height="16"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center">
+                                <Path Data="{TemplateBinding Tag}"
+                                      Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="1.5"
+                                      StrokeLineJoin="Round"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"/>
+                            </Viewbox>
+                        </Border>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
