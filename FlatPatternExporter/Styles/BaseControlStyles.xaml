@@ -184,7 +184,8 @@
                                         Background="{DynamicResource BackgroundSecondaryBrush}"
                                         BorderBrush="{DynamicResource BorderPrimaryBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="{StaticResource StandardCornerRadiusValue}">
+                                        CornerRadius="{StaticResource StandardCornerRadiusValue}"
+                                        Padding="2">
                                     <ScrollViewer Margin="0" SnapsToDevicePixels="True">
                                         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
                                     </ScrollViewer>
@@ -209,7 +210,6 @@
                             <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
                         </Trigger>
                         <Trigger SourceName="Popup" Property="Popup.AllowsTransparency" Value="true">
-                            <Setter TargetName="DropDownBorder" Property="CornerRadius" Value="0"/>
                             <Setter TargetName="DropDownBorder" Property="Margin" Value="0,2,0,0"/>
                         </Trigger>
                         <Trigger Property="IsEditable" Value="true">
