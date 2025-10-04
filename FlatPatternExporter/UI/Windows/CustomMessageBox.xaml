@@ -5,15 +5,15 @@
         xmlns:local="clr-namespace:FlatPatternExporter.UI.Controls"
         shell:WindowChrome.WindowChrome="{StaticResource CustomWindowChrome}"
         Title="Message"
-        Width="450"
-        WindowStartupLocation="CenterOwner"
+        Width="500"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         SizeToContent="Height"
         Background="{DynamicResource BackgroundPrimaryBrush}"
-        Foreground="{DynamicResource TextSecondaryBrush}">
+        Foreground="{DynamicResource TextSecondaryBrush}" ShowInTaskbar="False">
 
     <Border Style="{StaticResource WindowRootBorderStyle}">
-        <Grid SnapsToDevicePixels="True">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -27,7 +27,7 @@
                                   ShowMaximizeButton="False"/>
 
             <!-- Message content -->
-            <Grid Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}">
+            <Grid Grid.Row="1" Margin="10,15,10,15">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -35,8 +35,8 @@
 
                 <!-- Icon -->
                 <Viewbox Grid.Column="0"
-                         Width="48"
-                         Height="48"
+                         Width="40"
+                         Height="40"
                          Margin="0,0,16,0"
                          VerticalAlignment="Top">
                     <Path x:Name="IconPath"
@@ -54,7 +54,7 @@
                            TextWrapping="Wrap"
                            VerticalAlignment="Center"
                            Style="{StaticResource BaseTextBlockStyle}"
-                           FontSize="14"/>
+                           FontSize="{StaticResource StandardFontSize}"/>
             </Grid>
 
             <!-- Buttons -->
