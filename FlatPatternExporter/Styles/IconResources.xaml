@@ -19,7 +19,7 @@
     <Geometry x:Key="CloseIconGeometry">M18 6 6 18M6 6l12 12</Geometry>
 
     <!-- SVG moon icon (light theme) - crescent (24x24 viewBox) -->
-    <Geometry x:Key="MoonIconGeometry">M 21 12.808 C 20.5 18.155 15.151 21.948 9.893 20.791 C -0.078 18.6 1.15 3.909 11.11 3 C 6.395 9.296 14.619 17.462 21 12.808</Geometry>
+    <Geometry x:Key="MoonIconGeometry">M 21 12.79 A 9 9 0 1 1 11.21 3 A 7 7 0 0 0 21 12.79</Geometry>
 
     <!-- SVG sun icon (dark theme) - circle with rays (24x24 viewBox) -->
     <Geometry x:Key="SunIconGeometry">M 12 1 L 12 3 M 12 21 L 12 23 M 3.22 3.22 L 4.64 4.64 M 19.36 19.36 L 20.78 20.78 M 1 12 L 3 12 M 21 12 L 23 12 M 3.22 20.78 L 4.64 19.36 M 19.36 4.64 L 20.78 3.22 M 12 7 A 5 5 0 1 1 12 17 A 5 5 0 1 1 12 7</Geometry>
