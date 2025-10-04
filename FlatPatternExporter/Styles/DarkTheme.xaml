@@ -20,7 +20,7 @@
     <SolidColorBrush x:Key="BorderPrimaryBrush" Color="#3F3F46"/>
     <SolidColorBrush x:Key="BorderSecondaryBrush" Color="#454545"/>
     <SolidColorBrush x:Key="BorderTertiaryBrush" Color="#555555"/>
-    <SolidColorBrush x:Key="BorderLightBrush" Color="#383838"/>
+    <SolidColorBrush x:Key="BorderLightBrush" Color="#555555"/>
     <SolidColorBrush x:Key="BorderDarkBrush" Color="#5A5A5A"/>
     <SolidColorBrush x:Key="SeparatorBrush" Color="#3F3F46"/>
     <SolidColorBrush x:Key="GridLinesBrush" Color="#2D2D30"/>
