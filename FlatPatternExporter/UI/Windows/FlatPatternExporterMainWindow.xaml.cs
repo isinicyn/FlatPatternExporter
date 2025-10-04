@@ -171,9 +171,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     public FlatPatternExporterMainWindow()
     {
-        // Configure EPPlus license for noncommercial use (EPPlus 8.x)
-        OfficeOpenXml.ExcelPackage.License.SetNonCommercialPersonal("FlatPatternExporter");
-
         // Initialize services before InitializeComponent to prevent NullReferenceException
         _inventorManager.InitializeInventor();
         _documentScanner = new Core.DocumentScanner(_inventorManager);

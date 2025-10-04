@@ -1,30 +1,27 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 using FlatPatternExporter.Models;
-using OfficeOpenXml;
+using ClosedXML.Excel;
 
 namespace FlatPatternExporter.Services;
 
 public class ExcelExportService
 {
     private const int ImageSizePixels = 80;
-    private const int PixelToEmu = 9525;
 
     private static double PixelsToPoints(int pixels) => pixels * 72.0 / 96.0;
 
     public void ExportToExcel(string filePath, DataGrid dataGrid, IEnumerable view)
     {
-        var fileInfo = new System.IO.FileInfo(filePath);
-        using var package = new ExcelPackage(fileInfo);
-
-        var worksheet = package.Workbook.Worksheets.Add("Export");
+        using var workbook = new XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Export");
 
         var visibleColumns = dataGrid.Columns.Where(c => c.Visibility == Visibility.Visible).ToList();
 
         for (int col = 0; col < visibleColumns.Count; col++)
         {
-            worksheet.Cells[1, col + 1].Value = visibleColumns[col].Header.ToString();
+            worksheet.Cell(1, col + 1).Value = visibleColumns[col].Header.ToString();
         }
 
         int row = 2;
@@ -46,30 +43,22 @@ public class ExcelExportService
                             if (imageBytes != null && imageBytes.Length > 0)
                             {
                                 var imageStream = new System.IO.MemoryStream(imageBytes);
-                                var picture = worksheet.Drawings.AddPicture($"Image_R{row}C{col + 1}", imageStream);
-                                picture.ChangeCellAnchor(OfficeOpenXml.Drawing.eEditAs.TwoCell);
+                                var cell = worksheet.Cell(row, col + 1);
 
-                                picture.From.Row = row - 1;
-                                picture.From.Column = col;
-                                picture.From.RowOff = 0;
-                                picture.From.ColumnOff = 0;
-
-                                picture.To.Row = row - 1;
-                                picture.To.Column = col;
-                                picture.To.RowOff = ImageSizePixels * PixelToEmu;
-                                picture.To.ColumnOff = ImageSizePixels * PixelToEmu;
+                                var picture = worksheet.AddPicture(imageStream)
+                                    .MoveTo(cell, 0, 0, cell, ImageSizePixels, ImageSizePixels);
 
                                 hasImage = true;
                             }
                         }
                         catch
                         {
-                            worksheet.Cells[row, col + 1].Value = "[IMAGE]";
+                            worksheet.Cell(row, col + 1).Value = "[IMAGE]";
                         }
                     }
                     else
                     {
-                        worksheet.Cells[row, col + 1].Value = value;
+                        worksheet.Cell(row, col + 1).Value = value?.ToString() ?? string.Empty;
                     }
                 }
             }
@@ -82,12 +71,9 @@ public class ExcelExportService
             row++;
         }
 
-        if (worksheet.Dimension != null)
-        {
-            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
-        }
+        worksheet.Columns().AdjustToContents();
 
-        package.Save();
+        workbook.SaveAs(filePath);
     }
 
     public void ExportToCsv(string filePath, DataGrid dataGrid, IEnumerable view)

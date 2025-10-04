@@ -156,6 +156,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Autodesk Inventor Interop: `C:\Program Files\Autodesk\Inventor 2026\Bin\Public Assemblies\Autodesk.Inventor.Interop.dll`
 - netDxf.netstandard (v3.0.1) для работы с DXF файлами
 - Svg.Skia (v3.0.6) для конвертации SVG в PNG/BitmapImage
+- ClosedXML (v0.105.0) для экспорта данных в Excel
 - stdole (v17.14.40260) для COM interop
 
 ### Ключевые компоненты
