@@ -6,9 +6,9 @@ using System.Windows.Threading;
 using DxfRenderer;
 using FlatPatternExporter.Converters;
 using FlatPatternExporter.Services;
+using FlatPatternExporter.UI.Windows;
 using Inventor;
 using Svg.Skia;
-using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter.Core;
 
@@ -84,7 +84,7 @@ public class ThumbnailGenerator
         {
             dispatcher.Invoke(() =>
             {
-                MessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailGeneration", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
+                CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailGeneration", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
                     MessageBoxImage.Error);
             });
             return null;
@@ -124,7 +124,7 @@ public class ThumbnailGenerator
         {
             dispatcher.Invoke(() =>
             {
-                MessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailObtaining", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
+                CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailObtaining", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
                     MessageBoxImage.Error);
             });
             return null!;

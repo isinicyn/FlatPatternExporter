@@ -2,10 +2,12 @@
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Windows;
 using System.Windows.Threading;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
+using FlatPatternExporter.UI.Windows;
 using FlatPatternExporter.Utilities;
 using Inventor;
 using Path = System.IO.Path;
@@ -363,28 +365,26 @@ public class DxfExporter
         {
             if (exportOptions.ShowFileLockedDialogs)
             {
-                var result = MessageBox.Show(
+                var result = CustomMessageBox.Show(
                     LocalizationManager.Instance.GetString("Warning_FileLocked", filePath),
                     LocalizationManager.Instance.GetString("MessageBox_Warning"),
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning,
-                    MessageBoxDefaultButton.Button2);
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
 
-                if (result == DialogResult.Yes)
+                if (result == MessageBoxResult.Yes)
                 {
                     throw new OperationCanceledException();
                 }
 
                 while (IsFileLockedInternal(filePath))
                 {
-                    var waitResult = MessageBox.Show(
+                    var waitResult = CustomMessageBox.Show(
                         LocalizationManager.Instance.GetString("Info_WaitingForFileUnlock"),
                         LocalizationManager.Instance.GetString("MessageBox_Info"),
-                        MessageBoxButtons.OKCancel,
-                        MessageBoxIcon.Information,
-                        MessageBoxDefaultButton.Button2);
+                        MessageBoxButton.OKCancel,
+                        MessageBoxImage.Information);
 
-                    if (waitResult == DialogResult.Cancel)
+                    if (waitResult == MessageBoxResult.Cancel)
                     {
                         throw new OperationCanceledException();
                     }

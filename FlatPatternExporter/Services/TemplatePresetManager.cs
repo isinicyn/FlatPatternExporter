@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using MessageBox = System.Windows.MessageBox;
+using FlatPatternExporter.UI.Windows;
 
 namespace FlatPatternExporter.Services;
 
@@ -140,7 +140,7 @@ public class TemplatePresetManager : INotifyPropertyChanged
         if (SelectedTemplatePreset == null)
             return false;
 
-        var result = MessageBox.Show(
+        var result = CustomMessageBox.Show(
             _localizationManager.GetString("Confirm_DeletePreset", SelectedTemplatePreset.Name),
             _localizationManager.GetString("Confirm_DeletePresetTitle"),
             MessageBoxButton.YesNo,

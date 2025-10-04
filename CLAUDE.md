@@ -74,7 +74,8 @@ FlatPatternExporter/
     │   │   ├── FlatPatternExporterMainWindow.xaml(.cs)
     │   │   ├── AboutWindow.xaml(.cs)
     │   │   ├── ConflictDetailsWindow.xaml(.cs)
-    │   │   └── SelectIPropertyWindow.xaml(.cs)
+    │   │   ├── SelectIPropertyWindow.xaml(.cs)
+    │   │   └── CustomMessageBox.xaml(.cs)
     │   │
     │   ├── Controls/                   # Пользовательские элементы
     │   │   ├── CustomTitleBar.xaml(.cs)
@@ -206,6 +207,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
   - `AboutWindow` - независимое окно информации о программе
   - `ConflictDetailsWindow` - окно конфликтов с инжекцией делегата открытия документов
   - `SelectIPropertyWindow` - окно выбора свойств с полной инжекцией зависимостей
+  - `CustomMessageBox` - кастомное окно сообщений с поддержкой локализации и тем оформления
 - **Controls/ (namespace: FlatPatternExporter.UI.Controls)**: пользовательские элементы управления
   - `CustomTitleBar` - переиспользуемый компонент кастомного заголовка окна с поддержкой WindowChrome
   - `LayerSettingControl` - контрол настройки слоя DXF
@@ -469,6 +471,51 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Hardware rendering без использования `AllowsTransparency`
 - Централизованное управление настройками WindowChrome
 - Переиспользуемость компонента во всех окнах приложения
+
+### Система кастомных диалоговых окон
+Приложение использует кастомное окно сообщений вместо стандартного MessageBox:
+
+**Компонент:**
+- `CustomMessageBox` - модальное диалоговое окно с поддержкой локализации и тем оформления
+
+**Функциональные возможности:**
+- Поддержка всех типов кнопок: OK, OK/Cancel, Yes/No, Yes/No/Cancel
+- Поддержка типов иконок: Information, Warning, Error, Question
+- Автоматическая локализация кнопок и заголовков
+- Интеграция с системой тем (светлая/темная)
+- Использование CustomTitleBar для единообразия интерфейса
+
+**Использование:**
+```csharp
+// Простое информационное сообщение
+CustomMessageBox.Show("Сообщение");
+
+// С заголовком
+CustomMessageBox.Show("Сообщение", "Заголовок");
+
+// С кнопками и иконкой
+var result = CustomMessageBox.Show(
+    "Вы уверены?",
+    "Подтверждение",
+    MessageBoxButton.YesNo,
+    MessageBoxImage.Question
+);
+
+// С владельцем окна
+CustomMessageBox.Show(
+    this,
+    "Ошибка операции",
+    "Ошибка",
+    MessageBoxButton.OK,
+    MessageBoxImage.Error
+);
+```
+
+**Поддерживаемые иконки:**
+- `InfoIconGeometry` - информационное сообщение (синий)
+- `WarningIconGeometry` - предупреждение (оранжевый)
+- `ErrorIconGeometry` - ошибка (красный)
+- `QuestionIconGeometry` - вопрос (синий)
 
 ## Заметки по разработке
 

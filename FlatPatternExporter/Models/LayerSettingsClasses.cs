@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using FlatPatternExporter.Services;
+using FlatPatternExporter.UI.Windows;
 
 namespace FlatPatternExporter.Models;
     /// <summary>
@@ -303,7 +304,7 @@ namespace FlatPatternExporter.Models;
         /// </summary>
         private static void ShowValidationError()
         {
-            System.Windows.MessageBox.Show(
+            CustomMessageBox.Show(
                 ValidationMessage,
                 LocalizationManager.Instance.GetString("MessageBox_InputError"),
                 MessageBoxButton.OK,

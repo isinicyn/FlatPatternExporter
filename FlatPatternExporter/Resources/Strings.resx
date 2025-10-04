@@ -87,6 +87,12 @@
   <data name="Button_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="Button_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Button_No" xml:space="preserve">
+    <value>No</value>
+  </data>
   <data name="Button_Close" xml:space="preserve">
     <value>Close</value>
   </data>

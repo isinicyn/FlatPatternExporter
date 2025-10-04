@@ -4,8 +4,8 @@ using DefineEdge;
 using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
+using FlatPatternExporter.UI.Windows;
 using Inventor;
-using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter.Core;
 
@@ -32,14 +32,14 @@ public class InventorManager
         }
         catch (COMException)
         {
-            MessageBox.Show(
+            CustomMessageBox.Show(
                 LocalizationManager.Instance.GetString("Error_InventorConnection"), LocalizationManager.Instance.GetString("MessageBox_Error"),
                 MessageBoxButton.OK, MessageBoxImage.Error);
             _thisApplication = null;
         }
         catch (Exception ex)
         {
-            MessageBox.Show(LocalizationManager.Instance.GetString("Error_InventorConnection", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK,
+            CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_InventorConnection", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK,
                 MessageBoxImage.Error);
             _thisApplication = null;
         }
@@ -62,7 +62,7 @@ public class InventorManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show(LocalizationManager.Instance.GetString("Error_ProjectDataInit", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ProjectDataInit", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -79,7 +79,7 @@ public class InventorManager
         }
         catch (Exception ex)
         {
-            MessageBox.Show(LocalizationManager.Instance.GetString("Error_ProjectInfoGet", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ProjectInfoGet", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -141,7 +141,7 @@ public class InventorManager
     {
         if (!System.IO.File.Exists(filePath))
         {
-            MessageBox.Show(LocalizationManager.Instance.GetString("Error_FileNotFound", filePath), LocalizationManager.Instance.GetString("MessageBox_Error"),
+            CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_FileNotFound", filePath), LocalizationManager.Instance.GetString("MessageBox_Error"),
                 MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
@@ -160,7 +160,7 @@ public class InventorManager
         }
         catch (Exception ex)
         {
-            MessageBox.Show(LocalizationManager.Instance.GetString("Error_FileOpen", filePath, ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"),
+            CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_FileOpen", filePath, ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"),
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -178,7 +178,7 @@ public class InventorManager
                     return pd;
             }
 
-        MessageBox.Show(LocalizationManager.Instance.GetString("Error_DocumentNotFound", partNumber), LocalizationManager.Instance.GetString("MessageBox_Error"),
+        CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_DocumentNotFound", partNumber), LocalizationManager.Instance.GetString("MessageBox_Error"),
             MessageBoxButton.OK, MessageBoxImage.Error);
         return null;
     }
@@ -196,7 +196,7 @@ public class InventorManager
                     return pd.FullFileName;
             }
 
-        MessageBox.Show(LocalizationManager.Instance.GetString("Error_DocumentNotFound", partNumber), LocalizationManager.Instance.GetString("MessageBox_Error"),
+        CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_DocumentNotFound", partNumber), LocalizationManager.Instance.GetString("MessageBox_Error"),
             MessageBoxButton.OK, MessageBoxImage.Error);
         return null;
     }

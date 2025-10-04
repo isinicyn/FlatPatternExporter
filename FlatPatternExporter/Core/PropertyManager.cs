@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows;
 using FlatPatternExporter.Services;
+using FlatPatternExporter.UI.Windows;
 using Inventor;
 
 namespace FlatPatternExporter.Core;
@@ -147,7 +148,7 @@ public class PropertyManager(Document document)
         catch (Exception ex)
         {
             Debug.WriteLine($"Property value set error '{ourName}': {ex.Message}");
-            System.Windows.MessageBox.Show(LocalizationManager.Instance.GetString("Error_PropertyUpdateFailed", ourName), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_PropertyUpdateFailed", ourName), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -166,7 +167,7 @@ public class PropertyManager(Document document)
         catch (Exception ex)
         {
             Debug.WriteLine($"Property expression set error '{ourName}': {ex.Message}");
-            System.Windows.MessageBox.Show(LocalizationManager.Instance.GetString("Error_ExpressionUpdateFailed", ourName), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
+            CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ExpressionUpdateFailed", ourName), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

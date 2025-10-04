@@ -274,7 +274,6 @@
         <Setter Property="Background" Value="{DynamicResource BackgroundTertiaryBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderSecondaryBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource StandardTopOnlyBorderThicknessValue}"/>
-        <Setter Property="CornerRadius" Value="{StaticResource StandardCornerRadiusValue}"/>
         <Setter Property="Padding" Value="{StaticResource StandardPaddingThickness}"/>
     </Style>
 

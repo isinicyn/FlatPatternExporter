@@ -6,7 +6,6 @@ using System.Windows.Data;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
 using Button = System.Windows.Controls.Button;
-using MessageBox = System.Windows.MessageBox;
 
 namespace FlatPatternExporter.UI.Windows;
 public partial class SelectIPropertyWindow : Window
@@ -153,7 +152,7 @@ public partial class SelectIPropertyWindow : Window
     {
         if (sender is Button button && button.Tag is PresetIProperty property)
         {
-            var result = MessageBox.Show(
+            var result = CustomMessageBox.Show(
                 _localizationManager.GetString("Confirm_DeleteProperty", property.ListDisplayName),
                 _localizationManager.GetString("Confirm_DeletePropertyTitle"),
                 MessageBoxButton.YesNo,
@@ -225,7 +224,7 @@ public partial class SelectIPropertyWindow : Window
         var newProperty = _propertyListManager.CreateUserDefinedProperty(userDefinedPropertyName);
         if (newProperty == null)
         {
-            MessageBox.Show(_localizationManager.GetString("Warning_PropertyAlreadyAdded", userDefinedPropertyName), _localizationManager.GetString("MessageBox_Warning"),
+            CustomMessageBox.Show(_localizationManager.GetString("Warning_PropertyAlreadyAdded", userDefinedPropertyName), _localizationManager.GetString("MessageBox_Warning"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }

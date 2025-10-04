@@ -87,6 +87,12 @@
   <data name="Button_Cancel" xml:space="preserve">
     <value>Отмена</value>
   </data>
+  <data name="Button_Yes" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="Button_No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
   <data name="Button_Close" xml:space="preserve">
     <value>Закрыть</value>
   </data>

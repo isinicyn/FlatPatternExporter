@@ -21,7 +21,6 @@ using FlatPatternExporter.UI.Models;
 using Inventor;
 using Binding = System.Windows.Data.Binding;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Size = System.Windows.Size;
 using Style = System.Windows.Style;
@@ -277,7 +276,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
         catch (Exception ex)
         {
-            MessageBox.Show(_localizationManager.GetString("Error_SettingsLoad", ex.Message), _localizationManager.GetString("Error_Title"),
+            CustomMessageBox.Show(_localizationManager.GetString("Error_SettingsLoad", ex.Message), _localizationManager.GetString("Error_Title"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
@@ -291,7 +290,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
         catch (Exception ex)
         {
-            MessageBox.Show(_localizationManager.GetString("Error_SettingsSave", ex.Message), _localizationManager.GetString("Error_Title"),
+            CustomMessageBox.Show(_localizationManager.GetString("Error_SettingsSave", ex.Message), _localizationManager.GetString("Error_Title"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
@@ -443,7 +442,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 if (!suppressMessage)
                 {
                     var ver = AcadVersionMapping.GetDisplayName(_selectedAcadVersion);
-                    MessageBox.Show(
+                    CustomMessageBox.Show(
                         _localizationManager.GetString("Info_VersionNotSupported", ver),
                         _localizationManager.GetString("Info_Title"), MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -805,7 +804,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var operationName = operationType == OperationType.Scan
                 ? _localizationManager.GetString("Operation_Scanning")
                 : _localizationManager.GetString("Operation_Export");
-            MessageBox.Show(_localizationManager.GetString("Info_OperationInterrupted", operationName),
+            CustomMessageBox.Show(_localizationManager.GetString("Info_OperationInterrupted", operationName),
                 _localizationManager.GetString("Info_Title"), MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
@@ -816,7 +815,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 // For scanning, show special messages about conflicts and references
                 if (_documentScanner.ConflictAnalyzer.ConflictCount > 0)
                 {
-                    MessageBox.Show(_localizationManager.GetString("Info_ConflictsDetected", _documentScanner.ConflictAnalyzer.ConflictCount),
+                    CustomMessageBox.Show(_localizationManager.GetString("Info_ConflictsDetected", _documentScanner.ConflictAnalyzer.ConflictCount),
                         _localizationManager.GetString("Info_Warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 else if (_documentScanner.HasMissingReferences)
@@ -824,7 +823,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     var messageKey = result.ProcessingMethod == ProcessingMethod.BOM
                         ? "Info_BrokenReferences_BOM"
                         : "Info_BrokenReferences_Traverse";
-                    MessageBox.Show(_localizationManager.GetString(messageKey),
+                    CustomMessageBox.Show(_localizationManager.GetString(messageKey),
                         _localizationManager.GetString("Info_Warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 break;
@@ -833,7 +832,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 var exportTitle = isQuickMode
                     ? _localizationManager.GetString("Info_QuickExportCompleted")
                     : _localizationManager.GetString("Info_ExportCompleted");
-                MessageBox.Show(
+                CustomMessageBox.Show(
                     this,
                     _localizationManager.GetString("Info_ExportStatistics", exportTitle,
                         result.ProcessedCount + result.SkippedCount, result.SkippedCount,
@@ -880,7 +879,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var validation = _inventorManager.ValidateActiveDocument();
         if (!validation.IsValid)
         {
-            MessageBox.Show(validation.ErrorMessage, _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Warning);
+            CustomMessageBox.Show(validation.ErrorMessage, _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return null;
         }
         return validation;
@@ -895,7 +894,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var context = await _dxfExporter.PrepareExportContextAsync(document, requireScan, showProgress, _lastScannedDocument, exportOptions);
         if (!context.IsValid)
         {
-            MessageBox.Show(context.ErrorMessage, _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Warning);
+            CustomMessageBox.Show(context.ErrorMessage, _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Warning);
             if (context.ErrorMessage.Contains(LocalizationManager.Instance.GetString("Operation_ScanningKey")))
                 MultiplierTextBox.Text = "1";
             return null;
@@ -1385,7 +1384,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Check that there's data to export (like button does)
         if (_partsData.Count == 0)
         {
-            MessageBox.Show(_localizationManager.GetString("Info_NoDataForExport"),
+            CustomMessageBox.Show(_localizationManager.GetString("Info_NoDataForExport"),
                 _localizationManager.GetString("Info_Title"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
@@ -1432,7 +1431,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Check that no export or scanning operations are running
         if (_isExporting || _isScanning)
         {
-            MessageBox.Show(_localizationManager.GetString("Info_CannotClearDuringOperation"),
+            CustomMessageBox.Show(_localizationManager.GetString("Info_CannotClearDuringOperation"),
                 _localizationManager.GetString("Info_Title"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
@@ -1878,7 +1877,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var itemsWithoutFlatPattern = selectedItems.Where(p => !p.HasFlatPattern).ToList();
         if (itemsWithoutFlatPattern.Count == selectedItems.Count)
         {
-            MessageBox.Show(_localizationManager.GetString("Message_NoFlatPatternsSelected"), _localizationManager.GetString("MessageBox_Information"), MessageBoxButton.OK,
+            CustomMessageBox.Show(_localizationManager.GetString("Message_NoFlatPatternsSelected"), _localizationManager.GetString("MessageBox_Information"), MessageBoxButton.OK,
                 MessageBoxImage.Warning);
             return;
         }
@@ -1886,7 +1885,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (itemsWithoutFlatPattern.Count > 0)
         {
             var dialogResult =
-                MessageBox.Show(_localizationManager.GetString("Message_SomeFlatPatternsSkipped"),
+                CustomMessageBox.Show(_localizationManager.GetString("Message_SomeFlatPatternsSkipped"),
                     _localizationManager.GetString("MessageBox_Information"), MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (dialogResult == MessageBoxResult.No) return;
 
@@ -2003,7 +2002,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         var selectedItems = PartsDataGrid.SelectedItems.Cast<PartData>().ToList();
 
-        var result = MessageBox.Show(_localizationManager.GetString("Message_ConfirmDelete", selectedItems.Count),
+        var result = CustomMessageBox.Show(_localizationManager.GetString("Message_ConfirmDelete", selectedItems.Count),
             _localizationManager.GetString("MessageBox_Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question);
 
         if (result == MessageBoxResult.Yes)
@@ -2060,7 +2059,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Check for null before using fullPath
             if (string.IsNullOrEmpty(fullPath))
             {
-                MessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", partNumber), _localizationManager.GetString("MessageBox_Error"),
+                CustomMessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", partNumber), _localizationManager.GetString("MessageBox_Error"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 continue;
             }
@@ -2074,11 +2073,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(_localizationManager.GetString("Error_ExplorerOpen", fullPath, ex.Message),
+                    CustomMessageBox.Show(_localizationManager.GetString("Error_ExplorerOpen", fullPath, ex.Message),
                         _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             else
-                MessageBox.Show(_localizationManager.GetString("Error_FileNotFound", fullPath),
+                CustomMessageBox.Show(_localizationManager.GetString("Error_FileNotFound", fullPath),
                     _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -2096,7 +2095,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Check for null before using fullPath
             if (string.IsNullOrEmpty(fullPath))
             {
-                MessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", partNumber), _localizationManager.GetString("MessageBox_Error"),
+                CustomMessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", partNumber), _localizationManager.GetString("MessageBox_Error"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 continue;
             }
@@ -2226,7 +2225,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Check if column with this header already exists
         if (PartsDataGrid.Columns.Any(c => c.Header as string == columnHeader))
         {
-            MessageBox.Show(_localizationManager.GetString("Warning_ColumnAlreadyExists", columnHeader), _localizationManager.GetString("MessageBox_Warning"), MessageBoxButton.OK,
+            CustomMessageBox.Show(_localizationManager.GetString("Warning_ColumnAlreadyExists", columnHeader), _localizationManager.GetString("MessageBox_Warning"), MessageBoxButton.OK,
                 MessageBoxImage.Warning);
             return;
         }
@@ -2287,7 +2286,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var overriddenItems = selectedItems.Where(item => item.IsOverridden).ToList();
         if (overriddenItems.Count == 0)
         {
-            MessageBox.Show(_localizationManager.GetString("Info_NoOverriddenQuantities"), _localizationManager.GetString("MessageBox_Information"),
+            CustomMessageBox.Show(_localizationManager.GetString("Info_NoOverriddenQuantities"), _localizationManager.GetString("MessageBox_Information"),
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
@@ -2298,7 +2297,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             : string.Format(_localizationManager.GetString("Message_ResetQuantityMultiple"),
                 overriddenItems.Count);
 
-        var result = MessageBox.Show(message, _localizationManager.GetString("MessageBox_Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+        var result = CustomMessageBox.Show(message, _localizationManager.GetString("MessageBox_Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (result != MessageBoxResult.Yes) return;
 
         foreach (var item in overriddenItems)
