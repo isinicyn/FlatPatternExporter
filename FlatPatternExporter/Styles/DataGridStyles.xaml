@@ -3,6 +3,7 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:local="clr-namespace:FlatPatternExporter.UI.Windows"
                     xmlns:converters="clr-namespace:FlatPatternExporter.Converters"
+                    xmlns:services="clr-namespace:FlatPatternExporter.Services"
                     xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions">
     <converters:PropertyExpressionByNameConverter x:Key="PropertyExpressionByNameConverter" />
     <converters:DynamicPropertyValueConverter x:Key="DynamicPropertyValueConverter" />
@@ -289,12 +290,18 @@
             </Border>
 
             <TextBlock Grid.Column="1"
-                       Text="{Binding ProcessingStatus, Converter={StaticResource ProcessingStatusConverter}}"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource TextSecondaryBrush}"
                        FontSize="{StaticResource StandardFontSize}"
-                       Margin="0,0,10,0"/>
+                       Margin="0,0,10,0">
+                <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource ProcessingStatusConverter}">
+                        <Binding Path="ProcessingStatus"/>
+                        <Binding Path="CurrentCulture" Source="{x:Static services:LocalizationManager.Instance}"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
         </Grid>
     </DataTemplate>
 
