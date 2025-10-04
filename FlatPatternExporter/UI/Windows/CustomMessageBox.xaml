@@ -10,7 +10,9 @@
         ResizeMode="NoResize"
         SizeToContent="Height"
         Background="{DynamicResource BackgroundPrimaryBrush}"
-        Foreground="{DynamicResource TextSecondaryBrush}" ShowInTaskbar="False">
+        Foreground="{DynamicResource TextSecondaryBrush}"
+        ShowInTaskbar="False"
+        Topmost="True">
 
     <Border Style="{StaticResource WindowRootBorderStyle}">
         <Grid>
