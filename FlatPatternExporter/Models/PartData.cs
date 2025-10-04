@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Media.Imaging;
 using FlatPatternExporter.Enums;
+using FlatPatternExporter.Services;
 
 namespace FlatPatternExporter.Models;
 
@@ -13,12 +14,22 @@ public class PartData : INotifyPropertyChanged
     private bool isOverridden;
     private bool isMultiplied;
     private BitmapImage? dxfPreview;
-    private ProcessingStatus processingStatus = ProcessingStatus.NotProcessed;
+    private Enums.ProcessingStatus processingStatusEnum = Enums.ProcessingStatus.NotProcessed;
     private Dictionary<string, string> userDefinedProperties = [];
     private readonly Dictionary<string, bool> _isExpressionFlags = [];
     private int _expressionStateVersion;
     private bool _suppressExpressionVersion;
     private bool _expressionStateChangedWhileSuppressed;
+
+    public PartData()
+    {
+        LocalizationManager.Instance.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(ProcessingStatus));
+    }
 
     public string FileName { get; set; } = "";
     public string FullFileName { get; set; } = "";
@@ -98,18 +109,28 @@ public class PartData : INotifyPropertyChanged
         }
     }
 
-    public ProcessingStatus ProcessingStatus
+    public Enums.ProcessingStatus ProcessingStatusEnum
     {
-        get => processingStatus;
+        get => processingStatusEnum;
         set
         {
-            if (processingStatus != value)
+            if (processingStatusEnum != value)
             {
-                processingStatus = value;
+                processingStatusEnum = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ProcessingStatus));
             }
         }
     }
+
+    public string ProcessingStatus => ProcessingStatusEnum switch
+    {
+        Enums.ProcessingStatus.NotProcessed => LocalizationManager.Instance.GetString("ProcessingStatus_NotProcessed"),
+        Enums.ProcessingStatus.Pending => LocalizationManager.Instance.GetString("ProcessingStatus_Pending"),
+        Enums.ProcessingStatus.Success => LocalizationManager.Instance.GetString("ProcessingStatus_Success"),
+        Enums.ProcessingStatus.Skipped => LocalizationManager.Instance.GetString("ProcessingStatus_Skipped"),
+        _ => string.Empty
+    };
 
     public Dictionary<string, string> UserDefinedProperties
     {

@@ -168,7 +168,7 @@ public class DxfExporter
 
         foreach (var partData in partsDataList)
         {
-            partData.ProcessingStatus = ProcessingStatus.Pending;
+            partData.ProcessingStatusEnum = ProcessingStatus.Pending;
         }
 
         try
@@ -295,7 +295,7 @@ public class DxfExporter
                     }
                 }
 
-                partData.ProcessingStatus = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Skipped;
+                partData.ProcessingStatusEnum = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Skipped;
 
                 if (exportSuccess && generateThumbnails && thumbnailGenerator != null &&
                     AcadVersionMapping.SupportsOptimization(exportOptions.SelectedAcadVersion))
@@ -325,9 +325,9 @@ public class DxfExporter
         {
             foreach (var partData in partsDataList)
             {
-                if (partData.ProcessingStatus == ProcessingStatus.Pending)
+                if (partData.ProcessingStatusEnum == ProcessingStatus.Pending)
                 {
-                    partData.ProcessingStatus = ProcessingStatus.NotProcessed;
+                    partData.ProcessingStatusEnum = ProcessingStatus.NotProcessed;
                 }
             }
             throw;

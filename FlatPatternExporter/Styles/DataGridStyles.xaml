@@ -7,7 +7,6 @@
                     xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions">
     <converters:PropertyExpressionByNameConverter x:Key="PropertyExpressionByNameConverter" />
     <converters:DynamicPropertyValueConverter x:Key="DynamicPropertyValueConverter" />
-    <converters:ProcessingStatusConverter x:Key="ProcessingStatusConverter" />
 
     <!-- Base styles for cells -->
 
@@ -275,13 +274,13 @@
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="Transparent"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ProcessingStatus}" Value="Pending">
+                            <DataTrigger Binding="{Binding ProcessingStatusEnum}" Value="Pending">
                                 <Setter Property="Background" Value="{DynamicResource ProcessingStatusPendingBrush}"/>
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding ProcessingStatus}" Value="Success">
+                            <DataTrigger Binding="{Binding ProcessingStatusEnum}" Value="Success">
                                 <Setter Property="Background" Value="{DynamicResource ProcessingStatusSuccessBrush}"/>
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding ProcessingStatus}" Value="Skipped">
+                            <DataTrigger Binding="{Binding ProcessingStatusEnum}" Value="Skipped">
                                 <Setter Property="Background" Value="{DynamicResource ProcessingStatusSkippedBrush}"/>
                             </DataTrigger>
                         </Style.Triggers>
@@ -294,14 +293,8 @@
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource TextSecondaryBrush}"
                        FontSize="{StaticResource StandardFontSize}"
-                       Margin="0,0,10,0">
-                <TextBlock.Text>
-                    <MultiBinding Converter="{StaticResource ProcessingStatusConverter}">
-                        <Binding Path="ProcessingStatus"/>
-                        <Binding Path="CurrentCulture" Source="{x:Static services:LocalizationManager.Instance}"/>
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
+                       Margin="0,0,10,0"
+                       Text="{Binding ProcessingStatus}"/>
         </Grid>
     </DataTemplate>
 
