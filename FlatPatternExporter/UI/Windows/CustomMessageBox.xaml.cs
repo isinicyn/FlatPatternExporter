@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -49,9 +50,15 @@ public partial class CustomMessageBox : Window
     {
         var messageBox = new CustomMessageBox(messageBoxText, caption, button, icon);
 
+        // Set owner window to ensure proper modal behavior
         if (owner != null)
         {
             messageBox.Owner = owner;
+        }
+        else
+        {
+            // Auto-detect active window if owner not specified
+            messageBox.Owner = System.Windows.Application.Current?.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
         }
 
         messageBox.ShowDialog();
