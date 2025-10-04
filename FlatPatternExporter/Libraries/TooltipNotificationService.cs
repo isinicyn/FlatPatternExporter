@@ -18,12 +18,16 @@ public static class TooltipNotificationService
     /// <param name="element">Element on which the ToolTip will be displayed</param>
     /// <param name="message">Message text</param>
     /// <param name="durationSeconds">Display duration in seconds (default 1.5)</param>
-    /// <param name="placement">ToolTip placement (default Bottom)</param>
+    /// <param name="placement">ToolTip placement (default Mouse - centered above cursor)</param>
+    /// <param name="verticalOffset">Vertical offset in pixels (default -50)</param>
+    /// <param name="horizontalOffset">Horizontal offset in pixels (default 0)</param>
     public static void ShowTemporaryTooltip(
         FrameworkElement element,
         string message,
         double durationSeconds = 1.5,
-        PlacementMode placement = PlacementMode.Bottom)
+        PlacementMode placement = PlacementMode.Mouse,
+        double verticalOffset = -50,
+        double horizontalOffset = 0)
     {
         if (element == null || string.IsNullOrEmpty(message))
             return;
@@ -45,11 +49,30 @@ public static class TooltipNotificationService
         var tooltip = new ToolTip
         {
             Content = message,
-            IsOpen = true,
+            IsOpen = false,
             PlacementTarget = element,
-            Placement = placement
+            Placement = placement,
+            VerticalOffset = verticalOffset,
+            HorizontalOffset = horizontalOffset
         };
+
+        // Center tooltip horizontally above cursor when using Mouse placement
+        if (placement == PlacementMode.Mouse)
+        {
+            tooltip.Opened += (s, e) =>
+            {
+                if (s is ToolTip tt)
+                {
+                    // Measure the tooltip to get its actual width
+                    tt.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+                    // Offset by half width to center it
+                    tt.HorizontalOffset = horizontalOffset - (tt.DesiredSize.Width / 2);
+                }
+            };
+        }
+
         element.ToolTip = tooltip;
+        tooltip.IsOpen = true;
 
         // Create timer to restore original ToolTip
         var timer = new DispatcherTimer
