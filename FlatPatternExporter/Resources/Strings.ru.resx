@@ -1801,4 +1801,16 @@
   <data name="Excel_SheetName" xml:space="preserve">
     <value>Список деталей</value>
   </data>
+  <data name="ProcessingStatus_NotProcessed" xml:space="preserve">
+    <value>Не обработано</value>
+  </data>
+  <data name="ProcessingStatus_Pending" xml:space="preserve">
+    <value>Ожидание</value>
+  </data>
+  <data name="ProcessingStatus_Success" xml:space="preserve">
+    <value>Завершено</value>
+  </data>
+  <data name="ProcessingStatus_Skipped" xml:space="preserve">
+    <value>Пропущено</value>
+  </data>
 </root>

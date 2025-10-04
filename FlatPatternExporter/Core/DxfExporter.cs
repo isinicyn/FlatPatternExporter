@@ -168,9 +168,16 @@ public class DxfExporter
 
         foreach (var partData in partsDataList)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            partData.ProcessingStatus = ProcessingStatus.Pending;
+        }
 
-            var partNumber = partData.PartNumber;
+        try
+        {
+            foreach (var partData in partsDataList)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var partNumber = partData.PartNumber;
             var qty = partData.IsOverridden ? partData.Quantity : partData.OriginalQuantity * multiplier;
 
             if (exportOptions.SelectedExportFolder == ExportFolderType.PartFolder)
@@ -288,7 +295,7 @@ public class DxfExporter
                     }
                 }
 
-                partData.ProcessingStatus = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Error;
+                partData.ProcessingStatus = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Skipped;
 
                 if (exportSuccess && generateThumbnails && thumbnailGenerator != null &&
                     AcadVersionMapping.SupportsOptimization(exportOptions.SelectedAcadVersion))
@@ -312,6 +319,18 @@ public class DxfExporter
                 localSkippedCount++;
                 Debug.WriteLine($"Part processing error: {ex.Message}");
             }
+        }
+        }
+        catch (OperationCanceledException)
+        {
+            foreach (var partData in partsDataList)
+            {
+                if (partData.ProcessingStatus == ProcessingStatus.Pending)
+                {
+                    partData.ProcessingStatus = ProcessingStatus.NotProcessed;
+                }
+            }
+            throw;
         }
 
         processedCount = localProcessedCount;

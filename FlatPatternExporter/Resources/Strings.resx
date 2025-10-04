@@ -1801,4 +1801,16 @@ Open file?</value>
   <data name="Excel_SheetName" xml:space="preserve">
     <value>Parts List</value>
   </data>
+  <data name="ProcessingStatus_NotProcessed" xml:space="preserve">
+    <value>Not Processed</value>
+  </data>
+  <data name="ProcessingStatus_Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="ProcessingStatus_Success" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="ProcessingStatus_Skipped" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
 </root>

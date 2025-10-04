@@ -38,8 +38,9 @@ public enum AcadVersionType
 public enum ProcessingStatus
 {
     NotProcessed,   // Not processed (transparent)
+    Pending,        // Pending export (yellow/orange)
     Success,        // Successfully exported (green)
-    Error          // Export error (red)
+    Skipped         // Skipped (no flat pattern or error) (red)
 }
 
 public enum DocumentType

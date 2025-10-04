@@ -6,6 +6,7 @@
                     xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions">
     <converters:PropertyExpressionByNameConverter x:Key="PropertyExpressionByNameConverter" />
     <converters:DynamicPropertyValueConverter x:Key="DynamicPropertyValueConverter" />
+    <converters:ProcessingStatusConverter x:Key="ProcessingStatusConverter" />
 
     <!-- Base styles for cells -->
 
@@ -255,26 +256,35 @@
 
     <!-- Template for processing status column -->
     <DataTemplate x:Key="ProcessingStatusTemplate">
-        <Border Width="10" Height="10"
-                BorderBrush="{DynamicResource TextDisabledBrush}"
-                BorderThickness="{StaticResource StandardBorderThicknessValue}"
-                CornerRadius="{StaticResource SmallCornerRadiusValue}"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center">
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding ProcessingStatus}" Value="Success">
-                            <Setter Property="Background" Value="{DynamicResource ProcessingStatusSuccessBrush}"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding ProcessingStatus}" Value="Error">
-                            <Setter Property="Background" Value="{DynamicResource ProcessingStatusErrorBrush}"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-        </Border>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border Width="10" Height="10"
+                    BorderBrush="{DynamicResource TextDisabledBrush}"
+                    BorderThickness="{StaticResource StandardBorderThicknessValue}"
+                    CornerRadius="{StaticResource SmallCornerRadiusValue}"
+                    VerticalAlignment="Center"
+                    Margin="0,0,8,0">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ProcessingStatus}" Value="Pending">
+                                <Setter Property="Background" Value="{DynamicResource ProcessingStatusPendingBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ProcessingStatus}" Value="Success">
+                                <Setter Property="Background" Value="{DynamicResource ProcessingStatusSuccessBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ProcessingStatus}" Value="Skipped">
+                                <Setter Property="Background" Value="{DynamicResource ProcessingStatusSkippedBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
+            <TextBlock Text="{Binding ProcessingStatus, Converter={StaticResource ProcessingStatusConverter}}"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       FontSize="{StaticResource StandardFontSize}"/>
+        </StackPanel>
     </DataTemplate>
 
     <!-- DataGrid styles -->
