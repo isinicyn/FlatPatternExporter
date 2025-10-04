@@ -1,6 +1,8 @@
-﻿using System.Windows;
+﻿using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace WpfToolkit;
@@ -10,7 +12,19 @@ namespace WpfToolkit;
 /// </summary>
 public static class PopupNotificationService
 {
-    private static readonly Dictionary<FrameworkElement, (Popup popup, DispatcherTimer timer)> _activeNotifications = new();
+    private static readonly ConditionalWeakTable<FrameworkElement, NotificationState> _activeNotifications = new();
+
+    private sealed class NotificationState
+    {
+        public Popup Popup { get; init; } = null!;
+        public DispatcherTimer Timer { get; init; } = null!;
+
+        public void Cleanup()
+        {
+            Timer.Stop();
+            Popup.IsOpen = false;
+        }
+    }
 
     /// <summary>
     /// Shows a temporary notification popup with the specified message
@@ -32,28 +46,24 @@ public static class PopupNotificationService
         if (element == null || string.IsNullOrEmpty(message))
             return;
 
-        // Close previous notification for this element if exists
+        // Close previous notification
         if (_activeNotifications.TryGetValue(element, out var existing))
-        {
-            existing.timer.Stop();
-            existing.popup.IsOpen = false;
-            _activeNotifications.Remove(element);
-        }
+            existing.Cleanup();
 
-        // Create notification content using XAML styles
+        // Create content with fallback styles
         var textBlock = new TextBlock
         {
             Text = message,
-            Style = (Style)System.Windows.Application.Current.FindResource("NotificationTextStyle")
+            Style = TryFindResource<Style>("NotificationTextStyle")
         };
 
         var border = new Border
         {
-            Style = (Style)System.Windows.Application.Current.FindResource("NotificationContentStyle"),
-            Child = textBlock
+            Style = TryFindResource<Style>("NotificationContentStyle"),
+            Child = textBlock,
+            Opacity = 0
         };
 
-        // Create popup
         var popup = new Popup
         {
             Child = border,
@@ -63,39 +73,71 @@ public static class PopupNotificationService
             StaysOpen = true
         };
 
-        // Center popup horizontally above cursor when using Mouse placement
-        popup.Opened += (s, e) =>
-        {
-            border.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
-            if (placement == PlacementMode.Mouse)
-            {
-                popup.HorizontalOffset = horizontalOffset - (border.DesiredSize.Width / 2);
-                popup.VerticalOffset = verticalOffset;
-            }
-            else
-            {
-                popup.HorizontalOffset = horizontalOffset;
-                popup.VerticalOffset = verticalOffset;
-            }
-        };
+        // Calculate offset on Opened
+        popup.Opened += OnPopupOpened;
 
-        // Show popup
+        void OnPopupOpened(object? s, EventArgs e)
+        {
+            popup.Opened -= OnPopupOpened;
+
+            border.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+            popup.HorizontalOffset = placement == PlacementMode.Mouse
+                ? horizontalOffset - border.DesiredSize.Width / 2
+                : horizontalOffset;
+            popup.VerticalOffset = verticalOffset;
+
+            // Fade in animation
+            border.BeginAnimation(UIElement.OpacityProperty,
+                new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(200)));
+        }
+
         popup.IsOpen = true;
 
-        // Create timer to close popup
-        var timer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromSeconds(durationSeconds)
-        };
+        // Auto-close timer
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(durationSeconds) };
+        timer.Tick += OnTimerTick;
 
-        timer.Tick += (s, args) =>
+        void OnTimerTick(object? s, EventArgs e)
         {
+            timer.Tick -= OnTimerTick;
             timer.Stop();
-            popup.IsOpen = false;
-            _activeNotifications.Remove(element);
-        };
 
-        _activeNotifications[element] = (popup, timer);
+            // Fade out animation
+            var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(150));
+            fadeOut.Completed += (_, _) =>
+            {
+                popup.IsOpen = false;
+                _activeNotifications.Remove(element);
+            };
+            border.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+        }
+
+        _activeNotifications.AddOrUpdate(element, new NotificationState { Popup = popup, Timer = timer });
         timer.Start();
+    }
+
+    /// <summary>
+    /// Closes active notification for the specified element
+    /// </summary>
+    /// <param name="element">Element for which to close the notification</param>
+    public static void CloseNotification(FrameworkElement element)
+    {
+        if (_activeNotifications.TryGetValue(element, out var state))
+        {
+            state.Cleanup();
+            _activeNotifications.Remove(element);
+        }
+    }
+
+    private static T? TryFindResource<T>(string key) where T : class
+    {
+        try
+        {
+            return System.Windows.Application.Current.TryFindResource(key) as T;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
