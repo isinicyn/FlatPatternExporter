@@ -260,34 +260,15 @@ public static class SettingsManager
         if (window.SettingsExpander is not null)
             window.SettingsExpander.IsExpanded = settings.Interface.IsExpanded;
 
-        // Restore language
+        // Restore language selection in ComboBox (language already applied in App.xaml.cs)
         var savedLanguage = SupportedLanguages.All
             .FirstOrDefault(lang => lang.Code == settings.Interface.SelectedLanguage);
         if (savedLanguage != null)
         {
-            LocalizationManager.Instance.CurrentCulture = savedLanguage.Culture;
             window.LanguageComboBox.SelectedItem = savedLanguage;
         }
 
-        // Restore theme
-        var themeFileName = settings.Interface.SelectedTheme == "Light"
-            ? "ColorResources.xaml"
-            : "DarkTheme.xaml";
-        var themeUri = new Uri($"Styles/{themeFileName}", UriKind.Relative);
-
-        var mergedDictionaries = System.Windows.Application.Current.Resources.MergedDictionaries;
-        var existingTheme = mergedDictionaries.FirstOrDefault(d =>
-            d.Source?.OriginalString.Contains("ColorResources.xaml") == true ||
-            d.Source?.OriginalString.Contains("DarkTheme.xaml") == true);
-
-        if (existingTheme != null)
-        {
-            var index = mergedDictionaries.IndexOf(existingTheme);
-            mergedDictionaries.RemoveAt(index);
-            mergedDictionaries.Insert(index, new ResourceDictionary { Source = themeUri });
-        }
-
-        // Set ToggleButton state after applying theme
+        // Set ToggleButton state (theme already applied in App.xaml.cs)
         if (window.ThemeToggleButton is not null)
             window.ThemeToggleButton.IsChecked = settings.Interface.SelectedTheme == "Dark";
 

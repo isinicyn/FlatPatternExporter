@@ -256,9 +256,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         SetUIState(UIState.Initial());
 
-        // Load settings on startup
-        LoadSettings();
-
         // Initialize overlay visibility
         UpdateNoColumnsOverlayVisibility();
 
@@ -267,11 +264,13 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     }
 
-    private void LoadSettings()
+    /// <summary>
+    /// Applies application settings loaded from App.xaml.cs
+    /// </summary>
+    public void ApplySettings(ApplicationSettings settings)
     {
         try
         {
-            var settings = SettingsManager.LoadSettings();
             SettingsManager.ApplySettingsToMainWindow(settings, this);
         }
         catch (Exception ex)
