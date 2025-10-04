@@ -9,15 +9,23 @@ namespace FlatPatternExporter.Services;
 public class ExcelExportService
 {
     private const int ImageSizePixels = 80;
+    private readonly LocalizationManager _localizationManager;
+
+    public ExcelExportService()
+    {
+        _localizationManager = LocalizationManager.Instance;
+    }
 
     private static double PixelsToPoints(int pixels) => pixels * 72.0 / 96.0;
+    private static double PixelsToColumnWidth(int pixels) => pixels / 7.0;
 
     public void ExportToExcel(string filePath, DataGrid dataGrid, IEnumerable view)
     {
         using var workbook = new XLWorkbook();
-        var worksheet = workbook.Worksheets.Add("Export");
+        var worksheet = workbook.Worksheets.Add(_localizationManager.GetString("Excel_SheetName"));
 
         var visibleColumns = dataGrid.Columns.Where(c => c.Visibility == Visibility.Visible).ToList();
+        var imageColumns = new HashSet<int>();
 
         for (int col = 0; col < visibleColumns.Count; col++)
         {
@@ -49,6 +57,7 @@ public class ExcelExportService
                                     .MoveTo(cell, 0, 0, cell, ImageSizePixels, ImageSizePixels);
 
                                 hasImage = true;
+                                imageColumns.Add(col);
                             }
                         }
                         catch
@@ -72,6 +81,11 @@ public class ExcelExportService
         }
 
         worksheet.Columns().AdjustToContents();
+
+        foreach (int col in imageColumns)
+        {
+            worksheet.Column(col + 1).Width = PixelsToColumnWidth(ImageSizePixels);
+        }
 
         workbook.SaveAs(filePath);
     }

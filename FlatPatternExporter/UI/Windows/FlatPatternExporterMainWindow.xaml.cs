@@ -1119,9 +1119,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    private void CustomTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    private void CustomTextBox_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == System.Windows.Input.Key.Enter)
+        if (e.Key == Key.Enter)
         {
             AddCustomTextButton_Click(sender, new RoutedEventArgs());
             e.Handled = true;

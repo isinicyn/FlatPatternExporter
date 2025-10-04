@@ -1796,4 +1796,7 @@ The following characters are not allowed in layer names:
   <data name="Text_AuthorName" xml:space="preserve">
     <value>Sinicyn Ivan Victorovich</value>
   </data>
+  <data name="Excel_SheetName" xml:space="preserve">
+    <value>Parts List</value>
+  </data>
 </root>

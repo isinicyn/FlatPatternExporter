@@ -1796,4 +1796,7 @@
   <data name="Text_AuthorName" xml:space="preserve">
     <value>Синицын Иван Викторович</value>
   </data>
+  <data name="Excel_SheetName" xml:space="preserve">
+    <value>Список деталей</value>
+  </data>
 </root>
