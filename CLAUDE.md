@@ -64,7 +64,8 @@ FlatPatternExporter/
     │   ├── TemplatePresetManager.cs    # Управление пресетами шаблонов
     │   ├── VersionInfoService.cs       # Получение версии приложения и коммитов
     │   ├── PropertyListManager.cs      # Управление списками свойств с фильтрацией
-    │   └── LocalizationManager.cs      # Управление локализацией приложения
+    │   ├── LocalizationManager.cs      # Управление локализацией приложения
+    │   └── ExcelExportService.cs       # Экспорт данных в Excel/CSV
     │
     ├── Utilities/                      # Утилиты
     │   └── DxfOptimizer.cs             # Оптимизация DXF файлов
@@ -197,6 +198,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `VersionInfoService` - получение версии приложения и информации о коммитах
 - `PropertyListManager` - управление списками свойств с фильтрацией и состоянием
 - `LocalizationManager` - управление локализацией приложения с поддержкой русского и английского языков
+- `ExcelExportService` - экспорт данных DataGrid в Excel (XLSX) и CSV форматы с поддержкой изображений
 
 **Utilities/ - Утилиты (namespace: FlatPatternExporter.Utilities):**
 - `DxfOptimizer` - оптимизация DXF файлов для различных версий AutoCAD

@@ -693,6 +693,9 @@
   <data name="UI_Property" xml:space="preserve">
     <value>Свойство</value>
   </data>
+  <data name="UI_ExportToExcel" xml:space="preserve">
+    <value>Экспорт в Excel</value>
+  </data>
   <data name="UI_Conflicts" xml:space="preserve">
     <value>Конфликты</value>
   </data>
@@ -1776,5 +1779,18 @@
   </data>
   <data name="ToolTip_CopyToClipboard" xml:space="preserve">
     <value>Копировать в буфер обмена</value>
+  </data>
+
+  <!-- Export to Excel Messages -->
+  <data name="Message_ExportSuccess" xml:space="preserve">
+    <value>Данные успешно экспортированы в:
+{0}</value>
+  </data>
+  <data name="Message_ExportError" xml:space="preserve">
+    <value>Ошибка экспорта:
+{0}</value>
+  </data>
+  <data name="Title_Success" xml:space="preserve">
+    <value>Успех</value>
   </data>
 </root>

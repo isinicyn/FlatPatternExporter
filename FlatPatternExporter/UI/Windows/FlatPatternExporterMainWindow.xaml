@@ -663,6 +663,19 @@
                             </StackPanel>
                         </Button>
 
+                        <!-- Export to Excel button -->
+                        <Button x:Name="ExportToExcelButton"
+                                Click="ExportToExcelButton_Click"
+                                IsEnabled="False"
+                                Style="{StaticResource InteractiveActionButtonStyle}"
+                                Margin="{StaticResource RightStandardMarginThickness}">
+                            <Button.Content>
+                                <TextBlock Text="{extensions:Localize UI_ExportToExcel}"
+                                           TextAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Button.Content>
+                        </Button>
+
                         <!-- Designation analysis button -->
                             <Button Name="ConflictFilesButton"
                                 IsEnabled="False"

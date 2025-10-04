@@ -41,6 +41,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly ThumbnailGenerator _thumbnailGenerator = new();
     private readonly DxfExporter _dxfExporter;
     private readonly PartDataReader _partDataReader;
+    private readonly ExcelExportService _excelExportService = new();
 
     // UI elements
     public System.Windows.Controls.Primitives.ToggleButton? ThemeToggleButton { get; private set; }
@@ -170,6 +171,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     public FlatPatternExporterMainWindow()
     {
+        // Configure EPPlus license for noncommercial use (EPPlus 8.x)
+        OfficeOpenXml.ExcelPackage.License.SetNonCommercialPersonal("FlatPatternExporter");
+
         // Initialize services before InitializeComponent to prevent NullReferenceException
         _inventorManager.InitializeInventor();
         _documentScanner = new Core.DocumentScanner(_inventorManager);
@@ -762,6 +766,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         ScanButton.IsEnabled = state.ScanEnabled;
         ExportButton.IsEnabled = state.ExportEnabled;
+        ExportToExcelButton.IsEnabled = state.ExportEnabled;
         ClearButton.IsEnabled = state.ClearEnabled;
         ScanButton.Content = state.ScanButtonText;
         ExportButton.Content = state.ExportButtonText;
@@ -1006,6 +1011,49 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             AddUserDefinedIPropertyColumn,
             RemoveDataGridColumn);
         selectIPropertyWindow.ShowDialog();
+    }
+
+    private void ExportToExcelButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "Excel Files (*.xlsx)|*.xlsx|CSV Files (*.csv)|*.csv",
+                DefaultExt = ".xlsx",
+                FileName = $"Export_{DateTime.Now:yyyyMMdd_HHmmss}"
+            };
+
+            if (saveFileDialog.ShowDialog() != true)
+                return;
+
+            var isXlsx = System.IO.Path.GetExtension(saveFileDialog.FileName).ToLower() == ".xlsx";
+
+            if (isXlsx)
+            {
+                _excelExportService.ExportToExcel(saveFileDialog.FileName, PartsDataGrid, _partsDataView.View);
+            }
+            else
+            {
+                _excelExportService.ExportToCsv(saveFileDialog.FileName, PartsDataGrid, _partsDataView.View);
+            }
+
+            CustomMessageBox.Show(
+                this,
+                _localizationManager.GetString("Message_ExportSuccess", saveFileDialog.FileName),
+                _localizationManager.GetString("Title_Success"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            CustomMessageBox.Show(
+                this,
+                _localizationManager.GetString("Message_ExportError", ex.Message),
+                _localizationManager.GetString("Title_Error"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
     }
 
     private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

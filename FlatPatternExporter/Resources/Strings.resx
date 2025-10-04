@@ -693,6 +693,9 @@ Execution time: {3}</value>
   <data name="UI_Property" xml:space="preserve">
     <value>Property</value>
   </data>
+  <data name="UI_ExportToExcel" xml:space="preserve">
+    <value>Export to Excel</value>
+  </data>
   <data name="UI_Conflicts" xml:space="preserve">
     <value>Conflicts</value>
   </data>
@@ -1776,5 +1779,18 @@ The following characters are not allowed in layer names:
   </data>
   <data name="ToolTip_CopyToClipboard" xml:space="preserve">
     <value>Copy to clipboard</value>
+  </data>
+
+  <!-- Export to Excel Messages -->
+  <data name="Message_ExportSuccess" xml:space="preserve">
+    <value>Data successfully exported to:
+{0}</value>
+  </data>
+  <data name="Message_ExportError" xml:space="preserve">
+    <value>Export error:
+{0}</value>
+  </data>
+  <data name="Title_Success" xml:space="preserve">
+    <value>Success</value>
   </data>
 </root>
