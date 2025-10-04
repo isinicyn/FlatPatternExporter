@@ -1793,4 +1793,7 @@ The following characters are not allowed in layer names:
   <data name="Title_Success" xml:space="preserve">
     <value>Success</value>
   </data>
+  <data name="Text_AuthorName" xml:space="preserve">
+    <value>Sinicyn Ivan Victorovich</value>
+  </data>
 </root>

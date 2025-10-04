@@ -72,7 +72,7 @@
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="{extensions:Localize Text_AuthorLabel}"
                                    Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="Ivan Sinicyn"
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{extensions:Localize Text_AuthorName}"
                                    Style="{StaticResource BaseTextBlockStyle}"/>
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Email:"
@@ -108,6 +108,7 @@
                     <TextBlock FontSize="{StaticResource SmallFontSize}"
                                Foreground="{DynamicResource TextMutedBrush}"
                                TextWrapping="Wrap">
+                        <Run Text="• ClosedXML 0.105.0 (MIT License)" FontWeight="SemiBold"/><LineBreak/>
                         <Run Text="• netDxf.netstandard 3.0.1 (MIT License)" FontWeight="SemiBold"/><LineBreak/>
                         <Run Text="• Svg.Skia 3.2.1 (MIT License)" FontWeight="SemiBold"/><LineBreak/>
                         <Run Text="• stdole 17.14.40260" FontWeight="SemiBold"/>

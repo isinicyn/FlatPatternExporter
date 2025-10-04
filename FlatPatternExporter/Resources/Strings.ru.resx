@@ -1793,4 +1793,7 @@
   <data name="Title_Success" xml:space="preserve">
     <value>Успех</value>
   </data>
+  <data name="Text_AuthorName" xml:space="preserve">
+    <value>Синицын Иван Викторович</value>
+  </data>
 </root>
