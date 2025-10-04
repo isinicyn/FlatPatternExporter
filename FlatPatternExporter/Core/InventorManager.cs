@@ -19,7 +19,7 @@ public class InventorManager
     public string ProjectName => _projectName;
     public string ProjectWorkspacePath => _projectWorkspacePath;
 
-    public bool EnsureInventorConnection()
+    public bool EnsureInventorConnection(bool showError = false)
     {
         try
         {
@@ -32,15 +32,21 @@ public class InventorManager
         }
         catch (COMException)
         {
-            CustomMessageBox.Show(
-                LocalizationManager.Instance.GetString("Error_InventorConnection"), LocalizationManager.Instance.GetString("MessageBox_Error"),
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            if (showError)
+            {
+                CustomMessageBox.Show(
+                    LocalizationManager.Instance.GetString("Error_InventorConnection"), LocalizationManager.Instance.GetString("MessageBox_Error"),
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             _thisApplication = null;
         }
         catch (Exception ex)
         {
-            CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_InventorConnection", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK,
-                MessageBoxImage.Error);
+            if (showError)
+            {
+                CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_InventorConnection", ex.Message), LocalizationManager.Instance.GetString("MessageBox_Error"), MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
             _thisApplication = null;
         }
 
@@ -49,7 +55,7 @@ public class InventorManager
 
     public void InitializeInventor()
     {
-        EnsureInventorConnection();
+        EnsureInventorConnection(showError: true);
     }
 
     private void InitializeProjectData()
