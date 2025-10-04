@@ -42,7 +42,7 @@ FlatPatternExporter/
     ├── Libraries/                      # Внешние независимые библиотеки
     │   ├── DxfRenderer.cs              # Библиотека рендеринга DXF файлов
     │   ├── MarshalCore.cs              # Отдельная библиотека COM interop
-    │   └── TooltipNotificationService.cs # Библиотека всплывающих уведомлений
+    │   └── PopupNotificationService.cs    # Библиотека всплывающих уведомлений
     │
     ├── Enums/                          # Перечисления
     │   └── CommonEnums.cs              # Базовые enum и маппинги
@@ -174,7 +174,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 **Libraries/ - Внешние независимые библиотеки:**
 - `DxfRenderer` - библиотека рендеринга DXF файлов (namespace: DxfRenderer)
 - `MarshalCore` - COM interop библиотека (namespace: DefineEdge)
-- `TooltipNotificationService` - библиотека всплывающих уведомлений (namespace: WpfToolkit)
+- `PopupNotificationService` - библиотека всплывающих уведомлений (namespace: WpfToolkit)
 
 **Enums/ - Перечисления (namespace: FlatPatternExporter.Enums):**
 - `CommonEnums` - базовые перечисления (ExportFolderType, ProcessingMethod, ProcessingStatus, AcadVersionType, DocumentType и др.)
@@ -257,7 +257,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `FlatPatternExporter.Extensions` - расширения разметки XAML в Extensions/
 - `DxfRenderer` - независимая библиотека рендеринга DXF (Libraries/DxfRenderer.cs)
 - `DefineEdge` - независимая библиотека COM interop (Libraries/MarshalCore.cs)
-- `WpfToolkit` - независимая библиотека WPF компонентов (Libraries/TooltipNotificationService.cs)
+- `WpfToolkit` - независимая библиотека WPF компонентов (Libraries/PopupNotificationService.cs)
 
 **Зависимости между пространствами имен:**
 - `UI.Windows` → `Core`, `Enums`, `Models`, `Services`, `Utilities`, `UI.Controls`, `UI.Models`, `WpfToolkit`

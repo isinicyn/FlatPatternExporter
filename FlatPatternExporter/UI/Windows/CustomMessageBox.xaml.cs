@@ -140,7 +140,7 @@ public partial class CustomMessageBox : Window
         {
             System.Windows.Clipboard.SetText(_messageText);
             var message = _localizationManager.GetString("Text_Copied");
-            TooltipNotificationService.ShowTemporaryTooltip((FrameworkElement)sender, message);
+            PopupNotificationService.ShowNotification((FrameworkElement)sender, message);
         }
         catch
         {

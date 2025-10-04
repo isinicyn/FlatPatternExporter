@@ -398,4 +398,18 @@
         </Setter>
     </Style>
 
+    <!-- Notification popup content style -->
+    <Style x:Key="NotificationContentStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource BackgroundSecondaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource StandardBorderThicknessValue}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource StandardCornerRadiusValue}"/>
+        <Setter Property="Padding" Value="{StaticResource ControlPaddingThickness}"/>
+    </Style>
+
+    <Style x:Key="NotificationTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="FontSize" Value="{StaticResource LargeFontSize}"/>
+    </Style>
+
 </ResourceDictionary>
