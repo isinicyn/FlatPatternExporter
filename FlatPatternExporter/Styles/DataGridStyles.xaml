@@ -62,7 +62,7 @@
     
     <!-- Template for "Part Image" column -->
     <DataTemplate x:Key="PartImageTemplate">
-        <Border Margin="{StaticResource VerticalSmallMarginThickness}">
+        <Border Margin="{StaticResource SmallPaddingThickness}">
             <Border.OpacityMask>
                 <VisualBrush>
                     <VisualBrush.Visual>
@@ -117,7 +117,7 @@
 
     <!-- Centralized template for DXF images -->
     <ControlTemplate x:Key="DxfImageContainerTemplate" TargetType="ContentControl">
-        <Grid Margin="{StaticResource VerticalSmallMarginThickness}">
+        <Grid Margin="{StaticResource SmallPaddingThickness}">
             <Border>
                 <Border.OpacityMask>
                     <VisualBrush>
@@ -256,13 +256,20 @@
 
     <!-- Template for processing status column -->
     <DataTemplate x:Key="ProcessingStatusTemplate">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Border Width="10" Height="10"
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="{StaticResource SmallPaddingThickness}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="26"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Width="10" Height="10"
                     BorderBrush="{DynamicResource TextDisabledBrush}"
                     BorderThickness="{StaticResource StandardBorderThicknessValue}"
                     CornerRadius="{StaticResource SmallCornerRadiusValue}"
+                    HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Margin="0,0,8,0">
+                    Margin="0,1,0,0">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="Transparent"/>
@@ -280,11 +287,15 @@
                     </Style>
                 </Border.Style>
             </Border>
-            <TextBlock Text="{Binding ProcessingStatus, Converter={StaticResource ProcessingStatusConverter}}"
+
+            <TextBlock Grid.Column="1"
+                       Text="{Binding ProcessingStatus, Converter={StaticResource ProcessingStatusConverter}}"
+                       HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource TextSecondaryBrush}"
-                       FontSize="{StaticResource StandardFontSize}"/>
-        </StackPanel>
+                       FontSize="{StaticResource StandardFontSize}"
+                       Margin="0,0,10,0"/>
+        </Grid>
     </DataTemplate>
 
     <!-- DataGrid styles -->
