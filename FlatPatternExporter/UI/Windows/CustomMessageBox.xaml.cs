@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using FlatPatternExporter.Services;
+using WpfToolkit;
 
 namespace FlatPatternExporter.UI.Windows;
 
@@ -9,11 +10,13 @@ public partial class CustomMessageBox : Window
 {
     private MessageBoxResult _result = MessageBoxResult.None;
     private readonly LocalizationManager _localizationManager = LocalizationManager.Instance;
+    private string _messageText = string.Empty;
 
     private CustomMessageBox(string message, string title, MessageBoxButton button, MessageBoxImage icon)
     {
         InitializeComponent();
 
+        _messageText = message;
         MessageTextBlock.Text = message;
         TitleBar.Title = title;
         Title = title;
@@ -129,5 +132,19 @@ public partial class CustomMessageBox : Window
         };
 
         ButtonPanel.Children.Add(button);
+    }
+
+    private void CopyButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            System.Windows.Clipboard.SetText(_messageText);
+            var message = _localizationManager.GetString("Text_Copied");
+            TooltipNotificationService.ShowTemporaryTooltip((FrameworkElement)sender, message);
+        }
+        catch
+        {
+            // Игнорируем ошибки при копировании в буфер обмена
+        }
     }
 }

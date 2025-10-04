@@ -527,7 +527,8 @@
                                       StrokeThickness="1.5"
                                       StrokeLineJoin="Round"
                                       StrokeStartLineCap="Round"
-                                      StrokeEndLineCap="Round"/>
+                                      StrokeEndLineCap="Round"
+                                      Stretch="Uniform"/>
                             </Viewbox>
                         </Border>
                     </Border>

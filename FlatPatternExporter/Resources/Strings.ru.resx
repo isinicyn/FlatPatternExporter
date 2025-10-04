@@ -1775,4 +1775,7 @@
   <data name="Text_Copied" xml:space="preserve">
     <value>Скопировано!</value>
   </data>
+  <data name="ToolTip_CopyToClipboard" xml:space="preserve">
+    <value>Копировать в буфер обмена</value>
+  </data>
 </root>

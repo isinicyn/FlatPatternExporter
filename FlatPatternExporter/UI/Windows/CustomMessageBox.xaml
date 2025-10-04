@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:local="clr-namespace:FlatPatternExporter.UI.Controls"
+        xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions"
         shell:WindowChrome.WindowChrome="{StaticResource CustomWindowChrome}"
         Title="Message"
         Width="500"
@@ -26,7 +27,15 @@
             <local:CustomTitleBar x:Name="TitleBar"
                                   Grid.Row="0"
                                   ShowMinimizeButton="False"
-                                  ShowMaximizeButton="False"/>
+                                  ShowMaximizeButton="False">
+                <local:CustomTitleBar.ContentArea>
+                    <Button Style="{StaticResource TitleBarIconButtonStyle}"
+                            Tag="{StaticResource CopyIconGeometry}"
+                            Click="CopyButton_Click"
+                            ToolTip="{extensions:Localize ToolTip_CopyToClipboard}"
+                            Margin="0,0,8,0"/>
+                </local:CustomTitleBar.ContentArea>
+            </local:CustomTitleBar>
 
             <!-- Message content -->
             <Grid Grid.Row="1" Margin="10,15,10,15">
