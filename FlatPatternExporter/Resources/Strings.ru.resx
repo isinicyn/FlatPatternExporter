@@ -1784,7 +1784,9 @@
   <!-- Export to Excel Messages -->
   <data name="Message_ExportSuccess" xml:space="preserve">
     <value>Данные успешно экспортированы в:
-{0}</value>
+{0}
+
+Открыть файл?</value>
   </data>
   <data name="Message_ExportError" xml:space="preserve">
     <value>Ошибка экспорта:

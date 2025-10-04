@@ -1784,7 +1784,9 @@ The following characters are not allowed in layer names:
   <!-- Export to Excel Messages -->
   <data name="Message_ExportSuccess" xml:space="preserve">
     <value>Data successfully exported to:
-{0}</value>
+{0}
+
+Open file?</value>
   </data>
   <data name="Message_ExportError" xml:space="preserve">
     <value>Export error:

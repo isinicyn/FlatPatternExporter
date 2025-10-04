@@ -1035,12 +1035,28 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 _excelExportService.ExportToCsv(saveFileDialog.FileName, PartsDataGrid, _partsDataView.View);
             }
 
-            CustomMessageBox.Show(
+            var result = CustomMessageBox.Show(
                 this,
                 _localizationManager.GetString("Message_ExportSuccess", saveFileDialog.FileName),
                 _localizationManager.GetString("Title_Success"),
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = saveFileDialog.FileName,
+                        UseShellExecute = true
+                    });
+                }
+                catch
+                {
+                    // Ignore errors when opening file
+                }
+            }
         }
         catch (Exception ex)
         {
