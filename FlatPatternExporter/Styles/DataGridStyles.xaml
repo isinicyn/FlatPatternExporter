@@ -283,6 +283,9 @@
                             <DataTrigger Binding="{Binding ProcessingStatusEnum}" Value="Skipped">
                                 <Setter Property="Background" Value="{DynamicResource ProcessingStatusSkippedBrush}"/>
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding ProcessingStatusEnum}" Value="Interrupted">
+                                <Setter Property="Background" Value="{DynamicResource ProcessingStatusInterruptedBrush}"/>
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Border.Style>

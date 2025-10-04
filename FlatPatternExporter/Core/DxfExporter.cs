@@ -327,7 +327,7 @@ public class DxfExporter
             {
                 if (partData.ProcessingStatusEnum == ProcessingStatus.Pending)
                 {
-                    partData.ProcessingStatusEnum = ProcessingStatus.NotProcessed;
+                    partData.ProcessingStatusEnum = ProcessingStatus.Interrupted;
                 }
             }
             throw;

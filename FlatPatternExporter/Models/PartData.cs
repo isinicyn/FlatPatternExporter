@@ -129,6 +129,7 @@ public class PartData : INotifyPropertyChanged
         Enums.ProcessingStatus.Pending => LocalizationManager.Instance.GetString("ProcessingStatus_Pending"),
         Enums.ProcessingStatus.Success => LocalizationManager.Instance.GetString("ProcessingStatus_Success"),
         Enums.ProcessingStatus.Skipped => LocalizationManager.Instance.GetString("ProcessingStatus_Skipped"),
+        Enums.ProcessingStatus.Interrupted => LocalizationManager.Instance.GetString("ProcessingStatus_Interrupted"),
         _ => string.Empty
     };
 

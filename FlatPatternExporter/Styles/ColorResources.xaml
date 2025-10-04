@@ -71,6 +71,7 @@
     <SolidColorBrush x:Key="ProcessingStatusSuccessBrush" Color="#16A085"/>
     <SolidColorBrush x:Key="ProcessingStatusPendingBrush" Color="#F39C12"/>
     <SolidColorBrush x:Key="ProcessingStatusSkippedBrush" Color="#E74C3C"/>
+    <SolidColorBrush x:Key="ProcessingStatusInterruptedBrush" Color="#95A5A6"/>
 
     <!-- Status bar background -->
     <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#0078D4"/>

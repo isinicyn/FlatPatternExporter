@@ -1813,4 +1813,7 @@ Open file?</value>
   <data name="ProcessingStatus_Skipped" xml:space="preserve">
     <value>Skipped</value>
   </data>
+  <data name="ProcessingStatus_Interrupted" xml:space="preserve">
+    <value>Interrupted</value>
+  </data>
 </root>
