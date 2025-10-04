@@ -527,11 +527,10 @@ Use the "Conflicts" button on the control panel to view conflict details.</value
 
   <!-- Additional Export Messages -->
   <data name="Info_ExportStatistics" xml:space="preserve">
-    <value>{0}.
-Total files processed: {1}
-Skipped (no flat patterns): {2}
-Total exported: {3}
-Execution time: {4}</value>
+    <value>Total files processed: {0}
+Skipped (no flat patterns): {1}
+Total exported: {2}
+Execution time: {3}</value>
   </data>
 
   <!-- Core errors -->

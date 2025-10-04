@@ -833,10 +833,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     : _localizationManager.GetString("Info_ExportCompleted");
                 CustomMessageBox.Show(
                     this,
-                    _localizationManager.GetString("Info_ExportStatistics", exportTitle,
+                    _localizationManager.GetString("Info_ExportStatistics",
                         result.ProcessedCount + result.SkippedCount, result.SkippedCount,
                         result.ProcessedCount, GetElapsedTime(result.ElapsedTime)),
-                    _localizationManager.GetString("Info_Title"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    exportTitle, MessageBoxButton.OK, MessageBoxImage.Information);
                 break;
         }
     }
