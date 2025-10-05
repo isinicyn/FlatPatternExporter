@@ -31,7 +31,7 @@
         <StackPanel Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}">
             <GroupBox Header="{extensions:Localize Header_ProgramVersion}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
-                    <DockPanel Margin="{StaticResource BottomSmallMarginThickness}">
+                    <DockPanel>
                         <Button x:Name="CopyButton"
                                 Style="{StaticResource CopyIconButton}"
                                 DockPanel.Dock="Right"
@@ -60,7 +60,7 @@
 
             <GroupBox Header="{extensions:Localize Header_Author}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
-                    <Grid Margin="{StaticResource BottomHairlineMarginThickness}">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -71,49 +71,109 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="{extensions:Localize Text_AuthorLabel}"
-                                   Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}"/>
+                                   Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}" TextAlignment="Right"/>
                         <TextBlock Grid.Row="0" Grid.Column="1" Text="{extensions:Localize Text_AuthorName}"
                                    Style="{StaticResource BaseTextBlockStyle}"/>
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Email:"
-                                   Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="{StaticResource RightSmallMarginThickness}"/>
+                                   Style="{StaticResource BaseTextBlockStyle}" FontWeight="SemiBold" Margin="0,4,4,0" TextAlignment="Right"/>
                         <TextBlock Grid.Row="1" Grid.Column="1"
                                    x:Name="EmailTextBlock"
                                    Text="isinicyn@gmail.com"
-                                   Style="{StaticResource BaseTextBlockStyle}"
                                    Cursor="Hand"
-                                   MouseLeftButtonDown="EmailTextBlock_MouseLeftButtonDown"/>
+                                   Margin="0,4,0,0"
+                                   MouseLeftButtonDown="EmailTextBlock_MouseLeftButtonDown" HorizontalAlignment="Left">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentFillColorDefaultBrush}"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="TextDecorations" Value="Underline"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </Grid>
                 </StackPanel>
             </GroupBox>
 
             <GroupBox Header="{extensions:Localize Header_AISupport}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
-                    <TextBlock FontSize="{StaticResource SmallFontSize}"
-                               Foreground="{DynamicResource TextMutedBrush}"
-                               FontWeight="SemiBold"
-                               TextWrapping="Wrap">
-                        <Run Text="• ChatGPT 4o (WEB)"/><LineBreak/>
-                        <Run Text="• Mistral Large 2 (WEB)"/><LineBreak/>
-                        <Run Text="• Claude 3.5 Sonnet (WEB)"/><LineBreak/>
-                        <Run Text="• Claude 4 Sonnet (Claude Code)"/><LineBreak/>
-                        <Run Text="• Claude 4.1 Opus (Claude Code)"/><LineBreak/>
-                        <Run Text="• Claude 4.5 Sonnet (Claude Code)"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    </TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="WEB"
+                                   Style="{StaticResource BaseTextBlockStyle}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Margin="{StaticResource RightSmallMarginThickness}" TextAlignment="Center"/>
+                        <Border Grid.Row="0" Grid.Column="1"
+                                BorderBrush="{DynamicResource BorderPrimaryBrush}"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="{StaticResource SmallPaddingThickness}">
+                            <TextBlock FontSize="{StaticResource SmallFontSize}"
+                                       Foreground="{DynamicResource TextMutedBrush}"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap">
+                                <Run Text="• ChatGPT 4o"/><LineBreak/>
+                                <Run Text="• Mistral Large 2"/><LineBreak/>
+                                <Run Text="• Claude 3.5 Sonnet"/>
+                            </TextBlock>
+                        </Border>
+
+                        <Separator Grid.Row="1" Grid.ColumnSpan="2" Margin="{StaticResource VerticalSmallMarginThickness}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="CLI"
+                                   Style="{StaticResource BaseTextBlockStyle}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Margin="{StaticResource RightSmallMarginThickness}" TextAlignment="Center"/>
+                        <Border Grid.Row="2" Grid.Column="1"
+                                BorderBrush="{DynamicResource BorderPrimaryBrush}"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="{StaticResource SmallPaddingThickness}">
+                            <TextBlock FontSize="{StaticResource SmallFontSize}"
+                                       Foreground="{DynamicResource TextMutedBrush}"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap">
+                                <Run Text="• Claude 4 Sonnet"/><LineBreak/>
+                                <Run Text="• Claude 4.1 Opus"/><LineBreak/>
+                                <Run Text="• Claude 4.5 Sonnet"/>
+                            </TextBlock>
+                        </Border>
+                    </Grid>
                 </StackPanel>
             </GroupBox>
 
             <GroupBox Header="{extensions:Localize Header_OpenSourceLibraries}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
-                    <TextBlock FontSize="{StaticResource SmallFontSize}"
-                               Foreground="{DynamicResource TextMutedBrush}"
-                               FontWeight="SemiBold"
-                               TextWrapping="Wrap">
-                        <Run Text="• ClosedXML 0.105.0 (MIT License)"/><LineBreak/>
-                        <Run Text="• netDxf.netstandard 3.0.1 (MIT License)"/><LineBreak/>
-                        <Run Text="• Svg.Skia 3.2.1 (MIT License)"/>
-                    </TextBlock>
+                    <StackPanel>
+                        <TextBlock Text="• ClosedXML 0.105.0"
+                                   Style="{StaticResource BaseTextBlockStyle}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   FontWeight="SemiBold"
+                                   Margin="{StaticResource BottomHairlineMarginThickness}"/>
+                        <TextBlock Text="• netDxf.netstandard 3.0.1"
+                                   Style="{StaticResource BaseTextBlockStyle}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   FontWeight="SemiBold"
+                                   Margin="{StaticResource BottomHairlineMarginThickness}"/>
+                        <TextBlock Text="• Svg.Skia 3.2.1"
+                                   Style="{StaticResource BaseTextBlockStyle}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
                 </StackPanel>
             </GroupBox>
         </StackPanel>
@@ -128,4 +188,3 @@
     </Grid>
     </Border>
 </Window>
-
