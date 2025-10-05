@@ -91,14 +91,15 @@
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <TextBlock FontSize="{StaticResource SmallFontSize}"
                                Foreground="{DynamicResource TextMutedBrush}"
+                               FontWeight="SemiBold"
                                TextWrapping="Wrap">
-                        <Run Text="• ChatGPT 4o" FontWeight="SemiBold"/><LineBreak/>
-                        <Run Text="• Mistral Large 2" FontWeight="SemiBold"/><LineBreak/>
-                        <Run Text="• Claude 3.5 Sonnet" FontWeight="SemiBold"/><LineBreak/>
-                        <Run Text="• Claude 4 Sonnet" FontWeight="SemiBold"/><LineBreak/>
-                        <Run Text="• Claude 4.1 Opus" FontWeight="SemiBold"/><LineBreak/>
-                        <Run Text="• Claude 4.5 Sonnet" FontWeight="SemiBold"/>
-                        
+                        <Run Text="• ChatGPT 4o (WEB)"/><LineBreak/>
+                        <Run Text="• Mistral Large 2 (WEB)"/><LineBreak/>
+                        <Run Text="• Claude 3.5 Sonnet (WEB)"/><LineBreak/>
+                        <Run Text="• Claude 4 Sonnet (Claude Code)"/><LineBreak/>
+                        <Run Text="• Claude 4.1 Opus (Claude Code)"/><LineBreak/>
+                        <Run Text="• Claude 4.5 Sonnet (Claude Code)"/>
+
                     </TextBlock>
                 </StackPanel>
             </GroupBox>
@@ -107,11 +108,11 @@
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <TextBlock FontSize="{StaticResource SmallFontSize}"
                                Foreground="{DynamicResource TextMutedBrush}"
+                               FontWeight="SemiBold"
                                TextWrapping="Wrap">
-                        <Run Text="• ClosedXML 0.105.0 (MIT License)" FontWeight="SemiBold"/><LineBreak/>
-                        <Run Text="• netDxf.netstandard 3.0.1 (MIT License)" FontWeight="SemiBold"/><LineBreak/>
-                        <Run Text="• Svg.Skia 3.2.1 (MIT License)" FontWeight="SemiBold"/><LineBreak/>
-                        <Run Text="• stdole 17.14.40260" FontWeight="SemiBold"/>
+                        <Run Text="• ClosedXML 0.105.0 (MIT License)"/><LineBreak/>
+                        <Run Text="• netDxf.netstandard 3.0.1 (MIT License)"/><LineBreak/>
+                        <Run Text="• Svg.Skia 3.2.1 (MIT License)"/>
                     </TextBlock>
                 </StackPanel>
             </GroupBox>
