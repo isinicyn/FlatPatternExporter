@@ -10,7 +10,9 @@
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         Background="{DynamicResource BackgroundPrimaryBrush}"
-        Foreground="{DynamicResource TextSecondaryBrush}" WindowStyle="None">
+        Foreground="{DynamicResource TextSecondaryBrush}"
+        Activated="RefreshWindowSize"
+        StateChanged="RefreshWindowSize">
 
     <Border Style="{StaticResource WindowRootBorderStyle}">
         <Grid SnapsToDevicePixels="True">

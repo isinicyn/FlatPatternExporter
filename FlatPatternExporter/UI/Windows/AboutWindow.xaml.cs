@@ -30,6 +30,16 @@ namespace FlatPatternExporter.UI.Windows
             }
         }
 
+        /// <summary>
+        /// Fixes visual artifacts that occur when using WindowChrome with SizeToContent.
+        /// Forces window size update by toggling SizeToContent mode.
+        /// </summary>
+        private void RefreshWindowSize(object sender, EventArgs e)
+        {
+            SizeToContent = SizeToContent.Manual;
+            SizeToContent = SizeToContent.WidthAndHeight;
+        }
+
         private void ImageBorder_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             var fadeIn = new DoubleAnimation
