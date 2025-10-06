@@ -62,6 +62,10 @@
     <Message Text="SourceRevisionId: $(SourceRevisionId)" Importance="high" />
   </Target>
 
+  <ItemGroup>
+    <Resource Include="Resources\pic\5e4a4cfa-8411-4744-bd53-1f219e7ac097.png" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <Resource Include="FPExport.ico" />

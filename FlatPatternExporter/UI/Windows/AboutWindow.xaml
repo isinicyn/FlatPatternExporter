@@ -6,12 +6,11 @@
         xmlns:extensions="clr-namespace:FlatPatternExporter.Extensions"
         shell:WindowChrome.WindowChrome="{StaticResource CustomWindowChrome}"
         Title="{extensions:Localize Header_About}"
-        Width="450"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        SizeToContent="Height"
+        SizeToContent="WidthAndHeight"
         Background="{DynamicResource BackgroundPrimaryBrush}"
-        Foreground="{DynamicResource TextSecondaryBrush}">
+        Foreground="{DynamicResource TextSecondaryBrush}" WindowStyle="None">
 
     <Border Style="{StaticResource WindowRootBorderStyle}">
         <Grid SnapsToDevicePixels="True">
@@ -28,8 +27,37 @@
                               ShowMaximizeButton="False"/>
 
         <!-- Main information -->
-        <StackPanel Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}">
-            <GroupBox Header="{extensions:Localize Header_ProgramVersion}" Margin="{StaticResource VerticalSmallMarginThickness}">
+        <Grid Grid.Row="1" Margin="{StaticResource StandardPaddingThickness}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left border -->
+                <Border
+                    MaxHeight="{Binding ElementName=RightPanel, Path=ActualHeight}" Padding="0,4,5,4">
+            <Border Grid.Column="0"
+                    BorderBrush="{DynamicResource BorderPrimaryBrush}"
+                    BorderThickness="1"
+                    CornerRadius="3" Padding="1,1,1,1">
+                <Image Source="/Resources/pic/5e4a4cfa-8411-4744-bd53-1f219e7ac097.png"
+                       Stretch="Uniform">
+                    <Image.OpacityMask>
+                        <VisualBrush>
+                            <VisualBrush.Visual>
+                                <Border Background="Black"
+                                        CornerRadius="2"
+                                        Width="{Binding RelativeSource={RelativeSource AncestorType=Image}, Path=ActualWidth}"
+                                        Height="{Binding RelativeSource={RelativeSource AncestorType=Image}, Path=ActualHeight}"/>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Image.OpacityMask>
+                </Image>
+            </Border>
+                </Border>
+
+                <StackPanel x:Name="RightPanel" Grid.Column="1" VerticalAlignment="Top">
+                <GroupBox Header="{extensions:Localize Header_ProgramVersion}" Margin="{StaticResource VerticalSmallMarginThickness}">
                 <StackPanel Margin="{StaticResource SectionContentMarginThickness}">
                     <DockPanel>
                         <Button x:Name="CopyButton"
@@ -176,7 +204,8 @@
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
-        </StackPanel>
+            </StackPanel>
+        </Grid>
 
         <!-- Buttons -->
         <Border Grid.Row="2" Style="{StaticResource DialogBottomBarStyle}">
