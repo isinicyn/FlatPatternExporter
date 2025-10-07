@@ -268,11 +268,33 @@
                         </GroupBox>
 
                         <GroupBox Header="{extensions:Localize Header_ExcelExportSettings}" Margin="{StaticResource RightStandardMarginThickness}">
-                            <StackPanel Orientation="Horizontal" Margin="{StaticResource SectionContentMarginThickness}" VerticalAlignment="Center">
-                                <Label Content="{extensions:Localize Label_CsvDelimiter}" VerticalAlignment="Center"/>
-                                <ComboBox x:Name="CsvDelimiterComboBox"
-                                          Width="150"
+                            <Grid Margin="{StaticResource SectionContentMarginThickness}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Default export format -->
+                                <Label Grid.Row="0" Grid.Column="0" Content="{extensions:Localize Label_DefaultExportFormat}" VerticalAlignment="Center" Margin="{StaticResource RightSmallMarginThickness}"/>
+                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <RadioButton x:Name="ExcelFormatRadioButton" Content="{extensions:Localize UI_ExportFormatExcel}"
+                                                 IsChecked="{Binding DefaultExportFormat, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=Excel, Mode=TwoWay}"
+                                                 Margin="{StaticResource RightStandardMarginThickness}"/>
+                                    <RadioButton x:Name="CsvFormatRadioButton" Content="{extensions:Localize UI_ExportFormatCsv}"
+                                                 IsChecked="{Binding DefaultExportFormat, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=Csv, Mode=TwoWay}"/>
+                                </StackPanel>
+
+                                <!-- CSV delimiter -->
+                                <Label Grid.Row="1" Grid.Column="0" Content="{extensions:Localize Label_CsvDelimiter}" VerticalAlignment="Center" Margin="0,5,5,0"/>
+                                <ComboBox x:Name="CsvDelimiterComboBox" Grid.Row="1" Grid.Column="1"
+                                          Width="150" HorizontalAlignment="Left"
                                           Style="{StaticResource BaseComboBoxStyle}"
+                                          Margin="{StaticResource TopSmallMarginThickness}"
                                           SelectedValue="{Binding CsvDelimiter, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
@@ -294,7 +316,7 @@
                                     <enums:CsvDelimiterType>Tab</enums:CsvDelimiterType>
                                     <enums:CsvDelimiterType>Pipe</enums:CsvDelimiterType>
                                 </ComboBox>
-                            </StackPanel>
+                            </Grid>
                         </GroupBox>
 
                     </WrapPanel>

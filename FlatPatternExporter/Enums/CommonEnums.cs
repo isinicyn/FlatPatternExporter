@@ -32,6 +32,12 @@ public enum CsvDelimiterType
     Pipe = 3             // Pipe (|)
 }
 
+public enum ExportFileFormat
+{
+    Excel = 0,           // Excel (.xlsx)
+    Csv = 1              // CSV (.csv)
+}
+
 public enum AcadVersionType
 {
     V2018 = 0,           // 2018
@@ -117,4 +123,21 @@ public static class CsvDelimiterMapping
     };
 
     public static string GetDelimiter(CsvDelimiterType type) => DelimiterMap[type];
+}
+
+public static class ExportFileFormatMapping
+{
+    public static string GetFileExtension(ExportFileFormat format) => format switch
+    {
+        ExportFileFormat.Excel => ".xlsx",
+        ExportFileFormat.Csv => ".csv",
+        _ => ".xlsx"
+    };
+
+    public static int GetFilterIndex(ExportFileFormat format) => format switch
+    {
+        ExportFileFormat.Excel => 1,
+        ExportFileFormat.Csv => 2,
+        _ => 1
+    };
 }

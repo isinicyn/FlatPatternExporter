@@ -123,6 +123,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     // Excel/CSV export settings
     private CsvDelimiterType _csvDelimiter = CsvDelimiterType.Tab;
+    private ExportFileFormat _defaultExportFormat = ExportFileFormat.Excel;
 
     // Folder and path settings
     private ExportFolderType _selectedExportFolder = ExportFolderType.ChooseFolder;
@@ -513,6 +514,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (_csvDelimiter != value)
             {
                 _csvDelimiter = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public ExportFileFormat DefaultExportFormat
+    {
+        get => _defaultExportFormat;
+        set
+        {
+            if (_defaultExportFormat != value)
+            {
+                _defaultExportFormat = value;
                 OnPropertyChanged();
             }
         }
@@ -1033,7 +1047,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "Excel Files (*.xlsx)|*.xlsx|CSV Files (*.csv)|*.csv",
-                DefaultExt = ".xlsx",
+                DefaultExt = ExportFileFormatMapping.GetFileExtension(DefaultExportFormat),
+                FilterIndex = ExportFileFormatMapping.GetFilterIndex(DefaultExportFormat),
                 FileName = $"Export_{DateTime.Now:yyyyMMdd_HHmmss}"
             };
 

@@ -1834,4 +1834,13 @@
   <data name="CsvDelimiter_Pipe" xml:space="preserve">
     <value>Вертикальная черта (|)</value>
   </data>
+  <data name="Label_DefaultExportFormat" xml:space="preserve">
+    <value>Формат экспорта по умолчанию:</value>
+  </data>
+  <data name="UI_ExportFormatExcel" xml:space="preserve">
+    <value>Excel (.xlsx)</value>
+  </data>
+  <data name="UI_ExportFormatCsv" xml:space="preserve">
+    <value>CSV (.csv)</value>
+  </data>
 </root>
