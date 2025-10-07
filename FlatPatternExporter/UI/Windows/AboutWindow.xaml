@@ -36,48 +36,80 @@
             </Grid.ColumnDefinitions>
 
             <!-- Left border -->
-                <Border
-                    MaxHeight="{Binding ElementName=RightPanel, Path=ActualHeight}" Padding="0,4,5,4">
             <Border Grid.Column="0"
-                    BorderBrush="{DynamicResource BorderPrimaryBrush}"
-                    BorderThickness="1"
-                    CornerRadius="3"
-                    Padding="1,1,1,1"
-                    MouseEnter="ImageBorder_MouseEnter"
-                    MouseLeave="ImageBorder_MouseLeave">
-                <Grid>
-                    <Image x:Name="GrayscaleImage"
-                           Source="/Resources/pic/5e4a4cfa-8411-4744-bd53-1f219e7ac097.png"
-                           Stretch="Uniform">
-                        <Image.OpacityMask>
-                            <VisualBrush>
-                                <VisualBrush.Visual>
-                                    <Border Background="Black"
-                                            CornerRadius="2"
-                                            Width="{Binding RelativeSource={RelativeSource AncestorType=Image}, Path=ActualWidth}"
-                                            Height="{Binding RelativeSource={RelativeSource AncestorType=Image}, Path=ActualHeight}"/>
-                                </VisualBrush.Visual>
-                            </VisualBrush>
-                        </Image.OpacityMask>
-                    </Image>
-                    <Image x:Name="ColorImage"
-                           Source="/Resources/pic/5e4a4cfa-8411-4744-bd53-1f219e7ac097.png"
-                           Stretch="Uniform"
-                           Opacity="0">
-                        <Image.OpacityMask>
-                            <VisualBrush>
-                                <VisualBrush.Visual>
-                                    <Border Background="Black"
-                                            CornerRadius="2"
-                                            Width="{Binding RelativeSource={RelativeSource AncestorType=Image}, Path=ActualWidth}"
-                                            Height="{Binding RelativeSource={RelativeSource AncestorType=Image}, Path=ActualHeight}"/>
-                                </VisualBrush.Visual>
-                            </VisualBrush>
-                        </Image.OpacityMask>
-                    </Image>
-                </Grid>
-            </Border>
+                    MaxHeight="{Binding ElementName=RightPanel, Path=ActualHeight}"
+                    Padding="0,4,5,4"
+                    x:Name="ImageContainer">
+                <Border.Resources>
+                    <BitmapImage x:Key="OriginalImage"
+                                 UriSource="/Resources/pic/5e4a4cfa-8411-4744-bd53-1f219e7ac097.png"/>
+
+                    <FormatConvertedBitmap x:Key="GrayscaleImage"
+                                          Source="{StaticResource OriginalImage}"
+                                          DestinationFormat="Gray8"/>
+
+                    <VisualBrush x:Key="RoundedMask">
+                        <VisualBrush.Visual>
+                            <Border Background="Black"
+                                    CornerRadius="2"
+                                    Width="{Binding RelativeSource={RelativeSource AncestorType=Border, AncestorLevel=2}, Path=ActualWidth}"
+                                    Height="{Binding RelativeSource={RelativeSource AncestorType=Border, AncestorLevel=2}, Path=ActualHeight}"/>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </Border.Resources>
+
+                <Border BorderBrush="{DynamicResource BorderPrimaryBrush}"
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        Padding="1">
+                    <Grid>
+                        <Image Source="{StaticResource GrayscaleImage}"
+                               Stretch="Uniform"
+                               OpacityMask="{StaticResource RoundedMask}"/>
+
+                        <Image x:Name="ColorImage"
+                               Source="{StaticResource OriginalImage}"
+                               Stretch="Uniform"
+                               Opacity="0"
+                               OpacityMask="{StaticResource RoundedMask}">
+                            <Image.Style>
+                                <Style TargetType="Image">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=ImageContainer}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                       To="1.0"
+                                                                       Duration="0:0:1">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <QuadraticEase EasingMode="EaseInOut"/>
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                       To="0.0"
+                                                                       Duration="0:0:1">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <QuadraticEase EasingMode="EaseInOut"/>
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                    </Grid>
                 </Border>
+            </Border>
 
                 <StackPanel x:Name="RightPanel" Grid.Column="1" VerticalAlignment="Top">
                 <GroupBox Header="{extensions:Localize Header_ProgramVersion}" Margin="{StaticResource VerticalSmallMarginThickness}">
