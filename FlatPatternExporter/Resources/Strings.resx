@@ -694,7 +694,7 @@ Execution time: {3}</value>
     <value>Property</value>
   </data>
   <data name="UI_ExportToExcel" xml:space="preserve">
-    <value>Export to Excel</value>
+    <value>Export Data</value>
   </data>
   <data name="UI_Conflicts" xml:space="preserve">
     <value>Conflicts</value>
