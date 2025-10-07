@@ -17,7 +17,7 @@ public class VersionInfoService
     {
         try
         {
-            string? executingDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string executingDir = AppContext.BaseDirectory;
 
             using var process = new Process();
             process.StartInfo.FileName = "git";
@@ -25,7 +25,7 @@ public class VersionInfoService
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.WorkingDirectory = executingDir ?? AppDomain.CurrentDomain.BaseDirectory;
+            process.StartInfo.WorkingDirectory = executingDir;
 
             process.Start();
 
