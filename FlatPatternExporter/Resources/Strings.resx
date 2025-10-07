@@ -1816,4 +1816,22 @@ Open file?</value>
   <data name="ProcessingStatus_Interrupted" xml:space="preserve">
     <value>Interrupted</value>
   </data>
+  <data name="Header_ExcelExportSettings" xml:space="preserve">
+    <value>Excel/CSV Export Settings</value>
+  </data>
+  <data name="Label_CsvDelimiter" xml:space="preserve">
+    <value>CSV Delimiter:</value>
+  </data>
+  <data name="CsvDelimiter_Comma" xml:space="preserve">
+    <value>Comma (,)</value>
+  </data>
+  <data name="CsvDelimiter_Semicolon" xml:space="preserve">
+    <value>Semicolon (;)</value>
+  </data>
+  <data name="CsvDelimiter_Tab" xml:space="preserve">
+    <value>Tab</value>
+  </data>
+  <data name="CsvDelimiter_Pipe" xml:space="preserve">
+    <value>Pipe (|)</value>
+  </data>
 </root>

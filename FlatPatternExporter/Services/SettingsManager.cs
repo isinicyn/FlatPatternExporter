@@ -86,20 +86,27 @@ public record FileNameSettings
     public int SelectedTemplatePresetIndex { get; init; } = -1;
 }
 
+public record ExcelExportSettings
+{
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public CsvDelimiterType CsvDelimiter { get; init; } = CsvDelimiterType.Tab;
+}
+
 public record ApplicationSettings
 {
     public InterfaceSettings Interface { get; init; } = new();
     public ComponentFilterSettings ComponentFilter { get; init; } = new();
     public OrganizationSettings Organization { get; init; } = new();
-    
+
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ProcessingMethod SelectedProcessingMethod { get; init; } = ProcessingMethod.BOM;
-    
+
     public DxfExportSettings DxfExport { get; init; } = new();
     public SplineSettings Spline { get; init; } = new();
     public ExportFolderSettings ExportFolder { get; init; } = new();
     public FileNameSettings FileName { get; init; } = new();
-    
+    public ExcelExportSettings ExcelExport { get; init; } = new();
+
     public List<LayerSettingData> LayerSettings { get; init; } = [];
 }
 
@@ -249,7 +256,12 @@ public static class SettingsManager
                 TemplatePresets = templatePresets,
                 SelectedTemplatePresetIndex = window.PresetManager.GetSelectedPresetIndex()
             },
-            
+
+            ExcelExport = new ExcelExportSettings
+            {
+                CsvDelimiter = window.CsvDelimiter
+            },
+
             LayerSettings = layerSettings
         };
     }
@@ -309,6 +321,9 @@ public static class SettingsManager
         window.EnableFileNameConstructor = settings.FileName.EnableFileNameConstructor;
         window.TokenService.FileNameTemplate = settings.FileName.FileNameTemplate;
         window.PresetManager.LoadPresets(settings.FileName.TemplatePresets, settings.FileName.SelectedTemplatePresetIndex);
+
+        // Excel/CSV export settings
+        window.CsvDelimiter = settings.ExcelExport.CsvDelimiter;
 
         PropertyMetadataRegistry.UserDefinedProperties.Clear();
 

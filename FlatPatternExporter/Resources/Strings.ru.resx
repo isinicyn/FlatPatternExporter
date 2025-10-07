@@ -1816,4 +1816,22 @@
   <data name="ProcessingStatus_Interrupted" xml:space="preserve">
     <value>Прервано</value>
   </data>
+  <data name="Header_ExcelExportSettings" xml:space="preserve">
+    <value>Настройки экспорта Excel/CSV</value>
+  </data>
+  <data name="Label_CsvDelimiter" xml:space="preserve">
+    <value>Разделитель CSV:</value>
+  </data>
+  <data name="CsvDelimiter_Comma" xml:space="preserve">
+    <value>Запятая (,)</value>
+  </data>
+  <data name="CsvDelimiter_Semicolon" xml:space="preserve">
+    <value>Точка с запятой (;)</value>
+  </data>
+  <data name="CsvDelimiter_Tab" xml:space="preserve">
+    <value>Табуляция</value>
+  </data>
+  <data name="CsvDelimiter_Pipe" xml:space="preserve">
+    <value>Вертикальная черта (|)</value>
+  </data>
 </root>

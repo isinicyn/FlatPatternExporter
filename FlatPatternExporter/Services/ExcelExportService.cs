@@ -90,14 +90,14 @@ public class ExcelExportService
         workbook.SaveAs(filePath);
     }
 
-    public void ExportToCsv(string filePath, DataGrid dataGrid, IEnumerable view)
+    public void ExportToCsv(string filePath, DataGrid dataGrid, IEnumerable view, string delimiter)
     {
         using var writer = new System.IO.StreamWriter(filePath, false, System.Text.Encoding.UTF8);
 
         var visibleColumns = dataGrid.Columns.Where(c => c.Visibility == Visibility.Visible).ToList();
 
         var headers = visibleColumns.Select(c => c.Header.ToString());
-        writer.WriteLine(string.Join("\t", headers));
+        writer.WriteLine(string.Join(delimiter, headers));
 
         foreach (PartData item in view)
         {
@@ -114,7 +114,7 @@ public class ExcelExportService
                 }
                 return string.Empty;
             });
-            writer.WriteLine(string.Join("\t", values));
+            writer.WriteLine(string.Join(delimiter, values));
         }
     }
 

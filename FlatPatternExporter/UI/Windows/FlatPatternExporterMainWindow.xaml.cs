@@ -121,6 +121,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private bool _rebaseGeometry = true;
     private bool _trimCenterlines = false;
 
+    // Excel/CSV export settings
+    private CsvDelimiterType _csvDelimiter = CsvDelimiterType.Tab;
+
     // Folder and path settings
     private ExportFolderType _selectedExportFolder = ExportFolderType.ChooseFolder;
     private bool _enableSubfolder = false;
@@ -497,6 +500,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (_trimCenterlines != value)
             {
                 _trimCenterlines = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public CsvDelimiterType CsvDelimiter
+    {
+        get => _csvDelimiter;
+        set
+        {
+            if (_csvDelimiter != value)
+            {
+                _csvDelimiter = value;
                 OnPropertyChanged();
             }
         }
@@ -1032,7 +1048,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
             else
             {
-                _excelExportService.ExportToCsv(saveFileDialog.FileName, PartsDataGrid, _partsDataView.View);
+                var delimiter = CsvDelimiterMapping.GetDelimiter(CsvDelimiter);
+                _excelExportService.ExportToCsv(saveFileDialog.FileName, PartsDataGrid, _partsDataView.View, delimiter);
             }
 
             var result = CustomMessageBox.Show(

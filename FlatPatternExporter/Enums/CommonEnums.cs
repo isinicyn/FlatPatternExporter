@@ -24,6 +24,14 @@ public enum SplineReplacementType
     Arcs = 1              // Arcs
 }
 
+public enum CsvDelimiterType
+{
+    Comma = 0,           // Comma (,)
+    Semicolon = 1,       // Semicolon (;)
+    Tab = 2,             // Tab (\t)
+    Pipe = 3             // Pipe (|)
+}
+
 public enum AcadVersionType
 {
     V2018 = 0,           // 2018
@@ -87,4 +95,26 @@ public static class SplineReplacementMapping
         SplineReplacementType.Arcs => LocalizationManager.Instance.GetString("SplineReplacement_Arcs"),
         _ => type.ToString()
     };
+}
+
+public static class CsvDelimiterMapping
+{
+    private static readonly Dictionary<CsvDelimiterType, string> DelimiterMap = new()
+    {
+        { CsvDelimiterType.Comma, "," },
+        { CsvDelimiterType.Semicolon, ";" },
+        { CsvDelimiterType.Tab, "\t" },
+        { CsvDelimiterType.Pipe, "|" }
+    };
+
+    public static string GetDisplayName(CsvDelimiterType type) => type switch
+    {
+        CsvDelimiterType.Comma => LocalizationManager.Instance.GetString("CsvDelimiter_Comma"),
+        CsvDelimiterType.Semicolon => LocalizationManager.Instance.GetString("CsvDelimiter_Semicolon"),
+        CsvDelimiterType.Tab => LocalizationManager.Instance.GetString("CsvDelimiter_Tab"),
+        CsvDelimiterType.Pipe => LocalizationManager.Instance.GetString("CsvDelimiter_Pipe"),
+        _ => type.ToString()
+    };
+
+    public static string GetDelimiter(CsvDelimiterType type) => DelimiterMap[type];
 }

@@ -15,6 +15,7 @@ public class EnumToDisplayNameConverter : IMultiValueConverter
         return values[0] switch
         {
             SplineReplacementType splineType => SplineReplacementMapping.GetDisplayName(splineType),
+            CsvDelimiterType csvDelimiter => CsvDelimiterMapping.GetDisplayName(csvDelimiter),
             _ => values[0].ToString() ?? string.Empty
         };
     }
