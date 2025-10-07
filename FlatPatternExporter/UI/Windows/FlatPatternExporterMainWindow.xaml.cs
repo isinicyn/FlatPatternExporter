@@ -41,7 +41,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly ThumbnailGenerator _thumbnailGenerator = new();
     private readonly DxfExporter _dxfExporter;
     private readonly PartDataReader _partDataReader;
-    private readonly ExcelExportService _excelExportService = new();
+    private readonly ExcelExportService _excelExportService;
 
     // UI elements
     public System.Windows.Controls.Primitives.ToggleButton? ThemeToggleButton { get; private set; }
@@ -181,6 +181,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _documentScanner = new Core.DocumentScanner(_inventorManager);
         _dxfExporter = new Core.DxfExporter(_inventorManager, _documentScanner, _documentScanner.DocumentCache, _tokenService);
         _partDataReader = new Core.PartDataReader(_inventorManager, _documentScanner, _thumbnailGenerator, Dispatcher);
+        _excelExportService = new ExcelExportService(_inventorManager, _partDataReader);
 
         InitializeComponent();
 
@@ -1058,7 +1059,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         try
         {
-            string defaultFileName = GetExportFileName();
+            string defaultFileName = _excelExportService.GetExportFileName(ExcelExportFileNameType);
 
             var saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
@@ -1115,33 +1116,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
-    }
-
-    private string GetExportFileName()
-    {
-        if (ExcelExportFileNameType == ExcelExportFileNameType.DateTimeFormat)
-        {
-            return $"Export_{DateTime.Now:yyyyMMdd_HHmmss}";
-        }
-
-        var activeDoc = _inventorManager.Application?.ActiveDocument;
-        if (activeDoc == null)
-        {
-            return $"Export_{DateTime.Now:yyyyMMdd_HHmmss}";
-        }
-
-        if (ExcelExportFileNameType == ExcelExportFileNameType.FileName)
-        {
-            return System.IO.Path.GetFileNameWithoutExtension(activeDoc.DisplayName);
-        }
-        else if (ExcelExportFileNameType == ExcelExportFileNameType.PartNumber)
-        {
-            var docInfo = _partDataReader.GetDocumentInfo(activeDoc);
-            var partNumber = docInfo.PartNumber;
-            return string.IsNullOrWhiteSpace(partNumber) ? $"Export_{DateTime.Now:yyyyMMdd_HHmmss}" : partNumber;
-        }
-
-        return $"Export_{DateTime.Now:yyyyMMdd_HHmmss}";
     }
 
     private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

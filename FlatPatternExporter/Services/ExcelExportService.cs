@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
+using FlatPatternExporter.Core;
+using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using ClosedXML.Excel;
 
@@ -10,10 +12,14 @@ public class ExcelExportService
 {
     private const int ImageSizePixels = 80;
     private readonly LocalizationManager _localizationManager;
+    private readonly InventorManager _inventorManager;
+    private readonly PartDataReader _partDataReader;
 
-    public ExcelExportService()
+    public ExcelExportService(InventorManager inventorManager, PartDataReader partDataReader)
     {
         _localizationManager = LocalizationManager.Instance;
+        _inventorManager = inventorManager;
+        _partDataReader = partDataReader;
     }
 
     private static double PixelsToPoints(int pixels) => pixels * 72.0 / 96.0;
@@ -132,5 +138,32 @@ public class ExcelExportService
         {
             return null;
         }
+    }
+
+    public string GetExportFileName(ExcelExportFileNameType fileNameType)
+    {
+        if (fileNameType == ExcelExportFileNameType.DateTimeFormat)
+        {
+            return $"Export_{DateTime.Now:yyyyMMdd_HHmmss}";
+        }
+
+        var activeDoc = _inventorManager.Application?.ActiveDocument;
+        if (activeDoc == null)
+        {
+            return $"Export_{DateTime.Now:yyyyMMdd_HHmmss}";
+        }
+
+        if (fileNameType == ExcelExportFileNameType.FileName)
+        {
+            return System.IO.Path.GetFileNameWithoutExtension(activeDoc.DisplayName);
+        }
+        else if (fileNameType == ExcelExportFileNameType.PartNumber)
+        {
+            var docInfo = _partDataReader.GetDocumentInfo(activeDoc);
+            var partNumber = docInfo.PartNumber;
+            return string.IsNullOrWhiteSpace(partNumber) ? $"Export_{DateTime.Now:yyyyMMdd_HHmmss}" : partNumber;
+        }
+
+        return $"Export_{DateTime.Now:yyyyMMdd_HHmmss}";
     }
 }
