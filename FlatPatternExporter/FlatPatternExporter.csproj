@@ -11,12 +11,14 @@
     <LangVersion>12.0</LangVersion>
 
     <StartupObject>FlatPatternExporter.App</StartupObject>
-    
+
     <!-- Application metadata -->
-    <AssemblyTitle>FlatPatternExporter</AssemblyTitle>
-    <AssemblyDescription>Application for exporting flat patterns of sheet metal parts from Autodesk Inventor</AssemblyDescription>
-    <AssemblyProduct>FlatPatternExporter</AssemblyProduct>
-    <AssemblyCopyright>Copyright © 2025</AssemblyCopyright>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Company>Sinicyn Ivan Victorovich</Company>
+    <Product>FlatPatternExporter</Product>
+    <Copyright>Copyright © 2025 Sinicyn Ivan Victorovich</Copyright>
+    <AssemblyTitle>Flat Pattern Exporter for Autodesk Inventor</AssemblyTitle>
+    <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
