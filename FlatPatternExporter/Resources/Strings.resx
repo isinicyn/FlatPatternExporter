@@ -1843,4 +1843,16 @@ Open file?</value>
   <data name="UI_ExportFormatCsv" xml:space="preserve">
     <value>CSV (.csv)</value>
   </data>
+  <data name="Label_ExportFileName" xml:space="preserve">
+    <value>File Name:</value>
+  </data>
+  <data name="ExcelFileName_DateTimeFormat" xml:space="preserve">
+    <value>Date-Time (Export_20251007_220919)</value>
+  </data>
+  <data name="ExcelFileName_FileName" xml:space="preserve">
+    <value>Component File Name</value>
+  </data>
+  <data name="ExcelFileName_PartNumber" xml:space="preserve">
+    <value>Component Part Number</value>
+  </data>
 </root>

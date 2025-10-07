@@ -16,6 +16,7 @@ public class EnumToDisplayNameConverter : IMultiValueConverter
         {
             SplineReplacementType splineType => SplineReplacementMapping.GetDisplayName(splineType),
             CsvDelimiterType csvDelimiter => CsvDelimiterMapping.GetDisplayName(csvDelimiter),
+            ExcelExportFileNameType fileNameType => ExcelExportFileNameMapping.GetDisplayName(fileNameType),
             _ => values[0].ToString() ?? string.Empty
         };
     }

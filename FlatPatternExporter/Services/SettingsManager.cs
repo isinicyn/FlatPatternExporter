@@ -93,6 +93,9 @@ public record ExcelExportSettings
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ExportFileFormat DefaultExportFormat { get; init; } = ExportFileFormat.Excel;
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ExcelExportFileNameType ExcelExportFileNameType { get; init; } = ExcelExportFileNameType.DateTimeFormat;
 }
 
 public record ApplicationSettings
@@ -263,7 +266,8 @@ public static class SettingsManager
             ExcelExport = new ExcelExportSettings
             {
                 CsvDelimiter = window.CsvDelimiter,
-                DefaultExportFormat = window.DefaultExportFormat
+                DefaultExportFormat = window.DefaultExportFormat,
+                ExcelExportFileNameType = window.ExcelExportFileNameType
             },
 
             LayerSettings = layerSettings
@@ -329,6 +333,7 @@ public static class SettingsManager
         // Excel/CSV export settings
         window.CsvDelimiter = settings.ExcelExport.CsvDelimiter;
         window.DefaultExportFormat = settings.ExcelExport.DefaultExportFormat;
+        window.ExcelExportFileNameType = settings.ExcelExport.ExcelExportFileNameType;
 
         PropertyMetadataRegistry.UserDefinedProperties.Clear();
 

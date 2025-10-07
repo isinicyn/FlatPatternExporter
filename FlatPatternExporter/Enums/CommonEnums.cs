@@ -38,6 +38,13 @@ public enum ExportFileFormat
     Csv = 1              // CSV (.csv)
 }
 
+public enum ExcelExportFileNameType
+{
+    DateTimeFormat = 0,  // Date-time format (Export_20251007_220919.xlsx)
+    FileName = 1,        // Component file name
+    PartNumber = 2       // Component Part Number
+}
+
 public enum AcadVersionType
 {
     V2018 = 0,           // 2018
@@ -139,5 +146,16 @@ public static class ExportFileFormatMapping
         ExportFileFormat.Excel => 1,
         ExportFileFormat.Csv => 2,
         _ => 1
+    };
+}
+
+public static class ExcelExportFileNameMapping
+{
+    public static string GetDisplayName(ExcelExportFileNameType type) => type switch
+    {
+        ExcelExportFileNameType.DateTimeFormat => LocalizationManager.Instance.GetString("ExcelFileName_DateTimeFormat"),
+        ExcelExportFileNameType.FileName => LocalizationManager.Instance.GetString("ExcelFileName_FileName"),
+        ExcelExportFileNameType.PartNumber => LocalizationManager.Instance.GetString("ExcelFileName_PartNumber"),
+        _ => type.ToString()
     };
 }

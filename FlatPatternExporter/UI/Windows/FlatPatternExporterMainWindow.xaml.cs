@@ -124,6 +124,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     // Excel/CSV export settings
     private CsvDelimiterType _csvDelimiter = CsvDelimiterType.Tab;
     private ExportFileFormat _defaultExportFormat = ExportFileFormat.Excel;
+    private ExcelExportFileNameType _excelExportFileNameType = ExcelExportFileNameType.DateTimeFormat;
 
     // Folder and path settings
     private ExportFolderType _selectedExportFolder = ExportFolderType.ChooseFolder;
@@ -527,6 +528,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (_defaultExportFormat != value)
             {
                 _defaultExportFormat = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public ExcelExportFileNameType ExcelExportFileNameType
+    {
+        get => _excelExportFileNameType;
+        set
+        {
+            if (_excelExportFileNameType != value)
+            {
+                _excelExportFileNameType = value;
                 OnPropertyChanged();
             }
         }
@@ -1044,12 +1058,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         try
         {
+            string defaultFileName = GetExportFileName();
+
             var saveFileDialog = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "Excel Files (*.xlsx)|*.xlsx|CSV Files (*.csv)|*.csv",
                 DefaultExt = ExportFileFormatMapping.GetFileExtension(DefaultExportFormat),
                 FilterIndex = ExportFileFormatMapping.GetFilterIndex(DefaultExportFormat),
-                FileName = $"Export_{DateTime.Now:yyyyMMdd_HHmmss}"
+                FileName = defaultFileName
             };
 
             if (saveFileDialog.ShowDialog() != true)
@@ -1099,6 +1115,33 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
+    }
+
+    private string GetExportFileName()
+    {
+        if (ExcelExportFileNameType == ExcelExportFileNameType.DateTimeFormat)
+        {
+            return $"Export_{DateTime.Now:yyyyMMdd_HHmmss}";
+        }
+
+        var activeDoc = _inventorManager.Application?.ActiveDocument;
+        if (activeDoc == null)
+        {
+            return $"Export_{DateTime.Now:yyyyMMdd_HHmmss}";
+        }
+
+        if (ExcelExportFileNameType == ExcelExportFileNameType.FileName)
+        {
+            return System.IO.Path.GetFileNameWithoutExtension(activeDoc.DisplayName);
+        }
+        else if (ExcelExportFileNameType == ExcelExportFileNameType.PartNumber)
+        {
+            var docInfo = _partDataReader.GetDocumentInfo(activeDoc);
+            var partNumber = docInfo.PartNumber;
+            return string.IsNullOrWhiteSpace(partNumber) ? $"Export_{DateTime.Now:yyyyMMdd_HHmmss}" : partNumber;
+        }
+
+        return $"Export_{DateTime.Now:yyyyMMdd_HHmmss}";
     }
 
     private void MainWindow_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

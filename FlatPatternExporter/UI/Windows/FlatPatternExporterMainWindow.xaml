@@ -277,6 +277,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
                                 <!-- Default export format -->
@@ -315,6 +316,33 @@
                                     <enums:CsvDelimiterType>Semicolon</enums:CsvDelimiterType>
                                     <enums:CsvDelimiterType>Tab</enums:CsvDelimiterType>
                                     <enums:CsvDelimiterType>Pipe</enums:CsvDelimiterType>
+                                </ComboBox>
+
+                                <!-- Export file name -->
+                                <Label Grid.Row="2" Grid.Column="0" Content="{extensions:Localize Label_ExportFileName}" VerticalAlignment="Center" Margin="0,5,5,0"/>
+                                <ComboBox x:Name="ExportFileNameComboBox" Grid.Row="2" Grid.Column="1"
+                                          Width="300" HorizontalAlignment="Left"
+                                          Style="{StaticResource BaseComboBoxStyle}"
+                                          Margin="{StaticResource TopSmallMarginThickness}"
+                                          SelectedValue="{Binding ExcelExportFileNameType, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding>
+                                                        <MultiBinding.Converter>
+                                                            <converters:EnumToDisplayNameConverter/>
+                                                        </MultiBinding.Converter>
+                                                        <Binding/>
+                                                        <Binding Path="CurrentCulture" Source="{x:Static services:LocalizationManager.Instance}"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                    <enums:ExcelExportFileNameType>DateTimeFormat</enums:ExcelExportFileNameType>
+                                    <enums:ExcelExportFileNameType>FileName</enums:ExcelExportFileNameType>
+                                    <enums:ExcelExportFileNameType>PartNumber</enums:ExcelExportFileNameType>
                                 </ComboBox>
                             </Grid>
                         </GroupBox>

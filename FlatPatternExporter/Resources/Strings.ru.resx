@@ -1843,4 +1843,16 @@
   <data name="UI_ExportFormatCsv" xml:space="preserve">
     <value>CSV (.csv)</value>
   </data>
+  <data name="Label_ExportFileName" xml:space="preserve">
+    <value>Имя файла:</value>
+  </data>
+  <data name="ExcelFileName_DateTimeFormat" xml:space="preserve">
+    <value>Дата-Время (Export_20251007_220919)</value>
+  </data>
+  <data name="ExcelFileName_FileName" xml:space="preserve">
+    <value>Имя файла главного компонента</value>
+  </data>
+  <data name="ExcelFileName_PartNumber" xml:space="preserve">
+    <value>Обозначение главного компонента</value>
+  </data>
 </root>
