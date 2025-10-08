@@ -1855,4 +1855,61 @@
   <data name="ExcelFileName_PartNumber" xml:space="preserve">
     <value>Обозначение главного компонента</value>
   </data>
+
+  <!-- Update System -->
+  <data name="Header_Update" xml:space="preserve">
+    <value>Обновление</value>
+  </data>
+  <data name="Button_CheckUpdates" xml:space="preserve">
+    <value>Проверить обновления</value>
+  </data>
+  <data name="Header_VersionInformation" xml:space="preserve">
+    <value>Информация о версии</value>
+  </data>
+  <data name="Text_CurrentVersion" xml:space="preserve">
+    <value>Текущая версия:</value>
+  </data>
+  <data name="Text_NewVersion" xml:space="preserve">
+    <value>Новая версия:</value>
+  </data>
+  <data name="Header_ReleaseNotes" xml:space="preserve">
+    <value>Примечания к выпуску</value>
+  </data>
+  <data name="Header_DownloadProgress" xml:space="preserve">
+    <value>Прогресс загрузки</value>
+  </data>
+  <data name="Button_InstallUpdate" xml:space="preserve">
+    <value>Установить обновление</value>
+  </data>
+  <data name="Text_NoReleaseNotes" xml:space="preserve">
+    <value>Примечания к выпуску отсутствуют.</value>
+  </data>
+  <data name="Status_DownloadingUpdate" xml:space="preserve">
+    <value>Загрузка обновления...</value>
+  </data>
+  <data name="Status_LaunchingUpdater" xml:space="preserve">
+    <value>Запуск установщика обновлений...</value>
+  </data>
+  <data name="Error_DownloadFailed" xml:space="preserve">
+    <value>Не удалось загрузить обновление. Пожалуйста, попробуйте позже.</value>
+  </data>
+  <data name="Error_UpdateFailed" xml:space="preserve">
+    <value>Ошибка обновления</value>
+  </data>
+  <data name="Error_CheckUpdateFailed" xml:space="preserve">
+    <value>Не удалось проверить наличие обновлений. Проверьте подключение к интернету.</value>
+  </data>
+  <data name="Message_AlreadyLatestVersion" xml:space="preserve">
+    <value>Вы уже используете последнюю версию.</value>
+  </data>
+  <data name="Error_RateLimitExceeded" xml:space="preserve">
+    <value>Превышен лимит запросов к GitHub API. Попробуйте снова через час.
+
+Приложение использует GitHub API для проверки обновлений. Без авторизации существует ограничение в 60 запросов в час. Этот лимит был достигнут.
+
+Возможные решения:
+• Подождите около часа перед повторной попыткой
+• Проверяйте обновления реже
+• Посетите страницу проекта на GitHub вручную для загрузки новых версий</value>
+  </data>
 </root>

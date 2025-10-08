@@ -22,6 +22,11 @@ FlatPatternExporter/
 ├── README.md                           # Документация проекта
 ├── FlatPatternExporter.sln             # Файл решения Visual Studio
 ├── HELP/                               # Временные файлы справки
+├── FlatPatternExporter.Updater/        # Проект апдейтера (WPF)
+│   ├── FlatPatternExporter.Updater.csproj
+│   ├── App.xaml(.cs)                   # Главное приложение апдейтера
+│   ├── MainWindow.xaml(.cs)            # Окно процесса обновления
+│   └── FPExport.ico                    # Иконка приложения
 └── FlatPatternExporter/                # Основной проект
     ├── FlatPatternExporter.csproj      # Файл проекта
     ├── App.xaml(.cs)                   # Главное приложение
@@ -55,7 +60,9 @@ FlatPatternExporter/
     │   ├── ScanProgress.cs             # Модель прогресса сканирования
     │   ├── PartConflictInfo.cs         # Информация о конфликтах
     │   ├── OperationResult.cs          # Результат операции
-    │   └── DocumentValidationResult.cs # Результат валидации документа
+    │   ├── DocumentValidationResult.cs # Результат валидации документа
+    │   ├── ReleaseInfo.cs              # Информация о релизе GitHub
+    │   └── UpdateCheckResult.cs        # Результат проверки обновлений
     │
     ├── Services/                       # Вспомогательные сервисы
     │   ├── PropertyMetadataRegistry.cs # Центральный реестр метаданных
@@ -65,10 +72,13 @@ FlatPatternExporter/
     │   ├── VersionInfoService.cs       # Получение версии приложения и коммитов
     │   ├── PropertyListManager.cs      # Управление списками свойств с фильтрацией
     │   ├── LocalizationManager.cs      # Управление локализацией приложения
-    │   └── ExcelExportService.cs       # Экспорт данных в Excel/CSV
+    │   ├── ExcelExportService.cs       # Экспорт данных в Excel/CSV
+    │   ├── GitHubUpdateService.cs      # Работа с GitHub Releases API
+    │   └── UpdateManager.cs            # Управление процессом обновления
     │
     ├── Utilities/                      # Утилиты
-    │   └── DxfOptimizer.cs             # Оптимизация DXF файлов
+    │   ├── DxfOptimizer.cs             # Оптимизация DXF файлов
+    │   └── VersionComparer.cs          # Сравнение версий приложения
     │
     ├── UI/                             # Пользовательский интерфейс
     │   ├── Windows/                    # Окна приложения
@@ -76,7 +86,8 @@ FlatPatternExporter/
     │   │   ├── AboutWindow.xaml(.cs)
     │   │   ├── ConflictDetailsWindow.xaml(.cs)
     │   │   ├── SelectIPropertyWindow.xaml(.cs)
-    │   │   └── CustomMessageBox.xaml(.cs)
+    │   │   ├── CustomMessageBox.xaml(.cs)
+    │   │   └── UpdateWindow.xaml(.cs)
     │   │
     │   ├── Controls/                   # Пользовательские элементы
     │   │   ├── CustomTitleBar.xaml(.cs)
@@ -519,6 +530,39 @@ CustomMessageBox.Show(
 - `WarningIconGeometry` - предупреждение (оранжевый)
 - `ErrorIconGeometry` - ошибка (красный)
 - `QuestionIconGeometry` - вопрос (синий)
+
+### Система автоматических обновлений
+Приложение включает полностью автономную систему обновлений, интегрированную с GitHub Releases:
+
+**Архитектура:**
+- `GitHubUpdateService` - работа с GitHub Releases API для проверки и загрузки обновлений
+- `UpdateManager` - координация процесса обновления (проверка, загрузка, запуск апдейтера)
+- `VersionComparer` - сравнение версий в формате "2.1.0.X"
+- `UpdateWindow` - UI окно прогресса обновления с ProgressBar и статусами (в основном приложении)
+- `FlatPatternExporter.Updater` - отдельное WPF приложение для замены файлов с визуальным интерфейсом
+
+**Функциональные возможности:**
+- Проверка обновлений через кнопку "Проверить обновления" в AboutWindow
+- Автоматическое сравнение текущей и последней версий
+- Загрузка обновления с отображением прогресса
+- Резервное копирование текущих файлов перед обновлением
+- Автоматический перезапуск приложения после обновления
+- Обработка ошибок с возможностью отката
+
+**Процесс обновления:**
+1. Пользователь нажимает "Проверить обновления" в окне "О программе"
+2. Проверка наличия новых релизов через GitHub API
+3. При наличии обновления открывается UpdateWindow с информацией о релизе
+4. Пользователь подтверждает установку
+5. Скачивание .exe файла с отображением прогресса
+6. Запуск Updater с передачей PID процесса и путей к файлам
+7. Основное приложение завершается
+8. Updater ожидает завершения процесса, создает backup, заменяет файлы
+9. Автоматический перезапуск обновленного приложения
+
+**Модели данных:**
+- `ReleaseInfo` - информация о релизе (версия, описание, assets, дата публикации)
+- `UpdateCheckResult` - результат проверки (доступность обновления, версии, ошибки)
 
 ## Заметки по разработке
 

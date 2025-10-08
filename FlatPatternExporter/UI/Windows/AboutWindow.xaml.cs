@@ -7,9 +7,12 @@ namespace FlatPatternExporter.UI.Windows
 {
     public partial class AboutWindow : Window
     {
+        private readonly UpdateManager _updateManager;
+
         public AboutWindow()
         {
             InitializeComponent();
+            _updateManager = new UpdateManager();
             SetVersion();
         }
 
@@ -47,6 +50,49 @@ namespace FlatPatternExporter.UI.Windows
             Clipboard.SetText(EmailTextBlock.Text);
             var message = LocalizationManager.Instance.GetString("Text_Copied");
             PopupNotificationService.ShowNotification(EmailTextBlock, message);
+        }
+
+        private async void CheckUpdatesButton_Click(object sender, RoutedEventArgs e)
+        {
+            CheckUpdatesButton.IsEnabled = false;
+
+            try
+            {
+                var result = await _updateManager.CheckForUpdatesAsync();
+
+                if (!result.Success)
+                {
+                    CustomMessageBox.Show(
+                        this,
+                        result.ErrorMessage ?? LocalizationManager.Instance.GetString("Error_CheckUpdateFailed"),
+                        LocalizationManager.Instance.GetString("Header_Update"),
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error
+                    );
+                    return;
+                }
+
+                if (result.IsUpdateAvailable)
+                {
+                    var updateWindow = new UpdateWindow(result);
+                    updateWindow.Owner = this;
+                    updateWindow.ShowDialog();
+                }
+                else
+                {
+                    CustomMessageBox.Show(
+                        this,
+                        LocalizationManager.Instance.GetString("Message_AlreadyLatestVersion"),
+                        LocalizationManager.Instance.GetString("Header_Update"),
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+                }
+            }
+            finally
+            {
+                CheckUpdatesButton.IsEnabled = true;
+            }
         }
     }
 }

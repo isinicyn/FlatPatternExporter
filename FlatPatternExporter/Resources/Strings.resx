@@ -1855,4 +1855,61 @@ Open file?</value>
   <data name="ExcelFileName_PartNumber" xml:space="preserve">
     <value>Component Part Number</value>
   </data>
+
+  <!-- Update System -->
+  <data name="Header_Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="Button_CheckUpdates" xml:space="preserve">
+    <value>Check for Updates</value>
+  </data>
+  <data name="Header_VersionInformation" xml:space="preserve">
+    <value>Version Information</value>
+  </data>
+  <data name="Text_CurrentVersion" xml:space="preserve">
+    <value>Current Version:</value>
+  </data>
+  <data name="Text_NewVersion" xml:space="preserve">
+    <value>New Version:</value>
+  </data>
+  <data name="Header_ReleaseNotes" xml:space="preserve">
+    <value>Release Notes</value>
+  </data>
+  <data name="Header_DownloadProgress" xml:space="preserve">
+    <value>Download Progress</value>
+  </data>
+  <data name="Button_InstallUpdate" xml:space="preserve">
+    <value>Install Update</value>
+  </data>
+  <data name="Text_NoReleaseNotes" xml:space="preserve">
+    <value>No release notes available.</value>
+  </data>
+  <data name="Status_DownloadingUpdate" xml:space="preserve">
+    <value>Downloading update...</value>
+  </data>
+  <data name="Status_LaunchingUpdater" xml:space="preserve">
+    <value>Launching updater...</value>
+  </data>
+  <data name="Error_DownloadFailed" xml:space="preserve">
+    <value>Failed to download update. Please try again later.</value>
+  </data>
+  <data name="Error_UpdateFailed" xml:space="preserve">
+    <value>Update failed</value>
+  </data>
+  <data name="Error_CheckUpdateFailed" xml:space="preserve">
+    <value>Failed to check for updates. Please check your internet connection.</value>
+  </data>
+  <data name="Message_AlreadyLatestVersion" xml:space="preserve">
+    <value>You are already using the latest version.</value>
+  </data>
+  <data name="Error_RateLimitExceeded" xml:space="preserve">
+    <value>GitHub API rate limit exceeded. Please try again in an hour.
+
+The application uses GitHub API to check for updates. Without authentication, there is a limit of 60 requests per hour. This limit has been reached.
+
+Possible solutions:
+• Wait about an hour before trying again
+• Check for updates less frequently
+• Visit the project page on GitHub manually to download new versions</value>
+  </data>
 </root>

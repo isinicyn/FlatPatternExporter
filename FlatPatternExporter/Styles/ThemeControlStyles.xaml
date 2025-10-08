@@ -76,8 +76,35 @@
 
     <Style TargetType="ProgressBar">
         <Setter Property="Background" Value="{DynamicResource BackgroundTertiaryBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ProgressBarBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Grid>
+                        <Border x:Name="PART_Track"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{StaticResource StandardCornerRadiusValue}"/>
+                        <Border x:Name="PART_Indicator"
+                                HorizontalAlignment="Left"
+                                Background="{TemplateBinding Foreground}"
+                                CornerRadius="{StaticResource StandardCornerRadiusValue}">
+                            <Grid x:Name="Animation" ClipToBounds="True">
+                                <Rectangle x:Name="PART_GlowRect"
+                                           Width="0"
+                                           HorizontalAlignment="Left"
+                                           Fill="{TemplateBinding Foreground}"
+                                           RadiusX="{Binding Source={StaticResource SmallCornerRadiusValue}, Path=TopLeft}"
+                                           RadiusY="{Binding Source={StaticResource SmallCornerRadiusValue}, Path=TopLeft}"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="ComboBoxItem">

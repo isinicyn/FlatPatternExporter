@@ -168,7 +168,7 @@
                                    MouseLeftButtonDown="EmailTextBlock_MouseLeftButtonDown" HorizontalAlignment="Left">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
-                                    <Setter Property="Foreground" Value="{DynamicResource AccentFillColorDefaultBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="TextDecorations" Value="Underline"/>
@@ -264,10 +264,16 @@
 
         <!-- Buttons -->
         <Border Grid.Row="2" Style="{StaticResource DialogBottomBarStyle}">
-            <Button Content="{extensions:Localize Button_Close}"
-                    HorizontalAlignment="Right"
-                    Style="{StaticResource FileNameActionButtonStyle}"
-                    Click="CloseButton_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="CheckUpdatesButton"
+                        Content="{extensions:Localize Button_CheckUpdates}"
+                        Style="{StaticResource FileNameActionButtonStyle}"
+                        Click="CheckUpdatesButton_Click"
+                        Margin="{StaticResource RightSmallMarginThickness}"/>
+                <Button Content="{extensions:Localize Button_Close}"
+                        Style="{StaticResource FileNameActionButtonStyle}"
+                        Click="CloseButton_Click"/>
+            </StackPanel>
         </Border>
     </Grid>
     </Border>

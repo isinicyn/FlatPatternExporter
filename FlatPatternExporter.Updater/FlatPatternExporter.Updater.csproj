@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>FPExport.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Linked style files from main project -->
+    <Page Include="..\FlatPatternExporter\Styles\DarkTheme.xaml" Link="Styles\DarkTheme.xaml" />
+    <Page Include="..\FlatPatternExporter\Styles\DesignTokens.xaml" Link="Styles\DesignTokens.xaml" />
+    <Page Include="..\FlatPatternExporter\Styles\IconResources.xaml" Link="Styles\IconResources.xaml" />
+    <Page Include="..\FlatPatternExporter\Styles\BaseControlStyles.xaml" Link="Styles\BaseControlStyles.xaml" />
+    <Page Include="..\FlatPatternExporter\Styles\ThemeControlStyles.xaml" Link="Styles\ThemeControlStyles.xaml" />
+    <Page Include="..\FlatPatternExporter\Styles\ScrollBarStyles.xaml" Link="Styles\ScrollBarStyles.xaml" />
+
+    <!-- Linked control files from main project -->
+    <Page Include="..\FlatPatternExporter\UI\Controls\CustomTitleBar.xaml" Link="Controls\CustomTitleBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="..\FlatPatternExporter\UI\Controls\CustomTitleBar.xaml.cs" Link="Controls\CustomTitleBar.xaml.cs">
+      <DependentUpon>CustomTitleBar.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

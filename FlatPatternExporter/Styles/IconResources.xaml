@@ -36,4 +36,7 @@
     <!-- SVG question icon - circle with question mark (24x24 viewBox) -->
     <Geometry x:Key="QuestionIconGeometry">M 12 2 A 10 10 0 1 1 12 22 A 10 10 0 1 1 12 2 M 9.09 9 A 3 3 0 0 1 15 9 C 15 12 12 11.5 12 14 M 12 18 L 12 18.01</Geometry>
 
+    <!-- SVG download icon - arrow down with line (32x32 viewBox) -->
+    <Geometry x:Key="DownloadIconGeometry">M16 22V5M9 16l7 7l7-7M9 27h14</Geometry>
+
 </ResourceDictionary>
