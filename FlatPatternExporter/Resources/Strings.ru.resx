@@ -1912,4 +1912,7 @@
 • Проверяйте обновления реже
 • Посетите страницу проекта на GitHub вручную для загрузки новых версий</value>
   </data>
+  <data name="Update_Available" xml:space="preserve">
+    <value>Доступно обновление: версия {0}</value>
+  </data>
 </root>

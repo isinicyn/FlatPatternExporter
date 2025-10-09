@@ -42,6 +42,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly DxfExporter _dxfExporter;
     private readonly PartDataReader _partDataReader;
     private readonly ExcelExportService _excelExportService;
+    private readonly UpdateManager _updateManager = new();
 
     // UI elements
     public System.Windows.Controls.Primitives.ToggleButton? ThemeToggleButton { get; private set; }
@@ -56,6 +57,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private CancellationTokenSource? _operationCts;
     private int _itemCounter = 1;
     private bool _isUpdatingState;
+
+    // Update state
+    private UpdateCheckResult? _latestUpdateCheckResult;
 
     // UI state
     private double _scanProgressValue;
@@ -268,6 +272,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         // Initialize data in TokenService
         _tokenService.UpdatePartsData(_partsData);
+
+        // Subscribe to UpdateButtonClick event
+        TitleBar.UpdateButtonClick += TitleBar_UpdateButtonClick;
+
+        // Check for updates on startup (async fire-and-forget)
+        _ = CheckForUpdatesAsync();
 
     }
 
@@ -2513,5 +2523,41 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 column.Header = propertyDef.ColumnHeader;
             }
         }
+    }
+
+    /// <summary>
+    /// Checks for application updates asynchronously
+    /// </summary>
+    private async Task CheckForUpdatesAsync()
+    {
+        try
+        {
+            var result = await _updateManager.CheckForUpdatesAsync();
+
+            if (result.IsUpdateAvailable)
+            {
+                _latestUpdateCheckResult = result;
+                TitleBar.ShowUpdateButton = true;
+                TitleBar.UpdateTooltip = _localizationManager.GetString("Update_Available", result.LatestVersion);
+            }
+        }
+        catch
+        {
+            // Silently ignore update check errors on startup
+        }
+    }
+
+    /// <summary>
+    /// Handles click on update button in title bar
+    /// </summary>
+    private void TitleBar_UpdateButtonClick(object? sender, EventArgs e)
+    {
+        if (_latestUpdateCheckResult?.ReleaseInfo == null) return;
+
+        var updateWindow = new UpdateWindow(_latestUpdateCheckResult)
+        {
+            Owner = this
+        };
+        updateWindow.ShowDialog();
     }
 }

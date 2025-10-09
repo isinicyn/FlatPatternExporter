@@ -1912,4 +1912,7 @@ Possible solutions:
 • Check for updates less frequently
 • Visit the project page on GitHub manually to download new versions</value>
   </data>
+  <data name="Update_Available" xml:space="preserve">
+    <value>Update available: version {0}</value>
+  </data>
 </root>

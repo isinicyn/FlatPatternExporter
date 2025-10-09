@@ -83,6 +83,32 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
         set => SetValue(TitleAlignmentProperty, value);
     }
 
+    public static readonly DependencyProperty ShowUpdateButtonProperty =
+        DependencyProperty.Register(nameof(ShowUpdateButton), typeof(bool), typeof(CustomTitleBar),
+            new PropertyMetadata(false, OnShowUpdateButtonChanged));
+
+    public bool ShowUpdateButton
+    {
+        get => (bool)GetValue(ShowUpdateButtonProperty);
+        set => SetValue(ShowUpdateButtonProperty, value);
+    }
+
+    public static readonly DependencyProperty UpdateTooltipProperty =
+        DependencyProperty.Register(nameof(UpdateTooltip), typeof(string), typeof(CustomTitleBar),
+            new PropertyMetadata(string.Empty));
+
+    public string UpdateTooltip
+    {
+        get => (string)GetValue(UpdateTooltipProperty);
+        set => SetValue(UpdateTooltipProperty, value);
+    }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? UpdateButtonClick;
+
     #endregion
 
     #region Event Handlers
@@ -185,6 +211,19 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
         }
     }
 
+    private static void OnShowUpdateButtonChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is CustomTitleBar titleBar)
+        {
+            titleBar.UpdateButtonVisibility();
+        }
+    }
+
+    private void UpdateButton_Click(object sender, RoutedEventArgs e)
+    {
+        UpdateButtonClick?.Invoke(this, EventArgs.Empty);
+    }
+
     #endregion
 
     #region Private Methods
@@ -215,6 +254,7 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
     {
         MinimizeButton.Visibility = ShowMinimizeButton ? Visibility.Visible : Visibility.Collapsed;
         MaximizeRestoreButton.Visibility = ShowMaximizeButton ? Visibility.Visible : Visibility.Collapsed;
+        UpdateButton.Visibility = ShowUpdateButton ? Visibility.Visible : Visibility.Collapsed;
     }
 
     #endregion

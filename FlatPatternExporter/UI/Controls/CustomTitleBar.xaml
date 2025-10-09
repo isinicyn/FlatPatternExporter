@@ -101,6 +101,26 @@
             <StackPanel Grid.Column="3"
                         Orientation="Horizontal">
 
+                <!-- Reserved space for Update button (always 46px) -->
+                <Grid Width="46">
+                    <Button x:Name="UpdateButton"
+                            Style="{StaticResource WindowChromeButtonStyle}"
+                            Width="46"
+                            Height="32"
+                            Click="UpdateButton_Click"
+                            ToolTip="{Binding ElementName=TitleBarControl, Path=UpdateTooltip}">
+                        <Path Data="{StaticResource DownloadIconGeometry}"
+                              Stroke="{DynamicResource SuccessBrush}"
+                              StrokeThickness="1.5"
+                              Fill="Transparent"
+                              Width="16"
+                              Height="16"
+                              Stretch="Uniform"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
+                    </Button>
+                </Grid>
+
                 <!-- Minimize button -->
                 <Button x:Name="MinimizeButton"
                         Style="{StaticResource WindowChromeButtonStyle}"
