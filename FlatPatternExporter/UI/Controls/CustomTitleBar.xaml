@@ -120,7 +120,6 @@
                             Click="UpdateButton_Click"
                             ToolTip="{Binding ElementName=TitleBarControl, Path=UpdateTooltip}">
                         <Path x:Name="UpdateIconPath"
-                              Data="{StaticResource DownloadIconGeometry}"
                               StrokeThickness="1.5"
                               Fill="Transparent"
                               Width="16"
@@ -130,10 +129,15 @@
                               VerticalAlignment="Center">
                             <Path.Style>
                                 <Style TargetType="Path">
+                                    <Setter Property="Data" Value="{StaticResource DownloadIconGeometry}"/>
                                     <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=HasUpdateError}" Value="True">
                                             <Setter Property="Stroke" Value="{DynamicResource ErrorBrush}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=IsUpToDate}" Value="True">
+                                            <Setter Property="Data" Value="{StaticResource CheckmarkIconGeometry}"/>
+                                            <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

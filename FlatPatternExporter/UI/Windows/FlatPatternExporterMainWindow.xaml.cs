@@ -315,9 +315,34 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 var message = HasUpdateError
                     ? _localizationManager.GetString("Update_CheckFailed")
-                    : _localizationManager.GetString("Notification_UpdateAvailable");
+                    : IsUpToDate
+                        ? _localizationManager.GetString("Notification_UpToDate")
+                        : _localizationManager.GetString("Notification_UpdateAvailable");
 
                 TitleBar.ShowUpdateNotification(message);
+
+                if (IsUpToDate)
+                {
+                    HideUpToDateIndicatorWithDelay();
+                }
+            }
+        };
+        timer.Start();
+    }
+
+    private void HideUpToDateIndicatorWithDelay()
+    {
+        var timer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(2)
+        };
+        timer.Tick += (s, e) =>
+        {
+            timer.Stop();
+            if (IsUpToDate)
+            {
+                _latestUpdateCheckResult = null;
+                NotifyUpdatePropertiesChanged();
             }
         };
         timer.Start();
@@ -616,11 +641,15 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 return false;
 
             return _latestUpdateCheckResult != null &&
-                   (_latestUpdateCheckResult.IsUpdateAvailable || !_latestUpdateCheckResult.Success);
+                   (_latestUpdateCheckResult.IsUpdateAvailable || !_latestUpdateCheckResult.Success || IsUpToDate);
         }
     }
 
     public bool HasUpdateError => _latestUpdateCheckResult != null && !_latestUpdateCheckResult.Success;
+
+    public bool IsUpToDate => _latestUpdateCheckResult != null &&
+                               _latestUpdateCheckResult.Success &&
+                               !_latestUpdateCheckResult.IsUpdateAvailable;
 
     public string UpdateTooltip
     {
@@ -634,6 +663,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
             if (_latestUpdateCheckResult.IsUpdateAvailable)
                 return _localizationManager.GetString("Update_Available", _latestUpdateCheckResult.LatestVersion);
+
+            if (IsUpToDate)
+                return _localizationManager.GetString("Update_UpToDate");
 
             return string.Empty;
         }
@@ -2614,6 +2646,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         OnPropertyChanged(nameof(ShowUpdateButton));
         OnPropertyChanged(nameof(HasUpdateError));
+        OnPropertyChanged(nameof(IsUpToDate));
         OnPropertyChanged(nameof(UpdateTooltip));
     }
 
@@ -2670,6 +2703,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
                 await CheckForUpdatesAsync();
             }
+            return;
+        }
+
+        if (IsUpToDate)
+        {
             return;
         }
 

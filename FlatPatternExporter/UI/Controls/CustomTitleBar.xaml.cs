@@ -113,6 +113,16 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
         set => SetValue(HasUpdateErrorProperty, value);
     }
 
+    public static readonly DependencyProperty IsUpToDateProperty =
+        DependencyProperty.Register(nameof(IsUpToDate), typeof(bool), typeof(CustomTitleBar),
+            new PropertyMetadata(false));
+
+    public bool IsUpToDate
+    {
+        get => (bool)GetValue(IsUpToDateProperty);
+        set => SetValue(IsUpToDateProperty, value);
+    }
+
     public static readonly DependencyProperty ReserveUpdateButtonSpaceProperty =
         DependencyProperty.Register(nameof(ReserveUpdateButtonSpace), typeof(bool), typeof(CustomTitleBar),
             new PropertyMetadata(false));

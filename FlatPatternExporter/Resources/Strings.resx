@@ -1933,4 +1933,10 @@ Possible solutions:
   <data name="Notification_CheckingUpdates" xml:space="preserve">
     <value>Checking for updates...</value>
   </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>You're using the latest version</value>
+  </data>
+  <data name="Notification_UpToDate" xml:space="preserve">
+    <value>You're up to date!</value>
+  </data>
 </root>
