@@ -2584,13 +2584,18 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
             else if (!result.Success)
             {
+                _latestUpdateCheckResult = result;
                 TitleBar.ShowUpdateButton = true;
                 TitleBar.HasUpdateError = true;
                 TitleBar.UpdateTooltip = _localizationManager.GetString("Update_CheckFailed");
             }
         }
-        catch
+        catch (Exception ex)
         {
+            _latestUpdateCheckResult = new UpdateCheckResult
+            {
+                ErrorMessage = ex.Message
+            };
             TitleBar.ShowUpdateButton = true;
             TitleBar.HasUpdateError = true;
             TitleBar.UpdateTooltip = _localizationManager.GetString("Update_CheckFailed");
@@ -2602,7 +2607,20 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// </summary>
     private void TitleBar_UpdateButtonClick(object? sender, EventArgs e)
     {
-        if (_latestUpdateCheckResult?.ReleaseInfo == null) return;
+        if (_latestUpdateCheckResult == null) return;
+
+        if (TitleBar.HasUpdateError)
+        {
+            CustomMessageBox.Show(
+                this,
+                _latestUpdateCheckResult.ErrorMessage ?? _localizationManager.GetString("Error_CheckUpdateFailed"),
+                _localizationManager.GetString("Header_Update"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        }
+
+        if (_latestUpdateCheckResult.ReleaseInfo == null) return;
 
         var updateWindow = new UpdateWindow(_latestUpdateCheckResult)
         {
