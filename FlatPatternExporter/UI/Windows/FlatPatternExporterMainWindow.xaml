@@ -33,6 +33,7 @@
                               Title="Flat Pattern Exporter 2026"
                               Icon="/FPExport.ico"
                               TitleAlignment="Center"
+                              ReserveUpdateButtonSpace="True"
                               ShowUpdateButton="{Binding ShowUpdateButton, RelativeSource={RelativeSource AncestorType=Window}}"
                               HasUpdateError="{Binding HasUpdateError, RelativeSource={RelativeSource AncestorType=Window}}"
                               UpdateTooltip="{Binding UpdateTooltip, RelativeSource={RelativeSource AncestorType=Window}}">
