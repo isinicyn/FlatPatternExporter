@@ -294,8 +294,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _ = CheckForUpdatesAsync();
             }
-
-            ShowUpdateNotificationWithDelay();
         }
         catch (Exception ex)
         {
@@ -313,9 +311,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         timer.Tick += (s, e) =>
         {
             timer.Stop();
-            if (TitleBar.ShowUpdateButton)
+            if (ShowUpdateButton)
             {
-                var message = TitleBar.HasUpdateError
+                var message = HasUpdateError
                     ? _localizationManager.GetString("Update_CheckFailed")
                     : _localizationManager.GetString("Notification_UpdateAvailable");
 
@@ -594,7 +592,50 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _checkUpdatesOnStartup = value;
                 OnPropertyChanged();
+
+                if (!value)
+                {
+                    // Очистить данные проверки обновления при отключении
+                    _latestUpdateCheckResult = null;
+                    NotifyUpdatePropertiesChanged();
+                }
+                else
+                {
+                    // Запустить проверку обновлений при включении
+                    _ = CheckForUpdatesAsync();
+                }
             }
+        }
+    }
+
+    public bool ShowUpdateButton
+    {
+        get
+        {
+            if (!CheckUpdatesOnStartup)
+                return false;
+
+            return _latestUpdateCheckResult != null &&
+                   (_latestUpdateCheckResult.IsUpdateAvailable || !_latestUpdateCheckResult.Success);
+        }
+    }
+
+    public bool HasUpdateError => _latestUpdateCheckResult != null && !_latestUpdateCheckResult.Success;
+
+    public string UpdateTooltip
+    {
+        get
+        {
+            if (_latestUpdateCheckResult == null)
+                return string.Empty;
+
+            if (!_latestUpdateCheckResult.Success)
+                return _localizationManager.GetString("Update_CheckFailed");
+
+            if (_latestUpdateCheckResult.IsUpdateAvailable)
+                return _localizationManager.GetString("Update_Available", _latestUpdateCheckResult.LatestVersion);
+
+            return string.Empty;
         }
     }
 
@@ -2567,6 +2608,16 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
+    /// Notifies UI about update-related properties change
+    /// </summary>
+    private void NotifyUpdatePropertiesChanged()
+    {
+        OnPropertyChanged(nameof(ShowUpdateButton));
+        OnPropertyChanged(nameof(HasUpdateError));
+        OnPropertyChanged(nameof(UpdateTooltip));
+    }
+
+    /// <summary>
     /// Checks for application updates asynchronously
     /// </summary>
     private async Task CheckForUpdatesAsync()
@@ -2575,19 +2626,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             var result = await _updateManager.CheckForUpdatesAsync();
 
-            if (result.IsUpdateAvailable)
+            if (result.IsUpdateAvailable || !result.Success)
             {
                 _latestUpdateCheckResult = result;
-                TitleBar.ShowUpdateButton = true;
-                TitleBar.HasUpdateError = false;
-                TitleBar.UpdateTooltip = _localizationManager.GetString("Update_Available", result.LatestVersion);
-            }
-            else if (!result.Success)
-            {
-                _latestUpdateCheckResult = result;
-                TitleBar.ShowUpdateButton = true;
-                TitleBar.HasUpdateError = true;
-                TitleBar.UpdateTooltip = _localizationManager.GetString("Update_CheckFailed");
+                NotifyUpdatePropertiesChanged();
             }
         }
         catch (Exception ex)
@@ -2596,9 +2638,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 ErrorMessage = ex.Message
             };
-            TitleBar.ShowUpdateButton = true;
-            TitleBar.HasUpdateError = true;
-            TitleBar.UpdateTooltip = _localizationManager.GetString("Update_CheckFailed");
+            NotifyUpdatePropertiesChanged();
+        }
+        finally
+        {
+            ShowUpdateNotificationWithDelay();
         }
     }
 
@@ -2609,7 +2653,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (_latestUpdateCheckResult == null) return;
 
-        if (TitleBar.HasUpdateError)
+        if (HasUpdateError)
         {
             CustomMessageBox.Show(
                 this,
@@ -2628,4 +2672,5 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         };
         updateWindow.ShowDialog();
     }
+
 }
