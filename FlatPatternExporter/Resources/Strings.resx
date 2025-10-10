@@ -1860,8 +1860,8 @@ Open file?</value>
   <data name="Header_Updates" xml:space="preserve">
     <value>Updates</value>
   </data>
-  <data name="UI_CheckUpdatesOnStartup" xml:space="preserve">
-    <value>Check for updates on startup</value>
+  <data name="UI_AutoUpdateCheck" xml:space="preserve">
+    <value>Automatic update check</value>
   </data>
   <data name="Header_Update" xml:space="preserve">
     <value>Update</value>

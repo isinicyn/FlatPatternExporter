@@ -131,7 +131,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private ExcelExportFileNameType _excelExportFileNameType = ExcelExportFileNameType.DateTimeFormat;
 
     // Update settings
-    private bool _checkUpdatesOnStartup = true;
+    private bool _autoUpdateCheck = true;
 
     // Folder and path settings
     private ExportFolderType _selectedExportFolder = ExportFolderType.ChooseFolder;
@@ -290,7 +290,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         {
             SettingsManager.ApplySettingsToMainWindow(settings, this);
 
-            if (CheckUpdatesOnStartup)
+            if (AutoUpdateCheck)
             {
                 _ = CheckForUpdatesAsync();
             }
@@ -583,14 +583,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         }
     }
 
-    public bool CheckUpdatesOnStartup
+    public bool AutoUpdateCheck
     {
-        get => _checkUpdatesOnStartup;
+        get => _autoUpdateCheck;
         set
         {
-            if (_checkUpdatesOnStartup != value)
+            if (_autoUpdateCheck != value)
             {
-                _checkUpdatesOnStartup = value;
+                _autoUpdateCheck = value;
                 OnPropertyChanged();
 
                 if (!value)
@@ -612,7 +612,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         get
         {
-            if (!CheckUpdatesOnStartup)
+            if (!AutoUpdateCheck)
                 return false;
 
             return _latestUpdateCheckResult != null &&

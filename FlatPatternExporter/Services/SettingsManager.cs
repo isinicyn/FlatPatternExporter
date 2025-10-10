@@ -100,7 +100,7 @@ public record ExcelExportSettings
 
 public record UpdateSettings
 {
-    public bool CheckUpdatesOnStartup { get; init; } = true;
+    public bool AutoUpdateCheck { get; init; } = true;
 }
 
 public record ApplicationSettings
@@ -278,7 +278,7 @@ public static class SettingsManager
 
             Update = new UpdateSettings
             {
-                CheckUpdatesOnStartup = window.CheckUpdatesOnStartup
+                AutoUpdateCheck = window.AutoUpdateCheck
             },
 
             LayerSettings = layerSettings
@@ -347,7 +347,7 @@ public static class SettingsManager
         window.ExcelExportFileNameType = settings.ExcelExport.ExcelExportFileNameType;
 
         // Update settings
-        window.CheckUpdatesOnStartup = settings.Update.CheckUpdatesOnStartup;
+        window.AutoUpdateCheck = settings.Update.AutoUpdateCheck;
 
         PropertyMetadataRegistry.UserDefinedProperties.Clear();
 

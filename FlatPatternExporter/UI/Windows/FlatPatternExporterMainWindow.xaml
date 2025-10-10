@@ -675,9 +675,9 @@
                         <!-- Update settings group -->
                         <GroupBox Header="{extensions:Localize Header_Updates}" Margin="{StaticResource RightStandardMarginThickness}">
                             <StackPanel Orientation="Vertical" Margin="{StaticResource SectionContentMarginThickness}">
-                                <CheckBox x:Name="CheckUpdatesOnStartupCheckBox"
-                                          Content="{extensions:Localize UI_CheckUpdatesOnStartup}"
-                                          IsChecked="{Binding CheckUpdatesOnStartup, Mode=TwoWay}"/>
+                                <CheckBox x:Name="AutoUpdateCheckCheckBox"
+                                          Content="{extensions:Localize UI_AutoUpdateCheck}"
+                                          IsChecked="{Binding AutoUpdateCheck, Mode=TwoWay}"/>
                             </StackPanel>
                         </GroupBox>
                     </WrapPanel>
