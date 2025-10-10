@@ -294,12 +294,31 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _ = CheckForUpdatesAsync();
             }
+
+            ShowUpdateNotificationWithDelay();
         }
         catch (Exception ex)
         {
             CustomMessageBox.Show(_localizationManager.GetString("Error_SettingsLoad", ex.Message), _localizationManager.GetString("Error_Title"),
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+    }
+
+    private void ShowUpdateNotificationWithDelay()
+    {
+        var timer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(2)
+        };
+        timer.Tick += (s, e) =>
+        {
+            timer.Stop();
+            if (TitleBar.ShowUpdateButton)
+            {
+                TitleBar.ShowUpdateNotification(_localizationManager.GetString("Notification_UpdateAvailable"));
+            }
+        };
+        timer.Start();
     }
 
     private void SaveSettings()

@@ -1921,4 +1921,7 @@ Possible solutions:
   <data name="Update_Available" xml:space="preserve">
     <value>Update available: version {0}</value>
   </data>
+  <data name="Notification_UpdateAvailable" xml:space="preserve">
+    <value>New version available!</value>
+  </data>
 </root>

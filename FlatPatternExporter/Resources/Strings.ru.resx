@@ -1921,4 +1921,7 @@
   <data name="Update_Available" xml:space="preserve">
     <value>Доступно обновление: версия {0}</value>
   </data>
+  <data name="Notification_UpdateAvailable" xml:space="preserve">
+    <value>Доступна новая версия!</value>
+  </data>
 </root>

@@ -226,6 +226,25 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
 
     #endregion
 
+    #region Public Methods
+
+    public void ShowUpdateNotification(string message, double durationSeconds = 2.0)
+    {
+        if (UpdateButton.Visibility == Visibility.Visible)
+        {
+            WpfToolkit.PopupNotificationService.ShowNotification(
+                UpdateButton,
+                message,
+                durationSeconds,
+                System.Windows.Controls.Primitives.PlacementMode.Bottom,
+                verticalOffset: 5,
+                horizontalOffset: 0
+            );
+        }
+    }
+
+    #endregion
+
     #region Private Methods
 
     private void ToggleMaximizeRestore()
