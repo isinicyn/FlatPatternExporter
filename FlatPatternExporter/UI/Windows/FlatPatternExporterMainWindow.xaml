@@ -297,13 +297,12 @@
                                 <!-- CSV delimiter -->
                                 <Label Grid.Row="1" Grid.Column="0" Content="{extensions:Localize Label_CsvDelimiter}" VerticalAlignment="Center" Margin="0,5,5,0"/>
                                 <ComboBox x:Name="CsvDelimiterComboBox" Grid.Row="1" Grid.Column="1"
-                                          Width="150" HorizontalAlignment="Left"
                                           Style="{StaticResource BaseComboBoxStyle}"
                                           Margin="{StaticResource TopSmallMarginThickness}"
-                                          SelectedValue="{Binding CsvDelimiter, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}">
+                                          SelectedValue="{Binding CsvDelimiter, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" Width="160" HorizontalAlignment="Left">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock>
+                                            <TextBlock TextTrimming="CharacterEllipsis">
                                                 <TextBlock.Text>
                                                     <MultiBinding>
                                                         <MultiBinding.Converter>
@@ -325,13 +324,12 @@
                                 <!-- Export file name -->
                                 <Label Grid.Row="2" Grid.Column="0" Content="{extensions:Localize Label_ExportFileName}" VerticalAlignment="Center" Margin="0,5,5,0"/>
                                 <ComboBox x:Name="ExportFileNameComboBox" Grid.Row="2" Grid.Column="1"
-                                          Width="300" HorizontalAlignment="Left"
                                           Style="{StaticResource BaseComboBoxStyle}"
                                           Margin="{StaticResource TopSmallMarginThickness}"
-                                          SelectedValue="{Binding ExcelExportFileNameType, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}">
+                                          SelectedValue="{Binding ExcelExportFileNameType, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}" Width="160" HorizontalAlignment="Left">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock>
+                                            <TextBlock TextTrimming="CharacterEllipsis">
                                                 <TextBlock.Text>
                                                     <MultiBinding>
                                                         <MultiBinding.Converter>
