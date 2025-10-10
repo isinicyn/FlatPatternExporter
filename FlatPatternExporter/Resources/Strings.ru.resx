@@ -1857,6 +1857,12 @@
   </data>
 
   <!-- Update System -->
+  <data name="Header_Updates" xml:space="preserve">
+    <value>Обновления</value>
+  </data>
+  <data name="UI_CheckUpdatesOnStartup" xml:space="preserve">
+    <value>Проверять обновления при запуске</value>
+  </data>
   <data name="Header_Update" xml:space="preserve">
     <value>Обновление</value>
   </data>

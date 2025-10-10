@@ -669,6 +669,15 @@
                                           SelectionChanged="LanguageComboBox_SelectionChanged"/>
                             </StackPanel>
                         </GroupBox>
+
+                        <!-- Update settings group -->
+                        <GroupBox Header="{extensions:Localize Header_Updates}" Margin="{StaticResource RightStandardMarginThickness}">
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource SectionContentMarginThickness}">
+                                <CheckBox x:Name="CheckUpdatesOnStartupCheckBox"
+                                          Content="{extensions:Localize UI_CheckUpdatesOnStartup}"
+                                          IsChecked="{Binding CheckUpdatesOnStartup, Mode=TwoWay}"/>
+                            </StackPanel>
+                        </GroupBox>
                     </WrapPanel>
                 </TabItem>
             </TabControl>

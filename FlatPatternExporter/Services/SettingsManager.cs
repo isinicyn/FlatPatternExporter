@@ -98,6 +98,11 @@ public record ExcelExportSettings
     public ExcelExportFileNameType ExcelExportFileNameType { get; init; } = ExcelExportFileNameType.DateTimeFormat;
 }
 
+public record UpdateSettings
+{
+    public bool CheckUpdatesOnStartup { get; init; } = true;
+}
+
 public record ApplicationSettings
 {
     public InterfaceSettings Interface { get; init; } = new();
@@ -112,6 +117,7 @@ public record ApplicationSettings
     public ExportFolderSettings ExportFolder { get; init; } = new();
     public FileNameSettings FileName { get; init; } = new();
     public ExcelExportSettings ExcelExport { get; init; } = new();
+    public UpdateSettings Update { get; init; } = new();
 
     public List<LayerSettingData> LayerSettings { get; init; } = [];
 }
@@ -270,6 +276,11 @@ public static class SettingsManager
                 ExcelExportFileNameType = window.ExcelExportFileNameType
             },
 
+            Update = new UpdateSettings
+            {
+                CheckUpdatesOnStartup = window.CheckUpdatesOnStartup
+            },
+
             LayerSettings = layerSettings
         };
     }
@@ -334,6 +345,9 @@ public static class SettingsManager
         window.CsvDelimiter = settings.ExcelExport.CsvDelimiter;
         window.DefaultExportFormat = settings.ExcelExport.DefaultExportFormat;
         window.ExcelExportFileNameType = settings.ExcelExport.ExcelExportFileNameType;
+
+        // Update settings
+        window.CheckUpdatesOnStartup = settings.Update.CheckUpdatesOnStartup;
 
         PropertyMetadataRegistry.UserDefinedProperties.Clear();
 

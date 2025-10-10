@@ -130,6 +130,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private ExportFileFormat _defaultExportFormat = ExportFileFormat.Excel;
     private ExcelExportFileNameType _excelExportFileNameType = ExcelExportFileNameType.DateTimeFormat;
 
+    // Update settings
+    private bool _checkUpdatesOnStartup = true;
+
     // Folder and path settings
     private ExportFolderType _selectedExportFolder = ExportFolderType.ChooseFolder;
     private bool _enableSubfolder = false;
@@ -276,9 +279,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Subscribe to UpdateButtonClick event
         TitleBar.UpdateButtonClick += TitleBar_UpdateButtonClick;
 
-        // Check for updates on startup (async fire-and-forget)
-        _ = CheckForUpdatesAsync();
-
     }
 
     /// <summary>
@@ -289,6 +289,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         try
         {
             SettingsManager.ApplySettingsToMainWindow(settings, this);
+
+            if (CheckUpdatesOnStartup)
+            {
+                _ = CheckForUpdatesAsync();
+            }
         }
         catch (Exception ex)
         {
@@ -552,6 +557,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (_excelExportFileNameType != value)
             {
                 _excelExportFileNameType = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool CheckUpdatesOnStartup
+    {
+        get => _checkUpdatesOnStartup;
+        set
+        {
+            if (_checkUpdatesOnStartup != value)
+            {
+                _checkUpdatesOnStartup = value;
                 OnPropertyChanged();
             }
         }
