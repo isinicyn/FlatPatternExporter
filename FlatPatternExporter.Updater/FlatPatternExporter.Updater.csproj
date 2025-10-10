@@ -28,6 +28,9 @@
     <Compile Include="..\FlatPatternExporter\UI\Controls\CustomTitleBar.xaml.cs" Link="Controls\CustomTitleBar.xaml.cs">
       <DependentUpon>CustomTitleBar.xaml</DependentUpon>
     </Compile>
+
+    <!-- Linked library files from main project -->
+    <Compile Include="..\FlatPatternExporter\Libraries\PopupNotificationService.cs" Link="Libraries\PopupNotificationService.cs" />
   </ItemGroup>
 
 </Project>

@@ -1924,4 +1924,7 @@
   <data name="Notification_UpdateAvailable" xml:space="preserve">
     <value>Доступна новая версия!</value>
   </data>
+  <data name="Update_CheckFailed" xml:space="preserve">
+    <value>Ошибка проверки обновлений</value>
+  </data>
 </root>

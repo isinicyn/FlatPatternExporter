@@ -103,6 +103,16 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
         set => SetValue(UpdateTooltipProperty, value);
     }
 
+    public static readonly DependencyProperty HasUpdateErrorProperty =
+        DependencyProperty.Register(nameof(HasUpdateError), typeof(bool), typeof(CustomTitleBar),
+            new PropertyMetadata(false));
+
+    public bool HasUpdateError
+    {
+        get => (bool)GetValue(HasUpdateErrorProperty);
+        set => SetValue(HasUpdateErrorProperty, value);
+    }
+
     #endregion
 
     #region Events

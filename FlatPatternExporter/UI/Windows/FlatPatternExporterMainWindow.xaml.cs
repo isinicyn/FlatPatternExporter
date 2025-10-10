@@ -315,7 +315,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             timer.Stop();
             if (TitleBar.ShowUpdateButton)
             {
-                TitleBar.ShowUpdateNotification(_localizationManager.GetString("Notification_UpdateAvailable"));
+                var message = TitleBar.HasUpdateError
+                    ? _localizationManager.GetString("Update_CheckFailed")
+                    : _localizationManager.GetString("Notification_UpdateAvailable");
+
+                TitleBar.ShowUpdateNotification(message);
             }
         };
         timer.Start();
@@ -2575,12 +2579,21 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _latestUpdateCheckResult = result;
                 TitleBar.ShowUpdateButton = true;
+                TitleBar.HasUpdateError = false;
                 TitleBar.UpdateTooltip = _localizationManager.GetString("Update_Available", result.LatestVersion);
+            }
+            else if (!result.Success)
+            {
+                TitleBar.ShowUpdateButton = true;
+                TitleBar.HasUpdateError = true;
+                TitleBar.UpdateTooltip = _localizationManager.GetString("Update_CheckFailed");
             }
         }
         catch
         {
-            // Silently ignore update check errors on startup
+            TitleBar.ShowUpdateButton = true;
+            TitleBar.HasUpdateError = true;
+            TitleBar.UpdateTooltip = _localizationManager.GetString("Update_CheckFailed");
         }
     }
 

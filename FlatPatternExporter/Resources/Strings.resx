@@ -1924,4 +1924,7 @@ Possible solutions:
   <data name="Notification_UpdateAvailable" xml:space="preserve">
     <value>New version available!</value>
   </data>
+  <data name="Update_CheckFailed" xml:space="preserve">
+    <value>Update check failed</value>
+  </data>
 </root>
