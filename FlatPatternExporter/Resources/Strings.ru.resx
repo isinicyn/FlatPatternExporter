@@ -1927,4 +1927,10 @@
   <data name="Update_CheckFailed" xml:space="preserve">
     <value>Ошибка проверки обновлений</value>
   </data>
+  <data name="Question_RetryUpdateCheck" xml:space="preserve">
+    <value>Повторить попытку?</value>
+  </data>
+  <data name="Notification_CheckingUpdates" xml:space="preserve">
+    <value>Проверка обновлений...</value>
+  </data>
 </root>

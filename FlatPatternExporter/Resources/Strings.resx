@@ -1927,4 +1927,10 @@ Possible solutions:
   <data name="Update_CheckFailed" xml:space="preserve">
     <value>Update check failed</value>
   </data>
+  <data name="Question_RetryUpdateCheck" xml:space="preserve">
+    <value>Retry?</value>
+  </data>
+  <data name="Notification_CheckingUpdates" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
 </root>

@@ -2625,12 +2625,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         try
         {
             var result = await _updateManager.CheckForUpdatesAsync();
-
-            if (result.IsUpdateAvailable || !result.Success)
-            {
-                _latestUpdateCheckResult = result;
-                NotifyUpdatePropertiesChanged();
-            }
+            _latestUpdateCheckResult = result;
+            NotifyUpdatePropertiesChanged();
         }
         catch (Exception ex)
         {
@@ -2649,18 +2645,31 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// <summary>
     /// Handles click on update button in title bar
     /// </summary>
-    private void TitleBar_UpdateButtonClick(object? sender, EventArgs e)
+    private async void TitleBar_UpdateButtonClick(object? sender, EventArgs e)
     {
         if (_latestUpdateCheckResult == null) return;
 
         if (HasUpdateError)
         {
-            CustomMessageBox.Show(
+            var errorMessage = _latestUpdateCheckResult.ErrorMessage ?? _localizationManager.GetString("Error_CheckUpdateFailed");
+            var fullMessage = $"{errorMessage}\n\n{_localizationManager.GetString("Question_RetryUpdateCheck")}";
+
+            var result = CustomMessageBox.Show(
                 this,
-                _latestUpdateCheckResult.ErrorMessage ?? _localizationManager.GetString("Error_CheckUpdateFailed"),
+                fullMessage,
                 _localizationManager.GetString("Header_Update"),
-                MessageBoxButton.OK,
+                MessageBoxButton.YesNo,
                 MessageBoxImage.Error);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                TitleBar.ShowUpdateNotification(
+                    _localizationManager.GetString("Notification_CheckingUpdates"),
+                    0.5
+                );
+
+                await CheckForUpdatesAsync();
+            }
             return;
         }
 
