@@ -313,15 +313,17 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             timer.Stop();
             if (ShowUpdateButton)
             {
-                var message = HasUpdateError
-                    ? _localizationManager.GetString("Update_CheckFailed")
-                    : IsUpToDate
-                        ? _localizationManager.GetString("Notification_UpToDate")
-                        : _localizationManager.GetString("Notification_UpdateAvailable");
+                var message = UpdateState switch
+                {
+                    UpdateButtonState.Error => _localizationManager.GetString("Update_CheckFailed"),
+                    UpdateButtonState.UpToDate => _localizationManager.GetString("Notification_UpToDate"),
+                    UpdateButtonState.UpdateAvailable => _localizationManager.GetString("Notification_UpdateAvailable"),
+                    _ => string.Empty
+                };
 
                 TitleBar.ShowUpdateNotification(message);
 
-                if (IsUpToDate)
+                if (UpdateState == UpdateButtonState.UpToDate)
                 {
                     HideUpToDateIndicatorWithDelay();
                 }
@@ -339,7 +341,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         timer.Tick += (s, e) =>
         {
             timer.Stop();
-            if (IsUpToDate)
+            if (UpdateState == UpdateButtonState.UpToDate)
             {
                 _latestUpdateCheckResult = null;
                 NotifyUpdatePropertiesChanged();
@@ -640,34 +642,38 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (!AutoUpdateCheck)
                 return false;
 
-            return _latestUpdateCheckResult != null &&
-                   (_latestUpdateCheckResult.IsUpdateAvailable || !_latestUpdateCheckResult.Success || IsUpToDate);
+            return UpdateState != UpdateButtonState.None;
         }
     }
 
-    public bool HasUpdateError => _latestUpdateCheckResult != null && !_latestUpdateCheckResult.Success;
+    public UpdateButtonState UpdateState
+    {
+        get
+        {
+            if (_latestUpdateCheckResult == null)
+                return UpdateButtonState.None;
 
-    public bool IsUpToDate => _latestUpdateCheckResult != null &&
-                               _latestUpdateCheckResult.Success &&
-                               !_latestUpdateCheckResult.IsUpdateAvailable;
+            if (!_latestUpdateCheckResult.Success)
+                return UpdateButtonState.Error;
+
+            if (_latestUpdateCheckResult.IsUpdateAvailable)
+                return UpdateButtonState.UpdateAvailable;
+
+            return UpdateButtonState.UpToDate;
+        }
+    }
 
     public string UpdateTooltip
     {
         get
         {
-            if (_latestUpdateCheckResult == null)
-                return string.Empty;
-
-            if (!_latestUpdateCheckResult.Success)
-                return _localizationManager.GetString("Update_CheckFailed");
-
-            if (_latestUpdateCheckResult.IsUpdateAvailable)
-                return _localizationManager.GetString("Update_Available", _latestUpdateCheckResult.LatestVersion);
-
-            if (IsUpToDate)
-                return _localizationManager.GetString("Update_UpToDate");
-
-            return string.Empty;
+            return UpdateState switch
+            {
+                UpdateButtonState.Error => _localizationManager.GetString("Update_CheckFailed"),
+                UpdateButtonState.UpdateAvailable => _localizationManager.GetString("Update_Available", _latestUpdateCheckResult?.LatestVersion ?? string.Empty),
+                UpdateButtonState.UpToDate => _localizationManager.GetString("Update_UpToDate"),
+                _ => string.Empty
+            };
         }
     }
 
@@ -2645,8 +2651,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private void NotifyUpdatePropertiesChanged()
     {
         OnPropertyChanged(nameof(ShowUpdateButton));
-        OnPropertyChanged(nameof(HasUpdateError));
-        OnPropertyChanged(nameof(IsUpToDate));
+        OnPropertyChanged(nameof(UpdateState));
         OnPropertyChanged(nameof(UpdateTooltip));
     }
 
@@ -2682,33 +2687,37 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (_latestUpdateCheckResult == null) return;
 
-        if (HasUpdateError)
+        switch (UpdateState)
         {
-            var errorMessage = _latestUpdateCheckResult.ErrorMessage ?? _localizationManager.GetString("Error_CheckUpdateFailed");
-            var fullMessage = $"{errorMessage}\n\n{_localizationManager.GetString("Question_RetryUpdateCheck")}";
-
-            var result = CustomMessageBox.Show(
-                this,
-                fullMessage,
-                _localizationManager.GetString("Header_Update"),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Error);
-
-            if (result == MessageBoxResult.Yes)
+            case UpdateButtonState.Error:
             {
-                TitleBar.ShowUpdateNotification(
-                    _localizationManager.GetString("Notification_CheckingUpdates"),
-                    0.5
-                );
+                var errorMessage = _latestUpdateCheckResult.ErrorMessage ?? _localizationManager.GetString("Error_CheckUpdateFailed");
+                var fullMessage = $"{errorMessage}\n\n{_localizationManager.GetString("Question_RetryUpdateCheck")}";
 
-                await CheckForUpdatesAsync();
+                var result = CustomMessageBox.Show(
+                    this,
+                    fullMessage,
+                    _localizationManager.GetString("Header_Update"),
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Error);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    TitleBar.ShowUpdateNotification(
+                        _localizationManager.GetString("Notification_CheckingUpdates"),
+                        0.5
+                    );
+
+                    await CheckForUpdatesAsync();
+                }
+                return;
             }
-            return;
-        }
 
-        if (IsUpToDate)
-        {
-            return;
+            case UpdateButtonState.UpToDate:
+                return;
+
+            case UpdateButtonState.None:
+                return;
         }
 
         if (_latestUpdateCheckResult.ReleaseInfo == null) return;

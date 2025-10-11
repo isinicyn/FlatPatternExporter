@@ -35,8 +35,7 @@
                               TitleAlignment="Center"
                               ReserveUpdateButtonSpace="True"
                               ShowUpdateButton="{Binding ShowUpdateButton, RelativeSource={RelativeSource AncestorType=Window}}"
-                              HasUpdateError="{Binding HasUpdateError, RelativeSource={RelativeSource AncestorType=Window}}"
-                              IsUpToDate="{Binding IsUpToDate, RelativeSource={RelativeSource AncestorType=Window}}"
+                              UpdateState="{Binding UpdateState, RelativeSource={RelativeSource AncestorType=Window}}"
                               UpdateTooltip="{Binding UpdateTooltip, RelativeSource={RelativeSource AncestorType=Window}}">
             <local:CustomTitleBar.ContentArea>
                 <StackPanel Orientation="Horizontal">

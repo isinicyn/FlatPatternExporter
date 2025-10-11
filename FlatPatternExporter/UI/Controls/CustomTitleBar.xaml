@@ -119,30 +119,33 @@
                             Height="32"
                             Click="UpdateButton_Click"
                             ToolTip="{Binding ElementName=TitleBarControl, Path=UpdateTooltip}">
-                        <Path x:Name="UpdateIconPath"
-                              StrokeThickness="1.5"
-                              Fill="Transparent"
-                              Width="16"
-                              Height="16"
-                              Stretch="Uniform"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center">
-                            <Path.Style>
-                                <Style TargetType="Path">
-                                    <Setter Property="Data" Value="{StaticResource DownloadIconGeometry}"/>
-                                    <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=HasUpdateError}" Value="True">
-                                            <Setter Property="Stroke" Value="{DynamicResource ErrorBrush}"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=IsUpToDate}" Value="True">
-                                            <Setter Property="Data" Value="{StaticResource CheckmarkIconGeometry}"/>
-                                            <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Path.Style>
-                        </Path>
+                        <Viewbox Width="16" Height="16">
+                            <Path x:Name="UpdateIconPath"
+                                  StrokeThickness="1.5"
+                                  Fill="Transparent"
+                                  Stretch="Uniform">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Data" Value="{x:Null}"/>
+                                        <Setter Property="Stroke" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=UpdateState}" Value="UpdateAvailable">
+                                                <Setter Property="Data" Value="{StaticResource DownloadIconGeometry}"/>
+                                                <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=UpdateState}" Value="UpToDate">
+                                                <Setter Property="Data" Value="{StaticResource CheckmarkIconGeometry}"/>
+                                                <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=UpdateState}" Value="Error">
+                                                <Setter Property="Data" Value="{StaticResource ErrorIconGeometry}"/>
+                                                <Setter Property="Stroke" Value="{DynamicResource ErrorBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+                        </Viewbox>
                     </Button>
                 </Grid>
 

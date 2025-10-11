@@ -6,6 +6,14 @@ using System.Windows.Media;
 
 namespace FlatPatternExporter.UI.Controls;
 
+public enum UpdateButtonState
+{
+    None,
+    UpdateAvailable,
+    UpToDate,
+    Error
+}
+
 public partial class CustomTitleBar : System.Windows.Controls.UserControl
 {
     private Window? _parentWindow;
@@ -103,24 +111,14 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
         set => SetValue(UpdateTooltipProperty, value);
     }
 
-    public static readonly DependencyProperty HasUpdateErrorProperty =
-        DependencyProperty.Register(nameof(HasUpdateError), typeof(bool), typeof(CustomTitleBar),
-            new PropertyMetadata(false));
+    public static readonly DependencyProperty UpdateStateProperty =
+        DependencyProperty.Register(nameof(UpdateState), typeof(UpdateButtonState), typeof(CustomTitleBar),
+            new PropertyMetadata(UpdateButtonState.None));
 
-    public bool HasUpdateError
+    public UpdateButtonState UpdateState
     {
-        get => (bool)GetValue(HasUpdateErrorProperty);
-        set => SetValue(HasUpdateErrorProperty, value);
-    }
-
-    public static readonly DependencyProperty IsUpToDateProperty =
-        DependencyProperty.Register(nameof(IsUpToDate), typeof(bool), typeof(CustomTitleBar),
-            new PropertyMetadata(false));
-
-    public bool IsUpToDate
-    {
-        get => (bool)GetValue(IsUpToDateProperty);
-        set => SetValue(IsUpToDateProperty, value);
+        get => (UpdateButtonState)GetValue(UpdateStateProperty);
+        set => SetValue(UpdateStateProperty, value);
     }
 
     public static readonly DependencyProperty ReserveUpdateButtonSpaceProperty =
