@@ -2703,6 +2703,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
                 if (result == MessageBoxResult.Yes)
                 {
+                    _latestUpdateCheckResult = null;
+                    NotifyUpdatePropertiesChanged();
+
                     TitleBar.ShowUpdateNotification(
                         _localizationManager.GetString("Notification_CheckingUpdates"),
                         0.5

@@ -5,6 +5,70 @@
              Height="32">
 
     <UserControl.Resources>
+        <!-- Fade Animations -->
+        <Storyboard x:Key="FadeIn">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.3"/>
+        </Storyboard>
+        <Storyboard x:Key="FadeOut">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.3"/>
+        </Storyboard>
+
+        <!-- Base style for update icons -->
+        <Style x:Key="UpdateIconBaseStyle" TargetType="Path">
+            <Setter Property="StrokeThickness" Value="1.5"/>
+            <Setter Property="Fill" Value="Transparent"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Opacity" Value="0"/>
+        </Style>
+
+        <!-- Style for the 'UpdateAvailable' icon -->
+        <Style x:Key="UpdateAvailableIconStyle" TargetType="Path" BasedOn="{StaticResource UpdateIconBaseStyle}">
+            <Setter Property="Data" Value="{StaticResource DownloadIconGeometry}"/>
+            <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=UpdateState}" Value="UpdateAvailable">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource FadeIn}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource FadeOut}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style for the 'UpToDate' icon -->
+        <Style x:Key="UpToDateIconStyle" TargetType="Path" BasedOn="{StaticResource UpdateIconBaseStyle}">
+            <Setter Property="Data" Value="{StaticResource CheckmarkIconGeometry}"/>
+            <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=UpdateState}" Value="UpToDate">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource FadeIn}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource FadeOut}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style for the 'Error' icon -->
+        <Style x:Key="ErrorIconStyle" TargetType="Path" BasedOn="{StaticResource UpdateIconBaseStyle}">
+            <Setter Property="Data" Value="{StaticResource ErrorIconGeometry}"/>
+            <Setter Property="Stroke" Value="{DynamicResource ErrorBrush}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=UpdateState}" Value="Error">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Storyboard="{StaticResource FadeIn}"/>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard Storyboard="{StaticResource FadeOut}"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- Window chrome button style -->
         <Style x:Key="WindowChromeButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="Transparent"/>
@@ -120,31 +184,11 @@
                             Click="UpdateButton_Click"
                             ToolTip="{Binding ElementName=TitleBarControl, Path=UpdateTooltip}">
                         <Viewbox Width="16" Height="16">
-                            <Path x:Name="UpdateIconPath"
-                                  StrokeThickness="1.5"
-                                  Fill="Transparent"
-                                  Stretch="Uniform">
-                                <Path.Style>
-                                    <Style TargetType="Path">
-                                        <Setter Property="Data" Value="{x:Null}"/>
-                                        <Setter Property="Stroke" Value="Transparent"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=UpdateState}" Value="UpdateAvailable">
-                                                <Setter Property="Data" Value="{StaticResource DownloadIconGeometry}"/>
-                                                <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=UpdateState}" Value="UpToDate">
-                                                <Setter Property="Data" Value="{StaticResource CheckmarkIconGeometry}"/>
-                                                <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ElementName=TitleBarControl, Path=UpdateState}" Value="Error">
-                                                <Setter Property="Data" Value="{StaticResource ErrorIconGeometry}"/>
-                                                <Setter Property="Stroke" Value="{DynamicResource ErrorBrush}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Path.Style>
-                            </Path>
+                            <Grid>
+                                <Path Style="{StaticResource UpdateAvailableIconStyle}"/>
+                                <Path Style="{StaticResource UpToDateIconStyle}"/>
+                                <Path Style="{StaticResource ErrorIconStyle}"/>
+                            </Grid>
                         </Viewbox>
                     </Button>
                 </Grid>
