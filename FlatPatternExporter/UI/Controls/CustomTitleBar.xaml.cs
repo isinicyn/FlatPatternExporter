@@ -301,7 +301,6 @@ public partial class CustomTitleBar : System.Windows.Controls.UserControl
     {
         MinimizeButton.Visibility = ShowMinimizeButton ? Visibility.Visible : Visibility.Collapsed;
         MaximizeRestoreButton.Visibility = ShowMaximizeButton ? Visibility.Visible : Visibility.Collapsed;
-        UpdateButton.Visibility = ShowUpdateButton ? Visibility.Visible : Visibility.Collapsed;
     }
 
     #endregion
