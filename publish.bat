@@ -87,15 +87,20 @@ set profileName=%1
 set outputFolder=%2
 
 echo [1/2] Publishing main application...
-dotnet publish "FlatPatternExporter\FlatPatternExporter.csproj" ^
-    --configuration Release ^
-    /p:PublishProfile=%profileName%
 
-if errorlevel 1 (
-    echo [ERROR] Main application publishing failed
+:: Publish and extract version from output stream (suppress output)
+for /f "delims=" %%i in ('dotnet publish "FlatPatternExporter\FlatPatternExporter.csproj" --configuration Release /p:PublishProfile^=%profileName% 2^>^&1 ^| findstr /C:"File Version:"') do (
+    for /f "tokens=3" %%v in ("%%i") do set BUILD_VERSION=%%v
+)
+
+if defined BUILD_VERSION (
+    echo [VERSION] Detected version: %BUILD_VERSION%
+    echo [SUCCESS] Main application published
+) else (
+    echo [ERROR] Main application publishing failed - version not detected
     exit /b 1
 )
-echo [SUCCESS] Main application published
+
 goto :eof
 
 :PublishUpdater
@@ -105,7 +110,7 @@ set outputFolder=%2
 echo [2/2] Publishing Updater...
 dotnet publish "FlatPatternExporter.Updater\FlatPatternExporter.Updater.csproj" ^
     --configuration Release ^
-    /p:PublishProfile=%profileName%
+    /p:PublishProfile=%profileName% >nul 2>&1
 
 if errorlevel 1 (
     echo [ERROR] Updater publishing failed
@@ -141,9 +146,30 @@ if "%sourceFolder%"=="portable" (
     if not errorlevel 1 echo [SUCCESS] Updater copied
 )
 
+:: Extract version from compiled exe and create version file
+call :CreateVersionFile "%targetFolder%"
+
 echo.
 echo [INFO] Ready files are in: Release\%targetFolder%\
 echo.
+goto :eof
+
+:CreateVersionFile
+set targetFolder=%~1
+
+if defined BUILD_VERSION (
+    :: Create empty version file
+    set versionFile=Release\%targetFolder%\%BUILD_VERSION%
+    type nul > "!versionFile!"
+
+    if not errorlevel 1 (
+        echo [SUCCESS] Version file created: %BUILD_VERSION%
+    ) else (
+        echo [WARNING] Failed to create version file
+    )
+) else (
+    echo [WARNING] Could not extract version from build output
+)
 goto :eof
 
 :End
