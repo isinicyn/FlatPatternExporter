@@ -430,3 +430,9 @@ $RECYCLE.BIN/
 
 # Kiro folder (project management files)
 .kiro/
+
+# Claude Code settings (local configuration)
+.claude/
+
+# Temporary help files
+HELP/
