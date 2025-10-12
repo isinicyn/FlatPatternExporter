@@ -185,6 +185,8 @@ publish/
 # Note: Comment the next line if you want to checkin your web deploy settings,
 # but database connection strings (with potential passwords) will be unencrypted
 *.pubxml
+# Allow publish profiles for our project (no sensitive data)
+!**/Properties/PublishProfiles/*.pubxml
 *.publishproj
 
 # Microsoft Azure Web App publish settings. Comment the next line if you want to
@@ -193,7 +195,7 @@ publish/
 *.azurePubxml
 # Note: Comment the next line if you want to checkin your web deploy settings,
 # but database connection strings (with potential passwords) will be unencrypted
-*.pubxml
+# *.pubxml (disabled - we track our publish profiles)
 *.publishproj
 
 # Microsoft Azure Build Output
@@ -436,3 +438,7 @@ $RECYCLE.BIN/
 
 # Temporary help files
 HELP/
+
+# Publish output folders
+**/bin/publish/
+Release/
