@@ -88,7 +88,12 @@ The publish output contains a ready-to-run folder; distribute it alongside your 
 - **Incorrect DXF output**: experiment with spline replacement, geometry rebasing, and layer presets. Use the DXF preview column to confirm results quickly.
 
 ## License
-This project is distributed under the terms of the license found in `LICENSE.txt`.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
+
+This project is licensed under the **MIT License** - see the [LICENSE.txt](LICENSE.txt) file for full details.
+
+Copyright © 2025 Sinicyn Ivan Victorovich
 
 ---
 
