@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 
 namespace FlatPatternExporter.Updater;
@@ -18,7 +19,15 @@ public partial class MainWindow : Window
         _processId = processId;
         _updateFilePath = updateFilePath;
         _targetExecutablePath = targetExecutablePath;
-        _logPath = Path.Combine(Path.GetTempPath(), "FlatPatternExporter_Updater.log");
+
+        var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var logsDirectory = Path.Combine(appDataPath, "FlatPatternExporter", "Logs");
+        Directory.CreateDirectory(logsDirectory);
+
+        var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HHmmss");
+        _logPath = Path.Combine(logsDirectory, $"Updater_{timestamp}.log");
+
+        RotateLogs(logsDirectory, maxLogFiles: 10);
 
         Log($"=== Updater Started ===");
         Log($"Process ID: {_processId}");
@@ -54,6 +63,35 @@ public partial class MainWindow : Window
             using (var fs = new FileStream(_logPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
             {
                 fs.Flush(true);
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private void RotateLogs(string logsDirectory, int maxLogFiles)
+    {
+        try
+        {
+            var logFiles = Directory.GetFiles(logsDirectory, "Updater_*.log")
+                .Select(f => new FileInfo(f))
+                .OrderByDescending(f => f.CreationTime)
+                .ToList();
+
+            if (logFiles.Count > maxLogFiles)
+            {
+                var filesToDelete = logFiles.Skip(maxLogFiles);
+                foreach (var file in filesToDelete)
+                {
+                    try
+                    {
+                        file.Delete();
+                    }
+                    catch
+                    {
+                    }
+                }
             }
         }
         catch

@@ -1,4 +1,4 @@
-# FlatPatternExporter Publishing Guide
+﻿# FlatPatternExporter Publishing Guide
 
 This document describes the application publishing process for various deployment scenarios.
 
@@ -11,10 +11,6 @@ Publishes the application with separate DLL files.
 - File: `FlatPatternExporter\Properties\PublishProfiles\DeployProfile.pubxml`
 - Output: `FlatPatternExporter\bin\publish\deploy\`
 
-**Updater:**
-- File: `FlatPatternExporter.Updater\Properties\PublishProfiles\DeployProfile.pubxml`
-- Output: `FlatPatternExporter.Updater\bin\publish\deploy\`
-
 **Characteristics:**
 - ✅ Self-contained (.NET Runtime included)
 - ✅ Separate DLL files
@@ -25,11 +21,7 @@ Publishes the application with separate DLL files.
 
 **Manual publishing:**
 ```bash
-# Main application
 dotnet publish FlatPatternExporter\FlatPatternExporter.csproj --configuration Release /p:PublishProfile=DeployProfile
-
-# Updater
-dotnet publish FlatPatternExporter.Updater\FlatPatternExporter.Updater.csproj --configuration Release /p:PublishProfile=DeployProfile
 ```
 
 ---
@@ -41,25 +33,17 @@ Publishes the application as a single executable file.
 - File: `FlatPatternExporter\Properties\PublishProfiles\PortableProfile.pubxml`
 - Output: `FlatPatternExporter\bin\publish\portable\`
 
-**Updater:**
-- File: `FlatPatternExporter.Updater\Properties\PublishProfiles\PortableProfile.pubxml`
-- Output: `FlatPatternExporter.Updater\bin\publish\portable\`
-
 **Characteristics:**
 - ✅ Self-contained (.NET Runtime included)
 - ✅ PublishSingleFile (single .exe)
 - ✅ EnableCompressionInSingleFile
 - ✅ IncludeNativeLibrariesForSelfExtract
-- 📦 Size: ~150+ MB
+- 📦 Size: ~150 MB
 - 🎯 Use case: Portable version, ZIP archives
 
 **Manual publishing:**
 ```bash
-# Main application
 dotnet publish FlatPatternExporter\FlatPatternExporter.csproj --configuration Release /p:PublishProfile=PortableProfile
-
-# Updater
-dotnet publish FlatPatternExporter.Updater\FlatPatternExporter.Updater.csproj --configuration Release /p:PublishProfile=PortableProfile
 ```
 
 ---
@@ -71,10 +55,6 @@ Publishes the application without including .NET Runtime.
 - File: `FlatPatternExporter\Properties\PublishProfiles\FrameworkDependentProfile.pubxml`
 - Output: `FlatPatternExporter\bin\publish\framework-dependent\`
 
-**Updater:**
-- File: `FlatPatternExporter.Updater\Properties\PublishProfiles\FrameworkDependentProfile.pubxml`
-- Output: `FlatPatternExporter.Updater\bin\publish\framework-dependent\`
-
 **Characteristics:**
 - ⚠️ Requires .NET 8.0 Runtime on target machine
 - ✅ Minimal size
@@ -84,12 +64,35 @@ Publishes the application without including .NET Runtime.
 
 **Manual publishing:**
 ```bash
-# Main application
 dotnet publish FlatPatternExporter\FlatPatternExporter.csproj --configuration Release /p:PublishProfile=FrameworkDependentProfile
-
-# Updater
-dotnet publish FlatPatternExporter.Updater\FlatPatternExporter.Updater.csproj --configuration Release /p:PublishProfile=FrameworkDependentProfile
 ```
+
+---
+
+### 4. **GitHub Release Profile** (For automatic updates)
+Creates a zip archive with both main application and updater for GitHub Releases.
+
+**Characteristics:**
+- ✅ Uses Portable profile (SingleFile)
+- ✅ Creates zip archive with both executables
+- ✅ Archive saved to `Release\GitHub\`
+- ✅ Automatic cleanup of temporary files
+- 📦 Archive size: ~230 MB
+- 🎯 Use case: GitHub Releases for automatic updates
+
+**Archive structure:**
+```
+FlatPatternExporter-v2.1.0.677.zip
+├── FlatPatternExporter.exe          # Main application
+└── FlatPatternExporter.Updater.exe  # Updater
+```
+
+**Process:**
+1. Publishes main application (Portable profile)
+2. Publishes updater (Portable profile)
+3. Copies both .exe to `Release\GitHub\`
+4. Creates zip archive
+5. Deletes source .exe files (keeps only zip)
 
 ---
 
@@ -109,8 +112,9 @@ Menu:
 1. Deploy          - Ready files for installer (separate DLLs)
 2. Portable        - Portable version (single .exe file)
 3. Framework       - Depends on .NET 8 Runtime (minimal size)
-4. All             - Publish all profiles
-5. Exit            - Exit
+4. GitHub Release  - Create zip archive for GitHub Release
+5. All             - Publish all profiles
+6. Exit            - Exit
 ```
 
 #### Command line mode:
@@ -130,27 +134,36 @@ publish.bat all
 
 ### What does the script do?
 
-1. **Publishes** both projects (FlatPatternExporter + Updater) with the selected profile
+**For Deploy, Portable, Framework profiles:**
+1. **Publishes** main application with the selected profile
 2. **Copies** results to the `Release\<ProfileName>\` folder
 3. **Creates** ready-to-package structure
+
+**For GitHub Release profile:**
+1. **Publishes** both main application and updater (Portable profile)
+2. **Creates** zip archive with both executables
+3. **Saves** to `Release\GitHub\FlatPatternExporter-v{VERSION}.zip`
+4. **Cleans up** temporary files
 
 **Resulting structure:**
 ```
 Release\
 ├── Deploy\                              # Deploy profile
 │   ├── FlatPatternExporter.exe
-│   ├── FlatPatternExporter.Updater.exe
-│   └── *.dll                            # All dependencies of both applications
+│   └── *.dll                            # All dependencies
 │
 ├── Portable\                            # Portable profile
-│   ├── FlatPatternExporter.exe          # ~150 MB (everything included, SingleFile)
-│   └── FlatPatternExporter.Updater.exe  # ~80 MB (everything included, SingleFile)
+│   └── FlatPatternExporter.exe          # ~150 MB (everything included, SingleFile)
 │
-└── FrameworkDependent\                  # Framework-dependent profile
-    ├── FlatPatternExporter.exe
-    ├── FlatPatternExporter.Updater.exe
-    └── *.dll                            # Application libraries (without .NET Runtime)
+├── FrameworkDependent\                  # Framework-dependent profile
+│   ├── FlatPatternExporter.exe
+│   └── *.dll                            # Application libraries (without .NET Runtime)
+│
+└── GitHub\                              # GitHub Release profile
+    └── FlatPatternExporter-v2.1.0.677.zip  # Archive with main app + updater
 ```
+
+**Note:** Updater is only included in the GitHub Release archive. Regular profiles (Deploy, Portable, FrameworkDependent) contain only the main application, as the updater is automatically downloaded from GitHub when needed.
 
 ---
 
@@ -167,6 +180,13 @@ Release\
 - Single .exe file
 - No installation required
 - User-friendly
+
+### For GitHub Releases (automatic updates):
+✅ **Use GitHub Release Profile**
+- Zip archive with main app + updater
+- Automatic version in filename
+- Ready for upload to GitHub Releases
+- Supports automatic update system
 
 ### For corporate environments:
 ✅ **Use FrameworkDependent Profile**

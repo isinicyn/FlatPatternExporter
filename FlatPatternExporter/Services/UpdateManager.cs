@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Utilities;
 
@@ -71,19 +72,39 @@ public class UpdateManager
     {
         try
         {
-            var asset = release.Assets.FirstOrDefault(a => a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+            var asset = release.Assets.FirstOrDefault(a => a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase));
 
             if (asset == null)
                 return null;
 
             var tempPath = Path.Combine(Path.GetTempPath(), "FlatPatternExporter_Update");
+
+            if (Directory.Exists(tempPath))
+            {
+                try
+                {
+                    Directory.Delete(tempPath, recursive: true);
+                }
+                catch
+                {
+                }
+            }
+
             Directory.CreateDirectory(tempPath);
 
-            var downloadPath = Path.Combine(tempPath, asset.Name);
+            var zipPath = Path.Combine(tempPath, asset.Name);
+            var success = await _githubService.DownloadReleaseAssetAsync(asset.DownloadUrl, zipPath, progress);
 
-            var success = await _githubService.DownloadReleaseAssetAsync(asset.DownloadUrl, downloadPath, progress);
+            if (!success)
+                return null;
 
-            return success ? downloadPath : null;
+            var extractPath = Path.Combine(tempPath, "extracted");
+            ZipFile.ExtractToDirectory(zipPath, extractPath);
+
+            File.Delete(zipPath);
+
+            var mainExePath = Path.Combine(extractPath, "FlatPatternExporter.exe");
+            return File.Exists(mainExePath) ? mainExePath : null;
         }
         catch
         {
@@ -94,8 +115,8 @@ public class UpdateManager
     public void LaunchUpdater(string updateFilePath)
     {
         var currentExecutable = Environment.ProcessPath ?? string.Empty;
-        var currentDirectory = Path.GetDirectoryName(currentExecutable) ?? string.Empty;
-        var updaterPath = Path.Combine(currentDirectory, "FlatPatternExporter.Updater.exe");
+        var updateDirectory = Path.GetDirectoryName(updateFilePath) ?? string.Empty;
+        var updaterPath = Path.Combine(updateDirectory, "FlatPatternExporter.Updater.exe");
 
         if (!File.Exists(updaterPath))
         {
@@ -110,7 +131,7 @@ public class UpdateManager
             FileName = updaterPath,
             Arguments = arguments,
             UseShellExecute = true,
-            WorkingDirectory = currentDirectory
+            WorkingDirectory = updateDirectory
         };
 
         Process.Start(startInfo);
