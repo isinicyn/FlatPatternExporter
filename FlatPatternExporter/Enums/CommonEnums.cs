@@ -72,6 +72,13 @@ public enum DocumentType
     Invalid
 }
 
+public enum BuildType
+{
+    Deploy,
+    Portable,
+    FrameworkDependent
+}
+
 public enum OperationType
 {
     Scan,
@@ -157,5 +164,16 @@ public static class ExcelExportFileNameMapping
         ExcelExportFileNameType.FileName => LocalizationManager.Instance.GetString("ExcelFileName_FileName"),
         ExcelExportFileNameType.PartNumber => LocalizationManager.Instance.GetString("ExcelFileName_PartNumber"),
         _ => type.ToString()
+    };
+}
+
+public static class BuildTypeMapping
+{
+    public static string GetArchiveSuffix(BuildType type) => type switch
+    {
+        BuildType.Deploy => "Deploy",
+        BuildType.Portable => "Portable",
+        BuildType.FrameworkDependent => "FrameworkDependent",
+        _ => "Portable"
     };
 }

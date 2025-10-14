@@ -12,12 +12,12 @@ public partial class MainWindow : Window
     private readonly string _targetExecutablePath;
     private readonly string _logPath;
 
-    public MainWindow(int processId, string updateFilePath, string targetExecutablePath)
+    public MainWindow(int processId, string updateFilesPath, string targetExecutablePath)
     {
         InitializeComponent();
 
         _processId = processId;
-        _updateFilePath = updateFilePath;
+        _updateFilePath = updateFilesPath;
         _targetExecutablePath = targetExecutablePath;
 
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -31,7 +31,7 @@ public partial class MainWindow : Window
 
         Log($"=== Updater Started ===");
         Log($"Process ID: {_processId}");
-        Log($"Update file: {_updateFilePath}");
+        Log($"Update files path: {_updateFilePath}");
         Log($"Target executable: {_targetExecutablePath}");
 
         Loaded += MainWindow_Loaded;
@@ -251,39 +251,66 @@ public partial class MainWindow : Window
         SafeUpdateDetailsText($"Backup successfully created:\n{Path.GetFileName(backupPath)}");
     }
 
-    private void ReplaceExecutable(string updateFilePath, string targetExecutablePath)
+    private void ReplaceExecutable(string updateFilesPath, string targetExecutablePath)
     {
-        Log($"Replacing executable: {updateFilePath} -> {targetExecutablePath}");
-        SafeUpdateProgressText("Replacing executable...");
-        SafeUpdateDetailsText($"Source: {Path.GetFileName(updateFilePath)}\nDestination: {Path.GetFileName(targetExecutablePath)}");
+        Log($"Replacing application files from: {updateFilesPath}");
+        SafeUpdateProgressText("Replacing application files...");
+
+        var targetDirectory = Path.GetDirectoryName(targetExecutablePath);
+        if (string.IsNullOrEmpty(targetDirectory))
+        {
+            throw new InvalidOperationException("Target directory is null or empty");
+        }
+
+        var updateFiles = Directory.GetFiles(updateFilesPath, "*.*", SearchOption.AllDirectories);
+        Log($"Found {updateFiles.Length} files to update");
 
         var retryCount = 0;
         const int maxRetries = 5;
 
-        while (retryCount < maxRetries)
+        foreach (var sourceFile in updateFiles)
         {
-            try
+            var relativePath = Path.GetRelativePath(updateFilesPath, sourceFile);
+            var targetFile = Path.Combine(targetDirectory, relativePath);
+            var targetFileDirectory = Path.GetDirectoryName(targetFile);
+
+            if (!string.IsNullOrEmpty(targetFileDirectory) && !Directory.Exists(targetFileDirectory))
             {
-                Log($"Attempt {retryCount + 1} to copy file");
-                File.Copy(updateFilePath, targetExecutablePath, overwrite: true);
-                Log("File copied successfully");
-                SafeUpdateProgressText("File successfully replaced");
-                SafeUpdateDetailsText($"Application file successfully updated:\n{Path.GetFileName(targetExecutablePath)}");
-                return;
+                Directory.CreateDirectory(targetFileDirectory);
             }
-            catch (IOException ex) when (retryCount < maxRetries - 1)
+
+            retryCount = 0;
+            while (retryCount < maxRetries)
             {
-                retryCount++;
-                Log($"File locked, retry {retryCount}/{maxRetries}: {ex.Message}");
-                SafeUpdateProgressText($"Attempt {retryCount}/{maxRetries}...");
-                SafeUpdateDetailsText($"File locked, retrying...\nAttempt {retryCount} of {maxRetries}");
-                Thread.Sleep(1000);
+                try
+                {
+                    Log($"Copying: {relativePath}");
+                    SafeUpdateDetailsText($"Copying: {relativePath}");
+                    File.Copy(sourceFile, targetFile, overwrite: true);
+                    Log($"File copied successfully: {relativePath}");
+                    break;
+                }
+                catch (IOException ex) when (retryCount < maxRetries - 1)
+                {
+                    retryCount++;
+                    Log($"File locked, retry {retryCount}/{maxRetries}: {ex.Message}");
+                    SafeUpdateProgressText($"Attempt {retryCount}/{maxRetries}...");
+                    SafeUpdateDetailsText($"File locked, retrying...\nFile: {relativePath}\nAttempt {retryCount} of {maxRetries}");
+                    Thread.Sleep(1000);
+                }
+            }
+
+            if (retryCount >= maxRetries)
+            {
+                var errorMsg = $"Failed to replace file '{relativePath}' after {maxRetries} attempts";
+                Log($"ERROR: {errorMsg}");
+                throw new IOException(errorMsg);
             }
         }
 
-        var errorMsg = $"Failed to replace file after {maxRetries} attempts";
-        Log($"ERROR: {errorMsg}");
-        throw new IOException(errorMsg);
+        Log("All files replaced successfully");
+        SafeUpdateProgressText("Files successfully replaced");
+        SafeUpdateDetailsText($"Application files successfully updated\nTotal files: {updateFiles.Length}");
     }
 
     private void RestartApplication(string targetExecutablePath)

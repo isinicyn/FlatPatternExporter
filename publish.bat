@@ -21,10 +21,10 @@ goto :End
 :ShowMenu
 echo Select publish profile:
 echo.
-echo 1. Deploy          - Ready files for installer (separate DLLs)
-echo 2. Portable        - Portable version (single .exe file)
-echo 3. Framework       - Depends on .NET 8 Runtime (minimal size)
-echo 4. GitHub Release  - Create zip archive for GitHub Release
+echo 1. Deploy          - Ready files for installer (zip archive with separate DLLs)
+echo 2. Portable        - Portable version (zip archive with single .exe file)
+echo 3. Framework       - Depends on .NET 8 Runtime (zip archive, minimal size)
+echo 4. Updater Portable - Updater archive only (for deployment)
 echo 5. All             - Publish all profiles
 echo 6. Exit            - Exit
 echo.
@@ -33,7 +33,7 @@ set /p choice="Your choice (1-6): "
 if "%choice%"=="1" call :PublishProfile deploy
 if "%choice%"=="2" call :PublishProfile portable
 if "%choice%"=="3" call :PublishProfile framework
-if "%choice%"=="4" call :PublishGitHubRelease
+if "%choice%"=="4" call :PublishUpdaterPortable
 if "%choice%"=="5" call :PublishAllProfiles
 if "%choice%"=="6" exit /b 0
 
@@ -78,17 +78,17 @@ call :PublishProfile portable
 echo.
 call :PublishProfile framework
 echo.
-call :PublishGitHubRelease
+call :PublishUpdaterPortable
 echo.
 echo [SUCCESS] All profiles published!
 goto :eof
 
-:PublishGitHubRelease
+:PublishUpdaterPortable
 echo.
-echo [GITHUB RELEASE] Creating GitHub Release archive...
+echo [UPDATER PORTABLE] Creating Updater Portable archive...
 echo.
 
-echo [1/3] Publishing main application (Portable)...
+echo [1/3] Publishing main application to get version...
 call :PublishMainApp PortableProfile portable
 
 if errorlevel 1 (
@@ -107,43 +107,43 @@ if errorlevel 1 (
 )
 echo [SUCCESS] Updater published
 
-echo [3/3] Creating release archive...
+echo [3/3] Creating Updater archive...
 
 if not defined BUILD_VERSION (
     echo [ERROR] Could not create release archive - version not defined
     goto :eof
 )
 
-:: Create Release\GitHub directory
-set githubDir=Release\GitHub
-if not exist "%githubDir%" mkdir "%githubDir%"
+:: Create Release folder if not exists
+if not exist "Release" mkdir "Release"
 
-:: Copy exe files to GitHub directory
-copy "FlatPatternExporter\bin\publish\portable\FlatPatternExporter.exe" "%githubDir%\" /Y >nul 2>&1
-if not errorlevel 1 echo [SUCCESS] Main application copied
+:: Create temporary staging folder
+set stagingFolder=Release\staging
+if not exist "%stagingFolder%" mkdir "%stagingFolder%"
 
-copy "FlatPatternExporter.Updater\bin\publish\portable\FlatPatternExporter.Updater.exe" "%githubDir%\" /Y >nul 2>&1
+:: Copy Updater exe to staging directory
+copy "FlatPatternExporter.Updater\bin\publish\portable\FlatPatternExporter.Updater.exe" "%stagingFolder%\" /Y >nul 2>&1
 if not errorlevel 1 echo [SUCCESS] Updater copied
 
 :: Create zip archive
-set archiveName=FlatPatternExporter-v%BUILD_VERSION%.zip
-set archivePath=%githubDir%\%archiveName%
+set archiveName=FlatPatternExporter.Updater-v%BUILD_VERSION%.zip
+set archivePath=Release\%archiveName%
 
 if exist "%archivePath%" del "%archivePath%" >nul 2>&1
 
-powershell -NoProfile -Command "Compress-Archive -Path '%githubDir%\*.exe' -DestinationPath '%archivePath%' -CompressionLevel Optimal" >nul 2>&1
+powershell -NoProfile -Command "Compress-Archive -Path '%stagingFolder%\*.exe' -DestinationPath '%archivePath%' -CompressionLevel Optimal" >nul 2>&1
 
 if not errorlevel 1 (
-    echo [SUCCESS] GitHub Release archive created: %archiveName%
+    echo [SUCCESS] Updater Portable archive created: %archiveName%
 
-    :: Delete source exe files, keep only zip
-    del "%githubDir%\*.exe" >nul 2>&1
+    :: Delete staging folder
+    rmdir /S /Q "%stagingFolder%" >nul 2>&1
 
     echo.
-    echo [INFO] Archive ready for GitHub Release: %githubDir%\%archiveName%
-    echo [INFO] Files in archive: FlatPatternExporter.exe, FlatPatternExporter.Updater.exe
+    echo [INFO] Archive ready: Release\%archiveName%
+    echo [INFO] Files in archive: FlatPatternExporter.Updater.exe
 ) else (
-    echo [ERROR] Failed to create release archive
+    echo [ERROR] Failed to create updater archive
 )
 
 echo.
@@ -175,46 +175,56 @@ set sourceFolder=%1
 set targetFolder=%2
 
 echo.
-echo [COPY] Copying files to Release\%targetFolder%...
+echo [COPY] Preparing files for archive...
 
-:: Create target folder
-if not exist "Release\%targetFolder%" mkdir "Release\%targetFolder%"
+:: Create Release folder if not exists
+if not exist "Release" mkdir "Release"
+
+:: Create temporary staging folder
+set stagingFolder=Release\staging
+if not exist "%stagingFolder%" mkdir "%stagingFolder%"
 
 :: Copy files based on profile
 if "%sourceFolder%"=="portable" (
     :: For Portable profile copy only .exe files ^(SingleFile^)
-    copy "FlatPatternExporter\bin\publish\%sourceFolder%\FlatPatternExporter.exe" "Release\%targetFolder%\" /Y >nul 2>&1
+    copy "FlatPatternExporter\bin\publish\%sourceFolder%\FlatPatternExporter.exe" "%stagingFolder%\" /Y >nul 2>&1
     if not errorlevel 1 echo [SUCCESS] Main application copied ^(SingleFile^)
 ) else (
     :: For Deploy and FrameworkDependent copy all files
-    xcopy "FlatPatternExporter\bin\publish\%sourceFolder%\*" "Release\%targetFolder%\" /E /I /Y >nul 2>&1
+    xcopy "FlatPatternExporter\bin\publish\%sourceFolder%\*" "%stagingFolder%\" /E /I /Y >nul 2>&1
     if not errorlevel 1 echo [SUCCESS] Main application copied
 )
 
-:: Extract version from compiled exe and create version file
-call :CreateVersionFile "%targetFolder%"
+:: Create build type marker file
+echo %targetFolder% > "%stagingFolder%\.buildtype"
+echo [SUCCESS] Build type marker created: %targetFolder%
 
-echo.
-echo [INFO] Ready files are in: Release\%targetFolder%\
-echo.
-goto :eof
+:: Determine archive suffix based on target folder
+set archiveSuffix=%targetFolder%
+if "%targetFolder%"=="FrameworkDependent" set archiveSuffix=FrameworkDependent
 
-:CreateVersionFile
-set targetFolder=%~1
+:: Create zip archive
+echo [ARCHIVE] Creating zip archive...
+set archiveName=FlatPatternExporter-v%BUILD_VERSION%-%archiveSuffix%.zip
+set archivePath=Release\%archiveName%
 
-if defined BUILD_VERSION (
-    :: Create empty version file
-    set versionFile=Release\%targetFolder%\%BUILD_VERSION%
-    type nul > "!versionFile!"
+if exist "%archivePath%" del "%archivePath%" >nul 2>&1
 
-    if not errorlevel 1 (
-        echo [SUCCESS] Version file created: %BUILD_VERSION%
-    ) else (
-        echo [WARNING] Failed to create version file
-    )
+powershell -NoProfile -Command "Compress-Archive -Path '%stagingFolder%\*' -DestinationPath '%archivePath%' -CompressionLevel Optimal" >nul 2>&1
+
+if not errorlevel 1 (
+    echo [SUCCESS] Archive created: %archiveName%
+
+    :: Delete staging folder
+    rmdir /S /Q "%stagingFolder%" >nul 2>&1
+
+    echo.
+    echo [INFO] Archive ready: Release\%archiveName%
 ) else (
-    echo [WARNING] Could not extract version from build output
+    echo [ERROR] Failed to create archive
 )
+
+echo.
 goto :eof
 
 :End

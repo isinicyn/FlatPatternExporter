@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using FlatPatternExporter.Enums;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Utilities;
 
@@ -72,10 +73,23 @@ public class UpdateManager
     {
         try
         {
-            var asset = release.Assets.FirstOrDefault(a => a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase));
+            var buildType = BuildTypeDetector.DetectBuildType();
+            var buildSuffix = BuildTypeMapping.GetArchiveSuffix(buildType);
+            var version = release.Version;
 
-            if (asset == null)
-                return null;
+            var updaterAssetName = $"FlatPatternExporter.Updater-v{version}.zip";
+            var mainAppAssetName = $"FlatPatternExporter-v{version}-{buildSuffix}.zip";
+
+            var updaterAsset = release.Assets.FirstOrDefault(a =>
+                a.Name.Equals(updaterAssetName, StringComparison.OrdinalIgnoreCase));
+            var mainAppAsset = release.Assets.FirstOrDefault(a =>
+                a.Name.Equals(mainAppAssetName, StringComparison.OrdinalIgnoreCase));
+
+            if (updaterAsset == null || mainAppAsset == null)
+            {
+                var missingAsset = updaterAsset == null ? updaterAssetName : mainAppAssetName;
+                throw new FileNotFoundException($"Required archive not found in release: {missingAsset}");
+            }
 
             var tempPath = Path.Combine(Path.GetTempPath(), "FlatPatternExporter_Update");
 
@@ -92,31 +106,52 @@ public class UpdateManager
 
             Directory.CreateDirectory(tempPath);
 
-            var zipPath = Path.Combine(tempPath, asset.Name);
-            var success = await _githubService.DownloadReleaseAssetAsync(asset.DownloadUrl, zipPath, progress);
+            var updaterZipPath = Path.Combine(tempPath, updaterAssetName);
+            var mainAppZipPath = Path.Combine(tempPath, mainAppAssetName);
+
+            var updaterProgress = new Progress<double>(p => progress?.Report(p * 0.3));
+            var success = await _githubService.DownloadReleaseAssetAsync(updaterAsset.DownloadUrl, updaterZipPath, updaterProgress);
 
             if (!success)
+            {
+                CleanupTempDirectory(tempPath);
                 return null;
+            }
 
-            var extractPath = Path.Combine(tempPath, "extracted");
-            ZipFile.ExtractToDirectory(zipPath, extractPath);
+            var mainAppProgress = new Progress<double>(p => progress?.Report(30 + p * 0.7));
+            success = await _githubService.DownloadReleaseAssetAsync(mainAppAsset.DownloadUrl, mainAppZipPath, mainAppProgress);
 
-            File.Delete(zipPath);
+            if (!success)
+            {
+                CleanupTempDirectory(tempPath);
+                return null;
+            }
 
-            var mainExePath = Path.Combine(extractPath, "FlatPatternExporter.exe");
-            return File.Exists(mainExePath) ? mainExePath : null;
+            var updaterExtractPath = Path.Combine(tempPath, "updater");
+            var mainAppExtractPath = Path.Combine(tempPath, "app");
+
+            await Task.Run(() => ZipFile.ExtractToDirectory(updaterZipPath, updaterExtractPath));
+            await Task.Run(() => ZipFile.ExtractToDirectory(mainAppZipPath, mainAppExtractPath));
+
+            File.Delete(updaterZipPath);
+            File.Delete(mainAppZipPath);
+
+            var updaterExePath = Path.Combine(updaterExtractPath, "FlatPatternExporter.Updater.exe");
+            return File.Exists(updaterExePath) ? mainAppExtractPath : null;
         }
         catch
         {
+            var tempPath = Path.Combine(Path.GetTempPath(), "FlatPatternExporter_Update");
+            CleanupTempDirectory(tempPath);
             return null;
         }
     }
 
-    public void LaunchUpdater(string updateFilePath)
+    public void LaunchUpdater(string updateFilesPath)
     {
         var currentExecutable = Environment.ProcessPath ?? string.Empty;
-        var updateDirectory = Path.GetDirectoryName(updateFilePath) ?? string.Empty;
-        var updaterPath = Path.Combine(updateDirectory, "FlatPatternExporter.Updater.exe");
+        var tempPath = Path.GetDirectoryName(updateFilesPath) ?? string.Empty;
+        var updaterPath = Path.Combine(tempPath, "updater", "FlatPatternExporter.Updater.exe");
 
         if (!File.Exists(updaterPath))
         {
@@ -124,16 +159,30 @@ public class UpdateManager
         }
 
         var currentProcessId = Environment.ProcessId;
-        var arguments = $"\"{currentProcessId}\" \"{updateFilePath}\" \"{currentExecutable}\"";
+        var arguments = $"\"{currentProcessId}\" \"{updateFilesPath}\" \"{currentExecutable}\"";
 
         var startInfo = new ProcessStartInfo
         {
             FileName = updaterPath,
             Arguments = arguments,
             UseShellExecute = true,
-            WorkingDirectory = updateDirectory
+            WorkingDirectory = tempPath
         };
 
         Process.Start(startInfo);
+    }
+
+    private static void CleanupTempDirectory(string tempPath)
+    {
+        if (Directory.Exists(tempPath))
+        {
+            try
+            {
+                Directory.Delete(tempPath, recursive: true);
+            }
+            catch
+            {
+            }
+        }
     }
 }

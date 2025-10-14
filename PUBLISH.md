@@ -69,30 +69,32 @@ dotnet publish FlatPatternExporter\FlatPatternExporter.csproj --configuration Re
 
 ---
 
-### 4. **GitHub Release Profile** (For automatic updates)
-Creates a zip archive with both main application and updater for GitHub Releases.
+### 4. **Updater Portable Profile** (For deployment)
+Publishes only the updater application as a portable single-file executable.
+
+**Updater Application:**
+- File: `FlatPatternExporter.Updater\Properties\PublishProfiles\PortableProfile.pubxml`
+- Output: `FlatPatternExporter.Updater\bin\publish\portable\`
 
 **Characteristics:**
-- ✅ Uses Portable profile (SingleFile)
-- ✅ Creates zip archive with both executables
-- ✅ Archive saved to `Release\GitHub\`
-- ✅ Automatic cleanup of temporary files
-- 📦 Archive size: ~230 MB
-- 🎯 Use case: GitHub Releases for automatic updates
+- ✅ Self-contained (.NET Runtime included)
+- ✅ PublishSingleFile (single .exe)
+- ✅ Creates zip archive with updater only
+- ✅ Archive saved to `Release\`
+- 📦 Archive size: ~80 MB
+- 🎯 Use case: Deployment of updater for automatic updates
 
 **Archive structure:**
 ```
-FlatPatternExporter-v2.1.0.677.zip
-├── FlatPatternExporter.exe          # Main application
+FlatPatternExporter.Updater-v3.0.0.zip
 └── FlatPatternExporter.Updater.exe  # Updater
 ```
 
 **Process:**
-1. Publishes main application (Portable profile)
-2. Publishes updater (Portable profile)
-3. Copies both .exe to `Release\GitHub\`
-4. Creates zip archive
-5. Deletes source .exe files (keeps only zip)
+1. Publishes updater (Portable profile)
+2. Creates zip archive with updater
+3. Saves to `Release\FlatPatternExporter.Updater-v{VERSION}.zip`
+4. Automatic cleanup of temporary files
 
 ---
 
@@ -109,10 +111,10 @@ publish.bat
 
 Menu:
 ```
-1. Deploy          - Ready files for installer (separate DLLs)
-2. Portable        - Portable version (single .exe file)
-3. Framework       - Depends on .NET 8 Runtime (minimal size)
-4. GitHub Release  - Create zip archive for GitHub Release
+1. Deploy          - Ready files for installer (zip archive with separate DLLs)
+2. Portable        - Portable version (zip archive with single .exe file)
+3. Framework       - Depends on .NET 8 Runtime (zip archive, minimal size)
+4. Updater Portable - Updater archive only (for deployment)
 5. All             - Publish all profiles
 6. Exit            - Exit
 ```
@@ -136,34 +138,40 @@ publish.bat all
 
 **For Deploy, Portable, Framework profiles:**
 1. **Publishes** main application with the selected profile
-2. **Copies** results to the `Release\<ProfileName>\` folder
-3. **Creates** ready-to-package structure
+2. **Creates** `.buildtype` marker file (Deploy/Portable/FrameworkDependent)
+3. **Creates** zip archive with all files
+4. **Saves** to `Release\FlatPatternExporter-v{VERSION}-{BUILD_TYPE}.zip`
+5. **Cleans up** temporary files
 
-**For GitHub Release profile:**
-1. **Publishes** both main application and updater (Portable profile)
-2. **Creates** zip archive with both executables
-3. **Saves** to `Release\GitHub\FlatPatternExporter-v{VERSION}.zip`
+**For Updater Portable profile:**
+1. **Publishes** updater application (Portable profile)
+2. **Creates** zip archive with updater executable
+3. **Saves** to `Release\FlatPatternExporter.Updater-v{VERSION}.zip`
 4. **Cleans up** temporary files
 
 **Resulting structure:**
 ```
 Release\
-├── Deploy\                              # Deploy profile
+├── FlatPatternExporter-v3.0.0-Deploy.zip              # Deploy profile archive
 │   ├── FlatPatternExporter.exe
-│   └── *.dll                            # All dependencies
+│   ├── *.dll                                          # All dependencies
+│   └── .buildtype                                     # Contains "Deploy"
 │
-├── Portable\                            # Portable profile
-│   └── FlatPatternExporter.exe          # ~150 MB (everything included, SingleFile)
+├── FlatPatternExporter-v3.0.0-Portable.zip            # Portable profile archive
+│   ├── FlatPatternExporter.exe                        # ~150 MB (SingleFile)
+│   └── .buildtype                                     # Contains "Portable"
 │
-├── FrameworkDependent\                  # Framework-dependent profile
+├── FlatPatternExporter-v3.0.0-FrameworkDependent.zip  # Framework-dependent profile archive
 │   ├── FlatPatternExporter.exe
-│   └── *.dll                            # Application libraries (without .NET Runtime)
+│   ├── *.dll                                          # Application libraries only
+│   └── .buildtype                                     # Contains "FrameworkDependent"
 │
-└── GitHub\                              # GitHub Release profile
-    └── FlatPatternExporter-v2.1.0.677.zip  # Archive with main app + updater
+└── FlatPatternExporter.Updater-v3.0.0.zip             # Updater archive
+    └── FlatPatternExporter.Updater.exe                # ~80 MB (SingleFile)
 ```
 
-**Note:** Updater is only included in the GitHub Release archive. Regular profiles (Deploy, Portable, FrameworkDependent) contain only the main application, as the updater is automatically downloaded from GitHub when needed.
+**Build Type Detection:**
+The `.buildtype` marker file enables automatic update system to download correct archive matching current installation type. The updater is distributed separately and downloaded automatically when needed.
 
 ---
 
@@ -174,25 +182,30 @@ Release\
 - Transparent file structure
 - Easy to manage components
 - Can update individual DLLs
+- Extract zip archive contents for installer source
 
 ### For ZIP archives (Portable version):
 ✅ **Use Portable Profile**
 - Single .exe file
 - No installation required
 - User-friendly
+- Ready to distribute as-is
 
 ### For GitHub Releases (automatic updates):
-✅ **Use GitHub Release Profile**
-- Zip archive with main app + updater
-- Automatic version in filename
-- Ready for upload to GitHub Releases
-- Supports automatic update system
+✅ **Upload all build types + updater**
+- `FlatPatternExporter-v{VERSION}-Deploy.zip`
+- `FlatPatternExporter-v{VERSION}-Portable.zip`
+- `FlatPatternExporter-v{VERSION}-FrameworkDependent.zip`
+- `FlatPatternExporter.Updater-v{VERSION}.zip`
+- Users can choose appropriate build type
+- Automatic update system downloads matching archive
 
 ### For corporate environments:
 ✅ **Use FrameworkDependent Profile**
 - Minimal size
 - Centralized .NET Runtime management
 - Requires .NET 8.0 Runtime installation
+- Extract zip archive contents for deployment
 
 ---
 
