@@ -915,10 +915,10 @@ Execution time: {3}</value>
     <value>Template Presets Manager</value>
   </data>
   <data name="Header_DataSources" xml:space="preserve">
-    <value>Data Sources</value>
+    <value>Data Sources (double-click to add to template)</value>
   </data>
   <data name="Header_TemplateAndPreview" xml:space="preserve">
-    <value>Template and Preview</value>
+    <value>Template and Preview (double-click to remove from template)</value>
   </data>
   <data name="MenuItem_ExportSelectedDXF" xml:space="preserve">
     <value>Export selected DXF</value>

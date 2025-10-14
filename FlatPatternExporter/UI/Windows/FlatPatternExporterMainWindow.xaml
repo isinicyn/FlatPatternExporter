@@ -536,11 +536,51 @@
                                          MouseDoubleClick="TokenListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
 
                                 <TextBlock Text="{extensions:Localize Text_UserProperties}" Style="{StaticResource SectionHeaderTextStyle}"/>
-                                    <ListBox x:Name="UserDefinedTokensListBox"
-                                         ItemsSource="{Binding UserDefinedTokens}"
-                                         DisplayMemberPath="DisplayName"
-                                         Style="{StaticResource TokenListBoxStyle}"
-                                         MouseDoubleClick="TokenListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <ListBox x:Name="UserDefinedTokensListBox"
+                                             Grid.Column="0"
+                                             ItemsSource="{Binding UserDefinedTokens}"
+                                             DisplayMemberPath="DisplayName"
+                                             Style="{StaticResource TokenListBoxStyle}"
+                                             MouseDoubleClick="TokenListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
+
+                                        <Button x:Name="AddUserPropertyButton"
+                                            Grid.Column="1"
+                                            Click="AddPresetIPropertyButton_Click"
+                                            Margin="{StaticResource LeftSmallMarginThickness}"
+                                            VerticalAlignment="Center">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource AddIconButton}">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border x:Name="Border"
+                                                                        Background="{TemplateBinding Background}"
+                                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                                        CornerRadius="{StaticResource StandardCornerRadiusValue}"
+                                                                        Width="32"
+                                                                        Height="32">
+                                                                    <Viewbox
+                                                                             Stretch="Uniform" Margin="7">
+                                                                        <ContentPresenter Content="{TemplateBinding Content}"
+                                                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                                          HorizontalAlignment="Center"
+                                                                                          VerticalAlignment="Center"/>
+                                                                    </Viewbox>
+                                                                </Border>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </Grid>
 
                                     <!-- Custom text and quick symbols in one row -->
                                     <TextBlock Text="{extensions:Localize Text_CustomTextAndSymbols}" Style="{StaticResource SectionHeaderTextStyle}"/>

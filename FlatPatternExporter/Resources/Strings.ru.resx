@@ -915,10 +915,10 @@
     <value>Менеджер пресетов шаблонов</value>
   </data>
   <data name="Header_DataSources" xml:space="preserve">
-    <value>Источники данных</value>
+    <value>Источники данных (двойной клик добавляет в шаблон)</value>
   </data>
   <data name="Header_TemplateAndPreview" xml:space="preserve">
-    <value>Шаблон и предпросмотр</value>
+    <value>Шаблон и предпросмотр (двойной клик удаляет из шаблона)</value>
   </data>
   <data name="MenuItem_ExportSelectedDXF" xml:space="preserve">
     <value>Экспортировать выбранные DXF</value>
