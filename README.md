@@ -54,10 +54,10 @@ For automated release creation, use the included scripts:
    # Select option 5 (All) to create all build types
    ```
    This creates archives in `Release/` directory:
-   - `FlatPatternExporter-v{VERSION}-Deploy.zip`
-   - `FlatPatternExporter-v{VERSION}-Portable.zip`
-   - `FlatPatternExporter-v{VERSION}-FrameworkDependent.zip`
-   - `FlatPatternExporter.Updater-v{VERSION}.zip`
+   - `FlatPatternExporter-v{VERSION}-x64-Deploy.zip`
+   - `FlatPatternExporter-v{VERSION}-x64-Portable.zip`
+   - `FlatPatternExporter-v{VERSION}-x64-FrameworkDependent.zip`
+   - `FlatPatternExporter.Updater-v{VERSION}-x64.zip`
 
 2. **Create draft release on GitHub:**
    ```bash

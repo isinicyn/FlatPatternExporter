@@ -77,8 +77,8 @@ public class UpdateManager
             var buildSuffix = BuildTypeMapping.GetArchiveSuffix(buildType);
             var version = release.Version;
 
-            var updaterAssetName = $"FlatPatternExporter.Updater-v{version}.zip";
-            var mainAppAssetName = $"FlatPatternExporter-v{version}-{buildSuffix}.zip";
+            var updaterAssetName = $"FlatPatternExporter.Updater-v{version}-x64.zip";
+            var mainAppAssetName = $"FlatPatternExporter-v{version}-x64-{buildSuffix}.zip";
 
             var updaterAsset = release.Assets.FirstOrDefault(a =>
                 a.Name.Equals(updaterAssetName, StringComparison.OrdinalIgnoreCase));

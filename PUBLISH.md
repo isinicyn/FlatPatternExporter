@@ -86,14 +86,14 @@ Publishes only the updater application as a portable single-file executable.
 
 **Archive structure:**
 ```
-FlatPatternExporter.Updater-v3.0.0.zip
+FlatPatternExporter.Updater-v3.0.0-x64.zip
 └── FlatPatternExporter.Updater.exe  # Updater
 ```
 
 **Process:**
 1. Publishes updater (Portable profile)
 2. Creates zip archive with updater
-3. Saves to `Release\FlatPatternExporter.Updater-v{VERSION}.zip`
+3. Saves to `Release\FlatPatternExporter.Updater-v{VERSION}-x64.zip`
 4. Automatic cleanup of temporary files
 
 ---
@@ -140,34 +140,34 @@ publish.bat all
 1. **Publishes** main application with the selected profile
 2. **Creates** `.buildtype` marker file (Deploy/Portable/FrameworkDependent)
 3. **Creates** zip archive with all files
-4. **Saves** to `Release\FlatPatternExporter-v{VERSION}-{BUILD_TYPE}.zip`
+4. **Saves** to `Release\FlatPatternExporter-v{VERSION}-x64-{BUILD_TYPE}.zip`
 5. **Cleans up** temporary files
 
 **For Updater Portable profile:**
 1. **Publishes** updater application (Portable profile)
 2. **Creates** zip archive with updater executable
-3. **Saves** to `Release\FlatPatternExporter.Updater-v{VERSION}.zip`
+3. **Saves** to `Release\FlatPatternExporter.Updater-v{VERSION}-x64.zip`
 4. **Cleans up** temporary files
 
 **Resulting structure:**
 ```
 Release\
-├── FlatPatternExporter-v3.0.0-Deploy.zip              # Deploy profile archive
+├── FlatPatternExporter-v3.0.0-x64-Deploy.zip              # Deploy profile archive
 │   ├── FlatPatternExporter.exe
-│   ├── *.dll                                          # All dependencies
-│   └── .buildtype                                     # Contains "Deploy"
+│   ├── *.dll                                              # All dependencies
+│   └── .buildtype                                         # Contains "Deploy"
 │
-├── FlatPatternExporter-v3.0.0-Portable.zip            # Portable profile archive
-│   ├── FlatPatternExporter.exe                        # ~150 MB (SingleFile)
-│   └── .buildtype                                     # Contains "Portable"
+├── FlatPatternExporter-v3.0.0-x64-Portable.zip            # Portable profile archive
+│   ├── FlatPatternExporter.exe                            # ~150 MB (SingleFile)
+│   └── .buildtype                                         # Contains "Portable"
 │
-├── FlatPatternExporter-v3.0.0-FrameworkDependent.zip  # Framework-dependent profile archive
+├── FlatPatternExporter-v3.0.0-x64-FrameworkDependent.zip  # Framework-dependent profile archive
 │   ├── FlatPatternExporter.exe
-│   ├── *.dll                                          # Application libraries only
-│   └── .buildtype                                     # Contains "FrameworkDependent"
+│   ├── *.dll                                              # Application libraries only
+│   └── .buildtype                                         # Contains "FrameworkDependent"
 │
-└── FlatPatternExporter.Updater-v3.0.0.zip             # Updater archive
-    └── FlatPatternExporter.Updater.exe                # ~80 MB (SingleFile)
+└── FlatPatternExporter.Updater-v3.0.0-x64.zip             # Updater archive
+    └── FlatPatternExporter.Updater.exe                    # ~80 MB (SingleFile)
 ```
 
 **Build Type Detection:**
@@ -193,10 +193,10 @@ The `.buildtype` marker file enables automatic update system to download correct
 
 ### For GitHub Releases (automatic updates):
 ✅ **Upload all build types + updater**
-- `FlatPatternExporter-v{VERSION}-Deploy.zip`
-- `FlatPatternExporter-v{VERSION}-Portable.zip`
-- `FlatPatternExporter-v{VERSION}-FrameworkDependent.zip`
-- `FlatPatternExporter.Updater-v{VERSION}.zip`
+- `FlatPatternExporter-v{VERSION}-x64-Deploy.zip`
+- `FlatPatternExporter-v{VERSION}-x64-Portable.zip`
+- `FlatPatternExporter-v{VERSION}-x64-FrameworkDependent.zip`
+- `FlatPatternExporter.Updater-v{VERSION}-x64.zip`
 - Users can choose appropriate build type
 - Automatic update system downloads matching archive
 

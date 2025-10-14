@@ -126,7 +126,7 @@ copy "FlatPatternExporter.Updater\bin\publish\portable\FlatPatternExporter.Updat
 if not errorlevel 1 echo [SUCCESS] Updater copied
 
 :: Create zip archive
-set archiveName=FlatPatternExporter.Updater-v%BUILD_VERSION%.zip
+set archiveName=FlatPatternExporter.Updater-v%BUILD_VERSION%-x64.zip
 set archivePath=Release\%archiveName%
 
 if exist "%archivePath%" del "%archivePath%" >nul 2>&1
@@ -205,7 +205,7 @@ if "%targetFolder%"=="FrameworkDependent" set archiveSuffix=FrameworkDependent
 
 :: Create zip archive
 echo [ARCHIVE] Creating zip archive...
-set archiveName=FlatPatternExporter-v%BUILD_VERSION%-%archiveSuffix%.zip
+set archiveName=FlatPatternExporter-v%BUILD_VERSION%-x64-%archiveSuffix%.zip
 set archivePath=Release\%archiveName%
 
 if exist "%archivePath%" del "%archivePath%" >nul 2>&1
