@@ -109,8 +109,7 @@ set TAG_EXISTS_REMOTE=0
 git rev-parse v%VERSION% >nul 2>&1
 if %errorlevel% equ 0 set TAG_EXISTS_LOCAL=1
 
-git ls-remote --tags origin v%VERSION% >nul 2>&1
-if %errorlevel% equ 0 set TAG_EXISTS_REMOTE=1
+for /f %%i in ('git ls-remote --tags origin refs/tags/v%VERSION% 2^>nul ^| find "refs/tags/"') do set TAG_EXISTS_REMOTE=1
 
 if %TAG_EXISTS_LOCAL% equ 1 (
     echo [WARNING] Tag v%VERSION% already exists locally
@@ -215,7 +214,25 @@ echo [STEP 3/4] Creating draft release on GitHub...
 echo [INFO] This may take a few minutes to upload archives...
 echo.
 
-gh release create v%VERSION% --draft --title "v%VERSION%" --notes "## Release Notes%0A%0APlease add release notes here.%0A%0A### Archives%0A%0A- **Deploy** - For installers (Inno Setup, WiX, NSIS)%0A- **Portable** - Single executable, no installation required%0A- **FrameworkDependent** - Requires .NET 8.0 Runtime%0A- **Updater** - For automatic updates" Release\*.zip
+:: Create temporary release notes file
+set NOTES_FILE=%TEMP%\release_notes_%VERSION%.md
+(
+echo ## Release Notes
+echo.
+echo Please add release notes here.
+echo.
+echo ### Archives
+echo.
+echo - **Deploy** - For installers ^(Inno Setup, WiX, NSIS^)
+echo - **Portable** - Single executable, no installation required
+echo - **FrameworkDependent** - Requires .NET 8.0 Runtime
+echo - **Updater** - For automatic updates
+) > "%NOTES_FILE%"
+
+gh release create v%VERSION% --draft --title "v%VERSION%" --notes-file "%NOTES_FILE%" Release\*.zip
+
+:: Clean up temporary file
+del "%NOTES_FILE%" 2>nul
 
 if errorlevel 1 (
     echo [ERROR] Failed to create draft release
