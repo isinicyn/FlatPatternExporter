@@ -45,6 +45,37 @@ dotnet publish FlatPatternExporter/FlatPatternExporter.csproj -c Release -r win-
 ```
 The publish output contains a ready-to-run folder; distribute it alongside your configuration presets if required.
 
+### Creating GitHub Releases
+For automated release creation, use the included scripts:
+
+1. **Build all release archives:**
+   ```bash
+   publish.bat
+   # Select option 5 (All) to create all build types
+   ```
+   This creates archives in `Release/` directory:
+   - `FlatPatternExporter-v{VERSION}-Deploy.zip`
+   - `FlatPatternExporter-v{VERSION}-Portable.zip`
+   - `FlatPatternExporter-v{VERSION}-FrameworkDependent.zip`
+   - `FlatPatternExporter.Updater-v{VERSION}.zip`
+
+2. **Create draft release on GitHub:**
+   ```bash
+   create-release-draft.bat
+   ```
+   This script automatically:
+   - Detects version from Git commit count
+   - Creates and pushes a new tag
+   - Uploads all archives to GitHub
+   - Creates a draft release with placeholder notes
+
+3. **Finalize release:**
+   - Open the provided edit URL in your browser
+   - Update release notes with detailed description
+   - Click "Publish release" when ready
+
+See [PUBLISH.md](PUBLISH.md) for detailed publishing documentation.
+
 ## Usage
 1. Launch Autodesk Inventor and open the assembly or part you want to process.
 2. Run Flat Pattern Exporter (`FlatPatternExporter.exe`). The app connects to the active Inventor session on startup.
