@@ -552,6 +552,7 @@
                                         <Button x:Name="AddUserPropertyButton"
                                             Grid.Column="1"
                                             Click="AddPresetIPropertyButton_Click"
+                                            Tag="UserProperties"
                                             Margin="{StaticResource LeftSmallMarginThickness}"
                                             VerticalAlignment="Center">
                                             <Button.Style>

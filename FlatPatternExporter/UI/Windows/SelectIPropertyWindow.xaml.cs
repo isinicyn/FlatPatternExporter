@@ -23,7 +23,8 @@ public partial class SelectIPropertyWindow : Window
         Func<string, bool> isPropertyAdded,
         Action<PresetIProperty> addIPropertyColumn,
         Action<string> addUserDefinedColumn,
-        Action<string, bool> removeProperty)
+        Action<string, bool> removeProperty,
+        string? initialTabName = null)
     {
         InitializeComponent();
 
@@ -40,6 +41,26 @@ public partial class SelectIPropertyWindow : Window
         UpdatePropertyStates();
 
         _isInitialized = true;
+
+        if (!string.IsNullOrEmpty(initialTabName))
+        {
+            Loaded += (_, _) => SetActiveTabByName(initialTabName);
+        }
+    }
+
+    private void SetActiveTabByName(string tabName)
+    {
+        TabItem? targetTab = tabName switch
+        {
+            "StandardProperties" => StandardPropertiesTab,
+            "UserProperties" => UserPropertiesTab,
+            _ => null
+        };
+
+        if (targetTab != null)
+        {
+            PropertyTabControl.SelectedItem = targetTab;
+        }
     }
 
     public ObservableCollection<PresetIProperty> StandardProperties => _propertyListManager.StandardProperties;

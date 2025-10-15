@@ -1176,12 +1176,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
     private void AddPresetIPropertyButton_Click(object sender, RoutedEventArgs e)
     {
+        string? initialTabName = null;
+        if (sender is System.Windows.Controls.Button button && button.Tag is string tagValue)
+        {
+            initialTabName = tagValue;
+        }
+
         var selectIPropertyWindow = new SelectIPropertyWindow(
             PresetIProperties,
             inventorPropertyName => PartsDataGrid.Columns.Any(c => c.SortMemberPath == inventorPropertyName),
             AddIPropertyColumn,
             AddUserDefinedIPropertyColumn,
-            RemoveDataGridColumn);
+            RemoveDataGridColumn,
+            initialTabName);
         selectIPropertyWindow.ShowDialog();
     }
 

@@ -73,9 +73,9 @@
         </Border>
 
         <!-- Main content with tabs -->
-        <TabControl Grid.Row="2" Margin="{StaticResource StandardMarginThickness}">
+        <TabControl x:Name="PropertyTabControl" Grid.Row="2" Margin="{StaticResource StandardMarginThickness}">
             <!-- Standard properties tab -->
-            <TabItem Header="{extensions:Localize Text_StandardProperties}">
+            <TabItem x:Name="StandardPropertiesTab" Header="{extensions:Localize Text_StandardProperties}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -308,7 +308,7 @@
             </TabItem>
 
             <!-- User-defined properties tab -->
-            <TabItem Header="{extensions:Localize Text_UserProperties}">
+            <TabItem x:Name="UserPropertiesTab" Header="{extensions:Localize Text_UserProperties}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
