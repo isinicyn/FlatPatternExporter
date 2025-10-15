@@ -14,6 +14,7 @@ namespace FlatPatternExporter.Core;
 
 public class ThumbnailGenerator
 {
+    private readonly ApprenticeServerComponent _apprentice = new();
     /// <summary>
     /// Converts SVG string to BitmapImage
     /// </summary>
@@ -98,8 +99,7 @@ public class ThumbnailGenerator
             BitmapImage? bitmap = null;
             await dispatcher.InvokeAsync(() =>
             {
-                var apprentice = new ApprenticeServerComponent();
-                var apprenticeDoc = apprentice.Open(document.FullDocumentName);
+                var apprenticeDoc = _apprentice.Open(document.FullDocumentName);
 
                 var thumbnail = apprenticeDoc.Thumbnail;
                 var img = IPictureDispConverter.PictureDispToImage(thumbnail);
@@ -115,6 +115,7 @@ public class ThumbnailGenerator
                         bitmap.StreamSource = memoryStream;
                         bitmap.CacheOption = BitmapCacheOption.OnLoad;
                         bitmap.EndInit();
+                        bitmap.Freeze();
                     }
             });
 
