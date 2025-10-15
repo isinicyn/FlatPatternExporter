@@ -8,6 +8,7 @@ using FlatPatternExporter.Converters;
 using FlatPatternExporter.Services;
 using FlatPatternExporter.UI.Windows;
 using Inventor;
+using Microsoft.WindowsAPICodePack.Shell;
 using Svg.Skia;
 
 namespace FlatPatternExporter.Core;
@@ -96,39 +97,82 @@ public class ThumbnailGenerator
     {
         try
         {
-            BitmapImage? bitmap = null;
-            await dispatcher.InvokeAsync(() =>
-            {
-                var apprenticeDoc = _apprentice.Open(document.FullDocumentName);
-
-                var thumbnail = apprenticeDoc.Thumbnail;
-                var img = IPictureDispConverter.PictureDispToImage(thumbnail);
-
-                if (img != null)
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        img.Save(memoryStream, ImageFormat.Png);
-                        memoryStream.Position = 0;
-
-                        bitmap = new BitmapImage();
-                        bitmap.BeginInit();
-                        bitmap.StreamSource = memoryStream;
-                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmap.EndInit();
-                        bitmap.Freeze();
-                    }
-            });
-
-            return bitmap!;
+            return await GetThumbnailViaApprenticeAsync(document, dispatcher);
         }
-        catch (Exception ex)
+        catch
         {
-            dispatcher.Invoke(() =>
+            try
             {
-                CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailObtaining", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            });
-            return null!;
+                return await GetThumbnailViaShellAsync(document, dispatcher);
+            }
+            catch (Exception ex)
+            {
+                dispatcher.Invoke(() =>
+                {
+                    CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailObtaining", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                });
+                return null!;
+            }
         }
+    }
+
+    private async Task<BitmapImage> GetThumbnailViaApprenticeAsync(PartDocument document, Dispatcher dispatcher)
+    {
+        BitmapImage? bitmap = null;
+        await dispatcher.InvokeAsync(() =>
+        {
+            var apprenticeDoc = _apprentice.Open(document.FullDocumentName);
+
+            var thumbnail = apprenticeDoc.Thumbnail;
+            var img = IPictureDispConverter.PictureDispToImage(thumbnail);
+
+            if (img != null)
+                using (var memoryStream = new MemoryStream())
+                {
+                    img.Save(memoryStream, ImageFormat.Png);
+                    memoryStream.Position = 0;
+
+                    bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = memoryStream;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+                }
+        });
+
+        return bitmap!;
+    }
+
+    private async Task<BitmapImage> GetThumbnailViaShellAsync(PartDocument document, Dispatcher dispatcher)
+    {
+        BitmapImage? bitmap = null;
+        await dispatcher.InvokeAsync(() =>
+        {
+            var filePath = document.FullFileName;
+
+            if (!System.IO.File.Exists(filePath))
+                throw new FileNotFoundException($"File not found: {filePath}");
+
+            using var shellFile = ShellFile.FromFilePath(filePath);
+            using var thumbnail = shellFile.Thumbnail.ExtraLargeBitmap;
+
+            if (thumbnail != null)
+                using (var memoryStream = new MemoryStream())
+                {
+                    thumbnail.Save(memoryStream, ImageFormat.Png);
+                    memoryStream.Position = 0;
+
+                    bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = memoryStream;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+                }
+        });
+
+        return bitmap!;
     }
 }

@@ -75,6 +75,7 @@
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="netDxf.netstandard" Version="3.0.1" />
     <PackageReference Include="Svg.Skia" Version="3.2.1" />
     <PackageReference Include="stdole" Version="17.14.40260" />
