@@ -1,5 +1,7 @@
 # Flat Pattern Exporter
 
+[![100% Vibe Coded](https://img.shields.io/badge/100%25-Vibe%20Coded-9c4cff)](https://claude.ai/code)
+
 > Export sheet-metal flat patterns from Autodesk Inventor to DXF with customizable workflows.
 
 ## Overview
@@ -14,6 +16,9 @@ Flat Pattern Exporter (FPExport) is a standalone WPF utility that connects to a 
 - Generates thumbnails for parts and exported DXF previews to aid validation. Uses a dual-method approach: ApprenticeServer API (primary, faster) with automatic fallback to Windows Shell API if ApprenticeServer is unavailable.
 - Persists UI layout, column order, presets, themes, and localization preferences in `%AppData%\FlatPatternExporter\settings.json`.
 - Ships with English and Russian UI resources plus a light/dark theme switcher.
+
+## Development
+This project is developed with assistance from [Claude Code](https://claude.ai/code) - an AI-powered coding assistant that helps with architecture design, code implementation, and documentation.
 
 ## System Requirements
 - Windows 10/11 x64

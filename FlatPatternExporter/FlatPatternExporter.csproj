@@ -53,7 +53,7 @@
       <CommitDate>$([System.DateTime]::Parse('$(CommitDateRaw)').ToString('dd.MM.yyyy HH:mm:ss'))</CommitDate>
     </PropertyGroup>
     <PropertyGroup>
-      <VersionPrefix>3.0.1</VersionPrefix>
+      <VersionPrefix>3.0.2</VersionPrefix>
       <VersionSuffix>$(RevisionNumber)</VersionSuffix>
       <AssemblyVersion>$(VersionPrefix).$(VersionSuffix)</AssemblyVersion>
       <FileVersion>$(VersionPrefix).$(VersionSuffix)</FileVersion>
