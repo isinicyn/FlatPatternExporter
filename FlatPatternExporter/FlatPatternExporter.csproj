@@ -46,7 +46,7 @@
       <Output TaskParameter="ConsoleOutput" PropertyName="CommitHash" />
     </Exec>
     <PropertyGroup>
-      <VersionPrefix>3.0.0</VersionPrefix>
+      <VersionPrefix>3.0.1</VersionPrefix>
       <VersionSuffix>$(RevisionNumber)</VersionSuffix>
       <AssemblyVersion>$(VersionPrefix).$(VersionSuffix)</AssemblyVersion>
       <FileVersion>$(VersionPrefix).$(VersionSuffix)</FileVersion>

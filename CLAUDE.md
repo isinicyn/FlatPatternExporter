@@ -168,6 +168,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - netDxf.netstandard (v3.0.1) для работы с DXF файлами
 - Svg.Skia (v3.0.6) для конвертации SVG в PNG/BitmapImage
 - ClosedXML (v0.105.0) для экспорта данных в Excel
+- Microsoft-WindowsAPICodePack-Shell (v1.1.5) для fallback получения миниатюр через Windows Shell API
 - stdole (v17.14.40260) для COM interop
 
 ### Ключевые компоненты
@@ -178,7 +179,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DocumentCache` - управление кешем документов для оптимизации производительности
 - `ConflictAnalyzer` - анализ конфликтов обозначений деталей
 - `DxfExporter` - экспорт разверток в DXF с настройками слоев и оптимизацией
-- `ThumbnailGenerator` - генерация миниатюр из DXF и документов Inventor
+- `ThumbnailGenerator` - генерация миниатюр из DXF и документов Inventor с двухэтапным механизмом получения (ApprenticeServer → Windows Shell API fallback)
 - `PartDataReader` - работа со свойствами деталей, чтение iProperties, заполнение данных
 - `PropertyManager` - централизованное управление доступом к свойствам документов Inventor
 - `ConflictDataProcessor` - обработка и трансформация данных конфликтов

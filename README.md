@@ -11,7 +11,7 @@ Flat Pattern Exporter (FPExport) is a standalone WPF utility that connects to a 
 - Tracks part metadata in a document cache and resolves duplicate item numbers via the conflict analyzer.
 - Exports DXF files with customizable layer mapping, AutoCAD version targeting, polylines merging, spline replacement, geometry rebasing, and optional DXF optimization.
 - Builds file names from tokenized templates (including custom text and user-defined iProperties) and organizes output by material, thickness, or custom subfolders.
-- Generates thumbnails for parts and exported DXF previews to aid validation.
+- Generates thumbnails for parts and exported DXF previews to aid validation. Uses a dual-method approach: ApprenticeServer API (primary, faster) with automatic fallback to Windows Shell API if ApprenticeServer is unavailable.
 - Persists UI layout, column order, presets, themes, and localization preferences in `%AppData%\FlatPatternExporter\settings.json`.
 - Ships with English and Russian UI resources plus a light/dark theme switcher.
 
@@ -20,13 +20,14 @@ Flat Pattern Exporter (FPExport) is a standalone WPF utility that connects to a 
 - .NET 8.0 Desktop Runtime (or Visual Studio 2022 with .NET workload for development)
 - Autodesk Inventor 2020 or newer (tested with the 2026 API) installed locally
 - Git in `PATH` if you want build numbers populated by the MSBuild `SetVersionInfo` target
+- ApprenticeServer (optional) – recommended for faster thumbnail generation; Windows Shell API is used automatically if ApprenticeServer is unavailable
 
 ## Getting Started
 Clone the repository and choose the workflow that fits your environment.
 
 ### Build with Visual Studio
 1. Install Visual Studio 2022 with the `.NET desktop development` workload.
-2. Open `FlatPatternExporter.sln` and restore NuGet packages (`netDxf.netstandard`, `Svg.Skia`, `stdole`).
+2. Open `FlatPatternExporter.sln` and restore NuGet packages (`netDxf.netstandard`, `Svg.Skia`, `Microsoft-WindowsAPICodePack-Shell`, `ClosedXML`, `stdole`).
 3. Ensure the reference to `Autodesk.Inventor.Interop.dll` in `FlatPatternExporter/FlatPatternExporter.csproj` points to your Inventor installation (update the `HintPath` if necessary).
 4. Set the solution platform to `x64` (runtime identifier `win-x64`) and build.
 5. Start Autodesk Inventor, open the target assembly or part, then run the application from Visual Studio (`F5`).
@@ -117,6 +118,7 @@ See [PUBLISH.md](PUBLISH.md) for detailed publishing documentation.
 - **Missing Autodesk interop**: verify the path to `Autodesk.Inventor.Interop.dll` matches your Inventor version. Different installations (e.g., 2024/2025/2026) store the assembly in version-specific folders.
 - **Duplicate part numbers**: review the conflict analyzer panel after scanning. Resolve naming conflicts in Inventor or adjust token templates before exporting.
 - **Incorrect DXF output**: experiment with spline replacement, geometry rebasing, and layer presets. Use the DXF preview column to confirm results quickly.
+- **Thumbnail generation**: the application automatically handles thumbnail retrieval using a dual-method approach. If ApprenticeServer (Inventor's lightweight document reader) is unavailable, the app seamlessly falls back to Windows Shell API. No manual configuration is required—thumbnails will be generated using the best available method.
 
 ## License
 
