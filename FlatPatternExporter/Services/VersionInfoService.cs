@@ -17,29 +17,18 @@ public class VersionInfoService
     {
         try
         {
-            string executingDir = AppContext.BaseDirectory;
+            var assembly = Assembly.GetExecutingAssembly();
+            var commitDateAttribute = assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+                .FirstOrDefault(a => a.Key == "CommitDate");
 
-            using var process = new Process();
-            process.StartInfo.FileName = "git";
-            process.StartInfo.Arguments = "log -1 --format=%cd --date=format:\"%d.%m.%Y %H:%M:%S\"";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.WorkingDirectory = executingDir;
-
-            process.Start();
-
-            string output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            if (!string.IsNullOrWhiteSpace(output))
+            if (commitDateAttribute != null && !string.IsNullOrWhiteSpace(commitDateAttribute.Value))
             {
-                return output.Trim();
+                return commitDateAttribute.Value;
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error retrieving last commit date: {ex.Message}");
+            Debug.WriteLine($"Error retrieving commit date from assembly metadata: {ex.Message}");
         }
 
         return "Date not determined";

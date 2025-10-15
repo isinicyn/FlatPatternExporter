@@ -45,6 +45,13 @@
     <Exec Command="git rev-parse --short=7 HEAD" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="CommitHash" />
     </Exec>
+    <Exec Command="git log -1 --format=%%ci" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="CommitDateRaw" />
+    </Exec>
+    <PropertyGroup>
+      <!-- Format: 2025-10-15 13:28:14 +0300 -> 15.10.2025 13:28:14 -->
+      <CommitDate>$([System.DateTime]::Parse('$(CommitDateRaw)').ToString('dd.MM.yyyy HH:mm:ss'))</CommitDate>
+    </PropertyGroup>
     <PropertyGroup>
       <VersionPrefix>3.0.1</VersionPrefix>
       <VersionSuffix>$(RevisionNumber)</VersionSuffix>
@@ -52,12 +59,18 @@
       <FileVersion>$(VersionPrefix).$(VersionSuffix)</FileVersion>
       <InformationalVersion>$(VersionPrefix).$(VersionSuffix) build:$(CommitHash)</InformationalVersion>
     </PropertyGroup>
-    
+
+    <!-- Add commit date as assembly metadata -->
+    <ItemGroup>
+      <AssemblyMetadata Include="CommitDate" Value="$(CommitDate)" />
+    </ItemGroup>
+
     <!-- Add detailed logging -->
     <Message Text="VersionPrefix: $(VersionPrefix)" Importance="high" />
     <Message Text="VersionSuffix: $(VersionSuffix)" Importance="high" />
     <Message Text="RevisionNumber: $(RevisionNumber)" Importance="high" />
     <Message Text="CommitHash: $(CommitHash)" Importance="high" />
+    <Message Text="CommitDate: $(CommitDate)" Importance="high" />
     <Message Text="Assembly Version: $(AssemblyVersion)" Importance="high" />
     <Message Text="File Version: $(FileVersion)" Importance="high" />
     <Message Text="Informational Version: $(InformationalVersion)" Importance="high" />
