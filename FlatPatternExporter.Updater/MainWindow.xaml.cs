@@ -11,6 +11,7 @@ public partial class MainWindow : Window
     private readonly string _updateFilePath;
     private readonly string _targetExecutablePath;
     private readonly string _logPath;
+    private string _backupDirectory = string.Empty;
 
     public MainWindow(int processId, string updateFilesPath, string targetExecutablePath)
     {
@@ -133,6 +134,8 @@ public partial class MainWindow : Window
 
     private async Task PerformUpdateAsync()
     {
+        var updateSuccessful = false;
+
         try
         {
             Log("Step 1: Waiting for process to exit");
@@ -150,23 +153,81 @@ public partial class MainWindow : Window
             Log("Backup created");
             Log("Step 2 completed");
 
-            Log("Step 3: Replacing executable");
-            UpdateStatus("Replacing application file...", 60);
-            Log("About to replace executable");
-            ReplaceExecutable(_updateFilePath, _targetExecutablePath);
-            Log("Executable replaced");
-            Log("Step 3 completed");
+            Log("Step 3: Replacing application files");
+            UpdateStatus("Replacing application files...", 60);
+            Log("About to replace files");
 
-            Log("All steps completed successfully");
-            UpdateStatus("Update completed successfully!", 100);
-            SafeUpdateProgressText("Ready to restart");
-            SafeUpdateDetailsText("All steps completed successfully!\nUpdate finished.\n\nClick OK to restart the application.");
-
-            Log("Enabling close button");
-            Dispatcher.Invoke(() =>
+            try
             {
-                CloseButton.IsEnabled = true;
-            });
+                ReplaceExecutable(_updateFilePath, _targetExecutablePath);
+                Log("Files replaced successfully");
+                Log("Step 3 completed");
+                updateSuccessful = true;
+            }
+            catch (Exception ex)
+            {
+                Log($"ERROR during file replacement: {ex.Message}");
+                Log($"Stack trace: {ex.StackTrace}");
+
+                Log("Step 4: Rolling back from backup");
+                UpdateStatus("Update failed. Rolling back...", 50);
+
+                try
+                {
+                    RestoreFromBackup(_targetExecutablePath);
+                    Log("Rollback completed successfully");
+
+                    UpdateStatus("Update failed. System restored to previous state.", 0);
+                    SafeUpdateProgressText("Update failed - Rolled back");
+                    SafeUpdateDetailsText($"Update failed and rolled back:\n{ex.Message}\n\nYour application has been restored to the previous state.\n\nLog file:\n{_logPath}");
+
+                    MessageBox.Show(
+                        this,
+                        $"Update failed and rolled back:\n\n{ex.Message}\n\nYour application has been restored to the previous state.\n\nLog file: {_logPath}",
+                        "Update Failed",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+                catch (Exception rollbackEx)
+                {
+                    Log($"CRITICAL: Rollback failed: {rollbackEx.Message}");
+                    Log($"Stack trace: {rollbackEx.StackTrace}");
+
+                    UpdateStatus("CRITICAL: Update and rollback failed!", 0);
+                    SafeUpdateProgressText("Critical Error");
+                    SafeUpdateDetailsText($"Update failed and rollback also failed!\n\nOriginal error:\n{ex.Message}\n\nRollback error:\n{rollbackEx.Message}\n\nBackup location:\n{_backupDirectory}\n\nLog file:\n{_logPath}");
+
+                    MessageBox.Show(
+                        this,
+                        $"CRITICAL ERROR:\n\nUpdate failed:\n{ex.Message}\n\nRollback also failed:\n{rollbackEx.Message}\n\nPlease manually restore from backup:\n{_backupDirectory}\n\nLog file: {_logPath}",
+                        "Critical Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+
+                await Task.Delay(5000);
+                Application.Current.Shutdown(1);
+                return;
+            }
+
+            if (updateSuccessful)
+            {
+                Log("Step 4: Cleaning up backup");
+                UpdateStatus("Cleaning up...", 90);
+                DeleteBackup();
+                Log("Backup cleanup completed");
+
+                Log("All steps completed successfully");
+                UpdateStatus("Update completed successfully!", 100);
+                SafeUpdateProgressText("Ready to restart");
+                SafeUpdateDetailsText("All steps completed successfully!\nUpdate finished.\n\nClick OK to restart the application.");
+
+                Log("Enabling close button");
+                Dispatcher.Invoke(() =>
+                {
+                    CloseButton.IsEnabled = true;
+                });
+            }
         }
         catch (Exception ex)
         {
@@ -231,24 +292,60 @@ public partial class MainWindow : Window
         }
     }
 
+    private static bool IsBackupPath(string path)
+    {
+        var segments = path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return segments.Any(segment => segment.StartsWith("backup_", StringComparison.OrdinalIgnoreCase));
+    }
+
     private void CreateBackup(string targetExecutablePath)
     {
-        var backupPath = targetExecutablePath + ".backup";
-        Log($"Creating backup at: {backupPath}");
-        SafeUpdateProgressText($"Creating backup...");
-        SafeUpdateDetailsText($"File: {Path.GetFileName(targetExecutablePath)}\nBackup: {Path.GetFileName(backupPath)}");
-
-        if (File.Exists(backupPath))
+        var targetDirectory = Path.GetDirectoryName(targetExecutablePath);
+        if (string.IsNullOrEmpty(targetDirectory))
         {
-            Log($"Deleting existing backup");
-            File.Delete(backupPath);
+            throw new InvalidOperationException("Target directory is null or empty");
         }
 
-        Log($"Copying {targetExecutablePath} to {backupPath}");
-        File.Copy(targetExecutablePath, backupPath, overwrite: true);
-        Log($"Backup created successfully");
+        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        _backupDirectory = Path.Combine(targetDirectory, $"backup_{timestamp}");
+
+        Log($"Creating backup directory at: {_backupDirectory}");
+        SafeUpdateProgressText($"Creating backup...");
+        SafeUpdateDetailsText($"Backup directory: {Path.GetFileName(_backupDirectory)}");
+
+        if (Directory.Exists(_backupDirectory))
+        {
+            Log($"Deleting existing backup directory");
+            Directory.Delete(_backupDirectory, recursive: true);
+        }
+
+        Directory.CreateDirectory(_backupDirectory);
+
+        var filesToBackup = Directory.GetFiles(targetDirectory, "*.*", SearchOption.AllDirectories)
+            .Where(file => !IsBackupPath(file))
+            .ToList();
+
+        Log($"Found {filesToBackup.Count} files to backup");
+
+        foreach (var sourceFile in filesToBackup)
+        {
+            var relativePath = Path.GetRelativePath(targetDirectory, sourceFile);
+            var backupFile = Path.Combine(_backupDirectory, relativePath);
+            var backupFileDirectory = Path.GetDirectoryName(backupFile);
+
+            if (!string.IsNullOrEmpty(backupFileDirectory) && !Directory.Exists(backupFileDirectory))
+            {
+                Directory.CreateDirectory(backupFileDirectory);
+            }
+
+            Log($"Backing up: {relativePath}");
+            SafeUpdateDetailsText($"Backing up: {relativePath}");
+            File.Copy(sourceFile, backupFile, overwrite: true);
+        }
+
+        Log($"Backup created successfully. Total files: {filesToBackup.Count}");
         SafeUpdateProgressText($"Backup created");
-        SafeUpdateDetailsText($"Backup successfully created:\n{Path.GetFileName(backupPath)}");
+        SafeUpdateDetailsText($"Backup successfully created:\n{Path.GetFileName(_backupDirectory)}\nTotal files: {filesToBackup.Count}");
     }
 
     private void ReplaceExecutable(string updateFilesPath, string targetExecutablePath)
@@ -280,7 +377,9 @@ public partial class MainWindow : Window
             }
 
             retryCount = 0;
-            while (retryCount < maxRetries)
+            var copied = false;
+
+            while (retryCount < maxRetries && !copied)
             {
                 try
                 {
@@ -288,29 +387,145 @@ public partial class MainWindow : Window
                     SafeUpdateDetailsText($"Copying: {relativePath}");
                     File.Copy(sourceFile, targetFile, overwrite: true);
                     Log($"File copied successfully: {relativePath}");
-                    break;
+                    copied = true;
                 }
-                catch (IOException ex) when (retryCount < maxRetries - 1)
+                catch (IOException ex)
                 {
                     retryCount++;
+                    if (retryCount >= maxRetries)
+                    {
+                        var errorMsg = $"Failed to replace file '{relativePath}' after {maxRetries} attempts: {ex.Message}";
+                        Log($"ERROR: {errorMsg}");
+                        throw new IOException(errorMsg, ex);
+                    }
+
                     Log($"File locked, retry {retryCount}/{maxRetries}: {ex.Message}");
                     SafeUpdateProgressText($"Attempt {retryCount}/{maxRetries}...");
                     SafeUpdateDetailsText($"File locked, retrying...\nFile: {relativePath}\nAttempt {retryCount} of {maxRetries}");
                     Thread.Sleep(1000);
                 }
             }
-
-            if (retryCount >= maxRetries)
-            {
-                var errorMsg = $"Failed to replace file '{relativePath}' after {maxRetries} attempts";
-                Log($"ERROR: {errorMsg}");
-                throw new IOException(errorMsg);
-            }
         }
 
         Log("All files replaced successfully");
         SafeUpdateProgressText("Files successfully replaced");
         SafeUpdateDetailsText($"Application files successfully updated\nTotal files: {updateFiles.Length}");
+    }
+
+    private void DeleteBackup()
+    {
+        if (string.IsNullOrEmpty(_backupDirectory) || !Directory.Exists(_backupDirectory))
+        {
+            Log("No backup directory to delete");
+            return;
+        }
+
+        Log($"Deleting backup directory: {_backupDirectory}");
+        SafeUpdateProgressText("Cleaning up backup...");
+        SafeUpdateDetailsText($"Removing backup directory:\n{Path.GetFileName(_backupDirectory)}");
+
+        try
+        {
+            Directory.Delete(_backupDirectory, recursive: true);
+            Log("Backup directory deleted successfully");
+            SafeUpdateProgressText("Backup cleaned up");
+        }
+        catch (Exception ex)
+        {
+            Log($"ERROR deleting backup: {ex.Message}");
+            SafeUpdateProgressText("Failed to clean up backup");
+        }
+    }
+
+    private void RestoreFromBackup(string targetExecutablePath)
+    {
+        if (string.IsNullOrEmpty(_backupDirectory) || !Directory.Exists(_backupDirectory))
+        {
+            Log("No backup directory to restore from");
+            throw new InvalidOperationException("Backup directory not found. Cannot restore.");
+        }
+
+        var targetDirectory = Path.GetDirectoryName(targetExecutablePath);
+        if (string.IsNullOrEmpty(targetDirectory))
+        {
+            throw new InvalidOperationException("Target directory is null or empty");
+        }
+
+        Log($"Restoring from backup: {_backupDirectory}");
+        SafeUpdateProgressText("Cleaning target directory...");
+        SafeUpdateDetailsText($"Rolling back changes...\nStep 1: Removing all files");
+
+        Log("Step 1: Removing all files from target directory (except backup)");
+        var filesToDelete = Directory.GetFiles(targetDirectory, "*.*", SearchOption.AllDirectories)
+            .Where(file => !IsBackupPath(file))
+            .ToList();
+
+        Log($"Found {filesToDelete.Count} files to delete");
+
+        foreach (var file in filesToDelete)
+        {
+            try
+            {
+                var relativePath = Path.GetRelativePath(targetDirectory, file);
+                Log($"Deleting: {relativePath}");
+                SafeUpdateDetailsText($"Removing: {relativePath}");
+                File.Delete(file);
+            }
+            catch (Exception ex)
+            {
+                Log($"WARNING: Failed to delete file {file}: {ex.Message}");
+            }
+        }
+
+        Log("Step 2: Removing empty directories");
+        var directoriesToDelete = Directory.GetDirectories(targetDirectory, "*", SearchOption.AllDirectories)
+            .Where(dir => !IsBackupPath(dir))
+            .OrderByDescending(dir => dir.Length)
+            .ToList();
+
+        foreach (var directory in directoriesToDelete)
+        {
+            try
+            {
+                if (Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any())
+                {
+                    var relativePath = Path.GetRelativePath(targetDirectory, directory);
+                    Log($"Deleting empty directory: {relativePath}");
+                    Directory.Delete(directory);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"WARNING: Failed to delete directory {directory}: {ex.Message}");
+            }
+        }
+
+        Log("Step 3: Restoring files from backup");
+        SafeUpdateProgressText("Restoring files from backup...");
+        SafeUpdateDetailsText($"Step 2: Restoring files\nBackup: {Path.GetFileName(_backupDirectory)}");
+
+        var backupFiles = Directory.GetFiles(_backupDirectory, "*.*", SearchOption.AllDirectories);
+        Log($"Found {backupFiles.Length} files to restore");
+
+        foreach (var backupFile in backupFiles)
+        {
+            var relativePath = Path.GetRelativePath(_backupDirectory, backupFile);
+            var targetFile = Path.Combine(targetDirectory, relativePath);
+            var targetFileDirectory = Path.GetDirectoryName(targetFile);
+
+            if (!string.IsNullOrEmpty(targetFileDirectory) && !Directory.Exists(targetFileDirectory))
+            {
+                Directory.CreateDirectory(targetFileDirectory);
+            }
+
+            Log($"Restoring: {relativePath}");
+            SafeUpdateDetailsText($"Restoring: {relativePath}");
+            File.Copy(backupFile, targetFile, overwrite: true);
+        }
+
+        Log($"Restore completed. Files deleted: {filesToDelete.Count}, Files restored: {backupFiles.Length}");
+        SafeUpdateProgressText("Restore completed");
+        SafeUpdateDetailsText($"Rollback completed successfully!\n\nFiles removed: {filesToDelete.Count}\nFiles restored: {backupFiles.Length}");
     }
 
     private void RestartApplication(string targetExecutablePath)
