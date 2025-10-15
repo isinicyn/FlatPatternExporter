@@ -12,7 +12,7 @@ public partial class App : Application
         if (e.Args.Length != 3)
         {
             MessageBox.Show(
-                "Usage: FlatPatternExporter.Updater.exe <ProcessId> <UpdateFilePath> <TargetExecutablePath>",
+                "Usage: FlatPatternExporter.Updater.exe <ProcessId> <UpdateFilesDirectory> <TargetExecutablePath>",
                 "Invalid Arguments",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -31,14 +31,14 @@ public partial class App : Application
             return;
         }
 
-        var updateFilePath = e.Args[1];
+        var updateFilesPath = e.Args[1];
         var targetExecutablePath = e.Args[2];
 
-        if (!File.Exists(updateFilePath))
+        if (!Directory.Exists(updateFilesPath))
         {
             MessageBox.Show(
-                $"Error: Update file not found:\n{updateFilePath}",
-                "File Not Found",
+                $"Error: Update directory not found:\n{updateFilesPath}",
+                "Directory Not Found",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             Shutdown(1);
@@ -56,7 +56,7 @@ public partial class App : Application
             return;
         }
 
-        var mainWindow = new MainWindow(processId, updateFilePath, targetExecutablePath);
+        var mainWindow = new MainWindow(processId, updateFilesPath, targetExecutablePath);
         mainWindow.Show();
     }
 }
