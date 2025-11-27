@@ -15,7 +15,19 @@ namespace FlatPatternExporter.Core;
 
 public class ThumbnailGenerator
 {
-    private readonly ApprenticeServerComponent _apprentice = new();
+    private readonly Lazy<ApprenticeServerComponent?> _apprenticeLazy = new(() =>
+    {
+        try
+        {
+            return new ApprenticeServerComponent();
+        }
+        catch
+        {
+            return null;
+        }
+    });
+
+    private ApprenticeServerComponent? Apprentice => _apprenticeLazy.Value;
     /// <summary>
     /// Converts SVG string to BitmapImage
     /// </summary>
@@ -93,36 +105,41 @@ public class ThumbnailGenerator
         }
     }
 
-    public async Task<BitmapImage> GetThumbnailAsync(PartDocument document, Dispatcher dispatcher)
+    public async Task<BitmapImage?> GetThumbnailAsync(PartDocument document, Dispatcher dispatcher)
     {
-        try
-        {
-            return await GetThumbnailViaApprenticeAsync(document, dispatcher);
-        }
-        catch
+        if (Apprentice is not null)
         {
             try
             {
-                return await GetThumbnailViaShellAsync(document, dispatcher);
+                return await GetThumbnailViaApprenticeAsync(document, dispatcher);
             }
-            catch (Exception ex)
+            catch
             {
-                dispatcher.Invoke(() =>
-                {
-                    CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailObtaining", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-                });
-                return null!;
+                // Fallback to Shell API
             }
+        }
+
+        try
+        {
+            return await GetThumbnailViaShellAsync(document, dispatcher);
+        }
+        catch (Exception ex)
+        {
+            dispatcher.Invoke(() =>
+            {
+                CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailObtaining", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            });
+            return null;
         }
     }
 
-    private async Task<BitmapImage> GetThumbnailViaApprenticeAsync(PartDocument document, Dispatcher dispatcher)
+    private async Task<BitmapImage?> GetThumbnailViaApprenticeAsync(PartDocument document, Dispatcher dispatcher)
     {
         BitmapImage? bitmap = null;
         await dispatcher.InvokeAsync(() =>
         {
-            var apprenticeDoc = _apprentice.Open(document.FullDocumentName);
+            var apprenticeDoc = Apprentice!.Open(document.FullDocumentName);
 
             var thumbnail = apprenticeDoc.Thumbnail;
             var img = IPictureDispConverter.PictureDispToImage(thumbnail);
@@ -142,10 +159,10 @@ public class ThumbnailGenerator
                 }
         });
 
-        return bitmap!;
+        return bitmap;
     }
 
-    private async Task<BitmapImage> GetThumbnailViaShellAsync(PartDocument document, Dispatcher dispatcher)
+    private async Task<BitmapImage?> GetThumbnailViaShellAsync(PartDocument document, Dispatcher dispatcher)
     {
         BitmapImage? bitmap = null;
         await dispatcher.InvokeAsync(() =>
@@ -173,6 +190,6 @@ public class ThumbnailGenerator
                 }
         });
 
-        return bitmap!;
+        return bitmap;
     }
 }
