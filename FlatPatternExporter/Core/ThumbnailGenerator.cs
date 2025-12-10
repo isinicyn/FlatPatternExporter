@@ -15,7 +15,9 @@ namespace FlatPatternExporter.Core;
 
 public class ThumbnailGenerator
 {
-    private readonly Lazy<ApprenticeServerComponent?> _apprenticeLazy = new(() =>
+    private readonly ApprenticeServerComponent? _apprentice = CreateApprenticeServer();
+
+    private static ApprenticeServerComponent? CreateApprenticeServer()
     {
         try
         {
@@ -25,9 +27,7 @@ public class ThumbnailGenerator
         {
             return null;
         }
-    });
-
-    private ApprenticeServerComponent? Apprentice => _apprenticeLazy.Value;
+    }
     /// <summary>
     /// Converts SVG string to BitmapImage
     /// </summary>
@@ -107,7 +107,7 @@ public class ThumbnailGenerator
 
     public async Task<BitmapImage?> GetThumbnailAsync(PartDocument document, Dispatcher dispatcher)
     {
-        if (Apprentice is not null)
+        if (_apprentice is not null)
         {
             try
             {
@@ -134,32 +134,50 @@ public class ThumbnailGenerator
         }
     }
 
-    private async Task<BitmapImage?> GetThumbnailViaApprenticeAsync(PartDocument document, Dispatcher dispatcher)
+    private Task<BitmapImage?> GetThumbnailViaApprenticeAsync(PartDocument document, Dispatcher dispatcher)
     {
-        BitmapImage? bitmap = null;
-        await dispatcher.InvokeAsync(() =>
+        var tcs = new TaskCompletionSource<BitmapImage?>();
+
+        dispatcher.InvokeAsync(() =>
         {
-            var apprenticeDoc = Apprentice!.Open(document.FullDocumentName);
+            ApprenticeServerDocument? apprenticeDoc = null;
+            try
+            {
+                apprenticeDoc = _apprentice!.Open(document.FullDocumentName);
+                var thumbnail = apprenticeDoc.Thumbnail;
+                var img = IPictureDispConverter.PictureDispToImage(thumbnail);
 
-            var thumbnail = apprenticeDoc.Thumbnail;
-            var img = IPictureDispConverter.PictureDispToImage(thumbnail);
-
-            if (img != null)
-                using (var memoryStream = new MemoryStream())
+                if (img != null)
                 {
+                    using var memoryStream = new MemoryStream();
                     img.Save(memoryStream, ImageFormat.Png);
                     memoryStream.Position = 0;
 
-                    bitmap = new BitmapImage();
+                    var bitmap = new BitmapImage();
                     bitmap.BeginInit();
                     bitmap.StreamSource = memoryStream;
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
                     bitmap.EndInit();
                     bitmap.Freeze();
+
+                    tcs.SetResult(bitmap);
                 }
+                else
+                {
+                    tcs.SetResult(null);
+                }
+            }
+            catch (Exception ex)
+            {
+                tcs.SetException(ex);
+            }
+            finally
+            {
+                apprenticeDoc?.Close();
+            }
         });
 
-        return bitmap;
+        return tcs.Task;
     }
 
     private async Task<BitmapImage?> GetThumbnailViaShellAsync(PartDocument document, Dispatcher dispatcher)
