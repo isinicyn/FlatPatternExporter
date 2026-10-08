@@ -182,21 +182,13 @@ public class DxfExporter
 
             if (exportOptions.SelectedExportFolder == ExportFolderType.PartFolder)
             {
-                var partPath = _documentCache.GetCachedPartPath(partNumber) ?? _inventorManager.GetPartDocumentFullPath(partNumber);
-                if (!string.IsNullOrEmpty(partPath))
-                {
-                    targetDir = Path.GetDirectoryName(partPath) ?? "";
-                }
-                else
-                {
-                    targetDir = "";
-                }
+                targetDir = Path.GetDirectoryName(partData.FullFileName) ?? "";
             }
 
             PartDocument? partDoc = null;
             try
             {
-                partDoc = _documentCache.GetCachedPartDocument(partNumber) ?? _inventorManager.OpenPartDocument(partNumber);
+                partDoc = _documentCache.GetCachedPartDocument(partData.FullDocumentName) ?? _inventorManager.FindPartDocument(partData.FullDocumentName);
                 if (partDoc == null) throw new Exception(LocalizationManager.Instance.GetString("Error_PartFileNotFound"));
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
@@ -449,7 +441,7 @@ public class ExportContext
 {
     public string TargetDirectory { get; set; } = "";
     public int Multiplier { get; set; } = 1;
-    public Dictionary<string, int> SheetMetalParts { get; set; } = [];
+    public Dictionary<string, ScannedPart> SheetMetalParts { get; set; } = [];
     public bool GenerateThumbnails { get; set; } = true;
     public bool IsValid { get; set; } = true;
     public string ErrorMessage { get; set; } = "";

@@ -44,7 +44,7 @@ public class DocumentScanner
             ClearCaches();
             _hasMissingReferences = false;
 
-            var sheetMetalParts = new Dictionary<string, int>();
+            var sheetMetalParts = new Dictionary<string, ScannedPart>(StringComparer.OrdinalIgnoreCase);
 
             if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
             {
@@ -71,19 +71,9 @@ public class DocumentScanner
                     return result;
                 }
 
-                var mgr = new PropertyManager((Document)partDoc);
-                var partNumber = mgr.GetMappedProperty("PartNumber");
-                if (!string.IsNullOrEmpty(partNumber))
-                {
-                    _documentCache.AddDocumentToCache(partDoc, partNumber);
-
-                    if (partDoc.SubType == PropertyManager.SheetMetalSubType)
-                    {
-                        sheetMetalParts.Add(partNumber, 1);
-                        result.ProcessedCount = 1;
-                        result.SheetMetalParts = sheetMetalParts;
-                    }
-                }
+                ProcessPartDocument(partDoc, sheetMetalParts, 1);
+                result.ProcessedCount = sheetMetalParts.Count;
+                result.SheetMetalParts = sheetMetalParts;
             }
 
             result.WasCancelled = cancellationToken.IsCancellationRequested;
@@ -108,7 +98,7 @@ public class DocumentScanner
 
     private void ProcessComponentOccurrences(
         ComponentOccurrences occurrences,
-        Dictionary<string, int> sheetMetalParts,
+        Dictionary<string, ScannedPart> sheetMetalParts,
         ScanOptions options,
         IProgress<ScanProgress>? scanProgress = null,
         CancellationToken cancellationToken = default)
@@ -148,25 +138,7 @@ public class DocumentScanner
                 if (occ.DefinitionDocumentType == DocumentTypeEnum.kPartDocumentObject)
                 {
                     if (occ.Definition.Document is PartDocument partDoc)
-                    {
-                        var mgr = new PropertyManager((Document)partDoc);
-                        var partNumber = mgr.GetMappedProperty("PartNumber");
-                        if (!string.IsNullOrEmpty(partNumber))
-                        {
-                            _documentCache.AddDocumentToCache(partDoc, partNumber);
-
-                            if (partDoc.SubType == PropertyManager.SheetMetalSubType)
-                            {
-                                var modelState = mgr.GetModelState();
-                                _conflictAnalyzer.AddPartToTracker(partNumber, partDoc.FullFileName, modelState);
-
-                                if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
-                                    sheetMetalParts[partNumber]++;
-                                else
-                                    sheetMetalParts.Add(partNumber, 1);
-                            }
-                        }
-                    }
+                        ProcessPartDocument(partDoc, sheetMetalParts, 1);
                 }
                 else if (occ.DefinitionDocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
                 {
@@ -200,7 +172,7 @@ public class DocumentScanner
 
     private void ProcessBOM(
         BOM bom,
-        Dictionary<string, int> sheetMetalParts,
+        Dictionary<string, ScannedPart> sheetMetalParts,
         ScanOptions options,
         IProgress<ScanProgress>? scanProgress = null,
         CancellationToken cancellationToken = default)
@@ -320,45 +292,39 @@ public class DocumentScanner
         return allRows;
     }
 
-    private void ProcessBOMRowSimple(BOMRow row, Dictionary<string, int> sheetMetalParts, int parentQuantity = 1)
+    private void ProcessBOMRowSimple(BOMRow row, Dictionary<string, ScannedPart> sheetMetalParts, int parentQuantity = 1)
     {
         try
         {
             var componentDefinition = row.ComponentDefinitions[1];
             if (componentDefinition == null) return;
 
-            if (componentDefinition.Document is not Document document) return;
-
-            if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
-            {
-                if (document is PartDocument partDoc)
-                {
-                    var mgr = new PropertyManager((Document)partDoc);
-                    var partNumber = mgr.GetMappedProperty("PartNumber");
-                    if (!string.IsNullOrEmpty(partNumber))
-                    {
-                        _documentCache.AddDocumentToCache(partDoc, partNumber);
-
-                        if (partDoc.SubType == PropertyManager.SheetMetalSubType)
-                        {
-                            var modelState = mgr.GetModelState();
-                            _conflictAnalyzer.AddPartToTracker(partNumber, partDoc.FullFileName, modelState);
-
-                            var totalQuantity = row.ItemQuantity * parentQuantity;
-
-                            if (sheetMetalParts.TryGetValue(partNumber, out var quantity))
-                                sheetMetalParts[partNumber] += totalQuantity;
-                            else
-                                sheetMetalParts.Add(partNumber, totalQuantity);
-                        }
-                    }
-                }
-            }
+            if (componentDefinition.Document is PartDocument partDoc)
+                ProcessPartDocument(partDoc, sheetMetalParts, row.ItemQuantity * parentQuantity);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error in simple BOM row processing: {ex.Message}");
         }
+    }
+
+    private void ProcessPartDocument(PartDocument partDoc, Dictionary<string, ScannedPart> sheetMetalParts, int quantity)
+    {
+        var mgr = new PropertyManager((Document)partDoc);
+        var partNumber = mgr.GetMappedProperty("PartNumber");
+        if (string.IsNullOrEmpty(partNumber)) return;
+
+        _documentCache.AddDocumentToCache(partDoc);
+
+        if (partDoc.SubType != PropertyManager.SheetMetalSubType) return;
+
+        _conflictAnalyzer.AddPartToTracker(partNumber, partDoc.FullFileName, mgr.GetModelState());
+
+        var key = partDoc.FullDocumentName;
+        if (sheetMetalParts.TryGetValue(key, out var part))
+            part.Quantity += quantity;
+        else
+            sheetMetalParts.Add(key, new ScannedPart { FullDocumentName = key, PartNumber = partNumber, Quantity = quantity });
     }
 
     private bool ShouldExcludeComponent(BOMStructureEnum bomStructure, string fullFileName, ScanOptions options)
@@ -401,9 +367,16 @@ public class DocumentScanner
     }
 }
 
+public class ScannedPart
+{
+    public string FullDocumentName { get; init; } = "";
+    public string PartNumber { get; init; } = "";
+    public int Quantity { get; set; }
+}
+
 public class ScanResult
 {
-    public Dictionary<string, int> SheetMetalParts { get; set; } = [];
+    public Dictionary<string, ScannedPart> SheetMetalParts { get; set; } = [];
     public int ProcessedCount { get; set; }
     public int SkippedCount { get; set; }
     public TimeSpan ElapsedTime { get; set; }

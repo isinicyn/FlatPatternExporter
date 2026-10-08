@@ -206,6 +206,22 @@ public class PropertyManager(Document document)
     }
 
     /// <summary>
+    /// Gets full document name (file path with model state suffix for non-primary states)
+    /// </summary>
+    public string GetFullDocumentName()
+    {
+        try
+        {
+            return _document.FullDocumentName;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Full document name retrieval error: {ex.Message}");
+            return "";
+        }
+    }
+
+    /// <summary>
     /// Gets model state name
     /// </summary>
     public string GetModelState()

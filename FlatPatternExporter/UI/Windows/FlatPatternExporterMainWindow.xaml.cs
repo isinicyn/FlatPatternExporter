@@ -1866,7 +1866,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var stopwatch = Stopwatch.StartNew();
 
         // Execute export via centralized error handling
-        var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.PartNumber)).ToList();
+        var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.FullDocumentName)).ToList();
         var exportOptions = CreateExportOptions();
         var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
@@ -1980,8 +1980,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
             ClearConflictData();
 
-            var sheetMetalParts = new Dictionary<string, int>();
-
             // Create scanning options
             var scanOptions = new Core.ScanOptions
             {
@@ -1999,7 +1997,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 progress,
                 cancellationToken);
 
-            sheetMetalParts = scanResult.SheetMetalParts;
+            var sheetMetalParts = scanResult.SheetMetalParts;
             result.ProcessedCount = scanResult.ProcessedCount;
             result.ProcessingMethod = scanResult.ProcessingMethod;
 
@@ -2037,11 +2035,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
                 await Task.Run(async () =>
                 {
-                    foreach (var part in sheetMetalParts)
+                    foreach (var part in sheetMetalParts.Values)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        var partData = await _partDataReader.GetPartDataAsync(part.Key, part.Value, itemCounter++);
+                        var partData = await _partDataReader.GetPartDataAsync(part.FullDocumentName, part.Quantity, itemCounter++);
                         if (partData != null)
                         {
                             ((IProgress<PartData>)partProgress).Report(partData);
@@ -2264,7 +2262,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var itemCounter = 1;
         var totalParts = context.SheetMetalParts.Count;
 
-        foreach (var part in context.SheetMetalParts)
+        foreach (var part in context.SheetMetalParts.Values)
         {
             // Update progress every 5 parts or at important moments
             if (itemCounter % 5 == 1 || itemCounter == totalParts)
@@ -2275,7 +2273,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 await Task.Delay(1); // Minimal delay for UI update
             }
 
-            var partData = await _partDataReader.GetPartDataAsync(part.Key, part.Value * context.Multiplier, itemCounter++, loadThumbnail: false);
+            var partData = await _partDataReader.GetPartDataAsync(part.FullDocumentName, part.Quantity * context.Multiplier, itemCounter++, loadThumbnail: false);
             if (partData != null)
             {
                 // Don't call SetQuantityInternal again - quantity already set correctly in GetPartDataAsync
@@ -2510,13 +2508,12 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         foreach (var item in selectedItems)
         {
-            var partNumber = item.PartNumber;
-            var fullPath = _documentScanner.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorManager.GetPartDocumentFullPath(partNumber);
+            var fullPath = item.FullFileName;
 
             // Check for null before using fullPath
             if (string.IsNullOrEmpty(fullPath))
             {
-                CustomMessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", partNumber), _localizationManager.GetString("MessageBox_Error"),
+                CustomMessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", item.PartNumber), _localizationManager.GetString("MessageBox_Error"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 continue;
             }
@@ -2545,20 +2542,18 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         foreach (var item in selectedItems)
         {
-            var partNumber = item.PartNumber;
-            var fullPath = _documentScanner.DocumentCache.GetCachedPartPath(partNumber) ?? _inventorManager.GetPartDocumentFullPath(partNumber);
-            var targetModelState = item.ModelState;
+            var fullPath = item.FullFileName;
 
             // Check for null before using fullPath
             if (string.IsNullOrEmpty(fullPath))
             {
-                CustomMessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", partNumber), _localizationManager.GetString("MessageBox_Error"),
+                CustomMessageBox.Show(_localizationManager.GetString("Error_FileNotFoundForPart", item.PartNumber), _localizationManager.GetString("MessageBox_Error"),
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 continue;
             }
 
             // Open file with specified model state
-            _inventorManager.OpenInventorDocument(fullPath, targetModelState);
+            _inventorManager.OpenInventorDocument(fullPath, item.ModelState);
         }
     }
 

@@ -23,9 +23,9 @@ public class PartDataReader
         _dispatcher = dispatcher;
     }
 
-    public async Task<PartData> GetPartDataAsync(string partNumber, int quantity, int itemNumber, bool loadThumbnail = true)
+    public async Task<PartData> GetPartDataAsync(string fullDocumentName, int quantity, int itemNumber, bool loadThumbnail = true)
     {
-        var partDoc = _documentScanner.DocumentCache.GetCachedPartDocument(partNumber) ?? _inventorManager.OpenPartDocument(partNumber);
+        var partDoc = _documentScanner.DocumentCache.GetCachedPartDocument(fullDocumentName) ?? _inventorManager.FindPartDocument(fullDocumentName);
         if (partDoc == null) return null!;
 
         return await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
@@ -64,6 +64,7 @@ public class PartDataReader
     {
         partData.FileName = mgr.GetFileName();
         partData.FullFileName = mgr.GetFullFileName();
+        partData.FullDocumentName = mgr.GetFullDocumentName();
         partData.ModelState = mgr.GetModelState();
         partData.HasFlatPattern = mgr.HasFlatPattern();
         partData.Thickness = mgr.GetThickness();
@@ -125,7 +126,7 @@ public class PartDataReader
 
         foreach (var partData in partsData)
         {
-            var partDoc = _documentScanner.DocumentCache.GetCachedPartDocument(partData.PartNumber) ?? _inventorManager.OpenPartDocument(partData.PartNumber);
+            var partDoc = _documentScanner.DocumentCache.GetCachedPartDocument(partData.FullDocumentName) ?? _inventorManager.FindPartDocument(partData.FullDocumentName);
             if (partDoc != null)
             {
                 var mgr = new PropertyManager((Document)partDoc);

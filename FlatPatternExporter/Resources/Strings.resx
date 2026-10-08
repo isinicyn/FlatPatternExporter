@@ -1041,7 +1041,7 @@ Execution time: {3}</value>
     <value>Error opening file at path {0}: {1}</value>
   </data>
   <data name="Error_DocumentNotFound" xml:space="preserve">
-    <value>Document with part number {0} not found among open documents.</value>
+    <value>Document {0} not found among open documents.</value>
   </data>
   <data name="Error_FileNotFoundForPart" xml:space="preserve">
     <value>File associated with part number {0} not found among open documents.</value>

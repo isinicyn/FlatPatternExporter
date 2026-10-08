@@ -52,13 +52,18 @@ public class ConflictAnalyzer
             .ToHashSet();
     }
 
-    public void FilterConflictingParts(Dictionary<string, int> sheetMetalParts)
+    public void FilterConflictingParts(Dictionary<string, ScannedPart> sheetMetalParts)
     {
         var conflictingPartNumbers = GetConflictingPartNumbers();
 
-        foreach (var conflictingPartNumber in conflictingPartNumbers)
+        var conflictingKeys = sheetMetalParts
+            .Where(p => conflictingPartNumbers.Contains(p.Value.PartNumber))
+            .Select(p => p.Key)
+            .ToList();
+
+        foreach (var key in conflictingKeys)
         {
-            sheetMetalParts.Remove(conflictingPartNumber);
+            sheetMetalParts.Remove(key);
         }
     }
 

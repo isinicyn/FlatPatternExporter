@@ -33,6 +33,7 @@ public class PartData : INotifyPropertyChanged
 
     public string FileName { get; set; } = "";
     public string FullFileName { get; set; } = "";
+    public string FullDocumentName { get; set; } = "";
     public string ModelState { get; set; } = "";
     public BitmapImage? Preview { get; set; }
     public bool HasFlatPattern { get; set; }

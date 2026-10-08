@@ -171,38 +171,21 @@ public class InventorManager
         }
     }
 
-    public PartDocument? OpenPartDocument(string partNumber)
+    public PartDocument? FindPartDocument(string fullDocumentName)
     {
         var docs = _thisApplication?.Documents;
         if (docs == null) return null;
 
-        foreach (Document doc in docs)
-            if (doc is PartDocument pd)
-            {
-                var mgr = new PropertyManager((Document)pd);
-                if (mgr.GetMappedProperty("PartNumber") == partNumber)
-                    return pd;
-            }
+        try
+        {
+            if (docs.ItemByName[fullDocumentName] is PartDocument partDoc)
+                return partDoc;
+        }
+        catch (COMException)
+        {
+        }
 
-        CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_DocumentNotFound", partNumber), LocalizationManager.Instance.GetString("MessageBox_Error"),
-            MessageBoxButton.OK, MessageBoxImage.Error);
-        return null;
-    }
-
-    public string? GetPartDocumentFullPath(string partNumber)
-    {
-        var docs = _thisApplication?.Documents;
-        if (docs == null) return null;
-
-        foreach (Document doc in docs)
-            if (doc is PartDocument pd)
-            {
-                var mgr = new PropertyManager((Document)pd);
-                if (mgr.GetMappedProperty("PartNumber") == partNumber)
-                    return pd.FullFileName;
-            }
-
-        CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_DocumentNotFound", partNumber), LocalizationManager.Instance.GetString("MessageBox_Error"),
+        CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_DocumentNotFound", fullDocumentName), LocalizationManager.Instance.GetString("MessageBox_Error"),
             MessageBoxButton.OK, MessageBoxImage.Error);
         return null;
     }

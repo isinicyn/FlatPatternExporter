@@ -1041,7 +1041,7 @@
     <value>Ошибка при открытии файла по пути {0}: {1}</value>
   </data>
   <data name="Error_DocumentNotFound" xml:space="preserve">
-    <value>Документ с номером детали {0} не найден среди открытых.</value>
+    <value>Документ {0} не найден среди открытых.</value>
   </data>
   <data name="Error_FileNotFoundForPart" xml:space="preserve">
     <value>Файл, связанный с номером детали {0}, не найден среди открытых.</value>
