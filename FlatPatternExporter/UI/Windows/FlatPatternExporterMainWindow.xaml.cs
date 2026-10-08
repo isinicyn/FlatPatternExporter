@@ -151,6 +151,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     // Processing method
     private ProcessingMethod _selectedProcessingMethod = ProcessingMethod.BOM;
+    private BomViewType _selectedBomView = BomViewType.ModelData;
 
     // Model state
     private bool _isPrimaryModelState = true;
@@ -318,6 +319,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
             // Processing method
             SelectedProcessingMethod = settings.SelectedProcessingMethod;
+            SelectedBomView = settings.SelectedBomView;
 
             // DXF export settings (set backing field directly to avoid UI notification dialog)
             _selectedAcadVersion = settings.DxfExport.SelectedAcadVersion;
@@ -536,6 +538,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             },
 
             SelectedProcessingMethod = SelectedProcessingMethod,
+            SelectedBomView = SelectedBomView,
 
             DxfExport = new DxfExportSettings
             {
@@ -758,14 +761,35 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _selectedProcessingMethod = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(IsBomStructureFilterAvailable));
-                _tokenService.IsBomItemAvailable = value == ProcessingMethod.PartsOnly;
+                UpdateBomViewDependencies();
             }
         }
     }
 
+    public BomViewType SelectedBomView
+    {
+        get => _selectedBomView;
+        set
+        {
+            if (_selectedBomView != value)
+            {
+                _selectedBomView = value;
+                OnPropertyChanged();
+                UpdateBomViewDependencies();
+            }
+        }
+    }
+
+    private bool IsPartsOnlyMode => SelectedProcessingMethod == ProcessingMethod.BOM && SelectedBomView == BomViewType.PartsOnly;
+
     // Reference and phantom components never appear in the Parts Only view, so their filters do not apply
-    public bool IsBomStructureFilterAvailable => SelectedProcessingMethod != ProcessingMethod.PartsOnly;
+    public bool IsBomStructureFilterAvailable => !IsPartsOnlyMode;
+
+    private void UpdateBomViewDependencies()
+    {
+        OnPropertyChanged(nameof(IsBomStructureFilterAvailable));
+        _tokenService.IsBomItemAvailable = IsPartsOnlyMode;
+    }
 
     public bool MergeProfilesIntoPolyline
     {
@@ -1232,7 +1256,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 }
                 else if (_documentScanner.HasMissingReferences)
                 {
-                    var messageKey = result.ProcessingMethod is ProcessingMethod.BOM or ProcessingMethod.PartsOnly
+                    var messageKey = result.ProcessingMethod == ProcessingMethod.BOM
                         ? "Info_BrokenReferences_BOM"
                         : "Info_BrokenReferences_Traverse";
                     warnings.Add(_localizationManager.GetString(messageKey));
@@ -1331,7 +1355,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// </summary>
     private bool EnsurePartsOnlyViewEnabled(Document document)
     {
-        if (SelectedProcessingMethod != ProcessingMethod.PartsOnly || Core.DocumentScanner.IsPartsOnlyViewEnabled(document))
+        if (!IsPartsOnlyMode || Core.DocumentScanner.IsPartsOnlyViewEnabled(document))
             return true;
 
         var result = CustomMessageBox.Show(this, _localizationManager.GetString("Question_EnablePartsOnlyView"),
@@ -1376,6 +1400,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             SubfolderName = SubfolderNameTextBox.Text,
             Multiplier = int.TryParse(MultiplierTextBox.Text, out var m) ? m : 1,
             SelectedProcessingMethod = SelectedProcessingMethod,
+            SelectedBomView = SelectedBomView,
             ExcludeReferenceParts = ExcludeReferenceParts,
             ExcludePurchasedParts = ExcludePurchasedParts,
             ExcludePhantomParts = ExcludePhantomParts,
@@ -2087,6 +2112,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             // Create scanning options
             var scanOptions = new Core.ScanOptions
             {
+                BomView = SelectedBomView,
                 ExcludeReferenceParts = ExcludeReferenceParts,
                 ExcludePurchasedParts = ExcludePurchasedParts,
                 ExcludePhantomParts = ExcludePhantomParts,

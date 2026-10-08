@@ -52,6 +52,7 @@
     <Thickness x:Key="RightSmallMarginThickness">0,0,5,0</Thickness>
     <Thickness x:Key="LeftSmallMarginThickness">5,0,0,0</Thickness>
     <Thickness x:Key="BottomSmallMarginThickness">0,0,0,5</Thickness>
+    <Thickness x:Key="NestedOptionMarginThickness">20,0,0,5</Thickness>
     <Thickness x:Key="BottomLargeMarginThickness">0,0,0,15</Thickness>
     <Thickness x:Key="HorizontalSmallMarginThickness">5,0</Thickness>
     <Thickness x:Key="VerticalSmallMarginThickness">0,5</Thickness>

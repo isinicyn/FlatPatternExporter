@@ -1954,15 +1954,8 @@
   <data name="Legend_Root" xml:space="preserve">
     <value>Свойства сборки</value>
   </data>
-  <data name="UI_ProcessByPartsOnly" xml:space="preserve">
-    <value>По спецификации: только детали</value>
-  </data>
-  <data name="ToolTip_ProcessByPartsOnly" xml:space="preserve">
-    <value>Использует вид спецификации «Только детали»: количество считает Inventor, а номера позиций доступны в шаблоне имени файла.
-Детали внутри неразъёмных (сварных) и покупных узлов в этом виде не показываются.</value>
-  </data>
   <data name="ToolTip_FilterNotApplicablePartsOnly" xml:space="preserve">
-    <value>Не применяется в методе «Только детали»: Inventor всегда исключает такие компоненты из этого вида спецификации.</value>
+    <value>Не применяется для спецификации по списку деталей: Inventor всегда исключает такие компоненты из вида «Только детали».</value>
   </data>
   <data name="Question_EnablePartsOnlyView" xml:space="preserve">
     <value>В спецификации сборки отключён вид «Только детали».
@@ -1970,10 +1963,10 @@
 Включить его? Сборка будет помечена как изменённая.</value>
   </data>
   <data name="Info_PartsOnlyHiddenAssemblies" xml:space="preserve">
-    <value>В методе «Только детали» детали неразъёмных и покупных узлов не показываются. Эти узлы содержат листовые детали: {0}</value>
+    <value>В спецификации по списку деталей детали неразъёмных и покупных узлов не показываются. Эти узлы содержат листовые детали: {0}</value>
   </data>
   <data name="Warning_BomItemUnavailable" xml:space="preserve">
-    <value>{0}  (позиция заполняется только в методе «Только детали»)</value>
+    <value>{0}  (позиция заполняется только для спецификации по списку деталей)</value>
   </data>
   <data name="Property_BomItem_DisplayName" xml:space="preserve">
     <value>Позиция</value>
@@ -2006,5 +1999,19 @@
 
 Добавить к повторяющимся именам числовые суффиксы (_2, _3, …)?
 Выберите «Нет», чтобы отменить экспорт и изменить шаблон имени файла (например, добавить «Состояние модели» или «Позиция»).</value>
+  </data>
+  <data name="UI_BomViewModelData" xml:space="preserve">
+    <value>По модели</value>
+  </data>
+  <data name="UI_BomViewPartsOnly" xml:space="preserve">
+    <value>По списку деталей</value>
+  </data>
+  <data name="ToolTip_BomViewModelData" xml:space="preserve">
+    <value>Использует вид спецификации «Данные модели»: все компоненты, фильтры применяются к структуре спецификации каждого компонента.
+Номера позиций недоступны.</value>
+  </data>
+  <data name="ToolTip_BomViewPartsOnly" xml:space="preserve">
+    <value>Использует вид спецификации «Только детали»: количество считает Inventor, а номера позиций доступны в шаблоне имени файла.
+Детали внутри неразъёмных (сварных) и покупных узлов в этом виде не показываются.</value>
   </data>
 </root>

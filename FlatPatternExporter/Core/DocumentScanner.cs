@@ -54,10 +54,10 @@ public class DocumentScanner
 
                 if (processingMethod == ProcessingMethod.Traverse)
                     await Task.Run(() => ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, options, progress, cancellationToken), cancellationToken);
+                else if (processingMethod == ProcessingMethod.BOM && options.BomView == BomViewType.PartsOnly)
+                    await Task.Run(() => ProcessPartsOnlyBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, options, result.HiddenAssemblies, progress, cancellationToken), cancellationToken);
                 else if (processingMethod == ProcessingMethod.BOM)
                     await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, options, progress, cancellationToken), cancellationToken);
-                else if (processingMethod == ProcessingMethod.PartsOnly)
-                    await Task.Run(() => ProcessPartsOnlyBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, options, result.HiddenAssemblies, progress, cancellationToken), cancellationToken);
 
                 await _conflictAnalyzer.AnalyzeConflictsAsync();
                 if (!options.IncludeConflictingParts)
@@ -524,6 +524,7 @@ public class ScanResult
 
 public class ScanOptions
 {
+    public BomViewType BomView { get; set; }
     public bool ExcludeReferenceParts { get; set; }
     public bool ExcludePurchasedParts { get; set; }
     public bool ExcludePhantomParts { get; set; }

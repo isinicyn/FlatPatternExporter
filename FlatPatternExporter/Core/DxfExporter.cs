@@ -67,6 +67,7 @@ public class DxfExporter
 
             var scanOptions = new ScanOptions
             {
+                BomView = exportOptions.SelectedBomView,
                 ExcludeReferenceParts = exportOptions.ExcludeReferenceParts,
                 ExcludePurchasedParts = exportOptions.ExcludePurchasedParts,
                 ExcludePhantomParts = exportOptions.ExcludePhantomParts,
@@ -487,6 +488,7 @@ public class ExportOptions
     public string SubfolderName { get; set; } = "";
     public int Multiplier { get; set; } = 1;
     public ProcessingMethod SelectedProcessingMethod { get; set; }
+    public BomViewType SelectedBomView { get; set; }
 
     public bool ExcludeReferenceParts { get; set; }
     public bool ExcludePurchasedParts { get; set; }

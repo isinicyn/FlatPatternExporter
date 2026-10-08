@@ -15,8 +15,13 @@ public enum ExportFolderType
 public enum ProcessingMethod
 {
     Traverse = 0,          // Traverse
-    BOM = 1,              // Bill of Materials
-    PartsOnly = 2         // Parts Only BOM view
+    BOM = 1               // Bill of Materials
+}
+
+public enum BomViewType
+{
+    ModelData = 0,        // Model Data BOM view
+    PartsOnly = 1         // Parts Only BOM view
 }
 
 public enum SplineReplacementType

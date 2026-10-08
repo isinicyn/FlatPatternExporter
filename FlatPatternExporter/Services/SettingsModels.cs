@@ -96,6 +96,7 @@ public record ApplicationSettings
     public OrganizationSettings Organization { get; init; } = new();
 
     public ProcessingMethod SelectedProcessingMethod { get; init; } = ProcessingMethod.BOM;
+    public BomViewType SelectedBomView { get; init; } = BomViewType.ModelData;
 
     public DxfExportSettings DxfExport { get; init; } = new();
     public SplineSettings Spline { get; init; } = new();
