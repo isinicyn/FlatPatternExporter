@@ -1368,11 +1368,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// <summary>
     /// Warns when several parts would be exported to the same file; the export adds numeric suffixes to repeated names
     /// </summary>
-    private bool ConfirmFileNameCollisions(IEnumerable<PartData> partsDataList, string targetDirectory, ExportOptions exportOptions)
+    private bool ConfirmFileNameCollisions(IEnumerable<PartData> partsDataList, ExportContext context)
     {
         const int maxListedCollisions = 10;
 
-        var collisions = _dxfExporter.FindFileNameCollisions(partsDataList, targetDirectory, exportOptions);
+        var collisions = _dxfExporter.FindFileNameCollisions(partsDataList, context);
         if (collisions.Count == 0) return true;
 
         var lines = collisions.Take(maxListedCollisions).Select(group =>
@@ -1384,6 +1384,44 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var result = CustomMessageBox.Show(this, _localizationManager.GetString("Question_FileNameCollisions", collisions.Count, details),
             _localizationManager.GetString("MessageBox_Warning"), MessageBoxButton.YesNo, MessageBoxImage.Warning);
         return result == MessageBoxResult.Yes;
+    }
+
+    /// <summary>
+    /// Confirms file names, exports parts to DXF and shows the result.
+    /// Quick export starts the operation earlier, while it reads part data.
+    /// </summary>
+    private async Task RunExportAsync(List<PartData> partsDataList, ExportContext context, int skippedBeforeExport = 0, bool isQuickMode = false)
+    {
+        if (!ConfirmFileNameCollisions(partsDataList, context))
+        {
+            if (isQuickMode)
+            {
+                SetUIState(UIState.CreateClearedState());
+                _isExporting = false;
+            }
+            return;
+        }
+
+        // Configure UI for export
+        if (isQuickMode)
+            SetUIState(UIState.Exporting());
+        else
+            InitializeOperation(UIState.Exporting(), ref _isExporting);
+
+        var stopwatch = Stopwatch.StartNew();
+
+        // Execute export via centralized error handling
+        var result = await ExecuteWithErrorHandlingAsync(async () =>
+        {
+            var exportProgress = new Progress<double>(UpdateExportProgress);
+            var (processedCount, skippedCount) = await Task.Run(
+                () => _dxfExporter.ExportDXF(partsDataList, context, exportProgress, _operationCts!.Token), _operationCts!.Token);
+
+            return CreateExportOperationResult(processedCount, skippedCount + skippedBeforeExport, stopwatch.Elapsed);
+        }, LocalizationManager.Instance.GetString("Operation_Export"));
+
+        // Complete operation
+        CompleteOperation(result, OperationType.Export, ref _isExporting, isQuickMode);
     }
 
     private ExportOptions CreateExportOptions()
@@ -1985,27 +2023,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         if (context == null) return;
 
         var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.FullDocumentName)).ToList();
-        var exportOptions = CreateExportOptions();
-        if (!ConfirmFileNameCollisions(partsDataList, context.TargetDirectory, exportOptions)) return;
-
-        // Configure UI for export
-        InitializeOperation(UIState.Exporting(), ref _isExporting);
-        var stopwatch = Stopwatch.StartNew();
-
-        // Execute export via centralized error handling
-        var result = await ExecuteWithErrorHandlingAsync(async () =>
-        {
-            var processedCount = 0;
-            var skippedCount = 0;
-            var exportProgress = new Progress<double>(UpdateExportProgress);
-            await Task.Run(() => _dxfExporter.ExportDXF(partsDataList, context.TargetDirectory, context.Multiplier,
-                exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
-
-            return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
-        }, LocalizationManager.Instance.GetString("Operation_Export"));
-
-        // Complete operation
-        CompleteOperation(result, OperationType.Export, ref _isExporting);
+        await RunExportAsync(partsDataList, context);
     }
 
     private void StartClearList()
@@ -2381,6 +2399,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var tempPartsDataList = new List<PartData>();
         var itemCounter = 1;
         var totalParts = context.SheetMetalParts.Count;
+        var multiplier = context.Options.Multiplier;
 
         foreach (var part in context.SheetMetalParts.Values)
         {
@@ -2393,44 +2412,17 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 await Task.Delay(1); // Minimal delay for UI update
             }
 
-            var partData = await _partDataReader.GetPartDataAsync(part, context.RootProperties, part.Quantity * context.Multiplier, itemCounter++, loadThumbnail: false);
+            var partData = await _partDataReader.GetPartDataAsync(part, context.RootProperties, part.Quantity * multiplier, itemCounter++, loadThumbnail: false);
             if (partData != null)
             {
                 // Don't call SetQuantityInternal again - quantity already set correctly in GetPartDataAsync
-                partData.IsMultiplied = context.Multiplier > 1;
+                partData.IsMultiplied = multiplier > 1;
                 tempPartsDataList.Add(partData);
             }
         }
 
         context.GenerateThumbnails = false;
-        var exportOptions = CreateExportOptions();
-        exportOptions.ShowFileLockedDialogs = true;
-        if (!ConfirmFileNameCollisions(tempPartsDataList, context.TargetDirectory, exportOptions))
-        {
-            SetUIState(UIState.CreateClearedState());
-            _isExporting = false;
-            return;
-        }
-
-        // Switch to export state when file export ACTUALLY begins
-        SetUIState(UIState.Exporting());
-
-        var stopwatch = Stopwatch.StartNew();
-
-        // Execute export via centralized error handling
-        var result = await ExecuteWithErrorHandlingAsync(async () =>
-        {
-            var processedCount = 0;
-            var skippedCount = 0;
-            var exportProgress = new Progress<double>(UpdateExportProgress);
-            await Task.Run(() => _dxfExporter.ExportDXF(tempPartsDataList, context.TargetDirectory, context.Multiplier,
-                exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
-
-            return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
-        }, "quick export");
-
-        // Complete operation
-        CompleteOperation(result, OperationType.Export, ref _isExporting, isQuickMode: true);
+        await RunExportAsync(tempPartsDataList, context, isQuickMode: true);
     }
 
     private async void ExportButton_Click(object sender, RoutedEventArgs e)
@@ -2482,27 +2474,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: true, showProgress: false);
         if (context == null) return;
 
-        var exportOptions = CreateExportOptions();
-        if (!ConfirmFileNameCollisions(selectedItems, context.TargetDirectory, exportOptions)) return;
-
-        // Configure UI for export
-        InitializeOperation(UIState.Exporting(), ref _isExporting);
-        var stopwatch = Stopwatch.StartNew();
-
-        // Execute export via centralized error handling
-        var result = await ExecuteWithErrorHandlingAsync(async () =>
-        {
-            var processedCount = 0;
-            var skippedCount = itemsWithoutFlatPattern.Count;
-            var exportProgress = new Progress<double>(UpdateExportProgress);
-            await Task.Run(() => _dxfExporter.ExportDXF(selectedItems, context.TargetDirectory, context.Multiplier,
-                exportOptions, ref processedCount, ref skippedCount, context.GenerateThumbnails, exportProgress, _operationCts!.Token), _operationCts!.Token);
-
-            return CreateExportOperationResult(processedCount, skippedCount, stopwatch.Elapsed);
-        }, "selected parts export");
-
-        // Complete operation
-        CompleteOperation(result, OperationType.Export, ref _isExporting);
+        await RunExportAsync(selectedItems, context, skippedBeforeExport: itemsWithoutFlatPattern.Count);
     }
 
     private void MultiplierTextBox_TextChanged(object sender, TextChangedEventArgs e)

@@ -39,7 +39,7 @@ public class DxfExporter
         Document? lastScannedDocument,
         ExportOptions exportOptions)
     {
-        var context = new ExportContext();
+        var context = new ExportContext { Options = exportOptions };
 
         try
         {
@@ -55,7 +55,7 @@ public class DxfExporter
                 return context;
             }
 
-            if (!PrepareForExport(exportOptions, out var targetDir, out var multiplier))
+            if (!PrepareForExport(exportOptions, out var targetDir))
             {
                 context.IsValid = false;
                 context.ErrorMessage = LocalizationManager.Instance.GetString("Error_ExportPreparation");
@@ -63,7 +63,6 @@ public class DxfExporter
             }
 
             context.TargetDirectory = targetDir;
-            context.Multiplier = multiplier;
 
             var scanResult = await _documentScanner.ScanDocumentAsync(
                 document,
@@ -84,10 +83,9 @@ public class DxfExporter
         return context;
     }
 
-    private bool PrepareForExport(ExportOptions exportOptions, out string targetDir, out int multiplier)
+    private bool PrepareForExport(ExportOptions exportOptions, out string targetDir)
     {
         targetDir = "";
-        multiplier = 1;
 
         switch (exportOptions.SelectedExportFolder)
         {
@@ -136,28 +134,23 @@ public class DxfExporter
             if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
         }
 
-        multiplier = exportOptions.Multiplier;
         return true;
     }
 
-    public void ExportDXF(
-        IEnumerable<PartData> partsDataList,
-        string targetDir,
-        int multiplier,
-        ExportOptions exportOptions,
-        ref int processedCount,
-        ref int skippedCount,
-        bool generateThumbnails,
+    public (int Processed, int Skipped) ExportDXF(
+        IReadOnlyCollection<PartData> partsDataList,
+        ExportContext context,
         IProgress<double>? progress,
         CancellationToken cancellationToken = default)
     {
-        var totalParts = partsDataList.Count();
+        var exportOptions = context.Options;
+        var totalParts = partsDataList.Count;
         progress?.Report(0);
 
-        var localProcessedCount = processedCount;
-        var localSkippedCount = skippedCount;
+        var processedCount = 0;
+        var skippedCount = 0;
 
-        var thumbnailGenerator = generateThumbnails ? new ThumbnailGenerator() : null;
+        var thumbnailGenerator = context.GenerateThumbnails ? new ThumbnailGenerator() : null;
         var usedFilePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var partData in partsDataList)
@@ -171,8 +164,6 @@ public class DxfExporter
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-            var qty = partData.IsOverridden ? partData.Quantity : partData.OriginalQuantity * multiplier;
-
             PartDocument? partDoc = null;
             try
             {
@@ -181,7 +172,7 @@ public class DxfExporter
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
 
-                var filePath = GetTargetFilePath(partData, targetDir, exportOptions);
+                var filePath = GetTargetFilePath(partData, context);
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? "");
 
                 if (!IsValidPath(filePath)) continue;
@@ -260,7 +251,7 @@ public class DxfExporter
 
                 partData.ProcessingStatusEnum = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Skipped;
 
-                if (exportSuccess && generateThumbnails && thumbnailGenerator != null &&
+                if (exportSuccess && thumbnailGenerator != null &&
                     AcadVersionMapping.SupportsOptimization(exportOptions.SelectedAcadVersion))
                 {
                     var dxfPreview = thumbnailGenerator.GenerateDxfThumbnails(filePath, Dispatcher.CurrentDispatcher);
@@ -271,15 +262,15 @@ public class DxfExporter
                 }
 
                 if (exportSuccess)
-                    localProcessedCount++;
+                    processedCount++;
                 else
-                    localSkippedCount++;
+                    skippedCount++;
 
-                progress?.Report(totalParts > 0 ? (double)localProcessedCount / totalParts * 100 : 0);
+                progress?.Report(totalParts > 0 ? (double)processedCount / totalParts * 100 : 0);
             }
             catch (Exception ex)
             {
-                localSkippedCount++;
+                skippedCount++;
                 Debug.WriteLine($"Part processing error: {ex.Message}");
             }
         }
@@ -296,20 +287,19 @@ public class DxfExporter
             throw;
         }
 
-        processedCount = localProcessedCount;
-        skippedCount = localSkippedCount;
-
         progress?.Report(100);
+        return (processedCount, skippedCount);
     }
 
     /// <summary>
     /// Builds the full DXF path for a part from the export folder, organization options and file name template
     /// </summary>
-    public string GetTargetFilePath(PartData partData, string targetDir, ExportOptions exportOptions)
+    public string GetTargetFilePath(PartData partData, ExportContext context)
     {
+        var exportOptions = context.Options;
         var directory = exportOptions.SelectedExportFolder == ExportFolderType.PartFolder
             ? Path.GetDirectoryName(partData.FullFileName) ?? ""
-            : targetDir;
+            : context.TargetDirectory;
 
         if (exportOptions.OrganizeByMaterial)
             directory = Path.Combine(directory, partData.Material);
@@ -327,11 +317,11 @@ public class DxfExporter
     /// <summary>
     /// Finds parts with flat patterns that would be exported to the same file
     /// </summary>
-    public List<IGrouping<string, PartData>> FindFileNameCollisions(IEnumerable<PartData> partsDataList, string targetDir, ExportOptions exportOptions)
+    public List<IGrouping<string, PartData>> FindFileNameCollisions(IEnumerable<PartData> partsDataList, ExportContext context)
     {
         return [.. partsDataList
             .Where(p => p.HasFlatPattern)
-            .GroupBy(p => GetTargetFilePath(p, targetDir, exportOptions), StringComparer.OrdinalIgnoreCase)
+            .GroupBy(p => GetTargetFilePath(p, context), StringComparer.OrdinalIgnoreCase)
             .Where(g => g.Count() > 1)];
     }
 
@@ -459,8 +449,8 @@ public class DxfExporter
 
 public class ExportContext
 {
+    public ExportOptions Options { get; set; } = new();
     public string TargetDirectory { get; set; } = "";
-    public int Multiplier { get; set; } = 1;
     public Dictionary<string, ScannedPart> SheetMetalParts { get; set; } = [];
     public IReadOnlyDictionary<string, string> RootProperties { get; set; } = new Dictionary<string, string>();
     public bool GenerateThumbnails { get; set; } = true;
