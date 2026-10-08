@@ -70,7 +70,8 @@ public class DxfExporter
                 ExcludeReferenceParts = exportOptions.ExcludeReferenceParts,
                 ExcludePurchasedParts = exportOptions.ExcludePurchasedParts,
                 ExcludePhantomParts = exportOptions.ExcludePhantomParts,
-                IncludeLibraryComponents = exportOptions.IncludeLibraryComponents
+                IncludeLibraryComponents = exportOptions.IncludeLibraryComponents,
+                IncludeConflictingParts = exportOptions.IncludeConflictingParts
             };
 
             var scanResult = await _documentScanner.ScanDocumentAsync(
@@ -166,6 +167,7 @@ public class DxfExporter
         var localSkippedCount = skippedCount;
 
         var thumbnailGenerator = generateThumbnails ? new ThumbnailGenerator() : null;
+        var usedFilePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var partData in partsDataList)
         {
@@ -178,13 +180,7 @@ public class DxfExporter
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var partNumber = partData.PartNumber;
             var qty = partData.IsOverridden ? partData.Quantity : partData.OriginalQuantity * multiplier;
-
-            if (exportOptions.SelectedExportFolder == ExportFolderType.PartFolder)
-            {
-                targetDir = Path.GetDirectoryName(partData.FullFileName) ?? "";
-            }
 
             PartDocument? partDoc = null;
             try
@@ -193,28 +189,10 @@ public class DxfExporter
                 if (partDoc == null) throw new Exception(LocalizationManager.Instance.GetString("Error_PartFileNotFound"));
 
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
-                var material = partData.Material;
-                var thickness = partData.Thickness;
 
-                var materialDir = exportOptions.OrganizeByMaterial ? Path.Combine(targetDir, material) : targetDir;
-                if (!Directory.Exists(materialDir)) Directory.CreateDirectory(materialDir);
-
-                var thicknessDir = exportOptions.OrganizeByThickness
-                    ? Path.Combine(materialDir, thickness)
-                    : materialDir;
-                if (!Directory.Exists(thicknessDir)) Directory.CreateDirectory(thicknessDir);
-
-                string fileName;
-                if (exportOptions.EnableFileNameConstructor && !string.IsNullOrEmpty(_tokenService.FileNameTemplate))
-                {
-                    fileName = _tokenService.ResolveTemplate(_tokenService.FileNameTemplate, partData);
-                }
-                else
-                {
-                    fileName = partNumber;
-                }
-
-                var filePath = Path.Combine(thicknessDir, fileName + ".dxf");
+                var filePath = GetTargetFilePath(partData, targetDir, exportOptions);
+                var fileDir = Path.GetDirectoryName(filePath) ?? "";
+                if (!Directory.Exists(fileDir)) Directory.CreateDirectory(fileDir);
 
                 if (!IsValidPath(filePath)) continue;
 
@@ -222,6 +200,10 @@ public class DxfExporter
 
                 if (smCompDef.HasFlatPattern)
                 {
+                    if (exportOptions.AppendSuffixOnCollision)
+                        filePath = GetUniqueFilePath(filePath, usedFilePaths);
+                    usedFilePaths.Add(filePath);
+
                     var flatPattern = smCompDef.FlatPattern;
                     var oDataIO = flatPattern.DataIO;
 
@@ -330,6 +312,54 @@ public class DxfExporter
         skippedCount = localSkippedCount;
 
         progress?.Report(100);
+    }
+
+    /// <summary>
+    /// Builds the full DXF path for a part from the export folder, organization options and file name template
+    /// </summary>
+    public string GetTargetFilePath(PartData partData, string targetDir, ExportOptions exportOptions)
+    {
+        var directory = exportOptions.SelectedExportFolder == ExportFolderType.PartFolder
+            ? Path.GetDirectoryName(partData.FullFileName) ?? ""
+            : targetDir;
+
+        if (exportOptions.OrganizeByMaterial)
+            directory = Path.Combine(directory, partData.Material);
+
+        if (exportOptions.OrganizeByThickness)
+            directory = Path.Combine(directory, partData.Thickness);
+
+        var fileName = exportOptions.EnableFileNameConstructor && !string.IsNullOrEmpty(_tokenService.FileNameTemplate)
+            ? _tokenService.ResolveTemplate(_tokenService.FileNameTemplate, partData)
+            : partData.PartNumber;
+
+        return Path.Combine(directory, fileName + ".dxf");
+    }
+
+    /// <summary>
+    /// Finds parts with flat patterns that would be exported to the same file
+    /// </summary>
+    public List<IGrouping<string, PartData>> FindFileNameCollisions(IEnumerable<PartData> partsDataList, string targetDir, ExportOptions exportOptions)
+    {
+        return [.. partsDataList
+            .Where(p => p.HasFlatPattern)
+            .GroupBy(p => GetTargetFilePath(p, targetDir, exportOptions), StringComparer.OrdinalIgnoreCase)
+            .Where(g => g.Count() > 1)];
+    }
+
+    private static string GetUniqueFilePath(string filePath, HashSet<string> usedFilePaths)
+    {
+        if (!usedFilePaths.Contains(filePath)) return filePath;
+
+        var directory = Path.GetDirectoryName(filePath) ?? "";
+        var fileName = Path.GetFileNameWithoutExtension(filePath);
+        var extension = Path.GetExtension(filePath);
+
+        for (var index = 2; ; index++)
+        {
+            var candidate = Path.Combine(directory, $"{fileName}_{index}{extension}");
+            if (!usedFilePaths.Contains(candidate)) return candidate;
+        }
     }
 
     private string PrepareExportOptions(ExportOptions exportOptions)
@@ -462,6 +492,7 @@ public class ExportOptions
     public bool ExcludePurchasedParts { get; set; }
     public bool ExcludePhantomParts { get; set; }
     public bool IncludeLibraryComponents { get; set; }
+    public bool IncludeConflictingParts { get; set; }
 
     public bool OrganizeByMaterial { get; set; }
     public bool OrganizeByThickness { get; set; }
@@ -478,4 +509,5 @@ public class ExportOptions
 
     public List<LayerSetting> LayerSettings { get; set; } = [];
     public bool ShowFileLockedDialogs { get; set; } = true;
+    public bool AppendSuffixOnCollision { get; set; }
 }

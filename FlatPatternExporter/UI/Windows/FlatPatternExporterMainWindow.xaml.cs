@@ -107,6 +107,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private bool _excludePurchasedParts = true;
     private bool _excludePhantomParts = true;
     private bool _includeLibraryComponents = false;
+    private bool _includeConflictingParts = false;
 
     // File organization settings
     private bool _organizeByMaterial = false;
@@ -309,6 +310,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             ExcludePurchasedParts = settings.ComponentFilter.ExcludePurchasedParts;
             ExcludePhantomParts = settings.ComponentFilter.ExcludePhantomParts;
             IncludeLibraryComponents = settings.ComponentFilter.IncludeLibraryComponents;
+            IncludeConflictingParts = settings.ComponentFilter.IncludeConflictingParts;
 
             // Organization settings
             OrganizeByMaterial = settings.Organization.OrganizeByMaterial;
@@ -523,7 +525,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 ExcludeReferenceParts = ExcludeReferenceParts,
                 ExcludePurchasedParts = ExcludePurchasedParts,
                 ExcludePhantomParts = ExcludePhantomParts,
-                IncludeLibraryComponents = IncludeLibraryComponents
+                IncludeLibraryComponents = IncludeLibraryComponents,
+                IncludeConflictingParts = IncludeConflictingParts
             },
 
             Organization = new OrganizationSettings
@@ -640,6 +643,19 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             if (_includeLibraryComponents != value)
             {
                 _includeLibraryComponents = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool IncludeConflictingParts
+    {
+        get => _includeConflictingParts;
+        set
+        {
+            if (_includeConflictingParts != value)
+            {
+                _includeConflictingParts = value;
                 OnPropertyChanged();
             }
         }
@@ -1211,7 +1227,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 var warnings = new List<string>();
                 if (_documentScanner.ConflictAnalyzer.ConflictCount > 0)
                 {
-                    warnings.Add(_localizationManager.GetString("Info_ConflictsDetected", _documentScanner.ConflictAnalyzer.ConflictCount));
+                    var conflictsKey = IncludeConflictingParts ? "Info_ConflictsDetectedIncluded" : "Info_ConflictsDetected";
+                    warnings.Add(_localizationManager.GetString(conflictsKey, _documentScanner.ConflictAnalyzer.ConflictCount));
                 }
                 else if (_documentScanner.HasMissingReferences)
                 {
@@ -1325,6 +1342,30 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         return true;
     }
 
+    /// <summary>
+    /// Warns when several parts would be exported to the same file and lets the user add numeric suffixes
+    /// </summary>
+    private bool ConfirmFileNameCollisions(IEnumerable<PartData> partsDataList, string targetDirectory, ExportOptions exportOptions)
+    {
+        const int maxListedCollisions = 10;
+
+        var collisions = _dxfExporter.FindFileNameCollisions(partsDataList, targetDirectory, exportOptions);
+        if (collisions.Count == 0) return true;
+
+        var lines = collisions.Take(maxListedCollisions).Select(group =>
+            $"{System.IO.Path.GetFileName(group.Key)}: {string.Join(", ", group.Select(p => System.IO.Path.GetFileName(p.FullDocumentName)))}");
+        var details = string.Join(System.Environment.NewLine, lines);
+        if (collisions.Count > maxListedCollisions)
+            details += System.Environment.NewLine + "…";
+
+        var result = CustomMessageBox.Show(this, _localizationManager.GetString("Question_FileNameCollisions", collisions.Count, details),
+            _localizationManager.GetString("MessageBox_Warning"), MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        if (result != MessageBoxResult.Yes) return false;
+
+        exportOptions.AppendSuffixOnCollision = true;
+        return true;
+    }
+
     private ExportOptions CreateExportOptions()
     {
         return new ExportOptions
@@ -1339,6 +1380,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             ExcludePurchasedParts = ExcludePurchasedParts,
             ExcludePhantomParts = ExcludePhantomParts,
             IncludeLibraryComponents = IncludeLibraryComponents,
+            IncludeConflictingParts = IncludeConflictingParts,
             OrganizeByMaterial = OrganizeByMaterial,
             OrganizeByThickness = OrganizeByThickness,
             EnableFileNameConstructor = EnableFileNameConstructor,
@@ -1921,13 +1963,15 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: true, showProgress: true);
         if (context == null) return;
 
+        var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.FullDocumentName)).ToList();
+        var exportOptions = CreateExportOptions();
+        if (!ConfirmFileNameCollisions(partsDataList, context.TargetDirectory, exportOptions)) return;
+
         // Configure UI for export
         InitializeOperation(UIState.Exporting(), ref _isExporting);
         var stopwatch = Stopwatch.StartNew();
 
         // Execute export via centralized error handling
-        var partsDataList = _partsData.Where(p => context.SheetMetalParts.ContainsKey(p.FullDocumentName)).ToList();
-        var exportOptions = CreateExportOptions();
         var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
             var processedCount = 0;
@@ -2046,7 +2090,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 ExcludeReferenceParts = ExcludeReferenceParts,
                 ExcludePurchasedParts = ExcludePurchasedParts,
                 ExcludePhantomParts = ExcludePhantomParts,
-                IncludeLibraryComponents = IncludeLibraryComponents
+                IncludeLibraryComponents = IncludeLibraryComponents,
+                IncludeConflictingParts = IncludeConflictingParts
             };
 
             // Use ScanService for scanning
@@ -2348,15 +2393,22 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             }
         }
 
+        context.GenerateThumbnails = false;
+        var exportOptions = CreateExportOptions();
+        exportOptions.ShowFileLockedDialogs = true;
+        if (!ConfirmFileNameCollisions(tempPartsDataList, context.TargetDirectory, exportOptions))
+        {
+            SetUIState(UIState.CreateClearedState());
+            _isExporting = false;
+            return;
+        }
+
         // Switch to export state when file export ACTUALLY begins
         SetUIState(UIState.Exporting());
 
         var stopwatch = Stopwatch.StartNew();
 
         // Execute export via centralized error handling
-        context.GenerateThumbnails = false;
-        var exportOptions = CreateExportOptions();
-        exportOptions.ShowFileLockedDialogs = true;
         var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
             var processedCount = 0;
@@ -2421,12 +2473,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var context = await PrepareExportContextOrShowError(validation.Document!, requireScan: true, showProgress: false);
         if (context == null) return;
 
+        var exportOptions = CreateExportOptions();
+        if (!ConfirmFileNameCollisions(selectedItems, context.TargetDirectory, exportOptions)) return;
+
         // Configure UI for export
         InitializeOperation(UIState.Exporting(), ref _isExporting);
         var stopwatch = Stopwatch.StartNew();
 
         // Execute export via centralized error handling
-        var exportOptions = CreateExportOptions();
         var result = await ExecuteWithErrorHandlingAsync(async () =>
         {
             var processedCount = 0;

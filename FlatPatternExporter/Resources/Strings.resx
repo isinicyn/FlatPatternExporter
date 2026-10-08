@@ -1984,4 +1984,27 @@ Enable it? The assembly will be marked as modified.</value>
   <data name="Property_BomItem_Category" xml:space="preserve">
     <value>System</value>
   </data>
+  <data name="UI_IncludeConflicting" xml:space="preserve">
+    <value>Include duplicate part numbers</value>
+  </data>
+  <data name="ToolTip_IncludeConflicting" xml:space="preserve">
+    <value>Keep parts that share a part number (different files or model states) in the table instead of excluding them.
+Make sure their file names differ, for example add Model State or BOM Item to the file name template.</value>
+  </data>
+  <data name="Info_ConflictsDetectedIncluded" xml:space="preserve">
+    <value>Part designation conflicts detected.
+Total conflicts: {0}
+
+Different models or model states with identical designations found. They are kept in the table, make sure their DXF file names differ.
+
+Use the "Conflicts" button on the control panel to view conflict details.</value>
+  </data>
+  <data name="Question_FileNameCollisions" xml:space="preserve">
+    <value>{0} file name(s) are used by several parts, the files would overwrite each other:
+
+{1}
+
+Add numeric suffixes (_2, _3, …) to the repeated names?
+Choose "No" to cancel the export and adjust the file name template (for example, add Model State or BOM Item).</value>
+  </data>
 </root>

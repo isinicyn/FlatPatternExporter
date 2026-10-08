@@ -60,7 +60,8 @@ public class DocumentScanner
                     await Task.Run(() => ProcessPartsOnlyBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, options, result.HiddenAssemblies, progress, cancellationToken), cancellationToken);
 
                 await _conflictAnalyzer.AnalyzeConflictsAsync();
-                _conflictAnalyzer.FilterConflictingParts(sheetMetalParts);
+                if (!options.IncludeConflictingParts)
+                    _conflictAnalyzer.FilterConflictingParts(sheetMetalParts);
 
                 result.SheetMetalParts = sheetMetalParts;
                 result.ProcessedCount = sheetMetalParts.Count;
@@ -527,4 +528,5 @@ public class ScanOptions
     public bool ExcludePurchasedParts { get; set; }
     public bool ExcludePhantomParts { get; set; }
     public bool IncludeLibraryComponents { get; set; }
+    public bool IncludeConflictingParts { get; set; }
 }

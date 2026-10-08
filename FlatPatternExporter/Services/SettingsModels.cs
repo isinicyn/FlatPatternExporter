@@ -34,6 +34,7 @@ public record ComponentFilterSettings
     public bool ExcludePurchasedParts { get; init; } = true;
     public bool ExcludePhantomParts { get; init; } = true;
     public bool IncludeLibraryComponents { get; init; }
+    public bool IncludeConflictingParts { get; init; }
 }
 
 public record OrganizationSettings
