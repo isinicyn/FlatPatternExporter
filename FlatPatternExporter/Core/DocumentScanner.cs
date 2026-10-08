@@ -62,25 +62,18 @@ public class DocumentScanner
                 await _conflictAnalyzer.AnalyzeConflictsAsync();
                 if (!options.IncludeConflictingParts)
                     _conflictAnalyzer.FilterConflictingParts(sheetMetalParts);
-
-                result.SheetMetalParts = sheetMetalParts;
-                result.ProcessedCount = sheetMetalParts.Count;
             }
             else if (document.DocumentType == DocumentTypeEnum.kPartDocumentObject)
             {
                 var partDoc = (PartDocument)document;
 
                 if (!options.IncludeLibraryComponents && _inventorManager.IsLibraryComponent(partDoc.FullFileName))
-                {
-                    result.ProcessedCount = 0;
                     return result;
-                }
 
                 ProcessPartDocument(partDoc, sheetMetalParts, 1);
-                result.ProcessedCount = sheetMetalParts.Count;
-                result.SheetMetalParts = sheetMetalParts;
             }
 
+            result.SheetMetalParts = sheetMetalParts;
             result.WasCancelled = cancellationToken.IsCancellationRequested;
             result.HasMissingReferences = _hasMissingReferences;
         }
@@ -339,61 +332,48 @@ public class DocumentScanner
         ScanOptions options,
         List<string> hiddenAssemblies)
     {
-        if (!hideSuppressed && row.ItemQuantity <= 0) return;
-
-        if (options.ExcludePurchasedParts && row.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure) return;
+        var rowQuantity = row.ItemQuantity;
+        if (!hideSuppressed && rowQuantity <= 0) return;
 
         var componentDefinition = row.ComponentDefinitions[1];
         if (componentDefinition is VirtualComponentDefinition) return;
 
+        var bomStructure = row.BOMStructure;
+        var document = componentDefinition.Document;
+
         // Inseparable and purchased assemblies are listed as single rows, their parts are not shown
-        if (componentDefinition.Document is AssemblyDocument asmDoc)
+        if (document is AssemblyDocument asmDoc)
         {
-            if (ContainsSheetMetalParts(asmDoc))
+            if (!ShouldExcludeComponent(bomStructure, asmDoc.FullFileName, options) && ContainsSheetMetalParts(asmDoc))
                 hiddenAssemblies.Add(new PropertyManager((Document)asmDoc).GetMappedProperty("PartNumber"));
             return;
         }
 
-        foreach (var (partDoc, quantity) in GetRowPartDocuments(row))
-        {
-            if (!options.IncludeLibraryComponents && _inventorManager.IsLibraryComponent(partDoc.FullFileName))
-                continue;
+        List<(PartDocument PartDoc, int Quantity)> rowDocuments = row.Merged
+            ? GetMergedRowDocuments(row)
+            : document is PartDocument partDoc ? [(partDoc, rowQuantity)] : [];
 
-            ProcessPartDocument(partDoc, sheetMetalParts, quantity, row.ItemNumber);
+        foreach (var (rowPartDoc, quantity) in rowDocuments)
+        {
+            if (!ShouldExcludeComponent(bomStructure, rowPartDoc.FullFileName, options))
+                ProcessPartDocument(rowPartDoc, sheetMetalParts, quantity, row.ItemNumber);
         }
     }
 
-    private static IEnumerable<(PartDocument PartDoc, int Quantity)> GetRowPartDocuments(BOMRow row)
+    // A merged row combines different documents with the same part number: split it by referenced document
+    private static List<(PartDocument PartDoc, int Quantity)> GetMergedRowDocuments(BOMRow row)
     {
-        if (!row.Merged)
-        {
-            if (row.ComponentDefinitions[1].Document is PartDocument partDoc)
-                yield return (partDoc, row.ItemQuantity);
-            yield break;
-        }
-
-        // A merged row combines different documents with the same part number: split it by referenced document
-        var documents = new Dictionary<string, (PartDocument PartDoc, int Quantity)>(StringComparer.OrdinalIgnoreCase);
-        foreach (ComponentOccurrence occ in row.ComponentOccurrences)
-        {
-            if (occ.Definition.Document is not PartDocument partDoc) continue;
-
-            var key = partDoc.FullDocumentName;
-            documents[key] = documents.TryGetValue(key, out var entry) ? (entry.PartDoc, entry.Quantity + 1) : (partDoc, 1);
-        }
-
-        foreach (var entry in documents.Values)
-            yield return entry;
+        return [.. row.ComponentOccurrences.Cast<ComponentOccurrence>()
+            .Select(occ => occ.Definition.Document)
+            .OfType<PartDocument>()
+            .GroupBy(partDoc => partDoc.FullDocumentName, StringComparer.OrdinalIgnoreCase)
+            .Select(group => (group.First(), group.Count()))];
     }
 
     private static bool ContainsSheetMetalParts(AssemblyDocument asmDoc)
     {
-        foreach (Document doc in asmDoc.AllReferencedDocuments)
-        {
-            if (doc is PartDocument partDoc && partDoc.SubType == PropertyManager.SheetMetalSubType)
-                return true;
-        }
-        return false;
+        return asmDoc.AllReferencedDocuments.Cast<Document>()
+            .Any(doc => doc.SubType == PropertyManager.SheetMetalSubType);
     }
 
     private static BOMView? GetBOMView(BOM bom, BOMViewTypeEnum viewType)
@@ -421,10 +401,7 @@ public class DocumentScanner
     {
         try
         {
-            var componentDefinition = row.ComponentDefinitions[1];
-            if (componentDefinition == null) return;
-
-            if (componentDefinition.Document is PartDocument partDoc)
+            if (row.ComponentDefinitions[1]?.Document is PartDocument partDoc)
                 ProcessPartDocument(partDoc, sheetMetalParts, row.ItemQuantity * parentQuantity);
         }
         catch (Exception ex)
@@ -435,28 +412,33 @@ public class DocumentScanner
 
     private void ProcessPartDocument(PartDocument partDoc, Dictionary<string, ScannedPart> sheetMetalParts, int quantity, string bomItem = "")
     {
+        var key = partDoc.FullDocumentName;
+        if (sheetMetalParts.TryGetValue(key, out var part))
+        {
+            part.Quantity += quantity;
+            return;
+        }
+
+        // Already processed and not a sheet metal part
+        if (_documentCache.GetCachedPartDocument(key) != null) return;
+
         var mgr = new PropertyManager((Document)partDoc);
         var partNumber = mgr.GetMappedProperty("PartNumber");
         if (string.IsNullOrEmpty(partNumber)) return;
 
-        _documentCache.AddDocumentToCache(partDoc);
+        _documentCache.AddDocumentToCache(key, partDoc);
 
         if (partDoc.SubType != PropertyManager.SheetMetalSubType) return;
 
         _conflictAnalyzer.AddPartToTracker(partNumber, partDoc.FullFileName, mgr.GetModelState());
-
-        var key = partDoc.FullDocumentName;
-        if (sheetMetalParts.TryGetValue(key, out var part))
-            part.Quantity += quantity;
-        else
-            sheetMetalParts.Add(key, new ScannedPart { FullDocumentName = key, PartNumber = partNumber, Quantity = quantity, BomItem = bomItem });
+        sheetMetalParts.Add(key, new ScannedPart { FullDocumentName = key, PartNumber = partNumber, Quantity = quantity, BomItem = bomItem });
     }
 
     private static Dictionary<string, string> ReadRootProperties(Document document)
     {
         var mgr = new PropertyManager(document);
-        return PropertyMetadataRegistry.RootProperties.Keys
-            .Select(PropertyMetadataRegistry.GetSourceNameFromRootInternalName)
+        return PropertyMetadataRegistry.RootProperties.Values
+            .Select(p => p.SourceName)
             .ToDictionary(name => name, name => mgr.GetMappedProperty(name));
     }
 
@@ -512,7 +494,7 @@ public class ScanResult
 {
     public Dictionary<string, ScannedPart> SheetMetalParts { get; set; } = [];
     public IReadOnlyDictionary<string, string> RootProperties { get; set; } = new Dictionary<string, string>();
-    public int ProcessedCount { get; set; }
+    public int ProcessedCount => SheetMetalParts.Count;
     public int SkippedCount { get; set; }
     public TimeSpan ElapsedTime { get; set; }
     public bool WasCancelled { get; set; }

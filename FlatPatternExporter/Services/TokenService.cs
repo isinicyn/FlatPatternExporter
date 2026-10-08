@@ -18,7 +18,7 @@ public class TokenElement
     
     public bool IsUserDefined => !IsCustomText && PropertyMetadataRegistry.IsUserDefinedProperty(Name);
 
-    public bool IsRoot => !IsCustomText && PropertyMetadataRegistry.IsRootProperty(Name);
+    public bool IsRoot => !IsCustomText && PropertyMetadataRegistry.RootProperties.ContainsKey(Name);
 
     public string GetDisplayName()
     {
@@ -40,13 +40,11 @@ public partial class TokenService : INotifyPropertyChanged
     private readonly List<TokenElement> _tokenElements = [];
     private WrapPanel? _tokenContainer;
 
-    private const string BomItemToken = "{BomItem}";
-
     private string _fileNameTemplate = string.Empty;
     private string _fileNamePreview = string.Empty;
     private bool _isFileNameTemplateValid = true;
     private bool _hasPreviewWarning;
-    private bool _isBomItemAvailable;
+    private IReadOnlyCollection<string> _unavailableTokens = [];
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -120,9 +118,9 @@ public partial class TokenService : INotifyPropertyChanged
                     return "";
                 };
             }
-            else if (prop.Type == PropertyMetadataRegistry.PropertyType.Root)
+            else if (prop is PropertyMetadataRegistry.RootPropertyDefinition rootProperty)
             {
-                var sourceName = PropertyMetadataRegistry.GetSourceNameFromRootInternalName(prop.InternalName);
+                var sourceName = rootProperty.SourceName;
                 resolvers[tokenName] = partData =>
                     partData.RootProperties.TryGetValue(sourceName, out var value) ? value : "";
             }
@@ -343,19 +341,16 @@ public partial class TokenService : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// BOM item numbers are filled only by the Parts Only processing method
+    /// Tokens that stay empty with the current settings; using them shows a preview warning
     /// </summary>
-    public bool IsBomItemAvailable
+    public IReadOnlyCollection<string> UnavailableTokens
     {
-        get => _isBomItemAvailable;
+        get => _unavailableTokens;
         set
         {
-            if (_isBomItemAvailable != value)
-            {
-                _isBomItemAvailable = value;
-                OnPropertyChanged();
-                UpdatePreview();
-            }
+            _unavailableTokens = value;
+            OnPropertyChanged();
+            UpdatePreview();
         }
     }
 
@@ -378,9 +373,17 @@ public partial class TokenService : INotifyPropertyChanged
 
     private void SetPreview((string preview, bool isValid) result)
     {
-        var hasWarning = result.isValid && !_isBomItemAvailable && _fileNameTemplate.Contains(BomItemToken);
+        var unavailableNames = result.isValid
+            ? TokenRegex().Matches(_fileNameTemplate)
+                .Select(match => match.Groups[1].Value)
+                .Where(_unavailableTokens.Contains)
+                .Distinct()
+                .Select(token => PropertyMetadataRegistry.GetTokenProperty(token)?.DisplayName ?? token)
+                .ToList()
+            : [];
+        var hasWarning = unavailableNames.Count > 0;
         FileNamePreview = hasWarning
-            ? LocalizationManager.Instance.GetString("Warning_BomItemUnavailable", result.preview)
+            ? LocalizationManager.Instance.GetString("Warning_TokensUnavailable", result.preview, string.Join(", ", unavailableNames))
             : result.preview;
         IsFileNameTemplateValid = result.isValid;
         HasPreviewWarning = hasWarning;

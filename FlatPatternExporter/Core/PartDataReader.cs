@@ -23,12 +23,15 @@ public class PartDataReader
         _dispatcher = dispatcher;
     }
 
-    public async Task<PartData> GetPartDataAsync(string fullDocumentName, int quantity, int itemNumber, bool loadThumbnail = true)
+    public async Task<PartData> GetPartDataAsync(ScannedPart part, IReadOnlyDictionary<string, string> rootProperties, int quantity, int itemNumber, bool loadThumbnail = true)
     {
-        var partDoc = _documentScanner.DocumentCache.GetCachedPartDocument(fullDocumentName) ?? _inventorManager.FindPartDocument(fullDocumentName);
+        var partDoc = _documentScanner.DocumentCache.GetCachedPartDocument(part.FullDocumentName) ?? _inventorManager.FindPartDocument(part.FullDocumentName);
         if (partDoc == null) return null!;
 
-        return await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
+        var partData = await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
+        partData.BomItem = part.BomItem;
+        partData.RootProperties = rootProperties;
+        return partData;
     }
 
     public async Task<PartData> GetPartDataAsync(PartDocument partDoc, int quantity, int itemNumber, bool loadThumbnail = true)

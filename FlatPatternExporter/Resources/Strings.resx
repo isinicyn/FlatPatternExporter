@@ -285,7 +285,7 @@ This version is not supported by the used library.</value>
     <value>Part designation conflicts detected.
 Total conflicts: {0}
 
-Different models or model states with identical designations found. Conflicting components excluded from table to prevent errors.
+{1}
 
 Use the "Conflicts" button on the control panel to view conflict details.</value>
   </data>
@@ -1965,9 +1965,6 @@ Enable it? The assembly will be marked as modified.</value>
   <data name="Info_PartsOnlyHiddenAssemblies" xml:space="preserve">
     <value>In the BOM by parts only, parts of inseparable and purchased assemblies are not listed. These assemblies contain sheet metal parts: {0}</value>
   </data>
-  <data name="Warning_BomItemUnavailable" xml:space="preserve">
-    <value>{0}  (BOM item is filled only for the BOM by parts only)</value>
-  </data>
   <data name="Property_BomItem_DisplayName" xml:space="preserve">
     <value>BOM Item</value>
   </data>
@@ -1983,14 +1980,6 @@ Enable it? The assembly will be marked as modified.</value>
   <data name="ToolTip_IncludeConflicting" xml:space="preserve">
     <value>Keep parts that share a part number (different files or model states) in the table instead of excluding them.
 Make sure their file names differ, for example add Model State or BOM Item to the file name template.</value>
-  </data>
-  <data name="Info_ConflictsDetectedIncluded" xml:space="preserve">
-    <value>Part designation conflicts detected.
-Total conflicts: {0}
-
-Different models or model states with identical designations found. They are kept in the table, make sure their DXF file names differ.
-
-Use the "Conflicts" button on the control panel to view conflict details.</value>
   </data>
   <data name="Question_FileNameCollisions" xml:space="preserve">
     <value>{0} file name(s) are used by several parts, the files would overwrite each other:
@@ -2013,5 +2002,14 @@ BOM item numbers are not available.</value>
   <data name="ToolTip_BomViewPartsOnly" xml:space="preserve">
     <value>Uses the "Parts Only" BOM view: quantities are totaled by Inventor and BOM item numbers are available for the file name template.
 Parts inside inseparable (welded) and purchased assemblies are not listed in this view.</value>
+  </data>
+  <data name="Text_ConflictsExcluded" xml:space="preserve">
+    <value>Different models or model states with identical designations found. Conflicting components excluded from table to prevent errors.</value>
+  </data>
+  <data name="Text_ConflictsIncluded" xml:space="preserve">
+    <value>Different models or model states with identical designations found. They are kept in the table, make sure their DXF file names differ.</value>
+  </data>
+  <data name="Warning_TokensUnavailable" xml:space="preserve">
+    <value>{0}  (empty with the current processing method: {1})</value>
   </data>
 </root>

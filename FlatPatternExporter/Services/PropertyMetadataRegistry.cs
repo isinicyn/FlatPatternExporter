@@ -91,6 +91,7 @@ public static class PropertyMetadataRegistry
         public Dictionary<string, string>? ValueMappings { get; init; }
         public string? ColumnTemplate { get; init; }
         public bool IsSortable { get; init; } = true;
+        public bool UseNaturalSort { get; init; }
         public bool IsSearchable { get; init; } = true;
         public bool IsTokenizable { get; init; } = false;
 
@@ -138,6 +139,7 @@ public static class PropertyMetadataRegistry
             InternalName = "BomItem",
             LocalizationKeyPrefix = "Property_BomItem",
             Type = PropertyType.System,
+            UseNaturalSort = true,
             IsTokenizable = true
         },
         ["Quantity"] = new PropertyDefinition
@@ -557,9 +559,9 @@ public static class PropertyMetadataRegistry
     /// Properties of the root document available as file name tokens.
     /// Key: InternalName with ROOT_ prefix
     /// </summary>
-    public static readonly Dictionary<string, PropertyDefinition> RootProperties =
+    public static readonly Dictionary<string, RootPropertyDefinition> RootProperties =
         new[] { "PartNumber", "Description", "Project", "Revision" }
-            .Select(name => (PropertyDefinition)new RootPropertyDefinition(Properties[name]))
+            .Select(name => new RootPropertyDefinition(Properties[name]))
             .ToDictionary(p => p.InternalName);
 
     /// <summary>
@@ -610,7 +612,7 @@ public static class PropertyMetadataRegistry
     /// <summary>
     /// Special PropertyDefinition for root document properties based on a standard property
     /// </summary>
-    private class RootPropertyDefinition : PropertyDefinition
+    public sealed class RootPropertyDefinition : PropertyDefinition
     {
         private readonly PropertyDefinition _source;
 
@@ -618,10 +620,13 @@ public static class PropertyMetadataRegistry
         {
             _source = source;
             Type = PropertyType.Root;
-            PropertySetName = source.PropertySetName;
-            InventorPropertyName = source.InventorPropertyName;
             IsTokenizable = true;
         }
+
+        /// <summary>
+        /// InternalName of the standard property read from the root document
+        /// </summary>
+        public string SourceName => _source.InternalName;
 
         public override string DisplayName =>
             LocalizationManager.Instance.GetString("Property_Root_DisplayNameFormat", _source.DisplayName);
@@ -673,22 +678,6 @@ public static class PropertyMetadataRegistry
     public static PropertyDefinition? GetTokenProperty(string tokenName)
     {
         return GetTokenizableProperties().FirstOrDefault(p => p.TokenName == tokenName);
-    }
-
-    /// <summary>
-    /// Checks if InternalName is a root document property
-    /// </summary>
-    public static bool IsRootProperty(string internalName)
-    {
-        return internalName.StartsWith(RootPrefix);
-    }
-
-    /// <summary>
-    /// Extracts source property InternalName from InternalName of root document property
-    /// </summary>
-    public static string GetSourceNameFromRootInternalName(string internalName)
-    {
-        return IsRootProperty(internalName) ? internalName[RootPrefix.Length..] : internalName;
     }
 
     /// <summary>

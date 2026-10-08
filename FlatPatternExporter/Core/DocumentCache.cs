@@ -6,9 +6,9 @@ public class DocumentCache
 {
     private readonly Dictionary<string, PartDocument> _documentCache = new(StringComparer.OrdinalIgnoreCase);
 
-    public void AddDocumentToCache(PartDocument partDoc)
+    public void AddDocumentToCache(string fullDocumentName, PartDocument partDoc)
     {
-        _documentCache.TryAdd(partDoc.FullDocumentName, partDoc);
+        _documentCache.TryAdd(fullDocumentName, partDoc);
     }
 
     public PartDocument? GetCachedPartDocument(string fullDocumentName)

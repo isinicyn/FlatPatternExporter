@@ -65,20 +65,10 @@ public class DxfExporter
             context.TargetDirectory = targetDir;
             context.Multiplier = multiplier;
 
-            var scanOptions = new ScanOptions
-            {
-                BomView = exportOptions.SelectedBomView,
-                ExcludeReferenceParts = exportOptions.ExcludeReferenceParts,
-                ExcludePurchasedParts = exportOptions.ExcludePurchasedParts,
-                ExcludePhantomParts = exportOptions.ExcludePhantomParts,
-                IncludeLibraryComponents = exportOptions.IncludeLibraryComponents,
-                IncludeConflictingParts = exportOptions.IncludeConflictingParts
-            };
-
             var scanResult = await _documentScanner.ScanDocumentAsync(
                 document,
                 exportOptions.SelectedProcessingMethod,
-                scanOptions,
+                exportOptions.ToScanOptions(),
                 showProgress ? new Progress<ScanProgress>() : null);
 
             context.SheetMetalParts = scanResult.SheetMetalParts;
@@ -192,8 +182,7 @@ public class DxfExporter
                 var smCompDef = (SheetMetalComponentDefinition)partDoc.ComponentDefinition;
 
                 var filePath = GetTargetFilePath(partData, targetDir, exportOptions);
-                var fileDir = Path.GetDirectoryName(filePath) ?? "";
-                if (!Directory.Exists(fileDir)) Directory.CreateDirectory(fileDir);
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? "");
 
                 if (!IsValidPath(filePath)) continue;
 
@@ -201,9 +190,7 @@ public class DxfExporter
 
                 if (smCompDef.HasFlatPattern)
                 {
-                    if (exportOptions.AppendSuffixOnCollision)
-                        filePath = GetUniqueFilePath(filePath, usedFilePaths);
-                    usedFilePaths.Add(filePath);
+                    filePath = ReserveUniqueFilePath(filePath, usedFilePaths);
 
                     var flatPattern = smCompDef.FlatPattern;
                     var oDataIO = flatPattern.DataIO;
@@ -348,19 +335,20 @@ public class DxfExporter
             .Where(g => g.Count() > 1)];
     }
 
-    private static string GetUniqueFilePath(string filePath, HashSet<string> usedFilePaths)
+    /// <summary>
+    /// Returns the path itself or, when it is already used in this export, the first free name with a numeric suffix
+    /// </summary>
+    private static string ReserveUniqueFilePath(string filePath, HashSet<string> usedFilePaths)
     {
-        if (!usedFilePaths.Contains(filePath)) return filePath;
-
         var directory = Path.GetDirectoryName(filePath) ?? "";
         var fileName = Path.GetFileNameWithoutExtension(filePath);
         var extension = Path.GetExtension(filePath);
 
-        for (var index = 2; ; index++)
-        {
-            var candidate = Path.Combine(directory, $"{fileName}_{index}{extension}");
-            if (!usedFilePaths.Contains(candidate)) return candidate;
-        }
+        var candidate = filePath;
+        for (var index = 2; !usedFilePaths.Add(candidate); index++)
+            candidate = Path.Combine(directory, $"{fileName}_{index}{extension}");
+
+        return candidate;
     }
 
     private string PrepareExportOptions(ExportOptions exportOptions)
@@ -511,5 +499,14 @@ public class ExportOptions
 
     public List<LayerSetting> LayerSettings { get; set; } = [];
     public bool ShowFileLockedDialogs { get; set; } = true;
-    public bool AppendSuffixOnCollision { get; set; }
+
+    public ScanOptions ToScanOptions() => new()
+    {
+        BomView = SelectedBomView,
+        ExcludeReferenceParts = ExcludeReferenceParts,
+        ExcludePurchasedParts = ExcludePurchasedParts,
+        ExcludePhantomParts = ExcludePhantomParts,
+        IncludeLibraryComponents = IncludeLibraryComponents,
+        IncludeConflictingParts = IncludeConflictingParts
+    };
 }

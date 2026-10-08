@@ -246,6 +246,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Initialize ComboBox collections
         InitializeAcadVersions();
         InitializeAvailableTokens();
+        UpdateBomViewDependencies();
 
 
         // Initialize preset columns based on PropertyMapping
@@ -595,7 +596,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = [];
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> AvailableTokens { get; set; } = [];
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> UserDefinedTokens { get; set; } = [];
-    public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> RootTokens { get; set; } = [];
+    public IEnumerable<PropertyMetadataRegistry.PropertyDefinition> RootTokens { get; } = PropertyMetadataRegistry.RootProperties.Values;
     public TemplatePresetManager PresetManager { get; } = new();
 
     // Public properties for CheckBox data binding
@@ -788,7 +789,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private void UpdateBomViewDependencies()
     {
         OnPropertyChanged(nameof(IsBomStructureFilterAvailable));
-        _tokenService.IsBomItemAvailable = IsPartsOnlyMode;
+        _tokenService.UnavailableTokens = IsPartsOnlyMode ? [] : [nameof(PartData.BomItem)];
     }
 
     public bool MergeProfilesIntoPolyline
@@ -1251,8 +1252,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 var warnings = new List<string>();
                 if (_documentScanner.ConflictAnalyzer.ConflictCount > 0)
                 {
-                    var conflictsKey = IncludeConflictingParts ? "Info_ConflictsDetectedIncluded" : "Info_ConflictsDetected";
-                    warnings.Add(_localizationManager.GetString(conflictsKey, _documentScanner.ConflictAnalyzer.ConflictCount));
+                    var handling = _localizationManager.GetString(IncludeConflictingParts ? "Text_ConflictsIncluded" : "Text_ConflictsExcluded");
+                    warnings.Add(_localizationManager.GetString("Info_ConflictsDetected", _documentScanner.ConflictAnalyzer.ConflictCount, handling));
                 }
                 else if (_documentScanner.HasMissingReferences)
                 {
@@ -1328,7 +1329,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             CustomMessageBox.Show(validation.ErrorMessage, _localizationManager.GetString("MessageBox_Error"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return null;
         }
-        return validation;
+        return EnsurePartsOnlyViewEnabled(validation.Document!) ? validation : null;
     }
 
     /// <summary>
@@ -1336,8 +1337,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// </summary>
     private async Task<ExportContext?> PrepareExportContextOrShowError(Document document, bool requireScan = true, bool showProgress = false)
     {
-        if (!EnsurePartsOnlyViewEnabled(document)) return null;
-
         var exportOptions = CreateExportOptions();
         var context = await _dxfExporter.PrepareExportContextAsync(document, requireScan, showProgress, _lastScannedDocument, exportOptions);
         if (!context.IsValid)
@@ -1367,7 +1366,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
-    /// Warns when several parts would be exported to the same file and lets the user add numeric suffixes
+    /// Warns when several parts would be exported to the same file; the export adds numeric suffixes to repeated names
     /// </summary>
     private bool ConfirmFileNameCollisions(IEnumerable<PartData> partsDataList, string targetDirectory, ExportOptions exportOptions)
     {
@@ -1384,10 +1383,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         var result = CustomMessageBox.Show(this, _localizationManager.GetString("Question_FileNameCollisions", collisions.Count, details),
             _localizationManager.GetString("MessageBox_Warning"), MessageBoxButton.YesNo, MessageBoxImage.Warning);
-        if (result != MessageBoxResult.Yes) return false;
-
-        exportOptions.AppendSuffixOnCollision = true;
-        return true;
+        return result == MessageBoxResult.Yes;
     }
 
     private ExportOptions CreateExportOptions()
@@ -1863,13 +1859,15 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         if (_partsDataView.View is not ListCollectionView view) return;
 
-        if (e.Column.SortMemberPath != nameof(PartData.BomItem))
+        var definition = e.Column.SortMemberPath is { } path ? PropertyMetadataRegistry.GetPropertyByInternalName(path) : null;
+        var property = definition is { UseNaturalSort: true } ? typeof(PartData).GetProperty(definition.InternalName) : null;
+        if (property == null)
         {
             if (view.CustomSort != null) view.CustomSort = null;
             return;
         }
 
-        // BOM item numbers are sorted naturally ("2" before "10")
+        // Natural order: "2" before "10"
         e.Handled = true;
         var direction = e.Column.SortDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
         foreach (var column in PartsDataGrid.Columns)
@@ -1878,7 +1876,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         var sign = direction == ListSortDirection.Ascending ? 1 : -1;
         view.CustomSort = Comparer<object>.Create((x, y) =>
-            sign * NaturalStringComparer.Instance.Compare(((PartData)x).BomItem, ((PartData)y).BomItem));
+            sign * NaturalStringComparer.Instance.Compare(property.GetValue(x)?.ToString(), property.GetValue(y)?.ToString()));
     }
 
     private void PartsDataGrid_ColumnReordered(object? sender, DataGridColumnEventArgs e)
@@ -1934,8 +1932,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Document validation
         var validation = ValidateDocumentOrShowError();
         if (validation == null) return;
-
-        if (!EnsurePartsOnlyViewEnabled(validation.Document!)) return;
 
         // Configure UI for scanning
         InitializeOperation(UIState.Scanning(), ref _isScanning);
@@ -2110,15 +2106,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             ClearConflictData();
 
             // Create scanning options
-            var scanOptions = new Core.ScanOptions
-            {
-                BomView = SelectedBomView,
-                ExcludeReferenceParts = ExcludeReferenceParts,
-                ExcludePurchasedParts = ExcludePurchasedParts,
-                ExcludePhantomParts = ExcludePhantomParts,
-                IncludeLibraryComponents = IncludeLibraryComponents,
-                IncludeConflictingParts = IncludeConflictingParts
-            };
+            var scanOptions = CreateExportOptions().ToScanOptions();
 
             // Use ScanService for scanning
             var scanResult = await _documentScanner.ScanDocumentAsync(
@@ -2171,11 +2159,9 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        var partData = await _partDataReader.GetPartDataAsync(part.FullDocumentName, part.Quantity, itemCounter++);
+                        var partData = await _partDataReader.GetPartDataAsync(part, scanResult.RootProperties, part.Quantity, itemCounter++);
                         if (partData != null)
                         {
-                            partData.RootProperties = scanResult.RootProperties;
-                            partData.BomItem = part.BomItem;
                             ((IProgress<PartData>)partProgress).Report(partData);
                         }
 
@@ -2307,7 +2293,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         AvailableTokens = [];
         UserDefinedTokens = [];
-        RootTokens = [.. PropertyMetadataRegistry.RootProperties.Values];
 
         RefreshAvailableTokens();
         
@@ -2408,13 +2393,11 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 await Task.Delay(1); // Minimal delay for UI update
             }
 
-            var partData = await _partDataReader.GetPartDataAsync(part.FullDocumentName, part.Quantity * context.Multiplier, itemCounter++, loadThumbnail: false);
+            var partData = await _partDataReader.GetPartDataAsync(part, context.RootProperties, part.Quantity * context.Multiplier, itemCounter++, loadThumbnail: false);
             if (partData != null)
             {
                 // Don't call SetQuantityInternal again - quantity already set correctly in GetPartDataAsync
                 partData.IsMultiplied = context.Multiplier > 1;
-                partData.RootProperties = context.RootProperties;
-                partData.BomItem = part.BomItem;
                 tempPartsDataList.Add(partData);
             }
         }

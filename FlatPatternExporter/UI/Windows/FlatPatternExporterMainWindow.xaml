@@ -538,8 +538,7 @@
                                          Style="{StaticResource TokenListBoxStyle}"
                                          MouseDoubleClick="TokenListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
 
-                                <TextBlock Text="{extensions:Localize Text_RootProperties}" Style="{StaticResource SectionHeaderTextStyle}"
-                                           ToolTip="{extensions:Localize ToolTip_RootProperties}"/>
+                                <TextBlock Text="{extensions:Localize Text_RootProperties}" Style="{StaticResource SectionHeaderTextStyle}"/>
                                     <ListBox x:Name="RootTokensListBox"
                                          ItemsSource="{Binding RootTokens}"
                                          DisplayMemberPath="DisplayName"
