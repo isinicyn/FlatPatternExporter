@@ -77,6 +77,8 @@ public class PartData : INotifyPropertyChanged
 
     public int OriginalQuantity { get; set; }
 
+    public IReadOnlyDictionary<string, string> RootProperties { get; set; } = new Dictionary<string, string>();
+
     public bool IsOverridden
     {
         get => isOverridden;

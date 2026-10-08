@@ -1939,4 +1939,19 @@ Possible solutions:
   <data name="Notification_UpToDate" xml:space="preserve">
     <value>You're up to date!</value>
   </data>
+  <data name="Property_Root_DisplayNameFormat" xml:space="preserve">
+    <value>Assembly {0}</value>
+  </data>
+  <data name="Property_Root_Category" xml:space="preserve">
+    <value>Assembly properties</value>
+  </data>
+  <data name="Text_RootProperties" xml:space="preserve">
+    <value>Assembly properties</value>
+  </data>
+  <data name="ToolTip_RootProperties" xml:space="preserve">
+    <value>Properties of the active document (the scanned assembly or part). The value is the same for every exported file.</value>
+  </data>
+  <data name="Legend_Root" xml:space="preserve">
+    <value>Assembly properties</value>
+  </data>
 </root>

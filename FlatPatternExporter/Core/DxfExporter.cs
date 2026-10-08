@@ -80,6 +80,7 @@ public class DxfExporter
                 showProgress ? new Progress<ScanProgress>() : null);
 
             context.SheetMetalParts = scanResult.SheetMetalParts;
+            context.RootProperties = scanResult.RootProperties;
             context.IsValid = true;
         }
         catch (Exception ex)
@@ -442,6 +443,7 @@ public class ExportContext
     public string TargetDirectory { get; set; } = "";
     public int Multiplier { get; set; } = 1;
     public Dictionary<string, ScannedPart> SheetMetalParts { get; set; } = [];
+    public IReadOnlyDictionary<string, string> RootProperties { get; set; } = new Dictionary<string, string>();
     public bool GenerateThumbnails { get; set; } = true;
     public bool IsValid { get; set; } = true;
     public string ErrorMessage { get; set; } = "";

@@ -18,21 +18,13 @@ public class TokenElement
     
     public bool IsUserDefined => !IsCustomText && PropertyMetadataRegistry.IsUserDefinedProperty(Name);
 
+    public bool IsRoot => !IsCustomText && PropertyMetadataRegistry.IsRootProperty(Name);
+
     public string GetDisplayName()
     {
         if (IsCustomText) return Name;
 
-        // First search in predefined properties
-        var property = PropertyMetadataRegistry.Properties.Values
-            .FirstOrDefault(p => p.IsTokenizable && p.TokenName == Name);
-        if (property != null) return property.DisplayName;
-
-        // Then search in user-defined properties (TokenName contains UDP_ prefix)
-        var userProperty = PropertyMetadataRegistry.UserDefinedProperties
-            .FirstOrDefault(p => p.IsTokenizable && p.TokenName == Name);
-        if (userProperty != null) return userProperty.DisplayName;
-        
-        return Name;
+        return PropertyMetadataRegistry.GetTokenProperty(Name)?.DisplayName ?? Name;
     }
 }
 
@@ -124,6 +116,12 @@ public partial class TokenService : INotifyPropertyChanged
                     return "";
                 };
             }
+            else if (prop.Type == PropertyMetadataRegistry.PropertyType.Root)
+            {
+                var sourceName = PropertyMetadataRegistry.GetSourceNameFromRootInternalName(prop.InternalName);
+                resolvers[tokenName] = partData =>
+                    partData.RootProperties.TryGetValue(sourceName, out var value) ? value : "";
+            }
             else
             {
                 // Find property in PartData
@@ -163,10 +161,7 @@ public partial class TokenService : INotifyPropertyChanged
                 if (usePlaceholders)
                 {
                     // If no data, return placeholder
-                    var prop = PropertyMetadataRegistry.Properties.Values
-                        .FirstOrDefault(p => p.IsTokenizable && p.TokenName == token) ??
-                        PropertyMetadataRegistry.UserDefinedProperties
-                        .FirstOrDefault(p => p.IsTokenizable && p.TokenName == token);
+                    var prop = PropertyMetadataRegistry.GetTokenProperty(token);
                     value = prop?.PlaceholderValue ?? $"{{{token}}}";
                 }
                 else if (_tokenResolvers.TryGetValue(token, out var resolver))
@@ -396,7 +391,13 @@ public partial class TokenService : INotifyPropertyChanged
         var border = new Border
         {
             Style = _tokenContainer.FindResource("TokenBlockStyle") as Style,
-            Tag = tokenElement.IsCustomText ? "CustomText" : (tokenElement.IsUserDefined ? "UserDefined" : null)
+            Tag = tokenElement switch
+            {
+                { IsCustomText: true } => "CustomText",
+                { IsUserDefined: true } => "UserDefined",
+                { IsRoot: true } => "Root",
+                _ => null
+            }
         };
 
         var textBlock = new TextBlock

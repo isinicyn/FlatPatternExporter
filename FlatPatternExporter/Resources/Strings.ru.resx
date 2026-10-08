@@ -1939,4 +1939,19 @@
   <data name="Notification_UpToDate" xml:space="preserve">
     <value>Версия актуальна!</value>
   </data>
+  <data name="Property_Root_DisplayNameFormat" xml:space="preserve">
+    <value>{0} сборки</value>
+  </data>
+  <data name="Property_Root_Category" xml:space="preserve">
+    <value>Свойства сборки</value>
+  </data>
+  <data name="Text_RootProperties" xml:space="preserve">
+    <value>Свойства сборки</value>
+  </data>
+  <data name="ToolTip_RootProperties" xml:space="preserve">
+    <value>Свойства активного документа (сканируемой сборки или детали). Значение одинаково для всех экспортируемых файлов.</value>
+  </data>
+  <data name="Legend_Root" xml:space="preserve">
+    <value>Свойства сборки</value>
+  </data>
 </root>

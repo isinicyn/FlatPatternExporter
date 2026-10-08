@@ -53,6 +53,10 @@
                 <Setter Property="Background" Value="{DynamicResource TokenUserDefinedBackgroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource TokenUserDefinedBorderBrush}"/>
             </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="Root">
+                <Setter Property="Background" Value="{DynamicResource TokenRootBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource TokenRootBorderBrush}"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 

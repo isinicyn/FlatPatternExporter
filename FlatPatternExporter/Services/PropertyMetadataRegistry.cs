@@ -106,8 +106,11 @@ public static class PropertyMetadataRegistry
         IProperty,        // Standard Inventor property
         Document,         // Document property (not iProperty)
         System,          // Application system property
-        UserDefined      // User-defined iProperty
+        UserDefined,     // User-defined iProperty
+        Root             // iProperty of the scanned root document
     }
+
+    private const string RootPrefix = "ROOT_";
 
     /// <summary>
     /// Main registry of all properties
@@ -544,6 +547,15 @@ public static class PropertyMetadataRegistry
     };
 
     /// <summary>
+    /// Properties of the root document available as file name tokens.
+    /// Key: InternalName with ROOT_ prefix
+    /// </summary>
+    public static readonly Dictionary<string, PropertyDefinition> RootProperties =
+        new[] { "PartNumber", "Description", "Project", "Revision" }
+            .Select(name => (PropertyDefinition)new RootPropertyDefinition(Properties[name]))
+            .ToDictionary(p => p.InternalName);
+
+    /// <summary>
     /// Collection of user-defined properties
     /// </summary>
     public static readonly ObservableCollection<PropertyDefinition> UserDefinedProperties = [];
@@ -589,6 +601,31 @@ public static class PropertyMetadataRegistry
     }
 
     /// <summary>
+    /// Special PropertyDefinition for root document properties based on a standard property
+    /// </summary>
+    private class RootPropertyDefinition : PropertyDefinition
+    {
+        private readonly PropertyDefinition _source;
+
+        public RootPropertyDefinition(PropertyDefinition source) : base($"{RootPrefix}{source.InternalName}")
+        {
+            _source = source;
+            Type = PropertyType.Root;
+            PropertySetName = source.PropertySetName;
+            InventorPropertyName = source.InventorPropertyName;
+            IsTokenizable = true;
+        }
+
+        public override string DisplayName =>
+            LocalizationManager.Instance.GetString("Property_Root_DisplayNameFormat", _source.DisplayName);
+
+        public override string ColumnHeader => DisplayName;
+
+        public override string Category =>
+            LocalizationManager.Instance.GetString("Property_Root_Category");
+    }
+
+    /// <summary>
     /// Adds a user-defined property to the registry
     /// </summary>
     public static void AddUserDefinedProperty(string propertyName)
@@ -619,7 +656,32 @@ public static class PropertyMetadataRegistry
     public static IEnumerable<PropertyDefinition> GetTokenizableProperties()
     {
         return Properties.Values.Where(p => p.IsTokenizable)
+            .Concat(RootProperties.Values)
             .Concat(UserDefinedProperties.Where(p => p.IsTokenizable));
+    }
+
+    /// <summary>
+    /// Finds tokenizable property by token name
+    /// </summary>
+    public static PropertyDefinition? GetTokenProperty(string tokenName)
+    {
+        return GetTokenizableProperties().FirstOrDefault(p => p.TokenName == tokenName);
+    }
+
+    /// <summary>
+    /// Checks if InternalName is a root document property
+    /// </summary>
+    public static bool IsRootProperty(string internalName)
+    {
+        return internalName.StartsWith(RootPrefix);
+    }
+
+    /// <summary>
+    /// Extracts source property InternalName from InternalName of root document property
+    /// </summary>
+    public static string GetSourceNameFromRootInternalName(string internalName)
+    {
+        return IsRootProperty(internalName) ? internalName[RootPrefix.Length..] : internalName;
     }
 
     /// <summary>

@@ -44,6 +44,8 @@ public class DocumentScanner
             ClearCaches();
             _hasMissingReferences = false;
 
+            result.RootProperties = ReadRootProperties(document);
+
             var sheetMetalParts = new Dictionary<string, ScannedPart>(StringComparer.OrdinalIgnoreCase);
 
             if (document.DocumentType == DocumentTypeEnum.kAssemblyDocumentObject)
@@ -327,6 +329,14 @@ public class DocumentScanner
             sheetMetalParts.Add(key, new ScannedPart { FullDocumentName = key, PartNumber = partNumber, Quantity = quantity });
     }
 
+    private static Dictionary<string, string> ReadRootProperties(Document document)
+    {
+        var mgr = new PropertyManager(document);
+        return PropertyMetadataRegistry.RootProperties.Keys
+            .Select(PropertyMetadataRegistry.GetSourceNameFromRootInternalName)
+            .ToDictionary(name => name, name => mgr.GetMappedProperty(name));
+    }
+
     private bool ShouldExcludeComponent(BOMStructureEnum bomStructure, string fullFileName, ScanOptions options)
     {
         if (options.ExcludeReferenceParts && bomStructure == BOMStructureEnum.kReferenceBOMStructure)
@@ -377,6 +387,7 @@ public class ScannedPart
 public class ScanResult
 {
     public Dictionary<string, ScannedPart> SheetMetalParts { get; set; } = [];
+    public IReadOnlyDictionary<string, string> RootProperties { get; set; } = new Dictionary<string, string>();
     public int ProcessedCount { get; set; }
     public int SkippedCount { get; set; }
     public TimeSpan ElapsedTime { get; set; }

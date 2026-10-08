@@ -587,6 +587,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     public ObservableCollection<AcadVersionItem> AcadVersions { get; set; } = [];
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> AvailableTokens { get; set; } = [];
     public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> UserDefinedTokens { get; set; } = [];
+    public ObservableCollection<PropertyMetadataRegistry.PropertyDefinition> RootTokens { get; set; } = [];
     public TemplatePresetManager PresetManager { get; } = new();
 
     // Public properties for CheckBox data binding
@@ -2042,6 +2043,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                         var partData = await _partDataReader.GetPartDataAsync(part.FullDocumentName, part.Quantity, itemCounter++);
                         if (partData != null)
                         {
+                            partData.RootProperties = scanResult.RootProperties;
                             ((IProgress<PartData>)partProgress).Report(partData);
                         }
 
@@ -2173,7 +2175,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     {
         AvailableTokens = [];
         UserDefinedTokens = [];
-        
+        RootTokens = [.. PropertyMetadataRegistry.RootProperties.Values];
+
         RefreshAvailableTokens();
         
         // Subscribe to changes in user-defined properties collection
@@ -2191,8 +2194,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Get all tokenizable properties from centralized registry
         var tokenizableProperties = PropertyMetadataRegistry.GetTokenizableProperties();
 
-        // Separate into standard and user-defined properties
-        var standardProperties = tokenizableProperties.Where(p => p.Type != PropertyMetadataRegistry.PropertyType.UserDefined).OrderBy(p => p.DisplayName);
+        // Separate into standard and user-defined properties (root document properties have their own list)
+        var standardProperties = tokenizableProperties.Where(p => p.Type is not (PropertyMetadataRegistry.PropertyType.UserDefined or PropertyMetadataRegistry.PropertyType.Root)).OrderBy(p => p.DisplayName);
         var userDefinedProperties = tokenizableProperties.Where(p => p.Type == PropertyMetadataRegistry.PropertyType.UserDefined).OrderBy(p => p.DisplayName);
 
         // Add standard properties
@@ -2278,6 +2281,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 // Don't call SetQuantityInternal again - quantity already set correctly in GetPartDataAsync
                 partData.IsMultiplied = context.Multiplier > 1;
+                partData.RootProperties = context.RootProperties;
                 tempPartsDataList.Add(partData);
             }
         }

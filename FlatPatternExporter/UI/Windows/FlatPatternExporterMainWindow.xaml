@@ -535,6 +535,15 @@
                                          Style="{StaticResource TokenListBoxStyle}"
                                          MouseDoubleClick="TokenListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
 
+                                <TextBlock Text="{extensions:Localize Text_RootProperties}" Style="{StaticResource SectionHeaderTextStyle}"
+                                           ToolTip="{extensions:Localize ToolTip_RootProperties}"/>
+                                    <ListBox x:Name="RootTokensListBox"
+                                         ItemsSource="{Binding RootTokens}"
+                                         DisplayMemberPath="DisplayName"
+                                         Style="{StaticResource TokenListBoxStyle}"
+                                         ToolTip="{extensions:Localize ToolTip_RootProperties}"
+                                         MouseDoubleClick="TokenListBox_MouseDoubleClick" MinHeight="32" VerticalContentAlignment="Center" SnapsToDevicePixels="True"/>
+
                                 <TextBlock Text="{extensions:Localize Text_UserProperties}" Style="{StaticResource SectionHeaderTextStyle}"/>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -665,6 +674,15 @@
                                                     BorderBrush="{DynamicResource TokenCustomBorderBrush}"/>
                                             <TextBlock Style="{StaticResource TokenLegendText}"
                                                        Text="{extensions:Localize Legend_CustomText}"/>
+                                        </StackPanel>
+
+                                        <!-- Root document token -->
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
+                                            <Border Style="{StaticResource TokenLegendColorBox}"
+                                                    Background="{DynamicResource TokenRootBackgroundBrush}"
+                                                    BorderBrush="{DynamicResource TokenRootBorderBrush}"/>
+                                            <TextBlock Style="{StaticResource TokenLegendText}"
+                                                       Text="{extensions:Localize Legend_Root}"/>
                                         </StackPanel>
 
                                         <!-- User-defined token -->
