@@ -106,6 +106,7 @@
                                 <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
                                     <RadioButton x:Name="TraverseRadioButton" Content="{extensions:Localize UI_ProcessByStructure}" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=Traverse, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                     <RadioButton x:Name="BomRadioButton" Content="{extensions:Localize UI_ProcessByBOM}" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=BOM, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <RadioButton x:Name="PartsOnlyRadioButton" Content="{extensions:Localize UI_ProcessByPartsOnly}" ToolTip="{extensions:Localize ToolTip_ProcessByPartsOnly}" IsChecked="{Binding SelectedProcessingMethod, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter=PartsOnly, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                 </StackPanel>
 
                                 <!-- Vertical separator -->
@@ -113,9 +114,9 @@
 
                                 <!-- Component filtering -->
                                 <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                    <CheckBox x:Name="ExcludeReferencePartsCheckBox" Content="{extensions:Localize UI_ExcludeReference}" IsChecked="{Binding ExcludeReferenceParts, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <CheckBox x:Name="ExcludeReferencePartsCheckBox" Content="{extensions:Localize UI_ExcludeReference}" IsChecked="{Binding ExcludeReferenceParts, Mode=TwoWay}" IsEnabled="{Binding IsBomStructureFilterAvailable}" Style="{StaticResource BomStructureFilterCheckBoxStyle}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                     <CheckBox x:Name="ExcludePurchasedPartsCheckBox" Content="{extensions:Localize UI_ExcludePurchased}" IsChecked="{Binding ExcludePurchasedParts, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
-                                    <CheckBox x:Name="ExcludePhantomPartsCheckBox" Content="{extensions:Localize UI_ExcludePhantom}" IsChecked="{Binding ExcludePhantomParts, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
+                                    <CheckBox x:Name="ExcludePhantomPartsCheckBox" Content="{extensions:Localize UI_ExcludePhantom}" IsChecked="{Binding ExcludePhantomParts, Mode=TwoWay}" IsEnabled="{Binding IsBomStructureFilterAvailable}" Style="{StaticResource BomStructureFilterCheckBoxStyle}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                     <CheckBox x:Name="IncludeLibraryComponentsCheckBox" Content="{extensions:Localize UI_IncludeLibrary}" IsChecked="{Binding IncludeLibraryComponents, Mode=TwoWay}" Margin="{StaticResource BottomSmallMarginThickness}"/>
                                 </StackPanel>
                             </Grid>

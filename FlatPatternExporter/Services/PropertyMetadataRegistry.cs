@@ -133,6 +133,13 @@ public static class PropertyMetadataRegistry
             ColumnTemplate = "IDWithFlatPatternIndicatorTemplate",
             IsSearchable = false
         },
+        ["BomItem"] = new PropertyDefinition
+        {
+            InternalName = "BomItem",
+            LocalizationKeyPrefix = "Property_BomItem",
+            Type = PropertyType.System,
+            IsTokenizable = true
+        },
         ["Quantity"] = new PropertyDefinition
         {
             InternalName = "Quantity",

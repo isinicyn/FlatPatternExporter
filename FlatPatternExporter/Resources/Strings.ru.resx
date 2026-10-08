@@ -1954,4 +1954,34 @@
   <data name="Legend_Root" xml:space="preserve">
     <value>Свойства сборки</value>
   </data>
+  <data name="UI_ProcessByPartsOnly" xml:space="preserve">
+    <value>По спецификации: только детали</value>
+  </data>
+  <data name="ToolTip_ProcessByPartsOnly" xml:space="preserve">
+    <value>Использует вид спецификации «Только детали»: количество считает Inventor, а номера позиций доступны в шаблоне имени файла.
+Детали внутри неразъёмных (сварных) и покупных узлов в этом виде не показываются.</value>
+  </data>
+  <data name="ToolTip_FilterNotApplicablePartsOnly" xml:space="preserve">
+    <value>Не применяется в методе «Только детали»: Inventor всегда исключает такие компоненты из этого вида спецификации.</value>
+  </data>
+  <data name="Question_EnablePartsOnlyView" xml:space="preserve">
+    <value>В спецификации сборки отключён вид «Только детали».
+
+Включить его? Сборка будет помечена как изменённая.</value>
+  </data>
+  <data name="Info_PartsOnlyHiddenAssemblies" xml:space="preserve">
+    <value>В методе «Только детали» детали неразъёмных и покупных узлов не показываются. Эти узлы содержат листовые детали: {0}</value>
+  </data>
+  <data name="Warning_BomItemUnavailable" xml:space="preserve">
+    <value>{0}  (позиция заполняется только в методе «Только детали»)</value>
+  </data>
+  <data name="Property_BomItem_DisplayName" xml:space="preserve">
+    <value>Позиция</value>
+  </data>
+  <data name="Property_BomItem_ColumnHeader" xml:space="preserve">
+    <value>Позиция</value>
+  </data>
+  <data name="Property_BomItem_Category" xml:space="preserve">
+    <value>Системные</value>
+  </data>
 </root>

@@ -1954,4 +1954,34 @@ Possible solutions:
   <data name="Legend_Root" xml:space="preserve">
     <value>Assembly properties</value>
   </data>
+  <data name="UI_ProcessByPartsOnly" xml:space="preserve">
+    <value>By BOM: parts only</value>
+  </data>
+  <data name="ToolTip_ProcessByPartsOnly" xml:space="preserve">
+    <value>Uses the "Parts Only" BOM view: quantities are totaled by Inventor and BOM item numbers are available for the file name template.
+Parts inside inseparable (welded) and purchased assemblies are not listed in this view.</value>
+  </data>
+  <data name="ToolTip_FilterNotApplicablePartsOnly" xml:space="preserve">
+    <value>Not applicable to the "Parts only" method: Inventor always excludes such components from this BOM view.</value>
+  </data>
+  <data name="Question_EnablePartsOnlyView" xml:space="preserve">
+    <value>The "Parts Only" BOM view is disabled in this assembly.
+
+Enable it? The assembly will be marked as modified.</value>
+  </data>
+  <data name="Info_PartsOnlyHiddenAssemblies" xml:space="preserve">
+    <value>In the "Parts only" method, parts of inseparable and purchased assemblies are not listed. These assemblies contain sheet metal parts: {0}</value>
+  </data>
+  <data name="Warning_BomItemUnavailable" xml:space="preserve">
+    <value>{0}  (BOM item is filled only by the "Parts only" method)</value>
+  </data>
+  <data name="Property_BomItem_DisplayName" xml:space="preserve">
+    <value>BOM Item</value>
+  </data>
+  <data name="Property_BomItem_ColumnHeader" xml:space="preserve">
+    <value>BOM Item</value>
+  </data>
+  <data name="Property_BomItem_Category" xml:space="preserve">
+    <value>System</value>
+  </data>
 </root>

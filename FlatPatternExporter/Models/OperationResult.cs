@@ -9,5 +9,6 @@ public class OperationResult
     public TimeSpan ElapsedTime { get; set; }
     public bool WasCancelled { get; set; }
     public ProcessingMethod? ProcessingMethod { get; set; }
+    public List<string> HiddenAssemblies { get; set; } = [];
     public List<string> Errors { get; set; } = [];
 }

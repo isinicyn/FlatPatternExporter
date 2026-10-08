@@ -40,9 +40,13 @@ public partial class TokenService : INotifyPropertyChanged
     private readonly List<TokenElement> _tokenElements = [];
     private WrapPanel? _tokenContainer;
 
+    private const string BomItemToken = "{BomItem}";
+
     private string _fileNameTemplate = string.Empty;
     private string _fileNamePreview = string.Empty;
     private bool _isFileNameTemplateValid = true;
+    private bool _hasPreviewWarning;
+    private bool _isBomItemAvailable;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -322,6 +326,39 @@ public partial class TokenService : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Template is valid, but some tokens will be empty with the current settings
+    /// </summary>
+    public bool HasPreviewWarning
+    {
+        get => _hasPreviewWarning;
+        private set
+        {
+            if (_hasPreviewWarning != value)
+            {
+                _hasPreviewWarning = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// BOM item numbers are filled only by the Parts Only processing method
+    /// </summary>
+    public bool IsBomItemAvailable
+    {
+        get => _isBomItemAvailable;
+        set
+        {
+            if (_isBomItemAvailable != value)
+            {
+                _isBomItemAvailable = value;
+                OnPropertyChanged();
+                UpdatePreview();
+            }
+        }
+    }
+
     public void UpdatePartsData(IList<PartData> partsData)
     {
         _partsData = partsData ?? [];
@@ -330,17 +367,23 @@ public partial class TokenService : INotifyPropertyChanged
 
     public void UpdatePreviewWithSelectedData(PartData? selectedData)
     {
-        var (preview, isValid) = UpdateFileNamePreview(_fileNameTemplate, _partsData, selectedData);
-        FileNamePreview = preview;
-        IsFileNameTemplateValid = isValid;
+        SetPreview(UpdateFileNamePreview(_fileNameTemplate, _partsData, selectedData));
     }
 
     private void UpdatePreview()
     {
-        var (preview, isValid) = UpdateFileNamePreview(_fileNameTemplate, _partsData);
-        FileNamePreview = preview;
-        IsFileNameTemplateValid = isValid;
+        SetPreview(UpdateFileNamePreview(_fileNameTemplate, _partsData));
         UpdateVisualContent();
+    }
+
+    private void SetPreview((string preview, bool isValid) result)
+    {
+        var hasWarning = result.isValid && !_isBomItemAvailable && _fileNameTemplate.Contains(BomItemToken);
+        FileNamePreview = hasWarning
+            ? LocalizationManager.Instance.GetString("Warning_BomItemUnavailable", result.preview)
+            : result.preview;
+        IsFileNameTemplateValid = result.isValid;
+        HasPreviewWarning = hasWarning;
     }
 
     public void SetTokenContainer(WrapPanel tokenContainer)

@@ -56,6 +56,8 @@ public class DocumentScanner
                     await Task.Run(() => ProcessComponentOccurrences(asmDoc.ComponentDefinition.Occurrences, sheetMetalParts, options, progress, cancellationToken), cancellationToken);
                 else if (processingMethod == ProcessingMethod.BOM)
                     await Task.Run(() => ProcessBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, options, progress, cancellationToken), cancellationToken);
+                else if (processingMethod == ProcessingMethod.PartsOnly)
+                    await Task.Run(() => ProcessPartsOnlyBOM(asmDoc.ComponentDefinition.BOM, sheetMetalParts, options, result.HiddenAssemblies, progress, cancellationToken), cancellationToken);
 
                 await _conflictAnalyzer.AnalyzeConflictsAsync();
                 _conflictAnalyzer.FilterConflictingParts(sheetMetalParts);
@@ -232,16 +234,7 @@ public class DocumentScanner
         {
             var hideSuppressed = bom.HideSuppressedComponentsInBOM;
 
-            BOMView? bomView = null;
-            foreach (BOMView view in bom.BOMViews)
-            {
-                if (view.ViewType == BOMViewTypeEnum.kModelDataBOMViewType)
-                {
-                    bomView = view;
-                    break;
-                }
-            }
-
+            var bomView = GetBOMView(bom, BOMViewTypeEnum.kModelDataBOMViewType);
             if (bomView == null) return allRows;
 
             try
@@ -294,6 +287,135 @@ public class DocumentScanner
         return allRows;
     }
 
+    private void ProcessPartsOnlyBOM(
+        BOM bom,
+        Dictionary<string, ScannedPart> sheetMetalParts,
+        ScanOptions options,
+        List<string> hiddenAssemblies,
+        IProgress<ScanProgress>? scanProgress = null,
+        CancellationToken cancellationToken = default)
+    {
+        var bomView = GetBOMView(bom, BOMViewTypeEnum.kPartsOnlyBOMViewType);
+        if (bomView == null) return;
+
+        var hideSuppressed = bom.HideSuppressedComponentsInBOM;
+        var bomRows = bomView.BOMRows.Cast<BOMRow>().ToArray();
+        var processedRows = 0;
+
+        foreach (var row in bomRows)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                ProcessPartsOnlyRow(row, hideSuppressed, sheetMetalParts, options, hiddenAssemblies);
+            }
+            catch (COMException ex) when (ex.ErrorCode == unchecked((int)0x80004005))
+            {
+                _hasMissingReferences = true;
+                Debug.WriteLine($"Detected component with missing reference: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error processing parts only BOM row: {ex.Message}");
+            }
+
+            processedRows++;
+            scanProgress?.Report(new ScanProgress
+            {
+                ProcessedItems = processedRows,
+                TotalItems = bomRows.Length,
+                CurrentOperation = LocalizationManager.Instance.GetString("Status_ScanningBOM"),
+                CurrentItem = LocalizationManager.Instance.GetString("Status_BomRowProgress", processedRows, bomRows.Length)
+            });
+        }
+    }
+
+    private void ProcessPartsOnlyRow(
+        BOMRow row,
+        bool hideSuppressed,
+        Dictionary<string, ScannedPart> sheetMetalParts,
+        ScanOptions options,
+        List<string> hiddenAssemblies)
+    {
+        if (!hideSuppressed && row.ItemQuantity <= 0) return;
+
+        if (options.ExcludePurchasedParts && row.BOMStructure == BOMStructureEnum.kPurchasedBOMStructure) return;
+
+        var componentDefinition = row.ComponentDefinitions[1];
+        if (componentDefinition is VirtualComponentDefinition) return;
+
+        // Inseparable and purchased assemblies are listed as single rows, their parts are not shown
+        if (componentDefinition.Document is AssemblyDocument asmDoc)
+        {
+            if (ContainsSheetMetalParts(asmDoc))
+                hiddenAssemblies.Add(new PropertyManager((Document)asmDoc).GetMappedProperty("PartNumber"));
+            return;
+        }
+
+        foreach (var (partDoc, quantity) in GetRowPartDocuments(row))
+        {
+            if (!options.IncludeLibraryComponents && _inventorManager.IsLibraryComponent(partDoc.FullFileName))
+                continue;
+
+            ProcessPartDocument(partDoc, sheetMetalParts, quantity, row.ItemNumber);
+        }
+    }
+
+    private static IEnumerable<(PartDocument PartDoc, int Quantity)> GetRowPartDocuments(BOMRow row)
+    {
+        if (!row.Merged)
+        {
+            if (row.ComponentDefinitions[1].Document is PartDocument partDoc)
+                yield return (partDoc, row.ItemQuantity);
+            yield break;
+        }
+
+        // A merged row combines different documents with the same part number: split it by referenced document
+        var documents = new Dictionary<string, (PartDocument PartDoc, int Quantity)>(StringComparer.OrdinalIgnoreCase);
+        foreach (ComponentOccurrence occ in row.ComponentOccurrences)
+        {
+            if (occ.Definition.Document is not PartDocument partDoc) continue;
+
+            var key = partDoc.FullDocumentName;
+            documents[key] = documents.TryGetValue(key, out var entry) ? (entry.PartDoc, entry.Quantity + 1) : (partDoc, 1);
+        }
+
+        foreach (var entry in documents.Values)
+            yield return entry;
+    }
+
+    private static bool ContainsSheetMetalParts(AssemblyDocument asmDoc)
+    {
+        foreach (Document doc in asmDoc.AllReferencedDocuments)
+        {
+            if (doc is PartDocument partDoc && partDoc.SubType == PropertyManager.SheetMetalSubType)
+                return true;
+        }
+        return false;
+    }
+
+    private static BOMView? GetBOMView(BOM bom, BOMViewTypeEnum viewType)
+    {
+        foreach (BOMView view in bom.BOMViews)
+        {
+            if (view.ViewType == viewType)
+                return view;
+        }
+        return null;
+    }
+
+    public static bool IsPartsOnlyViewEnabled(Document document)
+    {
+        return document is not AssemblyDocument asmDoc || asmDoc.ComponentDefinition.BOM.PartsOnlyViewEnabled;
+    }
+
+    public static void EnablePartsOnlyView(Document document)
+    {
+        if (document is AssemblyDocument asmDoc)
+            asmDoc.ComponentDefinition.BOM.PartsOnlyViewEnabled = true;
+    }
+
     private void ProcessBOMRowSimple(BOMRow row, Dictionary<string, ScannedPart> sheetMetalParts, int parentQuantity = 1)
     {
         try
@@ -310,7 +432,7 @@ public class DocumentScanner
         }
     }
 
-    private void ProcessPartDocument(PartDocument partDoc, Dictionary<string, ScannedPart> sheetMetalParts, int quantity)
+    private void ProcessPartDocument(PartDocument partDoc, Dictionary<string, ScannedPart> sheetMetalParts, int quantity, string bomItem = "")
     {
         var mgr = new PropertyManager((Document)partDoc);
         var partNumber = mgr.GetMappedProperty("PartNumber");
@@ -326,7 +448,7 @@ public class DocumentScanner
         if (sheetMetalParts.TryGetValue(key, out var part))
             part.Quantity += quantity;
         else
-            sheetMetalParts.Add(key, new ScannedPart { FullDocumentName = key, PartNumber = partNumber, Quantity = quantity });
+            sheetMetalParts.Add(key, new ScannedPart { FullDocumentName = key, PartNumber = partNumber, Quantity = quantity, BomItem = bomItem });
     }
 
     private static Dictionary<string, string> ReadRootProperties(Document document)
@@ -382,6 +504,7 @@ public class ScannedPart
     public string FullDocumentName { get; init; } = "";
     public string PartNumber { get; init; } = "";
     public int Quantity { get; set; }
+    public string BomItem { get; init; } = "";
 }
 
 public class ScanResult
@@ -393,6 +516,7 @@ public class ScanResult
     public TimeSpan ElapsedTime { get; set; }
     public bool WasCancelled { get; set; }
     public bool HasMissingReferences { get; set; }
+    public List<string> HiddenAssemblies { get; set; } = [];
     public ProcessingMethod ProcessingMethod { get; set; }
     public List<string> Errors { get; set; } = [];
 }

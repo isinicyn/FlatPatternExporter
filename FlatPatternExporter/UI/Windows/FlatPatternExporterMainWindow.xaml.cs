@@ -18,6 +18,7 @@ using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
 using FlatPatternExporter.UI.Controls;
 using FlatPatternExporter.UI.Models;
+using FlatPatternExporter.Utilities;
 using Inventor;
 using Binding = System.Windows.Data.Binding;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -213,6 +214,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         PartsDataGrid.PreviewMouseLeftButtonUp += PartsDataGrid_PreviewMouseLeftButtonUp;
         PartsDataGrid.ColumnReordering += PartsDataGrid_ColumnReordering;
         PartsDataGrid.ColumnReordered += PartsDataGrid_ColumnReordered;
+        PartsDataGrid.Sorting += PartsDataGrid_Sorting;
 
         // Update overlay visibility when column collection changes
         ((INotifyCollectionChanged)PartsDataGrid.Columns).CollectionChanged += (s, e) => UpdateNoColumnsOverlayVisibility();
@@ -740,9 +742,14 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             {
                 _selectedProcessingMethod = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsBomStructureFilterAvailable));
+                _tokenService.IsBomItemAvailable = value == ProcessingMethod.PartsOnly;
             }
         }
     }
+
+    // Reference and phantom components never appear in the Parts Only view, so their filters do not apply
+    public bool IsBomStructureFilterAvailable => SelectedProcessingMethod != ProcessingMethod.PartsOnly;
 
     public bool MergeProfilesIntoPolyline
     {
@@ -1200,18 +1207,28 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         switch (operationType)
         {
             case OperationType.Scan:
-                // For scanning, show special messages about conflicts and references
+                // For scanning, show special messages about conflicts, references and hidden assemblies
+                var warnings = new List<string>();
                 if (_documentScanner.ConflictAnalyzer.ConflictCount > 0)
                 {
-                    CustomMessageBox.Show(_localizationManager.GetString("Info_ConflictsDetected", _documentScanner.ConflictAnalyzer.ConflictCount),
-                        _localizationManager.GetString("Info_Warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                    warnings.Add(_localizationManager.GetString("Info_ConflictsDetected", _documentScanner.ConflictAnalyzer.ConflictCount));
                 }
                 else if (_documentScanner.HasMissingReferences)
                 {
-                    var messageKey = result.ProcessingMethod == ProcessingMethod.BOM
+                    var messageKey = result.ProcessingMethod is ProcessingMethod.BOM or ProcessingMethod.PartsOnly
                         ? "Info_BrokenReferences_BOM"
                         : "Info_BrokenReferences_Traverse";
-                    CustomMessageBox.Show(_localizationManager.GetString(messageKey),
+                    warnings.Add(_localizationManager.GetString(messageKey));
+                }
+
+                if (result.HiddenAssemblies.Count > 0)
+                {
+                    warnings.Add(_localizationManager.GetString("Info_PartsOnlyHiddenAssemblies", string.Join(", ", result.HiddenAssemblies)));
+                }
+
+                if (warnings.Count > 0)
+                {
+                    CustomMessageBox.Show(string.Join(System.Environment.NewLine + System.Environment.NewLine, warnings),
                         _localizationManager.GetString("Info_Warning"), MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 break;
@@ -1278,6 +1295,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     /// </summary>
     private async Task<ExportContext?> PrepareExportContextOrShowError(Document document, bool requireScan = true, bool showProgress = false)
     {
+        if (!EnsurePartsOnlyViewEnabled(document)) return null;
+
         var exportOptions = CreateExportOptions();
         var context = await _dxfExporter.PrepareExportContextAsync(document, requireScan, showProgress, _lastScannedDocument, exportOptions);
         if (!context.IsValid)
@@ -1288,6 +1307,22 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             return null;
         }
         return context;
+    }
+
+    /// <summary>
+    /// Asks to enable the Parts Only BOM view when the Parts Only method is selected and the view is disabled
+    /// </summary>
+    private bool EnsurePartsOnlyViewEnabled(Document document)
+    {
+        if (SelectedProcessingMethod != ProcessingMethod.PartsOnly || Core.DocumentScanner.IsPartsOnlyViewEnabled(document))
+            return true;
+
+        var result = CustomMessageBox.Show(this, _localizationManager.GetString("Question_EnablePartsOnlyView"),
+            _localizationManager.GetString("MessageBox_Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if (result != MessageBoxResult.Yes) return false;
+
+        Core.DocumentScanner.EnablePartsOnlyView(document);
+        return true;
     }
 
     private ExportOptions CreateExportOptions()
@@ -1757,6 +1792,28 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _isColumnDraggedOutside = false;
     }
 
+    private void PartsDataGrid_Sorting(object? sender, DataGridSortingEventArgs e)
+    {
+        if (_partsDataView.View is not ListCollectionView view) return;
+
+        if (e.Column.SortMemberPath != nameof(PartData.BomItem))
+        {
+            if (view.CustomSort != null) view.CustomSort = null;
+            return;
+        }
+
+        // BOM item numbers are sorted naturally ("2" before "10")
+        e.Handled = true;
+        var direction = e.Column.SortDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+        foreach (var column in PartsDataGrid.Columns)
+            column.SortDirection = null;
+        e.Column.SortDirection = direction;
+
+        var sign = direction == ListSortDirection.Ascending ? 1 : -1;
+        view.CustomSort = Comparer<object>.Create((x, y) =>
+            sign * NaturalStringComparer.Instance.Compare(((PartData)x).BomItem, ((PartData)y).BomItem));
+    }
+
     private void PartsDataGrid_ColumnReordered(object? sender, DataGridColumnEventArgs e)
     {
         _reorderingColumn = null;
@@ -1810,6 +1867,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         // Document validation
         var validation = ValidateDocumentOrShowError();
         if (validation == null) return;
+
+        if (!EnsurePartsOnlyViewEnabled(validation.Document!)) return;
 
         // Configure UI for scanning
         InitializeOperation(UIState.Scanning(), ref _isScanning);
@@ -2001,6 +2060,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
             var sheetMetalParts = scanResult.SheetMetalParts;
             result.ProcessedCount = scanResult.ProcessedCount;
             result.ProcessingMethod = scanResult.ProcessingMethod;
+            result.HiddenAssemblies = scanResult.HiddenAssemblies;
 
             // Process parts for UI
             if (updateUI && sheetMetalParts.Count > 0)
@@ -2044,6 +2104,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                         if (partData != null)
                         {
                             partData.RootProperties = scanResult.RootProperties;
+                            partData.BomItem = part.BomItem;
                             ((IProgress<PartData>)partProgress).Report(partData);
                         }
 
@@ -2282,6 +2343,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 // Don't call SetQuantityInternal again - quantity already set correctly in GetPartDataAsync
                 partData.IsMultiplied = context.Multiplier > 1;
                 partData.RootProperties = context.RootProperties;
+                partData.BomItem = part.BomItem;
                 tempPartsDataList.Add(partData);
             }
         }
