@@ -80,6 +80,7 @@ FlatPatternExporter/
     │
     ├── Utilities/                      # Утилиты
     │   ├── DxfOptimizer.cs             # Оптимизация DXF файлов
+    │   ├── NaturalStringComparer.cs    # Естественное сравнение строк ("2" < "10")
     │   └── VersionComparer.cs          # Сравнение версий приложения
     │
     ├── UI/                             # Пользовательский интерфейс
@@ -219,6 +220,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 
 **Utilities/ - Утилиты (namespace: FlatPatternExporter.Utilities):**
 - `DxfOptimizer` - оптимизация DXF файлов для различных версий AutoCAD
+- `NaturalStringComparer` - естественное сравнение строк (сортировка номеров позиций BOM)
 
 **UI/ - Интерфейс пользователя:**
 - **Windows/ (namespace: FlatPatternExporter.UI.Windows)**: основные окна приложения
@@ -314,25 +316,29 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Анализирует конфликты обозначений деталей
 - Поддерживает пакетный экспорт с миниатюрами разверток
 
+### Идентификация деталей и методы обработки
+- Деталь идентифицируется по `FullDocumentName` (путь к файлу + состояние модели), а не по обозначению
+- Методы обработки (`ProcessingMethod`): перебор вхождений (Traverse), вид спецификации «Данные модели» (BOM), вид «Только детали» (PartsOnly)
+- В методе PartsOnly количество и номер позиции (`BomItem`) берутся из вида BOM; объединённые строки разбиваются по документам через `BOMRow.ComponentOccurrences`; ссылочные и фантомные компоненты исключает сам Inventor; детали неразъёмных и покупных узлов в этом виде не показываются
+- Детали с одинаковым обозначением фиксируются в `ConflictAnalyzer` и исключаются или остаются в таблице по настройке `IncludeConflictingParts`
+- Перед экспортом проверяется совпадение итоговых путей DXF (`DxfExporter.GetTargetFilePath`/`FindFileNameCollisions`), при совпадении возможны числовые суффиксы
+
 ### Система кеширования документов
 Для оптимизации производительности при работе с множеством открытых документов в Inventor реализована система кеширования:
 
 **Принцип работы:**
 - Кеш заполняется автоматически во время обхода структуры сборки при сканировании
-- Содержит ссылки на PartDocument объекты, индексированные по номеру детали (PartNumber)
-- Дополнительно кеширует полные пути к файлам для быстрого доступа
+- Содержит ссылки на PartDocument объекты, индексированные по `FullDocumentName`
+- Если документа нет в кеше, он ищется через `Documents.ItemByName(fullDocumentName)` (`InventorManager.FindPartDocument`)
 
 **Сервис DocumentCache (namespace: FlatPatternExporter.Core):**
 - Инкапсулирует всю логику кеширования
 - `AddDocumentToCache()` - добавление документа в кеш
 - `GetCachedPartDocument()` - получение документа из кеша
-- `GetCachedPartPath()` - получение пути к файлу детали
 - `ClearCache()` - очистка кеша
 
 **Точки заполнения кеша в DocumentScanner:**
-- `ProcessComponentOccurrences` - при методе обработки "Перебор"
-- `ProcessBOMRowSimple` - при методе обработки "Спецификация"
-- `ScanDocumentAsync` - для одиночных деталей
+- `ProcessPartDocument` - общая обработка детали для всех методов обработки и одиночных деталей
 
 **Точки использования кеша в UI:**
 - `PrepareExportContextAsync` - при быстром экспорте без предварительного сканирования
@@ -351,6 +357,8 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - Централизованная обработка через TokenService с кэшированием
 - Автоматическая санитизация недопустимых символов имени файла
 - Система пресетов для сохранения популярных конфигураций шаблонов
+- Группы токенов: стандартные свойства детали, свойства корневого документа (`ROOT_*`, `PropertyMetadataRegistry.RootProperties`, значения в `PartData.RootProperties`), пользовательские свойства (`UDP_*`), произвольный текст
+- Токен `{BomItem}` заполняется только методом PartsOnly, в остальных методах предпросмотр показывает предупреждение (`TokenService.HasPreviewWarning`)
 
 ### Система управления пресетами шаблонов
 Отдельный компонент для управления пользовательскими пресетами шаблонов имен файлов:
@@ -418,7 +426,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 
 **Enum-based система для RadioButton групп:**
 - `ExportFolderType` - управление выбором папки экспорта (5 опций)
-- `ProcessingMethod` - выбор метода обработки (Перебор/Спецификация)
+- `ProcessingMethod` - выбор метода обработки (Перебор/Спецификация/Только детали)
 
 **Универсальные конвертеры:**
 - `EnumToBooleanConverter` - универсальный конвертер для привязки enum к RadioButton
