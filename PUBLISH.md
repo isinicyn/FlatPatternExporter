@@ -111,28 +111,25 @@ publish.bat
 
 Menu:
 ```
-1. Deploy          - Ready files for installer (zip archive with separate DLLs)
-2. Portable        - Portable version (zip archive with single .exe file)
-3. Framework       - Depends on .NET 8 Runtime (zip archive, minimal size)
-4. Updater Portable - Updater archive only (for deployment)
-5. All             - Publish all profiles
-6. Exit            - Exit
+1. Deploy     - Archive with separate DLLs for installers
+2. Portable   - Archive with a single .exe file
+3. Framework  - Archive that requires .NET 8 Runtime, minimal size
+4. Updater    - Updater archive only
+5. All        - Full set of archives for a GitHub release
+6. Exit
 ```
 
 #### Command line mode:
 ```bash
-# Deploy profile
-publish.bat deploy
-
-# Portable profile
-publish.bat portable
-
-# Framework-dependent profile
-publish.bat framework
-
-# All profiles
-publish.bat all
+publish.bat deploy      # Deploy archive
+publish.bat portable    # Portable archive
+publish.bat framework   # Framework-dependent archive
+publish.bat updater     # Updater archive
+publish.bat all         # Full set for a release; old archives in Release\ are removed first
 ```
+
+In command line mode the script does not wait for a key press and returns exit code `1` on failure.
+When `dotnet publish` fails, its last lines are printed and the full output stays in `Release\publish-*.log`.
 
 ### What does the script do?
 
@@ -172,6 +169,39 @@ Release\
 
 **Build Type Detection:**
 The `.buildtype` marker file enables automatic update system to download correct archive matching current installation type. The updater is distributed separately and downloaded automatically when needed.
+
+---
+
+## Creating a GitHub Release
+
+`create-release-draft.bat` creates the tag `v{VERSION}` and a GitHub release with the four archives of the current version from `Release\`.
+
+```bash
+create-release-draft.bat                                # Draft with a notes template, asks for confirmation
+create-release-draft.bat notes.md                       # Draft with notes from a file
+create-release-draft.bat notes.md --publish             # Publish immediately
+create-release-draft.bat notes.md --publish --yes       # No questions (for scripts)
+```
+
+- Requires GitHub CLI (`gh`) and all commits pushed to the remote branch
+- Release title: `Flat Pattern Exporter {VersionPrefix}`, tag: `v{VersionPrefix}.{GitCommitCount}`
+- `{VERSION}` in the notes file is replaced with the full version
+- An existing tag or release is replaced only after confirmation; with `--yes` the script stops instead
+
+Typical release:
+```bash
+git push
+publish.bat all
+create-release-draft.bat notes.md --publish
+```
+
+### Release notes format
+
+The update window of the installed application shows release notes as plain text, so keep the Markdown simple:
+- One sentence about the release, then `##` sections: What's new, Improvements, Fixes, Good to know, Downloads
+- Plain `-` lists; no tables, HTML (`<details>`), images or bold text
+- Describe what the user gets, not what changed in the code
+- End with `Full changelog: https://github.com/isinicyn/FlatPatternExporter/compare/v{PREVIOUS}...v{VERSION}`
 
 ---
 
@@ -237,7 +267,7 @@ The `.buildtype` marker file enables automatic update system to download correct
 
 ### Versioning
 Application version is generated automatically based on Git:
-- Format: `2.1.0.{GitCommitCount}`
+- Format: `{VersionPrefix}.{GitCommitCount}`, e.g. `3.1.0.705`; `VersionPrefix` is set in `FlatPatternExporter.csproj`
 - Informational version contains Git commit hash
 
 ---
