@@ -537,9 +537,6 @@ Execution time: {3}</value>
   <data name="Error_ThumbnailGeneration" xml:space="preserve">
     <value>Error generating DXF thumbnails: {0}</value>
   </data>
-  <data name="Error_ThumbnailObtaining" xml:space="preserve">
-    <value>Error obtaining thumbnail: {0}</value>
-  </data>
   <data name="Error_InventorConnection" xml:space="preserve">
     <value>Could not connect to running Inventor instance. Make sure Inventor is running.</value>
   </data>

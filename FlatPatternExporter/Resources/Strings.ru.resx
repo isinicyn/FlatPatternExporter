@@ -537,9 +537,6 @@
   <data name="Error_ThumbnailGeneration" xml:space="preserve">
     <value>Ошибка при генерации миниатюр DXF: {0}</value>
   </data>
-  <data name="Error_ThumbnailObtaining" xml:space="preserve">
-    <value>Ошибка при получении миниатюры: {0}</value>
-  </data>
   <data name="Error_InventorConnection" xml:space="preserve">
     <value>Не удалось подключиться к запущенному экземпляру Inventor. Убедитесь, что Inventor запущен.</value>
   </data>

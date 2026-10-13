@@ -39,7 +39,6 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     private readonly LocalizationManager _localizationManager = LocalizationManager.Instance;
     private readonly TokenService _tokenService = new();
     private readonly DocumentScanner _documentScanner;
-    private readonly ThumbnailGenerator _thumbnailGenerator = new();
     private readonly DxfExporter _dxfExporter;
     private readonly PartDataReader _partDataReader;
     private readonly ExcelExportService _excelExportService;
@@ -190,7 +189,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         _inventorManager.InitializeInventor();
         _documentScanner = new Core.DocumentScanner(_inventorManager);
         _dxfExporter = new Core.DxfExporter(_inventorManager, _documentScanner, _documentScanner.DocumentCache, _tokenService);
-        _partDataReader = new Core.PartDataReader(_inventorManager, _documentScanner, _thumbnailGenerator, Dispatcher);
+        _partDataReader = new Core.PartDataReader(_inventorManager, _documentScanner);
         _excelExportService = new ExcelExportService(_inventorManager, _partDataReader);
 
         InitializeComponent();
@@ -2177,7 +2176,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        var partData = await _partDataReader.GetPartDataAsync(part, scanResult.RootProperties, part.Quantity, itemCounter++);
+                        var partData = _partDataReader.GetPartData(part, scanResult.RootProperties, part.Quantity, itemCounter++);
                         if (partData != null)
                         {
                             ((IProgress<PartData>)partProgress).Report(partData);
@@ -2412,10 +2411,10 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 await Task.Delay(1); // Minimal delay for UI update
             }
 
-            var partData = await _partDataReader.GetPartDataAsync(part, context.RootProperties, part.Quantity * multiplier, itemCounter++, loadThumbnail: false);
+            var partData = _partDataReader.GetPartData(part, context.RootProperties, part.Quantity * multiplier, itemCounter++, loadThumbnail: false);
             if (partData != null)
             {
-                // Don't call SetQuantityInternal again - quantity already set correctly in GetPartDataAsync
+                // Don't call SetQuantityInternal again - quantity already set correctly in GetPartData
                 partData.IsMultiplied = multiplier > 1;
                 tempPartsDataList.Add(partData);
             }

@@ -150,7 +150,6 @@ public class DxfExporter
         var processedCount = 0;
         var skippedCount = 0;
 
-        var thumbnailGenerator = context.GenerateThumbnails ? new ThumbnailGenerator() : null;
         var usedFilePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var partData in partsDataList)
@@ -251,10 +250,10 @@ public class DxfExporter
 
                 partData.ProcessingStatusEnum = exportSuccess ? ProcessingStatus.Success : ProcessingStatus.Skipped;
 
-                if (exportSuccess && thumbnailGenerator != null &&
+                if (exportSuccess && context.GenerateThumbnails &&
                     AcadVersionMapping.SupportsOptimization(exportOptions.SelectedAcadVersion))
                 {
-                    var dxfPreview = thumbnailGenerator.GenerateDxfThumbnails(filePath, Dispatcher.CurrentDispatcher);
+                    var dxfPreview = ThumbnailGenerator.GenerateDxfThumbnails(filePath, Dispatcher.CurrentDispatcher);
                     if (dxfPreview != null)
                     {
                         partData.DxfPreview = dxfPreview;

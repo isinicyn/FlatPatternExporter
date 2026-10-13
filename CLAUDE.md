@@ -107,7 +107,6 @@ FlatPatternExporter/
     │   ├── EnumToDisplayNameConverter.cs       # Конвертер enum значений в локализованные имена
     │   ├── DynamicPropertyValueConverter.cs    # Извлечение значений свойств по имени пути
     │   ├── PropertyExpressionByNameConverter.cs # Определение видимости fx индикатора
-    │   ├── IPictureDispConverter.cs            # Преобразование IPictureDisp в System.Drawing.Image
     │   ├── LocalizationConverter.cs            # Конвертер для локализации по значению
     │   └── LocalizationKeyConverter.cs         # Конвертер для локализации по ключу в параметре
     │
@@ -171,7 +170,6 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - netDxf.netstandard (v3.0.1) для работы с DXF файлами
 - Svg.Skia (v3.0.6) для конвертации SVG в PNG/BitmapImage
 - ClosedXML (v0.105.0) для экспорта данных в Excel
-- Microsoft-WindowsAPICodePack-Shell (v1.1.5) для fallback получения миниатюр через Windows Shell API
 - stdole (v17.14.40260) для COM interop
 
 ### Ключевые компоненты
@@ -182,7 +180,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `DocumentCache` - управление кешем документов для оптимизации производительности
 - `ConflictAnalyzer` - анализ конфликтов обозначений деталей
 - `DxfExporter` - экспорт разверток в DXF с настройками слоев и оптимизацией
-- `ThumbnailGenerator` - генерация миниатюр из DXF и документов Inventor с двухэтапным механизмом получения (ApprenticeServer → Windows Shell API fallback)
+- `ThumbnailGenerator` - генерация миниатюр из DXF и документов Inventor: PNG из файла через OLE Structured Storage (набор Inventor Summary Information, PIDSI_THUMBNAIL); потокобезопасно, без обращения к Inventor
 - `PartDataReader` - работа со свойствами деталей, чтение iProperties, заполнение данных
 - `PropertyManager` - централизованное управление доступом к свойствам документов Inventor
 - `ConflictDataProcessor` - обработка и трансформация данных конфликтов
@@ -257,7 +255,6 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - `EnumToDisplayNameConverter` - конвертер enum значений в локализованные имена
 - `DynamicPropertyValueConverter` - извлечение значений свойств по имени пути
 - `PropertyExpressionByNameConverter` - определение видимости fx индикатора
-- `IPictureDispConverter` - преобразование IPictureDisp в System.Drawing.Image
 - `LocalizationConverter` - конвертация строковых ключей в локализованные значения
 - `LocalizationKeyConverter` - конвертация ключей из параметра конвертера в локализованные значения
 

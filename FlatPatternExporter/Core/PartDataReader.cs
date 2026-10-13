@@ -1,7 +1,5 @@
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Threading;
 using FlatPatternExporter.Models;
 using FlatPatternExporter.Services;
 using Inventor;
@@ -12,29 +10,25 @@ public class PartDataReader
 {
     private readonly InventorManager _inventorManager;
     private readonly DocumentScanner _documentScanner;
-    private readonly ThumbnailGenerator _thumbnailGenerator;
-    private readonly Dispatcher _dispatcher;
 
-    public PartDataReader(InventorManager inventorManager, DocumentScanner documentScanner, ThumbnailGenerator thumbnailGenerator, Dispatcher dispatcher)
+    public PartDataReader(InventorManager inventorManager, DocumentScanner documentScanner)
     {
         _inventorManager = inventorManager;
         _documentScanner = documentScanner;
-        _thumbnailGenerator = thumbnailGenerator;
-        _dispatcher = dispatcher;
     }
 
-    public async Task<PartData> GetPartDataAsync(ScannedPart part, IReadOnlyDictionary<string, string> rootProperties, int quantity, int itemNumber, bool loadThumbnail = true)
+    public PartData GetPartData(ScannedPart part, IReadOnlyDictionary<string, string> rootProperties, int quantity, int itemNumber, bool loadThumbnail = true)
     {
         var partDoc = _documentScanner.DocumentCache.GetCachedPartDocument(part.FullDocumentName) ?? _inventorManager.FindPartDocument(part.FullDocumentName);
         if (partDoc == null) return null!;
 
-        var partData = await GetPartDataAsync(partDoc, quantity, itemNumber, loadThumbnail);
+        var partData = GetPartData(partDoc, quantity, itemNumber, loadThumbnail);
         partData.BomItem = part.BomItem;
         partData.RootProperties = rootProperties;
         return partData;
     }
 
-    public async Task<PartData> GetPartDataAsync(PartDocument partDoc, int quantity, int itemNumber, bool loadThumbnail = true)
+    public PartData GetPartData(PartDocument partDoc, int quantity, int itemNumber, bool loadThumbnail = true)
     {
         var partData = new PartData
         {
@@ -46,16 +40,16 @@ public class PartDataReader
 
         ReadAllPropertiesFromPart(partDoc, partData, mgr);
 
+        var userValues = mgr.GetMappedProperties(PropertyMetadataRegistry.UserDefinedProperties.Select(p => p.InternalName));
         foreach (var userDefinedProperty in PropertyMetadataRegistry.UserDefinedProperties)
         {
-            var value = mgr.GetMappedProperty(userDefinedProperty.InternalName);
             var propertyName = userDefinedProperty.InventorPropertyName ?? "";
-            partData.UserDefinedProperties[propertyName] = value;
+            partData.UserDefinedProperties[propertyName] = userValues[userDefinedProperty.InternalName];
         }
 
         if (loadThumbnail)
         {
-            partData.Preview = await _thumbnailGenerator.GetThumbnailAsync(partDoc, _dispatcher);
+            partData.Preview = ThumbnailGenerator.GetThumbnail(partData.FullFileName);
         }
 
         partData.SetQuantityInternal(quantity);
@@ -74,11 +68,13 @@ public class PartDataReader
 
         SetExpressionStatesForAllProperties(partData, mgr);
 
-        foreach (var property in PropertyMetadataRegistry.Properties.Values
-                     .Where(p => p.Type == PropertyMetadataRegistry.PropertyType.IProperty))
+        var values = mgr.GetMappedProperties(PropertyMetadataRegistry.Properties.Values
+            .Where(p => p.Type == PropertyMetadataRegistry.PropertyType.IProperty)
+            .Select(p => p.InternalName));
+
+        foreach (var (internalName, value) in values)
         {
-            var value = mgr.GetMappedProperty(property.InternalName);
-            var propInfo = typeof(PartData).GetProperty(property.InternalName);
+            var propInfo = typeof(PartData).GetProperty(internalName);
 
             if (propInfo != null && !string.IsNullOrEmpty(value))
             {

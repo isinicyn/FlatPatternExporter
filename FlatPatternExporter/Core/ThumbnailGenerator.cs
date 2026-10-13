@@ -1,33 +1,24 @@
-using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using DxfRenderer;
-using FlatPatternExporter.Converters;
 using FlatPatternExporter.Services;
 using FlatPatternExporter.UI.Windows;
-using Inventor;
-using Microsoft.WindowsAPICodePack.Shell;
 using Svg.Skia;
 
 namespace FlatPatternExporter.Core;
 
-public class ThumbnailGenerator
+public static class ThumbnailGenerator
 {
-    private readonly ApprenticeServerComponent? _apprentice = CreateApprenticeServer();
+    // Inventor Summary Information property set (replaces Microsoft FMTID_SummaryInformation since Inventor 6.0)
+    private static readonly Guid InventorSummaryInformationId = new("3D38DE39-0588-4C14-BB37-18F4D5DD31C7");
 
-    private static ApprenticeServerComponent? CreateApprenticeServer()
-    {
-        try
-        {
-            return new ApprenticeServerComponent();
-        }
-        catch
-        {
-            return null;
-        }
-    }
+    private const int PidThumbnail = 0x11;
+    private const ushort VtClipboardData = 71;
+    private const int ThumbnailDecodeWidth = 256;
+
     /// <summary>
     /// Converts SVG string to BitmapImage
     /// </summary>
@@ -60,14 +51,7 @@ public class ThumbnailGenerator
             using var image = surface.Snapshot();
             using var data = image.Encode(SkiaSharp.SKEncodedImageFormat.Png, 100);
 
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = new MemoryStream(data.ToArray());
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
-            bitmapImage.Freeze();
-
-            return bitmapImage;
+            return CreateFrozenBitmap(data.ToArray());
         }
         catch (Exception)
         {
@@ -75,7 +59,7 @@ public class ThumbnailGenerator
         }
     }
 
-    public BitmapImage? GenerateDxfThumbnails(string dxfFilePath, Dispatcher dispatcher)
+    public static BitmapImage? GenerateDxfThumbnails(string dxfFilePath, Dispatcher dispatcher)
     {
         if (!System.IO.File.Exists(dxfFilePath)) return null;
 
@@ -105,109 +89,126 @@ public class ThumbnailGenerator
         }
     }
 
-    public async Task<BitmapImage?> GetThumbnailAsync(PartDocument document, Dispatcher dispatcher)
+    /// <summary>
+    /// Gets the thumbnail saved in an Inventor file by reading the embedded PNG via OLE Structured Storage.
+    /// Returns null for files without one (legacy WMF/EMF thumbnails). Thread-safe, the result is frozen.
+    /// </summary>
+    public static BitmapImage? GetThumbnail(string fullFileName)
     {
-        if (_apprentice is not null)
-        {
-            try
-            {
-                return await GetThumbnailViaApprenticeAsync(document, dispatcher);
-            }
-            catch
-            {
-                // Fallback to Shell API
-            }
-        }
+        return ReadEmbeddedPng(fullFileName) is { } png ? CreateFrozenBitmap(png, ThumbnailDecodeWidth) : null;
+    }
+
+    private static BitmapImage CreateFrozenBitmap(byte[] imageData, int decodePixelWidth = 0)
+    {
+        using var stream = new MemoryStream(imageData);
+        var bitmap = new BitmapImage();
+        bitmap.BeginInit();
+        bitmap.StreamSource = stream;
+        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+        bitmap.DecodePixelWidth = decodePixelWidth;
+        bitmap.EndInit();
+        bitmap.Freeze();
+        return bitmap;
+    }
+
+    private static byte[]? ReadEmbeddedPng(string filePath)
+    {
+        NativeMethods.IPropertySetStorage? storage = null;
+        NativeMethods.IPropertyStorage? propertyStorage = null;
+        var values = new NativeMethods.PropVariant[1];
 
         try
         {
-            return await GetThumbnailViaShellAsync(document, dispatcher);
+            NativeMethods.StgOpenStorage(filePath, IntPtr.Zero,
+                NativeMethods.STGM_READ | NativeMethods.STGM_SHARE_DENY_WRITE, IntPtr.Zero, 0, out storage);
+
+            var fmtid = InventorSummaryInformationId;
+            storage.Open(ref fmtid, NativeMethods.STGM_READ | NativeMethods.STGM_SHARE_EXCLUSIVE, out propertyStorage);
+            propertyStorage.ReadMultiple(1, [new() { Kind = NativeMethods.PRSPEC_PROPID, PropId = PidThumbnail }], values);
+
+            if (values[0].Vt != VtClipboardData || values[0].Ptr == IntPtr.Zero)
+                return null;
+
+            // CLIPDATA: cbSize includes ulClipFmt; Inventor data is a 12-byte header followed by the image
+            const int ClipFormatSize = 4;
+            const int HeaderSize = 12;
+            var clipData = Marshal.PtrToStructure<NativeMethods.ClipData>(values[0].Ptr);
+            var imageSize = (int)clipData.Size - ClipFormatSize - HeaderSize;
+            if (imageSize <= 8 || clipData.Data == IntPtr.Zero)
+                return null;
+
+            var image = new byte[imageSize];
+            Marshal.Copy(clipData.Data + HeaderSize, image, 0, imageSize);
+
+            // Older files store WMF/EMF instead of PNG
+            return image.AsSpan().StartsWith(NativeMethods.PngSignature) ? image : null;
         }
-        catch (Exception ex)
+        catch
         {
-            dispatcher.Invoke(() =>
-            {
-                CustomMessageBox.Show(LocalizationManager.Instance.GetString("Error_ThumbnailObtaining", ex.Message), LocalizationManager.Instance.GetString("Error_Title"), MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            });
             return null;
         }
+        finally
+        {
+            NativeMethods.PropVariantClear(ref values[0]);
+            if (propertyStorage != null) Marshal.ReleaseComObject(propertyStorage);
+            if (storage != null) Marshal.ReleaseComObject(storage);
+        }
     }
 
-    private Task<BitmapImage?> GetThumbnailViaApprenticeAsync(PartDocument document, Dispatcher dispatcher)
+    private static class NativeMethods
     {
-        var tcs = new TaskCompletionSource<BitmapImage?>();
+        public const uint STGM_READ = 0x00000000;
+        public const uint STGM_SHARE_EXCLUSIVE = 0x00000010;
+        public const uint STGM_SHARE_DENY_WRITE = 0x00000020;
+        public const uint PRSPEC_PROPID = 1;
 
-        dispatcher.InvokeAsync(() =>
+        public static ReadOnlySpan<byte> PngSignature => [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+
+        [DllImport("ole32.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
+        public static extern void StgOpenStorage(string name, IntPtr priority, uint mode, IntPtr exclude, uint reserved,
+            [MarshalAs(UnmanagedType.Interface)] out IPropertySetStorage storage);
+
+        [DllImport("ole32.dll")]
+        public static extern int PropVariantClear(ref PropVariant value);
+
+        [ComImport, Guid("0000013A-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IPropertySetStorage
         {
-            ApprenticeServerDocument? apprenticeDoc = null;
-            try
-            {
-                apprenticeDoc = _apprentice!.Open(document.FullDocumentName);
-                var thumbnail = apprenticeDoc.Thumbnail;
-                var img = IPictureDispConverter.PictureDispToImage(thumbnail);
+            void Create(ref Guid fmtid, IntPtr clsid, uint flags, uint mode, out IntPtr propertyStorage);
 
-                if (img != null)
-                {
-                    using var memoryStream = new MemoryStream();
-                    img.Save(memoryStream, ImageFormat.Png);
-                    memoryStream.Position = 0;
+            void Open(ref Guid fmtid, uint mode, out IPropertyStorage propertyStorage);
+        }
 
-                    var bitmap = new BitmapImage();
-                    bitmap.BeginInit();
-                    bitmap.StreamSource = memoryStream;
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmap.EndInit();
-                    bitmap.Freeze();
-
-                    tcs.SetResult(bitmap);
-                }
-                else
-                {
-                    tcs.SetResult(null);
-                }
-            }
-            catch (Exception ex)
-            {
-                tcs.SetException(ex);
-            }
-            finally
-            {
-                apprenticeDoc?.Close();
-            }
-        });
-
-        return tcs.Task;
-    }
-
-    private async Task<BitmapImage?> GetThumbnailViaShellAsync(PartDocument document, Dispatcher dispatcher)
-    {
-        BitmapImage? bitmap = null;
-        await dispatcher.InvokeAsync(() =>
+        // ReadMultiple is the first vtable slot, the remaining members are not used
+        [ComImport, Guid("00000138-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IPropertyStorage
         {
-            var filePath = document.FullFileName;
+            void ReadMultiple(uint count,
+                [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] PropSpec[] specs,
+                [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] PropVariant[] values);
+        }
 
-            if (!System.IO.File.Exists(filePath))
-                throw new FileNotFoundException($"File not found: {filePath}");
+        [StructLayout(LayoutKind.Sequential)]
+        public struct PropSpec
+        {
+            public uint Kind;
+            public IntPtr PropId;
+        }
 
-            using var shellFile = ShellFile.FromFilePath(filePath);
-            using var thumbnail = shellFile.Thumbnail.ExtraLargeBitmap;
+        // PROPVARIANT trimmed to the type tag and the data pointer (x64 layout)
+        [StructLayout(LayoutKind.Explicit, Size = 24)]
+        public struct PropVariant
+        {
+            [FieldOffset(0)] public ushort Vt;
+            [FieldOffset(8)] public IntPtr Ptr;
+        }
 
-            if (thumbnail != null)
-                using (var memoryStream = new MemoryStream())
-                {
-                    thumbnail.Save(memoryStream, ImageFormat.Png);
-                    memoryStream.Position = 0;
-
-                    bitmap = new BitmapImage();
-                    bitmap.BeginInit();
-                    bitmap.StreamSource = memoryStream;
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmap.EndInit();
-                    bitmap.Freeze();
-                }
-        });
-
-        return bitmap;
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ClipData
+        {
+            public uint Size;
+            public int Format;
+            public IntPtr Data;
+        }
     }
 }
