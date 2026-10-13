@@ -170,7 +170,6 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 - netDxf.netstandard (v3.0.1) для работы с DXF файлами
 - Svg.Skia (v3.0.6) для конвертации SVG в PNG/BitmapImage
 - ClosedXML (v0.105.0) для экспорта данных в Excel
-- stdole (v17.14.40260) для COM interop
 
 ### Ключевые компоненты
 
@@ -435,6 +434,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
 **Система fx индикатора для редактируемых свойств:**
 - Универсальный шаблон `EditableWithFxTemplate` для отображения текста с fx индикатором
 - Система версионирования состояний выражений через `ExpressionStateVersion` 
+- Состояния выражений читаются только для колонок таблицы (`displayedColumns` в `PartDataReader.GetPartData`), для добавленной колонки — в `FillPropertyData`; экспорт без таблицы их не читает
 - Пакетная обработка изменений состояний выражений через `BeginExpressionBatch`/`EndExpressionBatch`
 - Передача пути свойства через `Tag` ячейки DataGrid для универсального связывания
 

@@ -2162,34 +2162,33 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 var itemCounter = 1;
                 var totalParts = sheetMetalParts.Count;
                 var processedParts = 0;
+                var displayedColumns = PartsDataGrid.Columns.Select(c => c.SortMemberPath).ToHashSet();
 
-                var partProgress = new Progress<PartData>(partData =>
+                // The worker does not wait for the UI: reports are queued in order and applied before the code after the loop
+                var partProgress = new Progress<PartData?>(partData =>
                 {
-                    partData.Item = _itemCounter;
-                    _partsData.Add(partData);
-                    _itemCounter++;
+                    if (partData != null)
+                    {
+                        partData.Item = _itemCounter;
+                        _partsData.Add(partData);
+                        _itemCounter++;
+                    }
+
+                    processedParts++;
+                    var progressState = UIState.Scanning();
+                    progressState.ProgressValue = (double)processedParts / totalParts * 100;
+                    progressState.ProgressText = _localizationManager.GetString("Status_ProcessingPartsProgress", processedParts, totalParts);
+                    SetUIState(progressState);
                 });
 
-                await Task.Run(async () =>
+                await Task.Run(() =>
                 {
                     foreach (var part in sheetMetalParts.Values)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
 
-                        var partData = _partDataReader.GetPartData(part, scanResult.RootProperties, part.Quantity, itemCounter++);
-                        if (partData != null)
-                        {
-                            ((IProgress<PartData>)partProgress).Report(partData);
-                        }
-
-                        processedParts++;
-                        await Dispatcher.InvokeAsync(() =>
-                        {
-                            var progressState = UIState.Scanning();
-                            progressState.ProgressValue = totalParts > 0 ? (double)processedParts / totalParts * 100 : 0;
-                            progressState.ProgressText = _localizationManager.GetString("Status_ProcessingPartsProgress", processedParts, totalParts);
-                            SetUIState(progressState);
-                        });
+                        var partData = _partDataReader.GetPartData(part, scanResult.RootProperties, part.Quantity, itemCounter++, displayedColumns);
+                        ((IProgress<PartData?>)partProgress).Report(partData);
                     }
                 }, cancellationToken);
             }
@@ -2400,25 +2399,28 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
         var totalParts = context.SheetMetalParts.Count;
         var multiplier = context.Options.Multiplier;
 
-        foreach (var part in context.SheetMetalParts.Values)
+        var preparationProgress = new Progress<int>(currentPart =>
         {
-            // Update progress every 5 parts or at important moments
-            if (itemCounter % 5 == 1 || itemCounter == totalParts)
-            {
-                var progressState = UIState.PreparingQuickExport();
-                progressState.ProgressText = _localizationManager.GetString("Status_PreparingPartData", itemCounter, totalParts);
-                SetUIState(progressState);
-                await Task.Delay(1); // Minimal delay for UI update
-            }
+            var progressState = UIState.PreparingQuickExport();
+            progressState.ProgressText = _localizationManager.GetString("Status_PreparingPartData", currentPart, totalParts);
+            SetUIState(progressState);
+        });
 
-            var partData = _partDataReader.GetPartData(part, context.RootProperties, part.Quantity * multiplier, itemCounter++, loadThumbnail: false);
-            if (partData != null)
+        await Task.Run(() =>
+        {
+            foreach (var part in context.SheetMetalParts.Values)
             {
-                // Don't call SetQuantityInternal again - quantity already set correctly in GetPartData
-                partData.IsMultiplied = multiplier > 1;
-                tempPartsDataList.Add(partData);
+                ((IProgress<int>)preparationProgress).Report(itemCounter);
+
+                var partData = _partDataReader.GetPartData(part, context.RootProperties, part.Quantity * multiplier, itemCounter++);
+                if (partData != null)
+                {
+                    // Don't call SetQuantityInternal again - quantity already set correctly in GetPartData
+                    partData.IsMultiplied = multiplier > 1;
+                    tempPartsDataList.Add(partData);
+                }
             }
-        }
+        });
 
         context.GenerateThumbnails = false;
         await RunExportAsync(tempPartsDataList, context, isQuickMode: true);

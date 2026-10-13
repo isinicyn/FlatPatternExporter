@@ -31,7 +31,7 @@ Clone the repository and choose the workflow that fits your environment.
 
 ### Build with Visual Studio
 1. Install Visual Studio 2022 with the `.NET desktop development` workload.
-2. Open `FlatPatternExporter.sln` and restore NuGet packages (`netDxf.netstandard`, `Svg.Skia`, `ClosedXML`, `stdole`).
+2. Open `FlatPatternExporter.sln` and restore NuGet packages (`netDxf.netstandard`, `Svg.Skia`, `ClosedXML`).
 3. Ensure the reference to `Autodesk.Inventor.Interop.dll` in `FlatPatternExporter/FlatPatternExporter.csproj` points to your Inventor installation (update the `HintPath` if necessary).
 4. Set the solution platform to `x64` (runtime identifier `win-x64`) and build.
 5. Start Autodesk Inventor, open the target assembly or part, then run the application from Visual Studio (`F5`).

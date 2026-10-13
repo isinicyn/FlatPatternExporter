@@ -430,8 +430,18 @@ public class DocumentScanner
 
         if (partDoc.SubType != PropertyManager.SheetMetalSubType) return;
 
-        _conflictAnalyzer.AddPartToTracker(partNumber, partDoc.FullFileName, mgr.GetModelState());
-        sheetMetalParts.Add(key, new ScannedPart { FullDocumentName = key, PartNumber = partNumber, Quantity = quantity, BomItem = bomItem });
+        var fullFileName = partDoc.FullFileName;
+        var modelState = mgr.GetModelState();
+        _conflictAnalyzer.AddPartToTracker(partNumber, fullFileName, modelState);
+        sheetMetalParts.Add(key, new ScannedPart
+        {
+            FullDocumentName = key,
+            FullFileName = fullFileName,
+            ModelState = modelState,
+            PartNumber = partNumber,
+            Quantity = quantity,
+            BomItem = bomItem
+        });
     }
 
     private static Dictionary<string, string> ReadRootProperties(Document document)
@@ -485,6 +495,8 @@ public class DocumentScanner
 public class ScannedPart
 {
     public string FullDocumentName { get; init; } = "";
+    public string FullFileName { get; init; } = "";
+    public string ModelState { get; init; } = "";
     public string PartNumber { get; init; } = "";
     public int Quantity { get; set; }
     public string BomItem { get; init; } = "";

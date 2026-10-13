@@ -263,7 +263,6 @@ The update window of the installed application shows release notes as plain text
 - netDxf.netstandard (v3.0.1)
 - Svg.Skia (v3.2.1)
 - ClosedXML (v0.105.0)
-- stdole (v17.14.40260)
 
 ### Versioning
 Application version is generated automatically based on Git:
