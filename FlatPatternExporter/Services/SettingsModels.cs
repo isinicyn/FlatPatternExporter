@@ -87,6 +87,7 @@ public record ExcelExportSettings
 public record UpdateSettings
 {
     public bool AutoUpdateCheck { get; init; } = true;
+    public DateOnly? AnnouncementShownDate { get; init; }
 }
 
 public record ApplicationSettings

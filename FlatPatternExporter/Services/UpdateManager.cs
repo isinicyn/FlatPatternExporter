@@ -55,6 +55,7 @@ public class UpdateManager
             return new UpdateCheckResult
             {
                 IsUpdateAvailable = isUpdateAvailable,
+                IsMajorUpgrade = VersionComparer.ParseVersion(latestVersion)?.Major > VersionComparer.ParseVersion(currentVersion)?.Major,
                 CurrentVersion = currentVersion,
                 LatestVersion = latestVersion,
                 ReleaseInfo = latestRelease

@@ -1936,6 +1936,57 @@ Possible solutions:
   <data name="Notification_UpToDate" xml:space="preserve">
     <value>You're up to date!</value>
   </data>
+  <data name="Announcement_Title" xml:space="preserve">
+    <value>FlatPatternExporter 4.0</value>
+  </data>
+  <data name="Announcement_HeaderUpcoming" xml:space="preserve">
+    <value>Version 4.0 is coming soon</value>
+  </data>
+  <data name="Announcement_HeaderReleased" xml:space="preserve">
+    <value>Version 4.0 is available</value>
+  </data>
+  <data name="Announcement_SubtitleUpcoming" xml:space="preserve">
+    <value>Expected between October 19 and 25, 2026. Here is what changes.</value>
+  </data>
+  <data name="Announcement_SubtitleReleased" xml:space="preserve">
+    <value>The new version is available on the download page. Here is what changed.</value>
+  </data>
+  <data name="Announcement_InterfaceTitle" xml:space="preserve">
+    <value>New interface</value>
+  </data>
+  <data name="Announcement_InterfaceText" xml:space="preserve">
+    <value>The interface is redesigned to make everyday tasks faster and clearer.</value>
+  </data>
+  <data name="Announcement_InstallationTitle" xml:space="preserve">
+    <value>Installation</value>
+  </data>
+  <data name="Announcement_InstallationText" xml:space="preserve">
+    <value>A one-click installer or an MSI package with a choice of folder and installation for all users. The portable version stays, but it is now a folder instead of a single file.</value>
+  </data>
+  <data name="Announcement_UpdatesTitle" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="Announcement_UpdatesText" xml:space="preserve">
+    <value>New versions install right from the program, and only the changes are downloaded.</value>
+  </data>
+  <data name="Announcement_RuntimeTitle" xml:space="preserve">
+    <value>.NET 10</value>
+  </data>
+  <data name="Announcement_RuntimeText" xml:space="preserve">
+    <value>The program moves to .NET 10, like Inventor 2025 and 2026. If .NET 10 is missing, the installer offers to install it (administrator rights are required).</value>
+  </data>
+  <data name="Announcement_MigrationTitle" xml:space="preserve">
+    <value>How to switch</value>
+  </data>
+  <data name="Announcement_MigrationText" xml:space="preserve">
+    <value>Version 3 does not update to 4.0 automatically: download the installer from the download page. Your settings are kept, and the current copy can be deleted after installation.</value>
+  </data>
+  <data name="Button_OpenDownloadPage" xml:space="preserve">
+    <value>Open download page</value>
+  </data>
+  <data name="Button_OpenProjectPage" xml:space="preserve">
+    <value>Project page</value>
+  </data>
   <data name="Property_Root_DisplayNameFormat" xml:space="preserve">
     <value>Assembly {0}</value>
   </data>

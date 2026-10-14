@@ -1936,6 +1936,57 @@
   <data name="Notification_UpToDate" xml:space="preserve">
     <value>Версия актуальна!</value>
   </data>
+  <data name="Announcement_Title" xml:space="preserve">
+    <value>FlatPatternExporter 4.0</value>
+  </data>
+  <data name="Announcement_HeaderUpcoming" xml:space="preserve">
+    <value>Скоро выйдет версия 4.0</value>
+  </data>
+  <data name="Announcement_HeaderReleased" xml:space="preserve">
+    <value>Вышла версия 4.0</value>
+  </data>
+  <data name="Announcement_SubtitleUpcoming" xml:space="preserve">
+    <value>Выход ожидается с 19 по 25 октября 2026 года. Вот что изменится.</value>
+  </data>
+  <data name="Announcement_SubtitleReleased" xml:space="preserve">
+    <value>Новая версия доступна на странице загрузки. Вот что изменилось.</value>
+  </data>
+  <data name="Announcement_InterfaceTitle" xml:space="preserve">
+    <value>Новый интерфейс</value>
+  </data>
+  <data name="Announcement_InterfaceText" xml:space="preserve">
+    <value>Интерфейс переработан, чтобы привычные задачи выполнялись быстрее и понятнее.</value>
+  </data>
+  <data name="Announcement_InstallationTitle" xml:space="preserve">
+    <value>Установка</value>
+  </data>
+  <data name="Announcement_InstallationText" xml:space="preserve">
+    <value>Установщик в один клик или MSI с выбором папки и установки для всех пользователей. Переносимая версия остаётся, но теперь это папка, а не один файл.</value>
+  </data>
+  <data name="Announcement_UpdatesTitle" xml:space="preserve">
+    <value>Обновления</value>
+  </data>
+  <data name="Announcement_UpdatesText" xml:space="preserve">
+    <value>Новые версии устанавливаются прямо из программы, загружаются только изменения.</value>
+  </data>
+  <data name="Announcement_RuntimeTitle" xml:space="preserve">
+    <value>.NET 10</value>
+  </data>
+  <data name="Announcement_RuntimeText" xml:space="preserve">
+    <value>Программа переходит на .NET 10, как и Inventor 2025 и 2026. Если .NET 10 на компьютере нет, установщик предложит установить его (нужны права администратора).</value>
+  </data>
+  <data name="Announcement_MigrationTitle" xml:space="preserve">
+    <value>Как перейти</value>
+  </data>
+  <data name="Announcement_MigrationText" xml:space="preserve">
+    <value>Версия 3 не обновится до 4.0 автоматически: скачайте установщик со страницы загрузки. Настройки сохранятся, текущую копию программы после установки можно удалить.</value>
+  </data>
+  <data name="Button_OpenDownloadPage" xml:space="preserve">
+    <value>Открыть страницу загрузки</value>
+  </data>
+  <data name="Button_OpenProjectPage" xml:space="preserve">
+    <value>Страница проекта</value>
+  </data>
   <data name="Property_Root_DisplayNameFormat" xml:space="preserve">
     <value>{0} сборки</value>
   </data>

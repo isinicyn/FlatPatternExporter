@@ -22,6 +22,20 @@ public partial class UpdateWindow : Window
         InitializeUI();
     }
 
+    /// <summary>
+    /// Opens the update window, or the version 4 announcement when the update is a major upgrade
+    /// </summary>
+    public static void ShowFor(Window owner, UpdateCheckResult result)
+    {
+        if (result.IsMajorUpgrade)
+        {
+            AnnouncementWindow.ShowFor(System.Windows.Application.Current.MainWindow, result.ReleaseInfo);
+            return;
+        }
+
+        new UpdateWindow(result) { Owner = owner }.ShowDialog();
+    }
+
     private void InitializeUI()
     {
         CurrentVersionTextBlock.Text = _currentVersion;

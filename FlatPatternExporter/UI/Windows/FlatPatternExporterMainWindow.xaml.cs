@@ -60,6 +60,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
     // Update state
     private UpdateCheckResult? _latestUpdateCheckResult;
+    private DateOnly? _announcementShownDate;
 
     // UI state
     private double _scanProgressValue;
@@ -355,6 +356,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
             // Update settings
             AutoUpdateCheck = settings.Update.AutoUpdateCheck;
+            _announcementShownDate = settings.Update.AnnouncementShownDate;
 
             // User-defined properties
             PropertyMetadataRegistry.UserDefinedProperties.Clear();
@@ -406,8 +408,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
                 }
             }
 
-            if (AutoUpdateCheck)
-                _ = CheckForUpdatesAsync();
+            _ = RunStartupUpdateChecksAsync();
         }
         catch (Exception ex)
         {
@@ -581,7 +582,8 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
             Update = new UpdateSettings
             {
-                AutoUpdateCheck = AutoUpdateCheck
+                AutoUpdateCheck = AutoUpdateCheck,
+                AnnouncementShownDate = _announcementShownDate
             },
 
             LayerSettings = layerSettings
@@ -2996,6 +2998,23 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
     }
 
     /// <summary>
+    /// Checks for updates at startup and shows the version 4.0 announcement at most once a day
+    /// </summary>
+    private async Task RunStartupUpdateChecksAsync()
+    {
+        if (AutoUpdateCheck)
+            await CheckForUpdatesAsync();
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        if (_announcementShownDate == today)
+            return;
+
+        _announcementShownDate = today;
+        await Task.Delay(TimeSpan.FromSeconds(3));
+        AnnouncementWindow.ShowFor(this, _latestUpdateCheckResult is { IsMajorUpgrade: true } result ? result.ReleaseInfo : null);
+    }
+
+    /// <summary>
     /// Handles click on update button in title bar
     /// </summary>
     private async void TitleBar_UpdateButtonClick(object? sender, EventArgs e)
@@ -3040,11 +3059,7 @@ public partial class FlatPatternExporterMainWindow : Window, INotifyPropertyChan
 
         if (_latestUpdateCheckResult.ReleaseInfo == null) return;
 
-        var updateWindow = new UpdateWindow(_latestUpdateCheckResult)
-        {
-            Owner = this
-        };
-        updateWindow.ShowDialog();
+        UpdateWindow.ShowFor(this, _latestUpdateCheckResult);
     }
 
 }

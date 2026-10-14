@@ -90,6 +90,7 @@ FlatPatternExporter/
     │   │   ├── ConflictDetailsWindow.xaml(.cs)
     │   │   ├── SelectIPropertyWindow.xaml(.cs)
     │   │   ├── CustomMessageBox.xaml(.cs)
+    │   │   ├── AnnouncementWindow.xaml(.cs)
     │   │   └── UpdateWindow.xaml(.cs)
     │   │
     │   ├── Controls/                   # Пользовательские элементы
@@ -226,6 +227,7 @@ dotnet run --project FlatPatternExporter\FlatPatternExporter.csproj
   - `ConflictDetailsWindow` - окно конфликтов с инжекцией делегата открытия документов
   - `SelectIPropertyWindow` - окно выбора свойств с полной инжекцией зависимостей
   - `CustomMessageBox` - кастомное окно сообщений с поддержкой локализации и тем оформления
+  - `AnnouncementWindow` - немодальное окно анонса версии 4.0 (режимы «скоро» и «вышла»)
 - **Controls/ (namespace: FlatPatternExporter.UI.Controls)**: пользовательские элементы управления
   - `CustomTitleBar` - переиспользуемый компонент кастомного заголовка окна с поддержкой WindowChrome
   - `LayerSettingControl` - контрол настройки слоя DXF
@@ -577,7 +579,13 @@ CustomMessageBox.Show(
 
 **Модели данных:**
 - `ReleaseInfo` - информация о релизе (версия, описание, assets, дата публикации)
-- `UpdateCheckResult` - результат проверки (доступность обновления, версии, ошибки)
+- `UpdateCheckResult` - результат проверки (доступность обновления, версии, ошибки, `IsMajorUpgrade` для перехода на 4.x)
+
+**Анонс версии 4.0:**
+- `AnnouncementWindow` показывается при запуске (`RunStartupUpdateChecksAsync` главного окна) не чаще раза в день (`UpdateSettings.AnnouncementShownDate`), после проверки обновлений, если она включена
+- Если последний релиз имеет старшую версию 4 и выше (`IsMajorUpgrade`), окно открывается в режиме «вышла» со ссылкой на страницу этого релиза (`ReleaseInfo.HtmlUrl`), иначе — на список релизов (`GitHubUpdateService.ReleasesUrl`)
+- `UpdateWindow.ShowFor` открывает анонс вместо `UpdateWindow` для `IsMajorUpgrade`; через него работают кнопка обновления в заголовке и проверка в AboutWindow
+- Версия 3.x не устанавливает 4.x: старый Updater не используется для перехода, пользователь скачивает установщик со страницы релиза
 
 ## Заметки по разработке
 

@@ -13,6 +13,8 @@ public class GitHubUpdateService
     private const string RepositoryOwner = "isinicyn";
     private const string RepositoryName = "FlatPatternExporter";
 
+    public const string ReleasesUrl = $"https://github.com/{RepositoryOwner}/{RepositoryName}/releases";
+
     private readonly HttpClient _httpClient;
     public string? LastError { get; private set; }
 

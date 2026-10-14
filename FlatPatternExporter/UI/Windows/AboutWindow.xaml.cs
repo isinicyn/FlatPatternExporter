@@ -74,9 +74,7 @@ namespace FlatPatternExporter.UI.Windows
 
                 if (result.IsUpdateAvailable)
                 {
-                    var updateWindow = new UpdateWindow(result);
-                    updateWindow.Owner = this;
-                    updateWindow.ShowDialog();
+                    UpdateWindow.ShowFor(this, result);
                 }
                 else
                 {
